@@ -1,0 +1,17 @@
+{
+  "name": "antigravity-enhancer",
+  "productName": "Antigravity Enhancer",
+  "version": "3.0.0",
+  "description": "Multilingual UI localization and model quota viewer for Antigravity IDE",
+  "homepage": "https://github.com/x2tora/antigravity-enhancer",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/x2tora/antigravity-enhancer.git"
+  },
+  "author": "x2tora",
+  "license": "Apache-2.0",
+  "scripts": {
+    "manifest": "node generate_enhancer_manifest.js",
+    "test": "node tests/e2e/runner.js --feature=F22,F23,F24,F25 --summary -NoKill"
+  }
+}

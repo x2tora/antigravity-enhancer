@@ -1,0 +1,36 @@
+{
+  "version": "3.0.0",
+  "channel": "stable",
+  "minAppVersion": "2.30.0",
+  "testedAppVersion": "2.31.2",
+  "repo": "x2tora/antigravity-enhancer",
+  "updatedAt": "2026-11-12T23:34:27.988Z",
+  "releaseNotes": "v3.0.0: Antigravity 2.31.2 full support (Gemini 4 Hydrogen & Coordinators i18n), Hybrid Zero-Resident Persistence across official app updates, and direct In-App Enhancer Hub self-updater.",
+  "files": {
+    "main-enhancer.js": {
+      "size": 27743,
+      "sha256": "03a6a1712ba5d0af3f750dfd19b73a620a017651c6452e7a7d05d8b1c633ca5c",
+      "restartRequired": true
+    },
+    "asar-patcher.js": {
+      "size": 11943,
+      "sha256": "c82d9c27bb86add36a2d51a7b9b6ee1ef3c1bb60e06a7180e2fac4855c0672da",
+      "restartRequired": true
+    },
+    "renderer-enhancer.js": {
+      "size": 106296,
+      "sha256": "6dcee3386230e0b7175fa4c9affe3e89a00acf19acf8651c58bcb99c21947f90",
+      "restartRequired": false
+    },
+    "gsap-core.js": {
+      "size": 74001,
+      "sha256": "269fb64b327f77b5d4e03a12ceabfbd38933dc48328ce719b120d44b169563be",
+      "restartRequired": false
+    },
+    "dictionaries.json": {
+      "size": 3514595,
+      "sha256": "b120f03de2b4f628e569911bf692c538154bbcef4b4d98e0b7150695a22e9063",
+      "restartRequired": false
+    }
+  }
+}

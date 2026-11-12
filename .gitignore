@@ -1,0 +1,20 @@
+# Large raw directories, extracted upstream bundles & build artifacts
+extracted_original/
+extracted_korean/
+extracted_[0-9]*/
+Antigravity_Korean_Patch/
+Antigravity_MultiLang_Patch/
+ui_bundle_*.js
+.agents/
+*.asar
+*.asar.patch
+*.asar.korean
+*.asar.original
+*.exe
+*.zip
+*.log
+SHA256SUMS.txt
+PROJECT.md
+TEST_*.md
+.tmp*
+tmp*
