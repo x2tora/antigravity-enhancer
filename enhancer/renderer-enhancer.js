@@ -1,5 +1,5 @@
 /**
- * Antigravity Enhancer v3.3.0 - Modular Renderer Enhancer Engine
+ * Antigravity Enhancer v3.3.1 - Modular Renderer Enhancer Engine
  * Features: 9-Language Zero-Restart i18n, GSAP v3.15.1 Zero-Bounce Motion,
  *           AI Model Quota HUD & Composer Inline Hover Card (2.31.2 Hydrogen/Argon/Gemini/Other),
  *           Native Title-Menu Patch Integration & In-App Updater (x2tora/antigravity-enhancer)
@@ -11,7 +11,7 @@
   const ipc = electron_1 ? electron_1.ipcRenderer : null;
   const payload = (typeof __ENHANCER_PAYLOAD__ !== 'undefined' && __ENHANCER_PAYLOAD__) ? __ENHANCER_PAYLOAD__ : {};
   const ENHANCER_REPO = payload.repo || 'x2tora/antigravity-enhancer';
-  const ENHANCER_CURRENT_VERSION = payload.version || '3.3.0';
+  const ENHANCER_CURRENT_VERSION = payload.version || '3.3.1';
 
   // ---------------------------------------------------------------------------
   // 1. Install GSAP Core into Preload World
@@ -811,6 +811,7 @@
   }
 
   let activeProgressHandler = null;
+  let activeModalLangHandler = null;
   if (ipc && typeof ipc.on === 'function') {
     ipc.on('enhancer:update-progress', (_ev, data) => {
       if (typeof activeProgressHandler === 'function') {
@@ -821,6 +822,10 @@
 
   function closeEnhancerHubModal(immediate = false) {
     activeProgressHandler = null;
+    if (activeModalLangHandler && typeof window !== 'undefined' && typeof window.removeEventListener === 'function') {
+      window.removeEventListener('antigravity-lang-changed', activeModalLangHandler);
+      activeModalLangHandler = null;
+    }
     const backdrop = document.getElementById('antigravity-enhancer-modal-backdrop');
     if (!backdrop) return;
     if (window.gsap && window.gsap.killTweensOf) window.gsap.killTweensOf(backdrop);
@@ -850,7 +855,8 @@
       appVersion: '2.31.2',
       asarBootstrapped: true
     };
-    const h = getHubStrings();
+    let h = getHubStrings();
+    let autoCheckDone = false;
 
     const backdrop = document.createElement('div');
     backdrop.id = 'antigravity-enhancer-modal-backdrop';
@@ -865,6 +871,7 @@
     modal.style.cssText = 'width:400px;max-width:94vw;max-height:88vh;overflow-y:auto;border-radius:12px;background:#0B0B0E;border:1px solid rgba(202,211,245,0.14);box-shadow:0 16px 40px rgba(0,0,0,0.6);padding:16px;color:#CAD3F5;font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable",Pretendard,"Segoe UI",sans-serif;font-size:13px;';
 
     const renderModalContent = (activeMode) => {
+      h = getHubStrings();
       if (activeMode === 'restore') {
         modal.innerHTML = `
           <header style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:12px;border-bottom:1px solid rgba(202,211,245,0.1);">
@@ -1028,7 +1035,8 @@
         if (document.body.contains(modal)) renderUpdateUI(res);
       };
 
-      if (opts.autoCheck) {
+      if (opts.autoCheck && !autoCheckDone) {
+        autoCheckDone = true;
         updateStatusEl.textContent = h.checking;
         checkEnhancerGithubUpdate(true).then((res) => {
           if (document.body.contains(modal)) renderUpdateUI(res || enhancerUpdateInfo || status.lastRemoteInfo);
@@ -1044,7 +1052,16 @@
     }
 
     backdrop.onclick = (e) => { if (e.target === backdrop) closeEnhancerHubModal(); };
-    renderModalContent(mode === 'restore' ? 'restore' : 'update');
+    const currentMode = (mode === 'restore' ? 'restore' : 'update');
+    renderModalContent(currentMode);
+    if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+      activeModalLangHandler = () => {
+        if (document.getElementById('antigravity-enhancer-modal-backdrop')) {
+          renderModalContent(currentMode);
+        }
+      };
+      window.addEventListener('antigravity-lang-changed', activeModalLangHandler);
+    }
   }
 
   // ---------------------------------------------------------------------------
