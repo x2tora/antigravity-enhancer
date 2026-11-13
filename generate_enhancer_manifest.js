@@ -7,7 +7,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
-const VERSION = '3.1.0';
+const VERSION = '3.2.0';
 const REPO = 'x2tora/antigravity-enhancer';
 const enhancerDir = path.join(__dirname, 'enhancer');
 
@@ -45,7 +45,7 @@ const manifest = {
   testedAppVersion: '2.31.2',
   repo: REPO,
   updatedAt: new Date().toISOString(),
-  releaseNotes: 'v3.1.0: Full 9-language New Conversation greetings & placeholders, OS-language auto-detected Windows installer, and streamlined direct launch without standalone launcher executable.',
+  releaseNotes: 'v3.2.0: Antigravity Enhanced title badge & native menu integration (Patch Version / Check Patch Updates / Restore Original), unified native styling, composer hover-only single-model quota card, and 9-language README & release docs.',
   files
 };
 

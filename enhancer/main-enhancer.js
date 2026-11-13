@@ -1,5 +1,5 @@
 /**
- * Antigravity Enhancer v3.1.0 - Main Process Bridge, Persistence & Secure In-App Updater
+ * Antigravity Enhancer v3.2.0 - Main Process Bridge, Persistence & Secure In-App Updater
  * Source Repo: https://github.com/x2tora/antigravity-enhancer
  */
 'use strict';
@@ -98,7 +98,7 @@ function writeBufferAtomic(filePath, buf) {
 
 function getLocalManifest() {
   const m = readJsonSafe(path.join(enhancerDir, 'manifest.json'), null);
-  return m || { version: '3.1.0', repo: ENHANCER_REPO, files: {} };
+  return m || { version: '3.2.0', repo: ENHANCER_REPO, files: {} };
 }
 
 function compareSemver(v1, v2) {
@@ -148,7 +148,7 @@ function httpsGetBufferNode(rawUrl, headers = {}, timeoutMs = 20000, maxBytes = 
 
     const req = https.get(rawUrl, {
       headers: {
-        'User-Agent': 'Antigravity-Enhancer/3.1.0',
+        'User-Agent': 'Antigravity-Enhancer/3.2.0',
         ...headers
       }
     }, (res) => {
@@ -209,7 +209,7 @@ async function secureFetchBuffer(rawUrl, options = {}) {
         method: 'GET',
         redirect: 'manual',
         headers: {
-          'User-Agent': 'Antigravity-Enhancer/3.1.0',
+          'User-Agent': 'Antigravity-Enhancer/3.2.0',
           ...headers
         },
         signal: controller.signal
@@ -341,7 +341,7 @@ function loadBootstrapPayload(forceRefresh = false) {
 
     cachedBootstrapPayload = {
       disabled: false,
-      version: manifest.version || '3.1.0',
+      version: manifest.version || '3.2.0',
       repo: ENHANCER_REPO,
       code: rendererCode,
       gsapCode,
@@ -412,7 +412,7 @@ function restoreFromBackupDir(backupDir) {
   return {
     ok: true,
     previousVersion: currentManifest.version,
-    restoredVersion: restoredManifest.version || '3.1.0',
+    restoredVersion: restoredManifest.version || '3.2.0',
     restartRequired
   };
 }
@@ -428,7 +428,7 @@ function getFullStatus() {
   } catch (_) {}
 
   return {
-    enhancerVersion: manifest.version || '3.1.0',
+    enhancerVersion: manifest.version || '3.2.0',
     appVersion: (el && el.app && el.app.getVersion) ? el.app.getVersion() : 'unknown',
     repo: ENHANCER_REPO,
     enhancerDir,
@@ -444,7 +444,7 @@ function getFullStatus() {
 
 async function checkRemoteUpdate() {
   const local = getLocalManifest();
-  const localVer = local.version || '3.1.0';
+  const localVer = local.version || '3.2.0';
   const cacheBust = `?t=${Date.now()}`;
 
   let remoteManifest = null;
@@ -525,7 +525,7 @@ async function checkRemoteUpdate() {
 
 async function applyInAppUpdate(refBranch = 'main') {
   const local = getLocalManifest();
-  const prevVersion = local.version || '3.1.0';
+  const prevVersion = local.version || '3.2.0';
 
   broadcastEvent('enhancer:update-progress', { phase: 'manifest', percent: 8, message: 'Fetching signed manifest...' });
   const manifestUrl = `https://raw.githubusercontent.com/${ENHANCER_REPO}/${encodeURIComponent(refBranch)}/enhancer/manifest.json?t=${Date.now()}`;

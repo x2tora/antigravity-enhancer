@@ -1,8 +1,8 @@
 /**
- * Antigravity Enhancer v3.1.0 - Modular Renderer Enhancer Engine
+ * Antigravity Enhancer v3.2.0 - Modular Renderer Enhancer Engine
  * Features: 9-Language Zero-Restart i18n, GSAP v3.15.1 Zero-Bounce Motion,
- *           AI Model Quota HUD & Composer Inline Badge (2.31.2 Hydrogen/Argon/Gemini/Claude),
- *           In-App Enhancer Hub & Direct Update Engine (x2tora/antigravity-enhancer)
+ *           AI Model Quota HUD & Composer Inline Hover Card (2.31.2 Hydrogen/Argon/Gemini/Claude),
+ *           Native Title-Menu Patch Integration & In-App Updater (x2tora/antigravity-enhancer)
  */
 (function () {
   'use strict';
@@ -11,7 +11,7 @@
   const ipc = electron_1 ? electron_1.ipcRenderer : null;
   const payload = (typeof __ENHANCER_PAYLOAD__ !== 'undefined' && __ENHANCER_PAYLOAD__) ? __ENHANCER_PAYLOAD__ : {};
   const ENHANCER_REPO = payload.repo || 'x2tora/antigravity-enhancer';
-  const ENHANCER_CURRENT_VERSION = payload.version || '3.1.0';
+  const ENHANCER_CURRENT_VERSION = payload.version || '3.2.0';
 
   // ---------------------------------------------------------------------------
   // 1. Install GSAP Core into Preload World
@@ -112,7 +112,9 @@
       el.closest('#antigravity-lang-quick-switch') ||
       el.closest('#antigravity-quick-lang-menu') ||
       el.closest('#antigravity-lang-dropdown-menu') ||
-      el.closest('#antigravity-enhancer-hub-btn') ||
+      el.closest('#antigravity-enhanced-tag') ||
+      el.closest('#antigravity-enhancer-menu-section') ||
+      el.closest('#antigravity-composer-quota-hovercard') ||
       el.closest('#antigravity-enhancer-modal-backdrop')
     )) {
       return true;
@@ -396,6 +398,20 @@
         .antigravity-copy-success svg, .antigravity-copy-pulse svg {
           stroke: #22c55e !important;
         }
+        #antigravity-quick-lang-menu .agy-overlay-item:hover,
+        #antigravity-lang-dropdown-menu .agy-overlay-item:hover {
+          background: rgba(202, 211, 245, 0.08) !important;
+        }
+        #antigravity-quick-lang-btn:hover,
+        #antigravity-quota-widget:hover {
+          border-color: rgba(160, 163, 246, 0.45) !important;
+        }
+        #antigravity-enhancer-modal .agy-enh-btn:hover:not(:disabled) {
+          background: rgba(202, 211, 245, 0.14) !important;
+        }
+        #antigravity-enhancer-modal .agy-enh-primary:hover:not(:disabled) {
+          opacity: 0.92 !important;
+        }
       `;
       root.appendChild(devStyle);
     }
@@ -482,255 +498,228 @@
 
   const HUB_I18N = {
     en: {
-      hubBtn: 'Enhancer',
-      updatePill: 'Update',
-      title: 'Antigravity Enhancer',
-      subtitle: 'Patch status & updates',
+      title: 'Antigravity Enhanced',
+      patchVersionPrefix: 'Patch Version',
+      checkUpdates: 'Check Patch Updates',
+      restoreVanilla: 'Restore Original',
       curVer: 'Patch Version',
       appVer: 'App Version',
-      persistenceTitle: 'Persistence Status',
-      asarOk: 'ASAR Active',
-      asarWarn: 'ASAR Repair Needed',
-      repairBtn: 'Verify & Repair',
-      repairedMsg: 'Status verified.',
-      updateSection: 'Updates (x2tora/antigravity-enhancer)',
+      updateSection: 'Updates',
       checkBtn: 'Check',
       checking: 'Checking...',
       upToDate: 'Up to date.',
       availPrefix: 'Update available: ',
       updateNow: 'Update',
       updating: 'Updating...',
+      updateDoneSuffix: ' installed.',
       openRelease: 'Open Release',
       reloadNow: 'Reload Window',
       restartNow: 'Restart App',
-      rollbackBtn: 'Rollback',
-      noBackup: 'No backup',
-      vanillaBtn: 'Restore Original',
-      vanillaConfirm: 'Click again to restore original',
-      safeModeWarn: 'Safe mode enabled'
+      closeBtn: 'Close',
+      cancelBtn: 'Cancel',
+      restoreConfirmTitle: 'Restore Original Files',
+      restoreConfirmDesc: 'Remove Antigravity Enhanced patches and restart Antigravity with original files?',
+      restoring: 'Restoring...',
+      safeModeWarn: 'Safe mode active'
     },
     ko: {
-      hubBtn: '패치 설정',
-      updatePill: '업데이트',
-      title: 'Antigravity Enhancer',
-      subtitle: '패치 상태 및 업데이트',
+      title: 'Antigravity Enhanced',
+      patchVersionPrefix: '패치 버전',
+      checkUpdates: '패치 업데이트 확인',
+      restoreVanilla: '원본 복구',
       curVer: '패치 버전',
       appVer: '앱 버전',
-      persistenceTitle: '업데이트 유지 상태',
-      asarOk: 'ASAR 연결됨',
-      asarWarn: 'ASAR 복구 필요',
-      repairBtn: '점검 및 복구',
-      repairedMsg: '상태를 복구했습니다.',
-      updateSection: '업데이트 (x2tora/antigravity-enhancer)',
+      updateSection: '업데이트',
       checkBtn: '확인',
       checking: '확인 중...',
       upToDate: '최신 버전입니다.',
       availPrefix: '새 버전: ',
       updateNow: '업데이트',
       updating: '업데이트 중...',
+      updateDoneSuffix: ' 설치 완료.',
       openRelease: '릴리즈 열기',
       reloadNow: '창 새로고침',
       restartNow: '앱 재시작',
-      rollbackBtn: '이전 버전 복원',
-      noBackup: '백업 없음',
-      vanillaBtn: '원본 복구',
-      vanillaConfirm: '한 번 더 누르면 원본으로 복구합니다',
-      safeModeWarn: '안전 모드가 활성화되었습니다'
+      closeBtn: '닫기',
+      cancelBtn: '취소',
+      restoreConfirmTitle: '원본 복구',
+      restoreConfirmDesc: 'Antigravity Enhanced 패치를 제거하고 원본 상태로 되돌린 뒤 앱을 재시작하시겠습니까?',
+      restoring: '복구 중...',
+      safeModeWarn: '안전 모드 활성화'
     },
     ja: {
-      hubBtn: 'パッチ',
-      updatePill: '更新',
-      title: 'Antigravity Enhancer',
-      subtitle: 'パッチ状態と更新',
-      curVer: 'パッチ版',
-      appVer: 'アプリ版',
-      persistenceTitle: '更新維持ステータス',
-      asarOk: 'ASAR 有効',
-      asarWarn: 'ASAR 修復が必要',
-      repairBtn: '確認 / 修復',
-      repairedMsg: '状態を確認しました。',
-      updateSection: '更新 (x2tora/antigravity-enhancer)',
+      title: 'Antigravity Enhanced',
+      patchVersionPrefix: 'パッチバージョン',
+      checkUpdates: 'パッチの更新を確認',
+      restoreVanilla: 'オリジナルに戻す',
+      curVer: 'パッチバージョン',
+      appVer: 'アプリバージョン',
+      updateSection: '更新',
       checkBtn: '確認',
       checking: '確認中...',
       upToDate: '最新バージョンです。',
       availPrefix: '新しいバージョン: ',
       updateNow: '更新する',
       updating: '更新中...',
+      updateDoneSuffix: ' を適用しました。',
       openRelease: 'リリースを開く',
       reloadNow: '再読み込み',
       restartNow: '再起動',
-      rollbackBtn: '前バージョンに戻す',
-      noBackup: 'バックアップなし',
-      vanillaBtn: 'オリジナル復元',
-      vanillaConfirm: 'もう一度クリックで復元します',
+      closeBtn: '閉じる',
+      cancelBtn: 'キャンセル',
+      restoreConfirmTitle: 'オリジナルに戻す',
+      restoreConfirmDesc: 'Antigravity Enhanced パッチを削除して元の状態に戻し、アプリを再起動しますか？',
+      restoring: '復元中...',
       safeModeWarn: 'セーフモード有効'
     },
     'zh-CN': {
-      hubBtn: '补丁',
-      updatePill: '更新',
-      title: 'Antigravity Enhancer',
-      subtitle: '补丁状态与更新',
+      title: 'Antigravity Enhanced',
+      patchVersionPrefix: '补丁版本',
+      checkUpdates: '检查补丁更新',
+      restoreVanilla: '恢复原版',
       curVer: '补丁版本',
       appVer: '应用版本',
-      persistenceTitle: '更新保留状态',
-      asarOk: 'ASAR 正常',
-      asarWarn: 'ASAR 需修复',
-      repairBtn: '检查并修复',
-      repairedMsg: '状态已修复。',
-      updateSection: '更新 (x2tora/antigravity-enhancer)',
+      updateSection: '更新',
       checkBtn: '检查更新',
       checking: '检查中...',
       upToDate: '已是最新版本。',
       availPrefix: '发现新版本: ',
       updateNow: '更新',
       updating: '更新中...',
+      updateDoneSuffix: ' 已安装。',
       openRelease: '打开发布页',
       reloadNow: '重新加载窗口',
       restartNow: '重启应用',
-      rollbackBtn: '回滚上一版',
-      noBackup: '暂无备份',
-      vanillaBtn: '恢复原版',
-      vanillaConfirm: '再次点击恢复原版',
+      closeBtn: '关闭',
+      cancelBtn: '取消',
+      restoreConfirmTitle: '恢复原版',
+      restoreConfirmDesc: '是否移除 Antigravity Enhanced 补丁并恢复为原版文件后重启应用？',
+      restoring: '正在恢复...',
       safeModeWarn: '安全模式已启用'
     },
     'zh-TW': {
-      hubBtn: '修補',
-      updatePill: '更新',
-      title: 'Antigravity Enhancer',
-      subtitle: '修補狀態與更新',
+      title: 'Antigravity Enhanced',
+      patchVersionPrefix: '修補版本',
+      checkUpdates: '檢查修補更新',
+      restoreVanilla: '還原原版',
       curVer: '修補版本',
       appVer: '應用版本',
-      persistenceTitle: '更新保留狀態',
-      asarOk: 'ASAR 正常',
-      asarWarn: 'ASAR 需修復',
-      repairBtn: '檢查並修復',
-      repairedMsg: '狀態已修復。',
-      updateSection: '更新 (x2tora/antigravity-enhancer)',
+      updateSection: '更新',
       checkBtn: '檢查更新',
       checking: '檢查中...',
       upToDate: '目前已是最新版本。',
       availPrefix: '新版本: ',
       updateNow: '更新',
       updating: '更新中...',
+      updateDoneSuffix: ' 已安裝。',
       openRelease: '開啟發佈頁面',
       reloadNow: '重新載入視窗',
       restartNow: '重新啟動',
-      rollbackBtn: '復原前一版本',
-      noBackup: '尚無備份',
-      vanillaBtn: '還原原版',
-      vanillaConfirm: '再次點擊還原原版',
+      closeBtn: '關閉',
+      cancelBtn: '取消',
+      restoreConfirmTitle: '還原原版',
+      restoreConfirmDesc: '是否移除 Antigravity Enhanced 修補並還原為原版檔案後重新啟動應用程式？',
+      restoring: '正在還原...',
       safeModeWarn: '安全模式已啟用'
     },
     es: {
-      hubBtn: 'Parche',
-      updatePill: 'Actualizar',
-      title: 'Antigravity Enhancer',
-      subtitle: 'Estado y actualizaciones',
+      title: 'Antigravity Enhanced',
+      patchVersionPrefix: 'Versión del parche',
+      checkUpdates: 'Buscar actualizaciones del parche',
+      restoreVanilla: 'Restaurar original',
       curVer: 'Versión del parche',
       appVer: 'Versión de la app',
-      persistenceTitle: 'Persistencia',
-      asarOk: 'ASAR activo',
-      asarWarn: 'Reparar ASAR',
-      repairBtn: 'Verificar y reparar',
-      repairedMsg: 'Estado verificado.',
-      updateSection: 'Actualizaciones (x2tora/antigravity-enhancer)',
+      updateSection: 'Actualizaciones',
       checkBtn: 'Buscar',
       checking: 'Buscando...',
       upToDate: 'Está actualizado.',
       availPrefix: 'Disponible: ',
       updateNow: 'Actualizar',
       updating: 'Actualizando...',
+      updateDoneSuffix: ' instalado.',
       openRelease: 'Abrir versión',
       reloadNow: 'Recargar ventana',
       restartNow: 'Reiniciar app',
-      rollbackBtn: 'Revertir',
-      noBackup: 'Sin copia',
-      vanillaBtn: 'Restaurar original',
-      vanillaConfirm: 'Haz clic otra vez para restaurar',
+      closeBtn: 'Cerrar',
+      cancelBtn: 'Cancelar',
+      restoreConfirmTitle: 'Restaurar original',
+      restoreConfirmDesc: '¿Eliminar los parches de Antigravity Enhanced, restaurar los archivos originales y reiniciar?',
+      restoring: 'Restaurando...',
       safeModeWarn: 'Modo seguro activo'
     },
     fr: {
-      hubBtn: 'Patch',
-      updatePill: 'MàJ',
-      title: 'Antigravity Enhancer',
-      subtitle: 'État et mises à jour',
+      title: 'Antigravity Enhanced',
+      patchVersionPrefix: 'Version du patch',
+      checkUpdates: 'Vérifier les mises à jour du patch',
+      restoreVanilla: 'Restaurer l’original',
       curVer: 'Version du patch',
       appVer: 'Version de l’app',
-      persistenceTitle: 'Persistance',
-      asarOk: 'ASAR actif',
-      asarWarn: 'ASAR à réparer',
-      repairBtn: 'Vérifier et réparer',
-      repairedMsg: 'État vérifié.',
-      updateSection: 'Mises à jour (x2tora/antigravity-enhancer)',
+      updateSection: 'Mises à jour',
       checkBtn: 'Vérifier',
       checking: 'Vérification...',
       upToDate: 'À jour.',
       availPrefix: 'Disponible : ',
       updateNow: 'Mettre à jour',
       updating: 'Mise à jour...',
+      updateDoneSuffix: ' installé.',
       openRelease: 'Ouvrir',
       reloadNow: 'Recharger',
       restartNow: 'Redémarrer',
-      rollbackBtn: 'Rétablir',
-      noBackup: 'Aucune sauvegarde',
-      vanillaBtn: 'Restaurer l’original',
-      vanillaConfirm: 'Cliquer encore pour restaurer',
+      closeBtn: 'Fermer',
+      cancelBtn: 'Annuler',
+      restoreConfirmTitle: 'Restaurer l’original',
+      restoreConfirmDesc: 'Supprimer les correctifs Antigravity Enhanced, restaurer les fichiers d’origine et redémarrer ?',
+      restoring: 'Restauration...',
       safeModeWarn: 'Mode sans échec actif'
     },
     de: {
-      hubBtn: 'Patch',
-      updatePill: 'Update',
-      title: 'Antigravity Enhancer',
-      subtitle: 'Status und Updates',
+      title: 'Antigravity Enhanced',
+      patchVersionPrefix: 'Patch-Version',
+      checkUpdates: 'Nach Patch-Updates suchen',
+      restoreVanilla: 'Original wiederherstellen',
       curVer: 'Patch-Version',
       appVer: 'App-Version',
-      persistenceTitle: 'Persistenzstatus',
-      asarOk: 'ASAR aktiv',
-      asarWarn: 'ASAR reparieren',
-      repairBtn: 'Prüfen / Reparieren',
-      repairedMsg: 'Status geprüft.',
-      updateSection: 'Updates (x2tora/antigravity-enhancer)',
+      updateSection: 'Updates',
       checkBtn: 'Prüfen',
       checking: 'Prüfe...',
       upToDate: 'Aktuell.',
       availPrefix: 'Verfügbar: ',
       updateNow: 'Aktualisieren',
       updating: 'Aktualisiere...',
+      updateDoneSuffix: ' installiert.',
       openRelease: 'Release öffnen',
       reloadNow: 'Neu laden',
       restartNow: 'App neu starten',
-      rollbackBtn: 'Zurücksetzen',
-      noBackup: 'Kein Backup',
-      vanillaBtn: 'Original wiederherstellen',
-      vanillaConfirm: 'Erneut klicken zum Wiederherstellen',
+      closeBtn: 'Schließen',
+      cancelBtn: 'Abbrechen',
+      restoreConfirmTitle: 'Original wiederherstellen',
+      restoreConfirmDesc: 'Antigravity Enhanced-Patches entfernen, Originaldateien wiederherstellen und neu starten?',
+      restoring: 'Wird wiederhergestellt...',
       safeModeWarn: 'Abgesicherter Modus aktiv'
     },
     ru: {
-      hubBtn: 'Патч',
-      updatePill: 'Обновл.',
-      title: 'Antigravity Enhancer',
-      subtitle: 'Состояние и обновления',
+      title: 'Antigravity Enhanced',
+      patchVersionPrefix: 'Версия патча',
+      checkUpdates: 'Проверить обновления патча',
+      restoreVanilla: 'Восстановить оригинал',
       curVer: 'Версия патча',
       appVer: 'Версия приложения',
-      persistenceTitle: 'Состояние защиты',
-      asarOk: 'ASAR активен',
-      asarWarn: 'Нужно восстановление ASAR',
-      repairBtn: 'Проверить / восстановить',
-      repairedMsg: 'Состояние проверено.',
-      updateSection: 'Обновления (x2tora/antigravity-enhancer)',
+      updateSection: 'Обновления',
       checkBtn: 'Проверить',
       checking: 'Проверка...',
       upToDate: 'Актуальная версия.',
       availPrefix: 'Доступна версия: ',
       updateNow: 'Обновить',
       updating: 'Обновление...',
+      updateDoneSuffix: ' установлен.',
       openRelease: 'Открыть релиз',
       reloadNow: 'Перезагрузить окно',
       restartNow: 'Перезапустить',
-      rollbackBtn: 'Откатить',
-      noBackup: 'Нет резервной копии',
-      vanillaBtn: 'Восстановить оригинал',
-      vanillaConfirm: 'Нажмите ещё раз для восстановления',
+      closeBtn: 'Закрыть',
+      cancelBtn: 'Отмена',
+      restoreConfirmTitle: 'Восстановить оригинал',
+      restoreConfirmDesc: 'Удалить патчи Antigravity Enhanced, восстановить исходные файлы и перезапустить приложение?',
+      restoring: 'Восстановление...',
       safeModeWarn: 'Включён безопасный режим'
     }
   };
@@ -757,7 +746,7 @@
       const res = await ipc.invoke('enhancer:check-update');
       if (res && res.ok) {
         enhancerUpdateInfo = res;
-        scheduleInjectQuickLanguageButton();
+        scheduleInjectTitleMenuIntegration();
       }
       return res;
     } catch (_) {
@@ -774,11 +763,12 @@
     });
   }
 
-  function closeEnhancerHubModal() {
+  function closeEnhancerHubModal(immediate = false) {
     activeProgressHandler = null;
     const backdrop = document.getElementById('antigravity-enhancer-modal-backdrop');
     if (!backdrop) return;
-    if (window.gsap) {
+    if (window.gsap && window.gsap.killTweensOf) window.gsap.killTweensOf(backdrop);
+    if (!immediate && window.gsap) {
       window.gsap.to(backdrop, {
         opacity: 0,
         duration: 0.12,
@@ -790,97 +780,200 @@
     }
   }
 
-  async function openEnhancerHubModal() {
+  async function openEnhancerHubModal(mode = 'update', opts = {}) {
     const existing = document.getElementById('antigravity-enhancer-modal-backdrop');
     if (existing) {
-      closeEnhancerHubModal();
-      return;
+      if (!opts.forceOpen) {
+        closeEnhancerHubModal(false);
+        return;
+      }
+      closeEnhancerHubModal(true);
     }
     const status = await refreshHubStatus() || {
       enhancerVersion: ENHANCER_CURRENT_VERSION,
       appVersion: '2.31.2',
-      asarBootstrapped: true,
-      backup: { available: false }
+      asarBootstrapped: true
     };
     const h = getHubStrings();
 
     const backdrop = document.createElement('div');
     backdrop.id = 'antigravity-enhancer-modal-backdrop';
-    backdrop.style.cssText = 'position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;background:rgba(11,11,14,0.78);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);padding:20px;app-region:no-drag;-webkit-app-region:no-drag;';
+    backdrop.className = 'notranslate';
+    backdrop.setAttribute('translate', 'no');
+    backdrop.style.cssText = 'position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;background:rgba(11,11,14,0.72);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);padding:20px;app-region:no-drag;-webkit-app-region:no-drag;';
 
     const modal = document.createElement('div');
     modal.id = 'antigravity-enhancer-modal';
-    modal.className = 'border bg-card text-foreground shadow-2xl';
-    modal.style.cssText = 'width:480px;max-width:95vw;max-height:90vh;overflow-y:auto;border-radius:12px;background:#0B0B0E;border:1px solid rgba(202,211,245,0.14);box-shadow:0 20px 48px rgba(0,0,0,0.65);padding:20px;color:#CAD3F5;font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable",Pretendard,"Segoe UI",sans-serif;font-size:13px;';
+    modal.className = 'agy-overlay border rounded-xl text-foreground shadow-lg notranslate';
+    modal.setAttribute('translate', 'no');
+    modal.style.cssText = 'width:400px;max-width:94vw;max-height:88vh;overflow-y:auto;border-radius:12px;background:#0B0B0E;border:1px solid rgba(202,211,245,0.14);box-shadow:0 16px 40px rgba(0,0,0,0.6);padding:16px;color:#CAD3F5;font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable",Pretendard,"Segoe UI",sans-serif;font-size:13px;';
 
-    const badgePill = (ok, label) => {
-      const bg = ok ? 'rgba(160,163,246,0.14)' : 'rgba(202,211,245,0.06)';
-      const border = ok ? 'rgba(160,163,246,0.4)' : 'rgba(202,211,245,0.18)';
-      const color = ok ? '#A0A3F6' : '#8A93B2';
-      const dot = `<span style="width:6px;height:6px;border-radius:50%;background:${color};display:inline-block;flex-shrink:0;"></span>`;
-      return `<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:9999px;background:${bg};border:1px solid ${border};color:${color};font-size:11px;font-weight:600;">${dot}${label}</span>`;
+    const renderModalContent = (activeMode) => {
+      if (activeMode === 'restore') {
+        modal.innerHTML = `
+          <header style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:12px;border-bottom:1px solid rgba(202,211,245,0.1);">
+            <span style="font-size:14px;font-weight:600;color:#CAD3F5;letter-spacing:-0.01em;">${h.restoreConfirmTitle}</span>
+            <button id="agy-hub-close" type="button" class="agy-enh-btn" style="background:rgba(202,211,245,0.06);border:1px solid rgba(202,211,245,0.12);color:#CAD3F5;border-radius:6px;width:24px;height:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;line-height:1;">×</button>
+          </header>
+          <p style="margin:0;padding:14px 0 16px;font-size:12.5px;color:#CAD3F5;line-height:1.5;opacity:0.9;">${h.restoreConfirmDesc}</p>
+          <footer style="display:flex;align-items:center;justify-content:flex-end;gap:8px;padding-top:10px;border-top:1px solid rgba(202,211,245,0.1);">
+            <button id="agy-hub-cancel-restore" type="button" class="agy-enh-btn" style="padding:6px 12px;border-radius:6px;background:rgba(202,211,245,0.06);border:1px solid rgba(202,211,245,0.14);color:#CAD3F5;font-size:12px;font-weight:500;cursor:pointer;">${h.cancelBtn}</button>
+            <button id="agy-hub-confirm-restore" type="button" class="agy-enh-primary" style="padding:6px 12px;border-radius:6px;background:#A0A3F6;border:none;color:#0B0B0E;font-size:12px;font-weight:600;cursor:pointer;">${h.restoreVanilla}</button>
+          </footer>
+        `;
+        modal.querySelector('#agy-hub-close').onclick = () => closeEnhancerHubModal();
+        modal.querySelector('#agy-hub-cancel-restore').onclick = () => closeEnhancerHubModal();
+        const confirmBtn = modal.querySelector('#agy-hub-confirm-restore');
+        confirmBtn.onclick = async () => {
+          confirmBtn.disabled = true;
+          confirmBtn.textContent = h.restoring;
+          await ipc.invoke('enhancer:restore-vanilla');
+        };
+        return;
+      }
+
+      modal.innerHTML = `
+        <header style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:12px;border-bottom:1px solid rgba(202,211,245,0.1);margin-bottom:12px;">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="font-size:14px;font-weight:600;color:#CAD3F5;letter-spacing:-0.01em;">Antigravity</span>
+            <span style="font-size:14px;font-weight:600;color:#A0A3F6;letter-spacing:-0.01em;">Enhanced</span>
+          </div>
+          <button id="agy-hub-close" type="button" class="agy-enh-btn" style="background:rgba(202,211,245,0.06);border:1px solid rgba(202,211,245,0.12);color:#CAD3F5;border-radius:6px;width:24px;height:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;line-height:1;">×</button>
+        </header>
+
+        ${status.safeMode ? `<p style="margin:0 0 12px;padding:8px 10px;border-radius:8px;background:rgba(160,163,246,0.1);border:1px solid rgba(160,163,246,0.35);color:#CAD3F5;font-size:11.5px;">${h.safeModeWarn}</p>` : ''}
+
+        <section class="agy-card rounded-xl border divide-y" style="border-radius:10px;background:rgba(202,211,245,0.03);border:1px solid rgba(202,211,245,0.1);margin-bottom:12px;overflow:hidden;">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border-bottom:1px solid rgba(202,211,245,0.08);">
+            <span style="font-size:12.5px;color:#CAD3F5;">${h.curVer}</span>
+            <span style="font-size:12.5px;font-weight:600;color:#A0A3F6;">v${status.enhancerVersion || ENHANCER_CURRENT_VERSION}</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;">
+            <span style="font-size:12.5px;color:#CAD3F5;">${h.appVer}</span>
+            <span style="font-size:12.5px;font-weight:500;color:#CAD3F5;opacity:0.85;">v${status.appVersion || '2.31.2'}</span>
+          </div>
+        </section>
+
+        <section class="agy-card rounded-xl border" style="padding:10px 12px;border-radius:10px;background:rgba(202,211,245,0.03);border:1px solid rgba(202,211,245,0.12);margin-bottom:12px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;">
+            <span style="font-size:12.5px;font-weight:600;color:#CAD3F5;">${h.updateSection}</span>
+            <button id="agy-hub-check-btn" type="button" class="agy-enh-btn" style="padding:4px 10px;border-radius:6px;background:rgba(160,163,246,0.14);border:1px solid rgba(160,163,246,0.38);color:#A0A3F6;font-size:11.5px;font-weight:600;cursor:pointer;">${h.checkBtn}</button>
+          </div>
+          <p id="agy-hub-update-status" style="margin:0;font-size:12px;color:#CAD3F5;line-height:1.45;"></p>
+          <aside id="agy-hub-progress-wrap" style="display:none;margin-top:8px;">
+            <div style="height:4px;border-radius:9999px;background:rgba(202,211,245,0.12);overflow:hidden;">
+              <span id="agy-hub-progress-bar" style="display:block;width:0%;height:100%;background:#A0A3F6;border-radius:9999px;"></span>
+            </div>
+            <p id="agy-hub-progress-text" style="margin:4px 0 0;font-size:11px;color:#CAD3F5;opacity:0.7;"></p>
+          </aside>
+          <div id="agy-hub-update-actions" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;"></div>
+        </section>
+
+        <footer style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:10px;border-top:1px solid rgba(202,211,245,0.1);">
+          <button id="agy-hub-vanilla-btn" type="button" class="agy-enh-btn" style="padding:5px 11px;border-radius:6px;background:rgba(202,211,245,0.06);border:1px solid rgba(202,211,245,0.14);color:#CAD3F5;font-size:12px;font-weight:500;cursor:pointer;">${h.restoreVanilla}</button>
+          <button id="agy-hub-close-footer" type="button" class="agy-enh-btn" style="padding:5px 11px;border-radius:6px;background:rgba(202,211,245,0.06);border:1px solid rgba(202,211,245,0.14);color:#CAD3F5;font-size:12px;font-weight:500;cursor:pointer;">${h.closeBtn}</button>
+        </footer>
+      `;
+
+      modal.querySelector('#agy-hub-close').onclick = () => closeEnhancerHubModal();
+      modal.querySelector('#agy-hub-close-footer').onclick = () => closeEnhancerHubModal();
+      modal.querySelector('#agy-hub-vanilla-btn').onclick = () => renderModalContent('restore');
+
+      const updateStatusEl = modal.querySelector('#agy-hub-update-status');
+      const updateActionsEl = modal.querySelector('#agy-hub-update-actions');
+      const progWrap = modal.querySelector('#agy-hub-progress-wrap');
+      const progBar = modal.querySelector('#agy-hub-progress-bar');
+      const progText = modal.querySelector('#agy-hub-progress-text');
+
+      const renderUpdateUI = (info) => {
+        updateActionsEl.innerHTML = '';
+        if (!info) {
+          updateStatusEl.textContent = h.upToDate;
+          return;
+        }
+        if (!info.ok) {
+          updateStatusEl.innerHTML = `<span style="color:#f87171;">${info.error || 'Error checking updates'}</span>`;
+          return;
+        }
+        if (!info.hasUpdate) {
+          updateStatusEl.innerHTML = `<span style="color:#A0A3F6;">${h.upToDate} (v${info.currentVersion})</span>`;
+          return;
+        }
+
+        const notesHtml = info.releaseNotes
+          ? `<div style="margin-top:6px;padding:7px 9px;border-radius:6px;background:#0B0B0E;border:1px solid rgba(202,211,245,0.1);font-size:11px;color:#CAD3F5;max-height:80px;overflow-y:auto;">${String(info.releaseNotes).replace(/</g, '&lt;')}</div>`
+          : '';
+        updateStatusEl.innerHTML = `<span style="color:#A0A3F6;font-weight:600;">${h.availPrefix}v${info.currentVersion} → v${info.remoteVersion}</span>${notesHtml}`;
+
+        if (info.canApplyInApp) {
+          const applyBtn = document.createElement('button');
+          applyBtn.type = 'button';
+          applyBtn.className = 'agy-enh-primary';
+          applyBtn.textContent = h.updateNow;
+          applyBtn.style.cssText = 'padding:5px 12px;border-radius:6px;background:#A0A3F6;border:none;color:#0B0B0E;font-size:12px;font-weight:600;cursor:pointer;';
+          applyBtn.onclick = async () => {
+            applyBtn.disabled = true;
+            applyBtn.textContent = h.updating;
+            progWrap.style.display = 'block';
+            const res = await ipc.invoke('enhancer:apply-update');
+            if (res && res.ok) {
+              progBar.style.width = '100%';
+              updateStatusEl.innerHTML = `<span style="color:#A0A3F6;font-weight:600;">v${res.newVersion}${h.updateDoneSuffix}</span>`;
+              updateActionsEl.innerHTML = '';
+              const finishBtn = document.createElement('button');
+              finishBtn.type = 'button';
+              finishBtn.className = 'agy-enh-primary';
+              finishBtn.textContent = res.restartRequired ? h.restartNow : h.reloadNow;
+              finishBtn.style.cssText = 'padding:5px 12px;border-radius:6px;background:#A0A3F6;border:none;color:#0B0B0E;font-size:12px;font-weight:600;cursor:pointer;';
+              finishBtn.onclick = () => ipc.invoke(res.restartRequired ? 'enhancer:relaunch' : 'enhancer:reload-windows');
+              updateActionsEl.appendChild(finishBtn);
+            } else {
+              applyBtn.disabled = false;
+              applyBtn.textContent = h.updateNow;
+              updateStatusEl.innerHTML = `<span style="color:#f87171;">${(res && res.error) || 'Update failed'}</span>`;
+            }
+          };
+          updateActionsEl.appendChild(applyBtn);
+        }
+
+        if (info.releasePageUrl) {
+          const relBtn = document.createElement('button');
+          relBtn.type = 'button';
+          relBtn.className = 'agy-enh-btn';
+          relBtn.textContent = h.openRelease;
+          relBtn.style.cssText = 'padding:5px 10px;border-radius:6px;background:rgba(202,211,245,0.06);border:1px solid rgba(202,211,245,0.14);color:#CAD3F5;font-size:11.5px;font-weight:500;cursor:pointer;';
+          relBtn.onclick = () => {
+            const targetUrl = info.exeDownloadUrl || info.releasePageUrl;
+            try { ipc.invoke('shell:open-external', targetUrl); } catch (_) { window.open(targetUrl, '_blank'); }
+          };
+          updateActionsEl.appendChild(relBtn);
+        }
+      };
+
+      activeProgressHandler = (data) => {
+        if (!document.body.contains(modal)) return;
+        progWrap.style.display = 'block';
+        const pct = Math.max(0, Math.min(100, Number(data && data.percent) || 0));
+        progBar.style.width = `${pct}%`;
+        if (data && data.message) progText.textContent = data.message;
+      };
+
+      renderUpdateUI(enhancerUpdateInfo || status.lastRemoteInfo);
+
+      const checkBtn = modal.querySelector('#agy-hub-check-btn');
+      checkBtn.onclick = async () => {
+        updateStatusEl.textContent = h.checking;
+        const res = await checkEnhancerGithubUpdate(true);
+        if (document.body.contains(modal)) renderUpdateUI(res);
+      };
+
+      if (opts.autoCheck) {
+        updateStatusEl.textContent = h.checking;
+        checkEnhancerGithubUpdate(true).then((res) => {
+          if (document.body.contains(modal)) renderUpdateUI(res || enhancerUpdateInfo || status.lastRemoteInfo);
+        });
+      }
     };
-
-    modal.innerHTML = `
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px;">
-        <div>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;background:#121319;border:1px solid rgba(202,211,245,0.18);">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18L12 6L17 18" stroke="#CAD3F5" stroke-width="2.3"></path><line x1="9.8" y1="14.5" x2="14.2" y2="14.5" stroke="#A0A3F6" stroke-width="2.2"></line><circle cx="17.5" cy="7" r="1.6" fill="#A0A3F6"></circle></svg>
-            </span>
-            <span style="font-size:15px;font-weight:700;color:#CAD3F5;letter-spacing:-0.01em;">${h.title}</span>
-          </div>
-          <div style="font-size:11.5px;color:#8A93B2;margin-top:4px;">${h.subtitle}</div>
-        </div>
-        <button id="agy-hub-close" type="button" style="background:#121319;border:1px solid rgba(202,211,245,0.14);color:#8A93B2;border-radius:6px;width:28px;height:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;line-height:1;">×</button>
-      </div>
-
-      ${status.safeMode ? `<div style="margin-bottom:12px;padding:8px 10px;border-radius:8px;background:rgba(160,163,246,0.1);border:1px solid rgba(160,163,246,0.35);color:#CAD3F5;font-size:11.5px;">${h.safeModeWarn}</div>` : ''}
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
-        <div style="padding:10px 12px;border-radius:8px;background:#121319;border:1px solid rgba(202,211,245,0.1);">
-          <div style="font-size:11px;color:#8A93B2;">${h.curVer}</div>
-          <div style="font-size:16px;font-weight:700;color:#A0A3F6;margin-top:2px;">v${status.enhancerVersion || ENHANCER_CURRENT_VERSION}</div>
-        </div>
-        <div style="padding:10px 12px;border-radius:8px;background:#121319;border:1px solid rgba(202,211,245,0.1);">
-          <div style="font-size:11px;color:#8A93B2;">${h.appVer}</div>
-          <div style="font-size:16px;font-weight:700;color:#CAD3F5;margin-top:2px;">v${status.appVersion || '2.31.2'}</div>
-        </div>
-      </div>
-
-      <div style="padding:12px;border-radius:8px;background:#121319;border:1px solid rgba(202,211,245,0.1);margin-bottom:12px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-          <span style="font-size:12px;font-weight:600;color:#CAD3F5;">${h.persistenceTitle}</span>
-          <button id="agy-hub-repair-btn" type="button" style="padding:4px 9px;border-radius:6px;background:#1A1B24;border:1px solid rgba(202,211,245,0.16);color:#CAD3F5;font-size:11px;font-weight:600;cursor:pointer;">${h.repairBtn}</button>
-        </div>
-        <div id="agy-hub-persist-pills" style="display:flex;flex-wrap:wrap;gap:6px;">
-          ${badgePill(status.asarBootstrapped, status.asarBootstrapped ? h.asarOk : h.asarWarn)}
-        </div>
-        <div id="agy-hub-persist-msg" style="font-size:11px;color:#A0A3F6;margin-top:6px;display:none;"></div>
-      </div>
-
-      <div style="padding:12px;border-radius:8px;background:#121319;border:1px solid rgba(160,163,246,0.28);margin-bottom:14px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;">
-          <span style="font-size:12px;font-weight:600;color:#CAD3F5;">${h.updateSection}</span>
-          <button id="agy-hub-check-btn" type="button" style="padding:4px 10px;border-radius:6px;background:rgba(160,163,246,0.16);border:1px solid rgba(160,163,246,0.45);color:#A0A3F6;font-size:11px;font-weight:600;cursor:pointer;">${h.checkBtn}</button>
-        </div>
-        <div id="agy-hub-update-status" style="font-size:12px;color:#CAD3F5;line-height:1.45;"></div>
-        <div id="agy-hub-progress-wrap" style="display:none;margin-top:8px;">
-          <div style="height:5px;border-radius:9999px;background:rgba(202,211,245,0.1);overflow:hidden;">
-            <div id="agy-hub-progress-bar" style="width:0%;height:100%;background:#A0A3F6;border-radius:9999px;"></div>
-          </div>
-          <div id="agy-hub-progress-text" style="font-size:11px;color:#8A93B2;margin-top:4px;"></div>
-        </div>
-        <div id="agy-hub-update-actions" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;"></div>
-      </div>
-
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:10px;border-top:1px solid rgba(202,211,245,0.1);">
-        <button id="agy-hub-rollback-btn" type="button" ${status.backup && status.backup.available ? '' : 'disabled'} style="padding:6px 11px;border-radius:6px;background:#121319;border:1px solid rgba(202,211,245,0.14);color:${status.backup && status.backup.available ? '#CAD3F5' : '#5E6580'};font-size:11.5px;font-weight:600;cursor:${status.backup && status.backup.available ? 'pointer' : 'not-allowed'};">
-          ${status.backup && status.backup.available ? `${h.rollbackBtn} (v${status.backup.version})` : h.noBackup}
-        </button>
-        <button id="agy-hub-vanilla-btn" type="button" style="padding:6px 11px;border-radius:6px;background:#121319;border:1px solid rgba(202,211,245,0.18);color:#CAD3F5;font-size:11.5px;font-weight:600;cursor:pointer;">${h.vanillaBtn}</button>
-      </div>
-    `;
 
     backdrop.appendChild(modal);
     (document.body || document.documentElement).appendChild(backdrop);
@@ -890,127 +983,7 @@
     }
 
     backdrop.onclick = (e) => { if (e.target === backdrop) closeEnhancerHubModal(); };
-    modal.querySelector('#agy-hub-close').onclick = () => closeEnhancerHubModal();
-
-    const updateStatusEl = modal.querySelector('#agy-hub-update-status');
-    const updateActionsEl = modal.querySelector('#agy-hub-update-actions');
-    const progWrap = modal.querySelector('#agy-hub-progress-wrap');
-    const progBar = modal.querySelector('#agy-hub-progress-bar');
-    const progText = modal.querySelector('#agy-hub-progress-text');
-
-    const renderUpdateUI = (info) => {
-      updateActionsEl.innerHTML = '';
-      if (!info) {
-        updateStatusEl.textContent = h.upToDate;
-        return;
-      }
-      if (!info.ok) {
-        updateStatusEl.innerHTML = `<span style="color:#f87171;">${info.error || 'Error checking updates'}</span>`;
-        return;
-      }
-      if (!info.hasUpdate) {
-        updateStatusEl.innerHTML = `<span style="color:#A0A3F6;">${h.upToDate} (v${info.currentVersion})</span>`;
-        return;
-      }
-
-      const notesHtml = info.releaseNotes
-        ? `<div style="margin-top:6px;padding:7px 9px;border-radius:6px;background:#0B0B0E;border:1px solid rgba(202,211,245,0.08);font-size:11px;color:#CAD3F5;max-height:80px;overflow-y:auto;">${String(info.releaseNotes).replace(/</g, '&lt;')}</div>`
-        : '';
-      updateStatusEl.innerHTML = `<span style="color:#A0A3F6;font-weight:600;">${h.availPrefix}v${info.currentVersion} → v${info.remoteVersion}</span>${notesHtml}`;
-
-      if (info.canApplyInApp) {
-        const applyBtn = document.createElement('button');
-        applyBtn.type = 'button';
-        applyBtn.textContent = h.updateNow;
-        applyBtn.style.cssText = 'padding:6px 12px;border-radius:6px;background:#A0A3F6;border:none;color:#0B0B0E;font-size:12px;font-weight:700;cursor:pointer;';
-        applyBtn.onclick = async () => {
-          applyBtn.disabled = true;
-          applyBtn.textContent = h.updating;
-          progWrap.style.display = 'block';
-          const res = await ipc.invoke('enhancer:apply-update');
-          if (res && res.ok) {
-            progBar.style.width = '100%';
-            updateStatusEl.innerHTML = `<span style="color:#A0A3F6;font-weight:600;">v${res.newVersion} 완료</span>`;
-            updateActionsEl.innerHTML = '';
-            const finishBtn = document.createElement('button');
-            finishBtn.type = 'button';
-            finishBtn.textContent = res.restartRequired ? h.restartNow : h.reloadNow;
-            finishBtn.style.cssText = 'padding:6px 12px;border-radius:6px;background:#A0A3F6;border:none;color:#0B0B0E;font-size:12px;font-weight:700;cursor:pointer;';
-            finishBtn.onclick = () => ipc.invoke(res.restartRequired ? 'enhancer:relaunch' : 'enhancer:reload-windows');
-            updateActionsEl.appendChild(finishBtn);
-          } else {
-            applyBtn.disabled = false;
-            applyBtn.textContent = h.updateNow;
-            updateStatusEl.innerHTML = `<span style="color:#f87171;">${(res && res.error) || 'Update failed'}</span>`;
-          }
-        };
-        updateActionsEl.appendChild(applyBtn);
-      }
-
-      if (info.releasePageUrl) {
-        const relBtn = document.createElement('button');
-        relBtn.type = 'button';
-        relBtn.textContent = h.openRelease;
-        relBtn.style.cssText = 'padding:6px 10px;border-radius:6px;background:#1A1B24;border:1px solid rgba(202,211,245,0.16);color:#CAD3F5;font-size:11.5px;font-weight:600;cursor:pointer;';
-        relBtn.onclick = () => {
-          const targetUrl = info.exeDownloadUrl || info.releasePageUrl;
-          try { ipc.invoke('shell:open-external', targetUrl); } catch (_) { window.open(targetUrl, '_blank'); }
-        };
-        updateActionsEl.appendChild(relBtn);
-      }
-    };
-
-    activeProgressHandler = (data) => {
-      if (!document.body.contains(modal)) return;
-      progWrap.style.display = 'block';
-      const pct = Math.max(0, Math.min(100, Number(data && data.percent) || 0));
-      progBar.style.width = `${pct}%`;
-      if (data && data.message) progText.textContent = data.message;
-    };
-
-    renderUpdateUI(enhancerUpdateInfo || status.lastRemoteInfo);
-
-    modal.querySelector('#agy-hub-check-btn').onclick = async () => {
-      updateStatusEl.textContent = h.checking;
-      const res = await checkEnhancerGithubUpdate(true);
-      renderUpdateUI(res);
-    };
-
-    modal.querySelector('#agy-hub-repair-btn').onclick = async () => {
-      const res = await ipc.invoke('enhancer:repair-persistence');
-      const msgEl = modal.querySelector('#agy-hub-persist-msg');
-      if (res && res.ok && res.status) {
-        modal.querySelector('#agy-hub-persist-pills').innerHTML = [
-          badgePill(res.status.asarBootstrapped, res.status.asarBootstrapped ? h.asarOk : h.asarWarn)
-        ].join('');
-        msgEl.textContent = h.repairedMsg;
-        msgEl.style.display = 'block';
-      }
-    };
-
-    modal.querySelector('#agy-hub-rollback-btn').onclick = async () => {
-      const res = await ipc.invoke('enhancer:rollback');
-      if (res && res.ok) {
-        await ipc.invoke(res.restartRequired ? 'enhancer:relaunch' : 'enhancer:reload-windows');
-      }
-    };
-
-    const vanillaBtn = modal.querySelector('#agy-hub-vanilla-btn');
-    let vanillaArmed = false;
-    let vanillaTimer = null;
-    vanillaBtn.onclick = async () => {
-      if (!vanillaArmed) {
-        vanillaArmed = true;
-        vanillaBtn.textContent = h.vanillaConfirm;
-        clearTimeout(vanillaTimer);
-        vanillaTimer = setTimeout(() => {
-          vanillaArmed = false;
-          vanillaBtn.textContent = h.vanillaBtn;
-        }, 4000);
-        return;
-      }
-      await ipc.invoke('enhancer:restore-vanilla');
-    };
+    renderModalContent(mode === 'restore' ? 'restore' : 'update');
   }
 
   // ---------------------------------------------------------------------------
@@ -1072,13 +1045,14 @@
     if (itemTitle) itemTitle.textContent = (activeLanguage === 'ko') ? '인터페이스 언어' : (safeDictGet(translations[activeLanguage], 'Interface Language') || 'Interface Language');
     if (itemDesc) itemDesc.textContent = (activeLanguage === 'ko') ? '표시할 언어를 선택합니다. (재시작 없이 즉시 변경)' : (safeDictGet(translations[activeLanguage], 'Select display language. (Zero restart)') || 'Select display language. (Zero restart)');
 
-    const hubBtnLbl = document.getElementById('antigravity-enhancer-hub-label');
-    if (hubBtnLbl) {
-      const h = getHubStrings();
-      hubBtnLbl.textContent = (enhancerUpdateInfo && enhancerUpdateInfo.hasUpdate)
-        ? `${h.updatePill} v${enhancerUpdateInfo.remoteVersion}`
-        : `v${ENHANCER_CURRENT_VERSION}`;
-    }
+    const h = getHubStrings();
+    const settingsVerSub = document.getElementById('antigravity-settings-hub-subtitle');
+    if (settingsVerSub) settingsVerSub.textContent = `${h.patchVersionPrefix} ${ENHANCER_CURRENT_VERSION}`;
+    const settingsCheckBtn = document.getElementById('antigravity-settings-open-hub');
+    if (settingsCheckBtn) settingsCheckBtn.textContent = h.checkUpdates;
+    const settingsRestoreBtn = document.getElementById('antigravity-settings-restore-btn');
+    if (settingsRestoreBtn) settingsRestoreBtn.textContent = h.restoreVanilla;
+    scheduleInjectTitleMenuIntegration();
 
     window.dispatchEvent(new CustomEvent('antigravity-lang-changed', { detail: { lang: activeLanguage } }));
   }
@@ -1189,12 +1163,15 @@
             <span id="antigravity-quota-toggle-thumb" style="pointer-events:none;display:inline-block;height:16px;width:16px;border-radius:9999px;background-color:#CAD3F5;box-shadow:0 1px 3px rgba(0,0,0,0.3);transition:transform 0.2s ease-in-out;transform:translateX(${isQuotaOn ? '16px' : '0px'});"></span>
           </button>
         </div>
-        <div class="py-2 px-3 w-full bg-transparent flex justify-between gap-4 items-center" style="display:flex;align-items:center;justify-content:space-between;gap:16px;">
+        <div class="py-2 px-3 w-full bg-transparent flex justify-between gap-4 items-center notranslate" translate="no" style="display:flex;align-items:center;justify-content:space-between;gap:16px;">
           <div class="flex-1 min-w-0 flex flex-col gap-0.5" style="flex:1 1 0%;min-width:180px;">
-            <span class="text-sm font-normal text-foreground">${h.title} (v${ENHANCER_CURRENT_VERSION})</span>
-            <div class="text-xs text-secondary-foreground" style="line-height:1.4;">${h.subtitle}</div>
+            <span class="text-sm font-normal text-foreground">Antigravity <span style="color:#A0A3F6;font-weight:600;">Enhanced</span></span>
+            <div class="text-xs text-secondary-foreground" id="antigravity-settings-hub-subtitle" style="line-height:1.4;">${h.patchVersionPrefix} ${ENHANCER_CURRENT_VERSION}</div>
           </div>
-          <button type="button" id="antigravity-settings-open-hub" class="px-2.5 py-1 text-xs font-semibold rounded-md bg-secondary text-foreground hover:opacity-90 cursor-pointer border border-border">${h.hubBtn} / ${h.checkBtn}</button>
+          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+            <button type="button" id="antigravity-settings-open-hub" class="px-2.5 py-1 text-xs font-medium rounded-md bg-secondary text-secondary-foreground hover:text-foreground cursor-pointer border-none transition-colors">${h.checkUpdates}</button>
+            <button type="button" id="antigravity-settings-restore-btn" class="px-2.5 py-1 text-xs font-medium rounded-md bg-secondary text-secondary-foreground hover:text-foreground cursor-pointer border-none transition-colors">${h.restoreVanilla}</button>
+          </div>
         </div>
       </div>
     `;
@@ -1230,7 +1207,9 @@
       quotaToggle.onclick = (e) => { e.stopPropagation(); toggleVis(); };
     }
     const settingsHubBtn = section.querySelector('#antigravity-settings-open-hub');
-    if (settingsHubBtn) settingsHubBtn.onclick = (e) => { e.stopPropagation(); openEnhancerHubModal(); };
+    if (settingsHubBtn) settingsHubBtn.onclick = (e) => { e.stopPropagation(); openEnhancerHubModal('update', { forceOpen: true, autoCheck: true }); };
+    const settingsRestoreBtn = section.querySelector('#antigravity-settings-restore-btn');
+    if (settingsRestoreBtn) settingsRestoreBtn.onclick = (e) => { e.stopPropagation(); openEnhancerHubModal('restore', { forceOpen: true }); };
 
     parentContainer.insertBefore(section, targetSection);
     updateLanguageSelectorUI();
@@ -1263,8 +1242,9 @@
 
     const menu = document.createElement('div');
     menu.id = 'antigravity-quick-lang-menu';
-    menu.className = 'agy-overlay border rounded-lg no-focus-ring flex flex-col shadow-md min-w-[175px] p-1 gap-px';
-    menu.style.cssText = `position:fixed;top:${topPx}px;right:${rightPx}px;min-width:175px;padding:4px;gap:1px;display:flex;flex-direction:column;border-radius:8px;background:#0B0B0E;border:1px solid rgba(202,211,245,0.16);color:#CAD3F5;font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable",Pretendard,"Segoe UI",sans-serif;z-index:99999;user-select:none;app-region:no-drag;-webkit-app-region:no-drag;`;
+    menu.className = 'agy-overlay border rounded-xl no-focus-ring flex flex-col shadow-lg min-w-[175px] p-1 gap-px notranslate';
+    menu.setAttribute('translate', 'no');
+    menu.style.cssText = `position:fixed;top:${topPx}px;right:${rightPx}px;min-width:175px;padding:4px;gap:1px;display:flex;flex-direction:column;border-radius:10px;background:#0B0B0E;border:1px solid rgba(202,211,245,0.14);box-shadow:0 12px 28px rgba(0,0,0,0.58);color:#CAD3F5;font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable",Pretendard,"Segoe UI",sans-serif;z-index:99999;user-select:none;app-region:no-drag;-webkit-app-region:no-drag;`;
 
     menu.innerHTML = LANG_ORDER.map(l => {
       const info = LANG_DISPLAY_NAMES[l] || { native: l, en: l };
@@ -1290,50 +1270,157 @@
     }
   }
 
-  function injectEnhancerHubButton(target, beforeBtn) {
-    if (!target || !target.container) return;
-    const h = getHubStrings();
-    const hasUpdate = Boolean(enhancerUpdateInfo && enhancerUpdateInfo.hasUpdate);
-    let hubBtn = document.getElementById('antigravity-enhancer-hub-btn');
-
-    if (!hubBtn) {
-      hubBtn = document.createElement('button');
-      hubBtn.id = 'antigravity-enhancer-hub-btn';
-      hubBtn.type = 'button';
-      hubBtn.style.cssText = 'display:inline-flex;align-items:center;justify-content:center;gap:4px;height:24px;padding:2px 7px;border-radius:6px;font-size:11px;font-weight:600;font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable",Pretendard,"Segoe UI",sans-serif;line-height:1;cursor:pointer;user-select:none;app-region:no-drag;-webkit-app-region:no-drag;margin-right:6px;white-space:nowrap;flex-shrink:0;transition:border-color 0.15s ease,background-color 0.15s ease;z-index:101;';
-      hubBtn.innerHTML = `<span id="antigravity-enhancer-hub-dot" style="width:6px;height:6px;border-radius:50%;flex-shrink:0;"></span><span id="antigravity-enhancer-hub-label"></span>`;
-      hubBtn.onclick = (e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        openEnhancerHubModal();
-      };
-    }
-
-    const dot = hubBtn.querySelector('#antigravity-enhancer-hub-dot');
-    const lbl = hubBtn.querySelector('#antigravity-enhancer-hub-label');
-    if (hasUpdate) {
-      hubBtn.style.background = 'rgba(160, 163, 246, 0.18)';
-      hubBtn.style.border = '1px solid rgba(160, 163, 246, 0.5)';
-      hubBtn.style.color = '#A0A3F6';
-      if (dot) dot.style.background = '#A0A3F6';
-      if (lbl) lbl.textContent = `${h.updatePill} v${enhancerUpdateInfo.remoteVersion}`;
-      hubBtn.title = `${h.availPrefix}v${enhancerUpdateInfo.remoteVersion} (Alt+Shift+E)`;
-    } else {
-      hubBtn.style.background = '#0B0B0E';
-      hubBtn.style.border = '1px solid rgba(202, 211, 245, 0.18)';
-      hubBtn.style.color = '#CAD3F5';
-      if (dot) dot.style.background = '#A0A3F6';
-      if (lbl) lbl.textContent = `v${ENHANCER_CURRENT_VERSION}`;
-      hubBtn.title = `${h.title} (Alt+Shift+E)`;
-    }
-
-    if (beforeBtn && beforeBtn.parentElement === target.container) {
-      if (hubBtn.nextSibling !== beforeBtn || hubBtn.parentElement !== target.container) {
-        target.container.insertBefore(hubBtn, beforeBtn);
+  function closeNativeTitleMenu() {
+    try {
+      const EscEvt = (typeof KeyboardEvent === 'function')
+        ? new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', keyCode: 27, which: 27, bubbles: true, cancelable: true })
+        : { type: 'keydown', key: 'Escape', bubbles: true, defaultPrevented: false, preventDefault() {} };
+      if (typeof document !== 'undefined' && document.dispatchEvent) document.dispatchEvent(EscEvt);
+    } catch (_) {}
+    try {
+      if (typeof document !== 'undefined' && document.body && document.body.dispatchEvent && typeof MouseEvent === 'function') {
+        document.body.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true }));
       }
-    } else if (hubBtn.parentElement !== target.container) {
-      target.container.appendChild(hubBtn);
+    } catch (_) {}
+  }
+
+  function createNativeMenuRow(id, label, interactive, badgeText) {
+    const wrapper = document.createElement('div');
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = id;
+    btn.setAttribute('data-testid', 'title-menu-bar-option');
+    btn.setAttribute('data-enhancer-injected', 'true');
+    if (interactive) {
+      btn.className = 'w-full px-3 py-1.5 text-left transition-colors flex justify-between items-center duration-100 select-none outline-none cursor-default hover:bg-secondary';
+    } else {
+      btn.setAttribute('tabindex', '-1');
+      btn.className = 'w-full px-3 py-1.5 text-left transition-colors flex justify-between items-center duration-100 select-none outline-none cursor-default pointer-events-none';
     }
+    const labelSpan = document.createElement('span');
+    labelSpan.textContent = label;
+    btn.appendChild(labelSpan);
+    if (badgeText) {
+      const badge = document.createElement('span');
+      badge.className = 'antigravity-menu-badge';
+      badge.style.cssText = 'color:#A0A3F6;font-size:11px;font-weight:600;margin-left:10px;';
+      badge.textContent = badgeText;
+      btn.appendChild(badge);
+    }
+    wrapper.appendChild(btn);
+    return { wrapper, btn };
+  }
+
+  function injectTitleMenuIntegration() {
+    if (typeof document === 'undefined' || payload.disabled) return;
+    const oldHubBtn = document.getElementById('antigravity-enhancer-hub-btn');
+    if (oldHubBtn) oldHubBtn.remove();
+
+    const menuBar = document.querySelector('[data-testid="title-menu-bar"]');
+    const items = menuBar
+      ? menuBar.querySelectorAll('[data-testid="title-menu-bar-item"]')
+      : document.querySelectorAll('[data-testid="title-menu-bar-item"]');
+    if (!items || items.length === 0) return;
+
+    let agyMenuBtn = null;
+    for (const item of items) {
+      const txt = (item.textContent || '').trim();
+      if (txt === 'Antigravity' || txt.startsWith('Antigravity')) {
+        agyMenuBtn = item;
+        break;
+      }
+    }
+    if (!agyMenuBtn) return;
+
+    if (!agyMenuBtn.querySelector('#antigravity-enhanced-tag')) {
+      const tag = document.createElement('span');
+      tag.id = 'antigravity-enhanced-tag';
+      tag.className = 'notranslate';
+      tag.setAttribute('translate', 'no');
+      tag.style.cssText = 'color:#A0A3F6;font-weight:600;margin-left:4px;letter-spacing:-0.01em;';
+      tag.style.color = '#A0A3F6';
+      tag.textContent = 'Enhanced';
+      agyMenuBtn.appendChild(tag);
+    }
+
+    const menuWrapper = agyMenuBtn.parentElement;
+    if (!menuWrapper) return;
+    const allOpts = menuWrapper.querySelectorAll('[data-testid="title-menu-bar-option"]');
+    let firstNativeOpt = null;
+    for (const opt of allOpts) {
+      if (opt.getAttribute('data-enhancer-injected') !== 'true') {
+        firstNativeOpt = opt;
+        break;
+      }
+    }
+    if (!firstNativeOpt) return;
+
+    const dropdown =
+      (firstNativeOpt.closest && (firstNativeOpt.closest('[data-browser-occluder="true"]') || firstNativeOpt.closest('div.absolute'))) ||
+      (firstNativeOpt.parentElement && firstNativeOpt.parentElement.parentElement);
+    if (!dropdown) return;
+
+    const h = getHubStrings();
+    const hasUpdate = Boolean(enhancerUpdateInfo && enhancerUpdateInfo.hasUpdate && enhancerUpdateInfo.remoteVersion);
+    const updateBadge = hasUpdate ? `v${enhancerUpdateInfo.remoteVersion}` : '';
+    const versionText = `${h.patchVersionPrefix} ${ENHANCER_CURRENT_VERSION}`;
+
+    let section = dropdown.querySelector('#antigravity-enhancer-menu-section');
+    if (section) {
+      const verSpan = section.querySelector('#antigravity-menu-patch-version span');
+      if (verSpan && verSpan.textContent !== versionText) verSpan.textContent = versionText;
+      const chkSpan = section.querySelector('#antigravity-menu-check-updates span');
+      if (chkSpan && chkSpan.textContent !== h.checkUpdates) chkSpan.textContent = h.checkUpdates;
+      const rstSpan = section.querySelector('#antigravity-menu-restore-vanilla span');
+      if (rstSpan && rstSpan.textContent !== h.restoreVanilla) rstSpan.textContent = h.restoreVanilla;
+      return;
+    }
+
+    section = document.createElement('div');
+    section.id = 'antigravity-enhancer-menu-section';
+    section.className = 'notranslate';
+    section.setAttribute('translate', 'no');
+
+    const sep = document.createElement('div');
+    sep.style.cssText = 'height:1px;background:rgba(202,211,245,0.1);margin:4px 0;';
+    section.appendChild(sep);
+
+    const verRow = createNativeMenuRow('antigravity-menu-patch-version', versionText, false, updateBadge);
+    const checkRow = createNativeMenuRow('antigravity-menu-check-updates', h.checkUpdates, true, '');
+    const restoreRow = createNativeMenuRow('antigravity-menu-restore-vanilla', h.restoreVanilla, true, '');
+
+    checkRow.btn.onclick = (e) => {
+      if (e) {
+        if (e.stopPropagation) e.stopPropagation();
+        if (e.preventDefault) e.preventDefault();
+      }
+      closeNativeTitleMenu();
+      openEnhancerHubModal('update', { forceOpen: true, autoCheck: true });
+    };
+
+    restoreRow.btn.onclick = (e) => {
+      if (e) {
+        if (e.stopPropagation) e.stopPropagation();
+        if (e.preventDefault) e.preventDefault();
+      }
+      closeNativeTitleMenu();
+      openEnhancerHubModal('restore', { forceOpen: true });
+    };
+
+    section.appendChild(verRow.wrapper);
+    section.appendChild(checkRow.wrapper);
+    section.appendChild(restoreRow.wrapper);
+    dropdown.appendChild(section);
+  }
+
+  let titleMenuInjectScheduled = false;
+  function scheduleInjectTitleMenuIntegration() {
+    if (titleMenuInjectScheduled) return;
+    titleMenuInjectScheduled = true;
+    (typeof requestAnimationFrame !== 'undefined' ? requestAnimationFrame : setTimeout)(() => {
+      titleMenuInjectScheduled = false;
+      injectTitleMenuIntegration();
+    });
   }
 
   function injectQuickLanguageButton() {
@@ -1367,7 +1454,7 @@
         target.container.appendChild(quickLangBtn);
       }
     }
-    injectEnhancerHubButton(target, quickLangBtn);
+    scheduleInjectTitleMenuIntegration();
   }
 
   // Shortcuts & Outside Clicks
@@ -1405,6 +1492,12 @@
       if (quickMenu && (!quickMenu.contains(e.target)) && (!quickBtn || !quickBtn.contains(e.target))) {
         quickMenu.remove();
       }
+      try {
+        if (e.target && e.target.closest && e.target.closest('[data-testid="title-menu-bar-item"]')) {
+          setTimeout(injectTitleMenuIntegration, 0);
+          scheduleInjectTitleMenuIntegration();
+        }
+      } catch (_) {}
     });
   }
 
@@ -1621,10 +1714,14 @@
         stopCountdownTicker();
         const tick = () => {
           const pop = document.getElementById('antigravity-quota-popover');
-          if (!pop) { stopCountdownTicker(); return; }
-          pop.querySelectorAll('.bucket-timer[data-target-ts]').forEach(el => {
-            const ts = Number(el.getAttribute('data-target-ts'));
-            if (ts && !isNaN(ts)) el.textContent = formatCountdown(ts);
+          const hoverCard = document.getElementById('antigravity-composer-quota-hovercard');
+          if (!pop && !hoverCard) { stopCountdownTicker(); return; }
+          [pop, hoverCard].forEach(rootEl => {
+            if (!rootEl) return;
+            rootEl.querySelectorAll('.bucket-timer[data-target-ts]').forEach(el => {
+              const ts = Number(el.getAttribute('data-target-ts'));
+              if (ts && !isNaN(ts)) el.textContent = formatCountdown(ts);
+            });
           });
         };
         tick();
@@ -1633,19 +1730,82 @@
 
       function closeQuotaPopover(popEl) {
         if (!popEl) return;
+        const finish = () => {
+          popEl.remove();
+          if (!document.getElementById('antigravity-composer-quota-hovercard')) stopCountdownTicker();
+        };
         if (window.gsap) {
-          window.gsap.to(popEl, { opacity: 0, duration: 0.1, ease: 'power1.in', onComplete: () => { popEl.remove(); stopCountdownTicker(); } });
-        } else { popEl.remove(); stopCountdownTicker(); }
+          window.gsap.to(popEl, { opacity: 0, duration: 0.1, ease: 'power1.in', onComplete: finish });
+        } else { finish(); }
+      }
+
+      function hideComposerQuotaHoverCard(immediate = false) {
+        const card = document.getElementById('antigravity-composer-quota-hovercard');
+        if (!card) return;
+        if (window.gsap && window.gsap.killTweensOf) window.gsap.killTweensOf(card);
+        const finish = () => {
+          card.remove();
+          if (!document.getElementById('antigravity-quota-popover')) stopCountdownTicker();
+        };
+        if (!immediate && window.gsap) {
+          window.gsap.to(card, { opacity: 0, duration: 0.08, ease: 'power1.in', onComplete: finish });
+        } else { finish(); }
+      }
+
+      function renderBucketHtml(title, pct, ts, qs) {
+        if (pct === null || pct === undefined) return '';
+        const barColor = pct < 20 ? '#f87171' : '#A0A3F6';
+        return `<article class="bucket-row" style="margin-top:6px;"><p style="margin:0 0 3px;display:flex;justify-content:space-between;font-size:11px;"><span style="color:#CAD3F5;opacity:0.9;">${title}</span><small class="bucket-timer" ${ts ? `data-target-ts="${ts}"` : ''} style="color:#CAD3F5;opacity:0.65;font-size:10.5px;font-variant-numeric:tabular-nums;">${ts ? formatCountdown(ts) : qs.checking}</small></p><footer style="display:flex;align-items:center;gap:8px;"><div class="progress-bar-bg" style="flex:1;height:5px;border-radius:9999px;background:rgba(202,211,245,0.12);overflow:hidden;"><span class="progress-bar-fill" style="display:block;width:${Math.max(0, Math.min(100, pct))}%;height:100%;background:${barColor};border-radius:9999px;"></span></div><b style="font-size:11px;font-weight:700;color:${pct < 20 ? '#f87171' : '#CAD3F5'};min-width:32px;text-align:right;">${pct}%</b></footer></article>`;
+      }
+
+      function showComposerQuotaHoverCard(anchorEl, groupKey, parsed) {
+        hideComposerQuotaHoverCard(true);
+        if (!parsed) return;
+        const grp = parsed[groupKey] || parsed.gemini;
+        if (!grp) return;
+
+        const qs = getQuotaStrings();
+        const card = document.createElement('div');
+        card.id = 'antigravity-composer-quota-hovercard';
+        card.className = 'agy-quota-hovercard agy-overlay border rounded-xl no-focus-ring flex flex-col shadow-lg notranslate';
+        card.setAttribute('translate', 'no');
+        card.setAttribute('data-group-key', grp.id);
+
+        const rect = anchorEl && anchorEl.getBoundingClientRect ? anchorEl.getBoundingClientRect() : { top: 400, bottom: 420, left: 100 };
+        const winH = window.innerHeight || 900;
+        const winW = window.innerWidth || 1200;
+        const placeAbove = (rect.top > 165);
+        const leftPx = Math.max(12, Math.min(winW - 296, rect.left || 12));
+        const vertCss = placeAbove
+          ? `bottom:${Math.max(12, winH - rect.top + 8)}px;top:auto;`
+          : `top:${Math.max(12, (rect.bottom || 32) + 8)}px;bottom:auto;`;
+
+        card.style.cssText = `position:fixed;${vertCss}left:${leftPx}px;width:280px;padding:10px 12px;border-radius:12px;background:#0B0B0E;border:1px solid rgba(202,211,245,0.14);box-shadow:0 14px 34px rgba(0,0,0,0.6);color:#CAD3F5;font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable",Pretendard,"Segoe UI",sans-serif;font-size:12px;z-index:99998;pointer-events:none;user-select:none;app-region:no-drag;-webkit-app-region:no-drag;`;
+
+        const vals = [grp.h5, grp.weekly].filter(v => typeof v === 'number');
+        const isLow = vals.length > 0 && Math.min(...vals) < 20;
+        const rows = renderBucketHtml(qs.h5Full, grp.h5, grp.h5TargetTs, qs) + renderBucketHtml(qs.weeklyFull, grp.weekly, grp.weeklyTargetTs, qs);
+        const modelsTxt = (grp.models || []).join(', ');
+
+        card.innerHTML = `<header style="display:flex;align-items:center;justify-content:space-between;gap:6px;padding-bottom:6px;border-bottom:1px solid rgba(202,211,245,0.1);"><div style="display:inline-flex;align-items:center;gap:6px;"><strong style="font-weight:600;font-size:12.5px;color:${isLow ? '#f87171' : (grp.id === 'argon' ? '#A0A3F6' : '#CAD3F5')};">${grp.label}</strong>${grp.id === currentActiveGroup ? `<em style="font-style:normal;font-size:9.5px;font-weight:700;padding:1px 5px;border-radius:4px;background:rgba(160,163,246,0.14);color:#A0A3F6;border:1px solid rgba(160,163,246,0.4);">${qs.activeTag}</em>` : ''}</div><span style="font-size:10.5px;color:#CAD3F5;opacity:0.6;max-width:155px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${modelsTxt}</span></header><section>${rows || '<p style="margin:6px 0 0;font-size:11px;color:#CAD3F5;opacity:0.65;">--</p>'}</section>`;
+
+        (document.body || document.documentElement).appendChild(card);
+        startCountdownTicker();
+        if (window.gsap) {
+          window.gsap.fromTo(card, { opacity: 0 }, { opacity: 1, duration: 0.1, ease: 'power1.out' });
+        }
       }
 
       function toggleQuotaPopover(anchorEl, parsed) {
         const existing = document.getElementById('antigravity-quota-popover');
         if (existing) { closeQuotaPopover(existing); return; }
+        hideComposerQuotaHoverCard(true);
         const qs = getQuotaStrings();
         const groupsList = [parsed.argon, parsed.gemini, parsed.other];
         const pop = document.createElement('div');
         pop.id = 'antigravity-quota-popover';
-        pop.className = 'agy-quota-popover agy-overlay border rounded-lg no-focus-ring flex flex-col shadow-md';
+        pop.className = 'agy-quota-popover agy-overlay border rounded-xl no-focus-ring flex flex-col shadow-lg notranslate';
+        pop.setAttribute('translate', 'no');
 
         const rect = anchorEl && anchorEl.getBoundingClientRect ? anchorEl.getBoundingClientRect() : { bottom: 36, right: 20, top: 10, left: 100 };
         const winH = window.innerHeight || 900;
@@ -1655,23 +1815,17 @@
           ? `bottom:${Math.max(12, winH - rect.top + 8)}px;top:auto;left:${Math.max(12, Math.min(winW - 330, rect.left || 12))}px;right:auto;`
           : `top:${Math.max(32, (rect.bottom || 32) + 6)}px;bottom:auto;right:${Math.max(12, winW - (rect.right || 1180))}px;left:auto;`;
 
-        pop.style.cssText = `position:fixed;${posCss}width:315px;padding:12px;background:#0B0B0E;border:1px solid rgba(202,211,245,0.16);color:#CAD3F5;font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable",Pretendard,"Segoe UI",sans-serif;font-size:12px;z-index:99999;user-select:none;app-region:no-drag;-webkit-app-region:no-drag;`;
-
-        const renderBucket = (title, pct, ts) => {
-          if (pct === null || pct === undefined) return '';
-          const barColor = pct < 20 ? '#f87171' : '#A0A3F6';
-          return `<div class="bucket-row" style="margin-top:6px;"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px;"><span style="color:#CAD3F5;opacity:0.9;">${title}</span><span class="bucket-timer" ${ts ? `data-target-ts="${ts}"` : ''} style="color:#8A93B2;font-size:10.5px;font-variant-numeric:tabular-nums;">${ts ? formatCountdown(ts) : qs.checking}</span></div><div style="display:flex;align-items:center;gap:8px;"><div class="progress-bar-bg" style="flex:1;height:5px;border-radius:9999px;background:rgba(202,211,245,0.12);overflow:hidden;"><div class="progress-bar-fill" style="width:${Math.max(0, Math.min(100, pct))}%;height:100%;background:${barColor};border-radius:9999px;"></div></div><span style="font-size:11px;font-weight:700;color:${pct < 20 ? '#f87171' : '#CAD3F5'};min-width:32px;text-align:right;">${pct}%</span></div></div>`;
-        };
+        pop.style.cssText = `position:fixed;${posCss}width:315px;padding:12px;border-radius:12px;background:#0B0B0E;border:1px solid rgba(202,211,245,0.14);box-shadow:0 16px 36px rgba(0,0,0,0.6);color:#CAD3F5;font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable",Pretendard,"Segoe UI",sans-serif;font-size:12px;z-index:99999;user-select:none;app-region:no-drag;-webkit-app-region:no-drag;`;
 
         const cardsHtml = groupsList.map(g => {
-          const rows = renderBucket(qs.h5Full, g.h5, g.h5TargetTs) + renderBucket(qs.weeklyFull, g.weekly, g.weeklyTargetTs);
+          const rows = renderBucketHtml(qs.h5Full, g.h5, g.h5TargetTs, qs) + renderBucketHtml(qs.weeklyFull, g.weekly, g.weeklyTargetTs, qs);
           const vals = [g.h5, g.weekly].filter(v => typeof v === 'number');
           const isLow = vals.length > 0 && Math.min(...vals) < 20;
-          const borderStyle = isLow ? 'background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.38);' : 'background:#121319;border:1px solid rgba(202,211,245,0.1);';
-          return `<div class="group-card rounded-lg p-2.5 mb-2" style="${borderStyle}border-radius:8px;padding:8px 10px;margin-bottom:8px;"><div style="display:flex;align-items:center;justify-content:space-between;gap:6px;"><div style="display:inline-flex;align-items:center;gap:5px;"><span style="font-weight:600;font-size:12px;color:${isLow ? '#f87171' : g.color};">${g.label}</span>${g.id === currentActiveGroup ? `<span style="font-size:9.5px;font-weight:700;padding:1px 5px;border-radius:4px;background:rgba(160,163,246,0.15);color:#A0A3F6;border:1px solid rgba(160,163,246,0.45);">${qs.activeTag}</span>` : ''}</div><span style="font-size:10.5px;color:#8A93B2;max-width:185px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${(g.models || []).join(', ')}</span></div>${rows || '<div style="font-size:11px;color:#8A93B2;margin-top:4px;">--</div>'}</div>`;
+          const borderStyle = isLow ? 'background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.38);' : 'background:rgba(202,211,245,0.03);border:1px solid rgba(202,211,245,0.1);';
+          return `<section class="group-card rounded-lg p-2.5 mb-2" style="${borderStyle}border-radius:8px;padding:8px 10px;margin-bottom:8px;"><header style="display:flex;align-items:center;justify-content:space-between;gap:6px;"><div style="display:inline-flex;align-items:center;gap:5px;"><strong style="font-weight:600;font-size:12px;color:${isLow ? '#f87171' : g.color};">${g.label}</strong>${g.id === currentActiveGroup ? `<em style="font-style:normal;font-size:9.5px;font-weight:700;padding:1px 5px;border-radius:4px;background:rgba(160,163,246,0.14);color:#A0A3F6;border:1px solid rgba(160,163,246,0.4);">${qs.activeTag}</em>` : ''}</div><span style="font-size:10.5px;color:#CAD3F5;opacity:0.6;max-width:185px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${(g.models || []).join(', ')}</span></header><main>${rows || '<p style="margin:4px 0 0;font-size:11px;color:#CAD3F5;opacity:0.65;">--</p>'}</main></section>`;
         }).join('');
 
-        pop.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(202,211,245,0.1);"><span style="font-weight:600;font-size:12.5px;color:#CAD3F5;">${qs.title}</span><button id="antigravity-popover-refresh" title="${qs.refresh}" style="background:none;border:none;color:#8A93B2;cursor:pointer;padding:0;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg></button></div><div>${cardsHtml}</div><div style="margin-top:2px;padding-top:6px;text-align:right;border-top:1px solid rgba(202,211,245,0.1);"><button id="antigravity-open-models-settings" style="background:none;border:none;color:#A0A3F6;font-size:11px;font-weight:500;cursor:pointer;">${qs.openSettings}</button></div>`;
+        pop.innerHTML = `<header style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(202,211,245,0.1);"><span style="font-weight:600;font-size:12.5px;color:#CAD3F5;">${qs.title}</span><button id="antigravity-popover-refresh" title="${qs.refresh}" style="background:none;border:none;color:#CAD3F5;opacity:0.7;cursor:pointer;padding:0;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg></button></header><main>${cardsHtml}</main><footer style="margin-top:2px;padding-top:6px;text-align:right;border-top:1px solid rgba(202,211,245,0.1);"><button id="antigravity-open-models-settings" style="background:none;border:none;color:#A0A3F6;font-size:11px;font-weight:500;cursor:pointer;">${qs.openSettings}</button></footer>`;
         (document.body || document.documentElement).appendChild(pop);
         startCountdownTicker();
 
@@ -1693,7 +1847,7 @@
           openBtn.onclick = (e) => {
             e.stopPropagation();
             pop.remove();
-            stopCountdownTicker();
+            if (!document.getElementById('antigravity-composer-quota-hovercard')) stopCountdownTicker();
             if (window.__TSR_ROUTER__) window.__TSR_ROUTER__.navigate({ search: prev => ({ ...prev, settingsOpen: true, settingsScreen: 'Models' }) });
           };
         }
@@ -1703,12 +1857,18 @@
         const pop = document.getElementById('antigravity-quota-popover');
         const widget = document.getElementById('antigravity-quota-widget');
         if (pop && (!pop.contains(e.target)) && (!widget || !widget.contains(e.target))) closeQuotaPopover(pop);
+        hideComposerQuotaHoverCard(true);
       });
+
+      document.addEventListener('mousedown', () => {
+        hideComposerQuotaHoverCard(true);
+      }, true);
 
       window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
           const pop = document.getElementById('antigravity-quota-popover');
           if (pop) closeQuotaPopover(pop);
+          hideComposerQuotaHoverCard(true);
         }
       });
 
@@ -1743,6 +1903,20 @@
         if (refBtn) refBtn.onclick = (e) => { e.stopPropagation(); updateQuotaWidget(true); };
       }
 
+      function extractTriggerModelText(trigger) {
+        if (!trigger) return '';
+        const aria = trigger.getAttribute('aria-label') || '';
+        const match = aria.match(/current:\s*([^\n,·]+)/i);
+        if (match && match[1]) return match[1].trim();
+        let text = '';
+        for (let i = 0; i < trigger.childNodes.length; i++) {
+          const ch = trigger.childNodes[i];
+          if (ch.nodeType === 1 && ch.classList && ch.classList.contains('antigravity-inline-model-quota')) continue;
+          text += (ch.textContent || '');
+        }
+        return text.trim();
+      }
+
       function updateComposerModelQuota(parsedData, activeGroup) {
         try {
           const triggers = document.querySelectorAll('button[data-testid="model-selector-trigger"], [data-testid="model-selector-trigger"], .model-selector-trigger');
@@ -1751,26 +1925,30 @@
           const currentParsed = parsedData || (getCachedQuota() ? parseGroups(getCachedQuota()) : null);
 
           for (const trigger of triggers) {
-            const aria = trigger.getAttribute('aria-label') || '';
-            const match = aria.match(/current:\s*([^\n,·]+)/i);
-            const triggerText = (match && match[1]) ? match[1].trim() : (trigger.textContent || '').trim();
+            const triggerText = extractTriggerModelText(trigger);
             const groupKey = resolveModelGroup(triggerText) || activeGroup || 'gemini';
             const grp = currentParsed ? currentParsed[groupKey] : null;
 
             let inlineBadge = trigger.querySelector('.antigravity-inline-model-quota');
             if (!inlineBadge) {
               inlineBadge = document.createElement('span');
-              inlineBadge.className = 'antigravity-inline-model-quota';
+              inlineBadge.className = 'antigravity-inline-model-quota notranslate';
+              inlineBadge.setAttribute('translate', 'no');
               inlineBadge.style.cssText = 'display:inline-flex;align-items:center;gap:3.5px;height:19px;padding:0 7px;margin-left:5px;margin-right:2px;border-radius:9999px;font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable",Pretendard,"Segoe UI",sans-serif;font-size:11px;font-weight:700;line-height:1;cursor:pointer;user-select:none;white-space:nowrap;flex-shrink:0;vertical-align:middle;';
               if (trigger.lastChild) trigger.insertBefore(inlineBadge, trigger.lastChild);
               else trigger.appendChild(inlineBadge);
             }
 
-            inlineBadge.onclick = (e) => {
-              e.stopPropagation();
-              e.preventDefault();
-              const latest = lastQuotaData || getCachedQuota();
-              if (latest) toggleQuotaPopover(inlineBadge, parseGroups(latest));
+            inlineBadge.setAttribute('data-group-key', groupKey);
+            inlineBadge.onclick = null;
+            inlineBadge.onmousedown = () => { hideComposerQuotaHoverCard(true); };
+            inlineBadge.onmouseenter = () => {
+              const latestRaw = lastQuotaData || getCachedQuota();
+              const latestParsed = latestRaw ? parseGroups(latestRaw) : currentParsed;
+              if (latestParsed) showComposerQuotaHoverCard(inlineBadge, groupKey, latestParsed);
+            };
+            inlineBadge.onmouseleave = () => {
+              hideComposerQuotaHoverCard(false);
             };
 
             const brandColor = grp?.color || '#A0A3F6';
@@ -1914,6 +2092,7 @@
     if (document.body) {
       scheduleInjectLanguageSetting();
       scheduleInjectQuickLanguageButton();
+      scheduleInjectTitleMenuIntegration();
     }
   }
 
@@ -1922,6 +2101,7 @@
     setupGsapGlobalInteractions();
     injectMainWorldQuotaWidget();
     injectQuickLanguageButton();
+    injectTitleMenuIntegration();
     setTimeout(() => checkEnhancerGithubUpdate(false), 2500);
     setInterval(() => checkEnhancerGithubUpdate(true), 3600000);
 
@@ -1941,6 +2121,7 @@
       }
       scheduleInjectLanguageSetting();
       scheduleInjectQuickLanguageButton();
+      scheduleInjectTitleMenuIntegration();
     });
 
     observer.observe(document.documentElement || document.body, {
@@ -1960,6 +2141,7 @@
         }
         scheduleInjectLanguageSetting();
         scheduleInjectQuickLanguageButton();
+        scheduleInjectTitleMenuIntegration();
       }
     }, 2000);
   }
