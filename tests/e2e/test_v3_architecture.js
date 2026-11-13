@@ -115,7 +115,11 @@ function createRendererHarness(initialLang = 'ko', seedDomFn = null) {
           canApplyInApp: true,
           currentVersion: '3.3.0',
           remoteVersion: '3.4.0',
-          releaseNotes: 'Test update'
+          releaseNotes: 'English test update',
+          releaseNotesI18n: {
+            en: 'English test update',
+            ko: '한국어 업데이트 변경사항'
+          }
         };
       }
       return { ok: true };
@@ -215,6 +219,10 @@ registerTest(1, 'F22', 'manifest.json v3.3.0 points to x2tora/antigravity-enhanc
   assert.strictEqual(manifest.version, '3.3.0');
   assert.strictEqual(manifest.repo, 'x2tora/antigravity-enhancer');
   assert.strictEqual(manifest.testedAppVersion, '2.31.2');
+  assert.ok(manifest.releaseNotesI18n && typeof manifest.releaseNotesI18n === 'object', 'manifest.json must include releaseNotesI18n');
+  for (const l of ['en', 'ko', 'ja', 'zh-CN', 'zh-TW', 'es', 'fr', 'de', 'ru']) {
+    assert.ok(typeof manifest.releaseNotesI18n[l] === 'string' && manifest.releaseNotesI18n[l].length > 10, `Missing manifest releaseNotesI18n for ${l}`);
+  }
 
   for (const [fname, meta] of Object.entries(manifest.files)) {
     const fpath = path.join(ENHANCER_DIR, fname);
@@ -552,6 +560,8 @@ registerTest(3, 'F24', 'Native Antigravity Enhanced title menu integrates Patch 
 
   const modal = document.getElementById('antigravity-enhancer-modal');
   assert.ok(modal, 'Clicking Check Patch Updates in native menu must open modal');
+  const notesBox = modal.querySelector('#agy-hub-release-notes');
+  assert.ok(notesBox && notesBox.textContent.includes('한국어 업데이트 변경사항'), 'In-app update notes must display in active app language (ko)');
   assert.ok(modal.querySelector('#agy-hub-check-btn'), 'Check Updates button must exist');
   assert.strictEqual(modal.querySelector('#agy-hub-repair-btn'), null, 'Verify & Repair UI must be removed');
   assert.strictEqual(modal.querySelector('#agy-hub-rollback-btn'), null, 'Rollback UI must be removed');

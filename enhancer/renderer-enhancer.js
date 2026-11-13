@@ -956,8 +956,10 @@
           return;
         }
 
-        const notesHtml = info.releaseNotes
-          ? `<div style="margin-top:6px;padding:7px 9px;border-radius:6px;background:#0B0B0E;border:1px solid rgba(202,211,245,0.1);font-size:11px;color:#CAD3F5;max-height:80px;overflow-y:auto;">${String(info.releaseNotes).replace(/</g, '&lt;')}</div>`
+        const i18nMap = (info && info.releaseNotesI18n && typeof info.releaseNotesI18n === 'object') ? info.releaseNotesI18n : null;
+        const localizedNotes = (i18nMap && (i18nMap[activeLanguage] || i18nMap.en)) || info.releaseNotes || '';
+        const notesHtml = localizedNotes
+          ? `<div id="agy-hub-release-notes" style="margin-top:6px;padding:7px 9px;border-radius:6px;background:#0B0B0E;border:1px solid rgba(202,211,245,0.1);font-size:11px;color:#CAD3F5;max-height:110px;overflow-y:auto;white-space:pre-wrap;line-height:1.45;">${String(localizedNotes).replace(/</g, '&lt;')}</div>`
           : '';
         updateStatusEl.innerHTML = `<span style="color:#A0A3F6;font-weight:600;">${h.availPrefix}v${info.currentVersion} → v${info.remoteVersion}</span>${notesHtml}`;
 

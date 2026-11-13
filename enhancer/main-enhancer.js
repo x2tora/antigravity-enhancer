@@ -378,6 +378,30 @@ function getFullStatus() {
   };
 }
 
+function parseReleaseNotesMarkdown(md) {
+  if (!md || typeof md !== 'string') return null;
+  const summaryToLang = {
+    '한국어': 'ko',
+    '日本語': 'ja',
+    '简体中文': 'zh-CN',
+    '繁體中文': 'zh-TW',
+    'Español': 'es',
+    'Français': 'fr',
+    'Deutsch': 'de',
+    'Русский': 'ru'
+  };
+  const out = {};
+  const enMatch = md.match(/##\s*Changes\s*\r?\n([\s\S]*?)(?:\r?\n---|\r?\n###|$)/i);
+  if (enMatch && enMatch[1] && enMatch[1].trim()) out.en = enMatch[1].trim();
+  const detailsRe = /<details>\s*<summary>([^<]+)<\/summary>([\s\S]*?)<\/details>/gi;
+  let m;
+  while ((m = detailsRe.exec(md)) !== null) {
+    const lang = summaryToLang[m[1].trim()];
+    if (lang && m[2] && m[2].trim()) out[lang] = m[2].trim();
+  }
+  return Object.keys(out).length > 0 ? out : null;
+}
+
 async function checkRemoteUpdate() {
   const local = getLocalManifest();
   const localVer = local.version || '3.2.0';
@@ -441,6 +465,12 @@ async function checkRemoteUpdate() {
     releaseUrl = releaseData.html_url;
   }
 
+  const parsedBodyI18n = parseReleaseNotesMarkdown(releaseData && releaseData.body);
+  const manifestI18n = (remoteManifest && remoteManifest.releaseNotesI18n && typeof remoteManifest.releaseNotesI18n === 'object')
+    ? remoteManifest.releaseNotesI18n
+    : null;
+  const releaseNotesI18n = manifestI18n || parsedBodyI18n || null;
+
   const result = {
     ok: true,
     hasUpdate,
@@ -448,7 +478,8 @@ async function checkRemoteUpdate() {
     updateSource,
     currentVersion: localVer,
     remoteVersion: latestVer,
-    releaseNotes: (remoteManifest && remoteManifest.releaseNotes) || (releaseData && releaseData.body) || '',
+    releaseNotes: (releaseNotesI18n && releaseNotesI18n.en) || (remoteManifest && remoteManifest.releaseNotes) || (releaseData && releaseData.body) || '',
+    releaseNotesI18n,
     releasePageUrl: (releaseData && releaseData.html_url) || `https://github.com/${ENHANCER_REPO}/releases/latest`,
     exeDownloadUrl: releaseUrl,
     manifest: remoteManifest
@@ -461,7 +492,7 @@ async function checkRemoteUpdate() {
 
 async function applyInAppUpdate(refBranch = 'main') {
   const local = getLocalManifest();
-  const prevVersion = local.version || '3.2.0';
+  const prevVersion = local.version || '3.3.0';
 
   broadcastEvent('enhancer:update-progress', { phase: 'manifest', percent: 8, message: 'Fetching signed manifest...' });
   const manifestUrl = `https://raw.githubusercontent.com/${ENHANCER_REPO}/${encodeURIComponent(refBranch)}/enhancer/manifest.json?t=${Date.now()}`;
