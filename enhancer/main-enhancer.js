@@ -1,5 +1,5 @@
 /**
- * Antigravity Enhancer v3.0.0 - Main Process Bridge, Persistence & Secure In-App Updater
+ * Antigravity Enhancer v3.1.0 - Main Process Bridge, Persistence & Secure In-App Updater
  * Source Repo: https://github.com/x2tora/antigravity-enhancer
  */
 'use strict';
@@ -9,7 +9,6 @@ const path = require('path');
 const vm = require('vm');
 const https = require('https');
 const crypto = require('crypto');
-const { execFileSync, spawn } = require('child_process');
 
 const ENHANCER_REPO = 'x2tora/antigravity-enhancer';
 const MANIFEST_URL = `https://raw.githubusercontent.com/${ENHANCER_REPO}/main/enhancer/manifest.json`;
@@ -33,11 +32,8 @@ const ALLOWED_UPDATE_FILES = new Set([
 
 let electronMod = null;
 let enhancerDir = __dirname;
-let launcherExePath = '';
 let cachedBootstrapPayload = null;
 let initialized = false;
-let updateDownloadedThisSession = false;
-let guardianSpawned = false;
 let appRootDir = '';
 let runtimeState = {
   safeMode: false,
@@ -67,16 +63,6 @@ function getAppAsarPath() {
   }
   const localDefault = path.join(process.env.LOCALAPPDATA || '', 'Programs', 'Antigravity', 'resources', 'app.asar');
   return localDefault;
-}
-
-function getLauncherPath() {
-  if (launcherExePath && fs.existsSync(launcherExePath)) return launcherExePath;
-  const candidate = path.join(process.env.LOCALAPPDATA || '', 'AntigravityEnhancer', 'AntigravityEnhancerLauncher.exe');
-  if (fs.existsSync(candidate)) {
-    launcherExePath = candidate;
-    return candidate;
-  }
-  return '';
 }
 
 function readJsonSafe(filePath, fallback = null) {
@@ -112,7 +98,7 @@ function writeBufferAtomic(filePath, buf) {
 
 function getLocalManifest() {
   const m = readJsonSafe(path.join(enhancerDir, 'manifest.json'), null);
-  return m || { version: '3.0.0', repo: ENHANCER_REPO, files: {} };
+  return m || { version: '3.1.0', repo: ENHANCER_REPO, files: {} };
 }
 
 function compareSemver(v1, v2) {
@@ -162,7 +148,7 @@ function httpsGetBufferNode(rawUrl, headers = {}, timeoutMs = 20000, maxBytes = 
 
     const req = https.get(rawUrl, {
       headers: {
-        'User-Agent': 'Antigravity-Enhancer/3.0.0',
+        'User-Agent': 'Antigravity-Enhancer/3.1.0',
         ...headers
       }
     }, (res) => {
@@ -223,7 +209,7 @@ async function secureFetchBuffer(rawUrl, options = {}) {
         method: 'GET',
         redirect: 'manual',
         headers: {
-          'User-Agent': 'Antigravity-Enhancer/3.0.0',
+          'User-Agent': 'Antigravity-Enhancer/3.1.0',
           ...headers
         },
         signal: controller.signal
@@ -355,7 +341,7 @@ function loadBootstrapPayload(forceRefresh = false) {
 
     cachedBootstrapPayload = {
       disabled: false,
-      version: manifest.version || '3.0.0',
+      version: manifest.version || '3.1.0',
       repo: ENHANCER_REPO,
       code: rendererCode,
       gsapCode,
@@ -426,22 +412,9 @@ function restoreFromBackupDir(backupDir) {
   return {
     ok: true,
     previousVersion: currentManifest.version,
-    restoredVersion: restoredManifest.version || '3.0.0',
+    restoredVersion: restoredManifest.version || '3.1.0',
     restartRequired
   };
-}
-
-function checkLogonTaskRegistered() {
-  if (process.platform !== 'win32') return false;
-  try {
-    execFileSync('schtasks.exe', ['/Query', '/TN', 'AntigravityEnhancerPersist'], {
-      stdio: 'ignore',
-      windowsHide: true
-    });
-    return true;
-  } catch (_) {
-    return false;
-  }
 }
 
 function getFullStatus() {
@@ -454,17 +427,13 @@ function getFullStatus() {
     asarStatus = patcher.inspectAsarStatus(asarPath);
   } catch (_) {}
 
-  const launcher = getLauncherPath();
   return {
-    enhancerVersion: manifest.version || '3.0.0',
+    enhancerVersion: manifest.version || '3.1.0',
     appVersion: (el && el.app && el.app.getVersion) ? el.app.getVersion() : 'unknown',
     repo: ENHANCER_REPO,
     enhancerDir,
     asarPath,
     asarBootstrapped: Boolean(asarStatus.bootstrapped),
-    smartLauncherInstalled: Boolean(launcher),
-    launcherPath: launcher,
-    logonTaskRegistered: checkLogonTaskRegistered(),
     safeMode: runtimeState.safeMode,
     disabled: runtimeState.disabled,
     lastError: runtimeState.lastError,
@@ -475,7 +444,7 @@ function getFullStatus() {
 
 async function checkRemoteUpdate() {
   const local = getLocalManifest();
-  const localVer = local.version || '3.0.0';
+  const localVer = local.version || '3.1.0';
   const cacheBust = `?t=${Date.now()}`;
 
   let remoteManifest = null;
@@ -556,7 +525,7 @@ async function checkRemoteUpdate() {
 
 async function applyInAppUpdate(refBranch = 'main') {
   const local = getLocalManifest();
-  const prevVersion = local.version || '3.0.0';
+  const prevVersion = local.version || '3.1.0';
 
   broadcastEvent('enhancer:update-progress', { phase: 'manifest', percent: 8, message: 'Fetching signed manifest...' });
   const manifestUrl = `https://raw.githubusercontent.com/${ENHANCER_REPO}/${encodeURIComponent(refBranch)}/enhancer/manifest.json?t=${Date.now()}`;
@@ -655,56 +624,6 @@ async function applyInAppUpdate(refBranch = 'main') {
   };
 }
 
-function spawnPostUpdateGuardian(reason = 'auto-updater') {
-  if (guardianSpawned) return;
-  const launcher = getLauncherPath();
-  if (!launcher) return;
-  guardianSpawned = true;
-  try {
-    const child = spawn(launcher, ['--watch-update', String(process.pid), '--reason', reason], {
-      detached: true,
-      stdio: 'ignore',
-      windowsHide: true
-    });
-    if (child.unref) child.unref();
-  } catch (_) {
-    guardianSpawned = false;
-  }
-}
-
-function hookOfficialAutoUpdater() {
-  const el = getElectron();
-  if (!el) return;
-
-  try {
-    if (el.autoUpdater && typeof el.autoUpdater.on === 'function') {
-      el.autoUpdater.on('update-downloaded', () => {
-        updateDownloadedThisSession = true;
-        spawnPostUpdateGuardian('electron-autoUpdater');
-      });
-    }
-  } catch (_) {}
-
-  try {
-    el.app.on('will-quit', () => {
-      if (updateDownloadedThisSession) {
-        spawnPostUpdateGuardian('will-quit');
-      } else if (process.platform === 'win32') {
-        // Also check electron-updater pending cache dir
-        const cachePending = path.join(process.env.LOCALAPPDATA || '', 'antigravity-updater', 'pending');
-        if (fs.existsSync(cachePending)) {
-          try {
-            const items = fs.readdirSync(cachePending);
-            if (items.length > 0) {
-              spawnPostUpdateGuardian('pending-cache');
-            }
-          } catch (_) {}
-        }
-      }
-    });
-  } catch (_) {}
-}
-
 function registerIpcHandlers() {
   const el = getElectron();
   if (!el || !el.ipcMain) return;
@@ -746,12 +665,6 @@ function registerIpcHandlers() {
       const asarPath = getAppAsarPath();
       const patcher = require(path.join(enhancerDir, 'asar-patcher.js'));
       const res = patcher.patchAsar(asarPath, { force: false });
-      const launcher = getLauncherPath();
-      if (launcher) {
-        try {
-          execFileSync(launcher, ['--setup-shortcuts'], { stdio: 'ignore', windowsHide: true });
-        } catch (_) {}
-      }
       return { ok: true, asar: res, status: getFullStatus() };
     } catch (err) {
       return { ok: false, error: err.message || String(err) };
@@ -790,20 +703,6 @@ function registerIpcHandlers() {
   ipcMain.handle('enhancer:restore-vanilla', async () => {
     try {
       const asarPath = getAppAsarPath();
-      const launcher = getLauncherPath();
-      if (launcher) {
-        const child = spawn(launcher, ['--restore-vanilla', '--pid', String(process.pid), '--relaunch'], {
-          detached: true,
-          stdio: 'ignore',
-          windowsHide: true
-        });
-        if (child.unref) child.unref();
-        setTimeout(() => {
-          try { app.exit(0); } catch (_) {}
-        }, 150);
-        return { ok: true, mode: 'launcher-relaunch' };
-      }
-
       const patcher = require(path.join(enhancerDir, 'asar-patcher.js'));
       patcher.unpatchAsar(asarPath);
       setTimeout(() => {
@@ -828,15 +727,6 @@ function init(options = {}) {
   handleCrashFailsafe();
   loadBootstrapPayload(true);
   registerIpcHandlers();
-
-  const el = getElectron();
-  if (el && el.app) {
-    if (el.app.isReady && el.app.isReady()) {
-      hookOfficialAutoUpdater();
-    } else if (el.app.whenReady) {
-      el.app.whenReady().then(() => hookOfficialAutoUpdater()).catch(() => {});
-    }
-  }
 }
 
 module.exports = {

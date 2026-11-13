@@ -33,7 +33,7 @@ jobs:
         shell: pwsh
         run: |
           $tag = "${{ github.ref_name }}"
-          $ver = if ($tag -match '^v(\d+\.\d+\.\d+)$') { $Matches[1] } else { "3.0.0" }
+          $ver = if ($tag -match '^v(\d+\.\d+\.\d+)$') { $Matches[1] } else { "3.1.0" }
           powershell -NoProfile -ExecutionPolicy Bypass -File .\build_exe_installer.ps1 -Version $ver
 
       - name: Run v3 architecture E2E suite
@@ -48,7 +48,6 @@ jobs:
           path: |
             Antigravity-Enhancer-Setup.exe
             Antigravity-Enhancer-v*-Setup.exe
-            AntigravityEnhancerLauncher.exe
             Antigravity-Enhancer-v*-Win.zip
             SHA256SUMS.txt
 
@@ -60,6 +59,5 @@ jobs:
           files: |
             Antigravity-Enhancer-Setup.exe
             Antigravity-Enhancer-v*-Setup.exe
-            AntigravityEnhancerLauncher.exe
             Antigravity-Enhancer-v*-Win.zip
             SHA256SUMS.txt

@@ -1,5 +1,5 @@
 /**
- * Antigravity Enhancer v3.0.0 - Modular Renderer Enhancer Engine
+ * Antigravity Enhancer v3.1.0 - Modular Renderer Enhancer Engine
  * Features: 9-Language Zero-Restart i18n, GSAP v3.15.1 Zero-Bounce Motion,
  *           AI Model Quota HUD & Composer Inline Badge (2.31.2 Hydrogen/Argon/Gemini/Claude),
  *           In-App Enhancer Hub & Direct Update Engine (x2tora/antigravity-enhancer)
@@ -11,7 +11,7 @@
   const ipc = electron_1 ? electron_1.ipcRenderer : null;
   const payload = (typeof __ENHANCER_PAYLOAD__ !== 'undefined' && __ENHANCER_PAYLOAD__) ? __ENHANCER_PAYLOAD__ : {};
   const ENHANCER_REPO = payload.repo || 'x2tora/antigravity-enhancer';
-  const ENHANCER_CURRENT_VERSION = payload.version || '3.0.0';
+  const ENHANCER_CURRENT_VERSION = payload.version || '3.1.0';
 
   // ---------------------------------------------------------------------------
   // 1. Install GSAP Core into Preload World
@@ -203,6 +203,13 @@
     const vUpper = safeDictGet(activeDict, upper);
     if (typeof vUpper === 'string') return raw.replace(trimmed, () => vUpper);
 
+    const dynRules = (lang === 'ko') ? dynamicRules : (multiLangDynamicRules[lang] || []);
+    for (const rule of dynRules) {
+      if (rule.reg.test(trimmed)) {
+        return raw.replace(trimmed, trimmed.replace(rule.reg, rule.rep));
+      }
+    }
+
     const p40Map = prefixDict40ByLang[lang];
     const p30Map = prefixDict30ByLang[lang];
     if (trimmed.length >= 28 && p40Map && p30Map) {
@@ -215,13 +222,6 @@
       if (normTrimmed.length >= 30) {
         const m30 = p30Map.get(normTrimmed.slice(0, 30));
         if (typeof m30 === 'string') return raw.replace(trimmed, () => m30);
-      }
-    }
-
-    const dynRules = (lang === 'ko') ? dynamicRules : (multiLangDynamicRules[lang] || []);
-    for (const rule of dynRules) {
-      if (rule.reg.test(trimmed)) {
-        return raw.replace(trimmed, trimmed.replace(rule.reg, rule.rep));
       }
     }
 
@@ -253,12 +253,33 @@
   const TRANSLATE_ATTRS = ['placeholder', 'data-placeholder', 'aria-placeholder', 'title', 'aria-label', 'data-tooltip', 'data-tip'];
   const originalTextMap = new WeakMap();
 
+  function translateElementAttrs(el) {
+    for (const attr of TRANSLATE_ATTRS) {
+      const val = el.getAttribute ? el.getAttribute(attr) : el[attr];
+      if (!val) continue;
+      const origKey = '__orig_' + attr;
+      const lastTransKey = '__last_trans_' + attr;
+      if (el[origKey] === undefined || (val !== el[origKey] && val !== el[lastTransKey])) {
+        el[origKey] = val;
+      }
+      const baseAttrVal = el[origKey] || val;
+      const trans = (activeLanguage === 'ko')
+        ? (safeDictGet(placeholders, baseAttrVal) || safeDictGet(exactDict, baseAttrVal) || (typeof baseAttrVal === 'string' ? safeDictGet(exactDict, baseAttrVal.toLowerCase()) : undefined) || translateText(baseAttrVal, 'ko'))
+        : translateText(baseAttrVal, activeLanguage);
+      if (trans && trans !== val) {
+        el[lastTransKey] = trans;
+        if (el.setAttribute) el.setAttribute(attr, trans);
+        if (attr === 'placeholder') el.placeholder = trans;
+      }
+    }
+  }
+
   function translateNode(node) {
-    if (!node || activeLanguage === 'en' || isImeComposing || isInputOrEditable(node)) return;
+    if (!node || activeLanguage === 'en' || isImeComposing) return;
 
     if (node.nodeType === 3) {
       const parent = node.parentElement;
-      if (!parent || shouldIgnore(parent) || node._isTranslating) return;
+      if (!parent || shouldIgnore(parent) || isInputOrEditable(parent) || node._isTranslating) return;
       const raw = node.nodeValue;
       if (!raw || !raw.trim()) return;
       if (node._lastTranslatedValue && raw === node._lastTranslatedValue) return;
@@ -286,27 +307,19 @@
     }
 
     if (node.nodeType === 1) {
-      if (shouldIgnore(node)) return;
-      const isFocused = (document.activeElement === node);
-      for (const attr of TRANSLATE_ATTRS) {
-        if (attr === 'placeholder' && isFocused) continue;
-        const val = node.getAttribute ? node.getAttribute(attr) : node[attr];
-        if (!val) continue;
-        const origKey = '__orig_' + attr;
-        const lastTransKey = '__last_trans_' + attr;
-        if (node[origKey] === undefined || (val !== node[origKey] && val !== node[lastTransKey])) {
-          node[origKey] = val;
-        }
-        const baseAttrVal = node[origKey] || val;
-        const trans = (activeLanguage === 'ko')
-          ? (safeDictGet(placeholders, baseAttrVal) || safeDictGet(exactDict, baseAttrVal) || (typeof baseAttrVal === 'string' ? safeDictGet(exactDict, baseAttrVal.toLowerCase()) : undefined) || translateText(baseAttrVal, 'ko'))
-          : translateText(baseAttrVal, activeLanguage);
-        if (trans && trans !== val) {
-          node[lastTransKey] = trans;
-          if (node.setAttribute) node.setAttribute(attr, trans);
-          if (attr === 'placeholder') node.placeholder = trans;
-        }
+      const tag = node.tagName;
+      const isFormInput = (tag === 'INPUT' || tag === 'TEXTAREA');
+      const isEditableRoot = Boolean(
+        node.isContentEditable ||
+        (node.hasAttribute && (node.hasAttribute('data-lexical-editor') || (node.classList && node.classList.contains('lexical-editor'))))
+      );
+      if (isFormInput || isEditableRoot) {
+        const inProtectedWidget = node.closest && node.closest('.monaco-editor, .notranslate, [translate="no"], #antigravity-enhancer-modal-backdrop, #antigravity-quota-popover');
+        if (!inProtectedWidget) translateElementAttrs(node);
+        return;
       }
+      if (isInputOrEditable(node) || shouldIgnore(node)) return;
+      translateElementAttrs(node);
       if (node.shadowRoot) translateNode(node.shadowRoot);
       const children = node.childNodes;
       for (let i = 0; i < children.length; i++) translateNode(children[i]);
@@ -316,9 +329,20 @@
     }
   }
 
+  function revertElementAttrs(el) {
+    for (const attr of TRANSLATE_ATTRS) {
+      const key = '__orig_' + attr;
+      if (el[key] !== undefined) {
+        if (el.setAttribute) el.setAttribute(attr, el[key]);
+        if (attr === 'placeholder') el.placeholder = el[key];
+      }
+    }
+  }
+
   function revertToOriginal(node) {
-    if (!node || isInputOrEditable(node)) return;
+    if (!node) return;
     if (node.nodeType === 3) {
+      if (isInputOrEditable(node)) return;
       const orig = node._originalText !== undefined ? node._originalText : originalTextMap.get(node);
       if (orig !== undefined) {
         node._isTranslating = true;
@@ -329,13 +353,13 @@
       return;
     }
     if (node.nodeType === 1) {
-      for (const attr of TRANSLATE_ATTRS) {
-        const key = '__orig_' + attr;
-        if (node[key] !== undefined) {
-          if (node.setAttribute) node.setAttribute(attr, node[key]);
-          if (attr === 'placeholder') node.placeholder = node[key];
-        }
+      const tag = node.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || node.isContentEditable || (node.hasAttribute && node.hasAttribute('data-lexical-editor'))) {
+        revertElementAttrs(node);
+        return;
       }
+      if (isInputOrEditable(node)) return;
+      revertElementAttrs(node);
       if (node.shadowRoot) revertToOriginal(node.shadowRoot);
       const ch = node.childNodes;
       for (let i = 0; i < ch.length; i++) revertToOriginal(ch[i]);
@@ -467,10 +491,6 @@
       persistenceTitle: 'Persistence Status',
       asarOk: 'ASAR Active',
       asarWarn: 'ASAR Repair Needed',
-      launcherOk: 'Launcher Ready',
-      launcherWarn: 'Launcher Missing',
-      taskOk: 'Startup Task Active',
-      taskWarn: 'Startup Task Off',
       repairBtn: 'Verify & Repair',
       repairedMsg: 'Status verified.',
       updateSection: 'Updates (x2tora/antigravity-enhancer)',
@@ -499,10 +519,6 @@
       persistenceTitle: '업데이트 유지 상태',
       asarOk: 'ASAR 연결됨',
       asarWarn: 'ASAR 복구 필요',
-      launcherOk: '런처 설치됨',
-      launcherWarn: '런처 미설치',
-      taskOk: '로그온 작업 활성',
-      taskWarn: '로그온 작업 꺼짐',
       repairBtn: '점검 및 복구',
       repairedMsg: '상태를 복구했습니다.',
       updateSection: '업데이트 (x2tora/antigravity-enhancer)',
@@ -531,10 +547,6 @@
       persistenceTitle: '更新維持ステータス',
       asarOk: 'ASAR 有効',
       asarWarn: 'ASAR 修復が必要',
-      launcherOk: 'ランチャー接続済み',
-      launcherWarn: 'ランチャー未検出',
-      taskOk: 'ログオン監視有効',
-      taskWarn: 'ログオン監視無効',
       repairBtn: '確認 / 修復',
       repairedMsg: '状態を確認しました。',
       updateSection: '更新 (x2tora/antigravity-enhancer)',
@@ -563,10 +575,6 @@
       persistenceTitle: '更新保留状态',
       asarOk: 'ASAR 正常',
       asarWarn: 'ASAR 需修复',
-      launcherOk: '启动器就绪',
-      launcherWarn: '未找到启动器',
-      taskOk: '登录任务已启用',
-      taskWarn: '登录任务未启用',
       repairBtn: '检查并修复',
       repairedMsg: '状态已修复。',
       updateSection: '更新 (x2tora/antigravity-enhancer)',
@@ -595,10 +603,6 @@
       persistenceTitle: '更新保留狀態',
       asarOk: 'ASAR 正常',
       asarWarn: 'ASAR 需修復',
-      launcherOk: '啟動器就緒',
-      launcherWarn: '找不到啟動器',
-      taskOk: '登入工作已啟用',
-      taskWarn: '登入工作未啟用',
       repairBtn: '檢查並修復',
       repairedMsg: '狀態已修復。',
       updateSection: '更新 (x2tora/antigravity-enhancer)',
@@ -627,10 +631,6 @@
       persistenceTitle: 'Persistencia',
       asarOk: 'ASAR activo',
       asarWarn: 'Reparar ASAR',
-      launcherOk: 'Launcher listo',
-      launcherWarn: 'Launcher no encontrado',
-      taskOk: 'Tarea de inicio activa',
-      taskWarn: 'Tarea desactivada',
       repairBtn: 'Verificar y reparar',
       repairedMsg: 'Estado verificado.',
       updateSection: 'Actualizaciones (x2tora/antigravity-enhancer)',
@@ -659,10 +659,6 @@
       persistenceTitle: 'Persistance',
       asarOk: 'ASAR actif',
       asarWarn: 'ASAR à réparer',
-      launcherOk: 'Lanceur prêt',
-      launcherWarn: 'Lanceur absent',
-      taskOk: 'Tâche de session active',
-      taskWarn: 'Tâche inactive',
       repairBtn: 'Vérifier et réparer',
       repairedMsg: 'État vérifié.',
       updateSection: 'Mises à jour (x2tora/antigravity-enhancer)',
@@ -691,10 +687,6 @@
       persistenceTitle: 'Persistenzstatus',
       asarOk: 'ASAR aktiv',
       asarWarn: 'ASAR reparieren',
-      launcherOk: 'Launcher bereit',
-      launcherWarn: 'Launcher fehlt',
-      taskOk: 'Anmeldeaufgabe aktiv',
-      taskWarn: 'Aufgabe aus',
       repairBtn: 'Prüfen / Reparieren',
       repairedMsg: 'Status geprüft.',
       updateSection: 'Updates (x2tora/antigravity-enhancer)',
@@ -723,10 +715,6 @@
       persistenceTitle: 'Состояние защиты',
       asarOk: 'ASAR активен',
       asarWarn: 'Нужно восстановление ASAR',
-      launcherOk: 'Лаунчер готов',
-      launcherWarn: 'Лаунчер не найден',
-      taskOk: 'Задача входа активна',
-      taskWarn: 'Задача отключена',
       repairBtn: 'Проверить / восстановить',
       repairedMsg: 'Состояние проверено.',
       updateSection: 'Обновления (x2tora/antigravity-enhancer)',
@@ -812,8 +800,6 @@
       enhancerVersion: ENHANCER_CURRENT_VERSION,
       appVersion: '2.31.2',
       asarBootstrapped: true,
-      smartLauncherInstalled: false,
-      logonTaskRegistered: false,
       backup: { available: false }
     };
     const h = getHubStrings();
@@ -869,8 +855,6 @@
         </div>
         <div id="agy-hub-persist-pills" style="display:flex;flex-wrap:wrap;gap:6px;">
           ${badgePill(status.asarBootstrapped, status.asarBootstrapped ? h.asarOk : h.asarWarn)}
-          ${badgePill(status.smartLauncherInstalled, status.smartLauncherInstalled ? h.launcherOk : h.launcherWarn)}
-          ${badgePill(status.logonTaskRegistered, status.logonTaskRegistered ? h.taskOk : h.taskWarn)}
         </div>
         <div id="agy-hub-persist-msg" style="font-size:11px;color:#A0A3F6;margin-top:6px;display:none;"></div>
       </div>
@@ -997,9 +981,7 @@
       const msgEl = modal.querySelector('#agy-hub-persist-msg');
       if (res && res.ok && res.status) {
         modal.querySelector('#agy-hub-persist-pills').innerHTML = [
-          badgePill(res.status.asarBootstrapped, res.status.asarBootstrapped ? h.asarOk : h.asarWarn),
-          badgePill(res.status.smartLauncherInstalled, res.status.smartLauncherInstalled ? h.launcherOk : h.launcherWarn),
-          badgePill(res.status.logonTaskRegistered, res.status.logonTaskRegistered ? h.taskOk : h.taskWarn)
+          badgePill(res.status.asarBootstrapped, res.status.asarBootstrapped ? h.asarOk : h.asarWarn)
         ].join('');
         msgEl.textContent = h.repairedMsg;
         msgEl.style.display = 'block';

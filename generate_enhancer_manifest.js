@@ -7,7 +7,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
-const VERSION = '3.0.0';
+const VERSION = '3.1.0';
 const REPO = 'x2tora/antigravity-enhancer';
 const enhancerDir = path.join(__dirname, 'enhancer');
 
@@ -45,7 +45,7 @@ const manifest = {
   testedAppVersion: '2.31.2',
   repo: REPO,
   updatedAt: new Date().toISOString(),
-  releaseNotes: 'v3.0.0: Antigravity 2.31.2 full support (Gemini 4 Hydrogen & Coordinators i18n), Hybrid Zero-Resident Persistence across official app updates, and direct In-App Enhancer Hub self-updater.',
+  releaseNotes: 'v3.1.0: Full 9-language New Conversation greetings & placeholders, OS-language auto-detected Windows installer, and streamlined direct launch without standalone launcher executable.',
   files
 };
 

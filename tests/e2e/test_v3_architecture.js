@@ -1,9 +1,9 @@
 // tests/e2e/test_v3_architecture.js
-// Comprehensive verification suite for Antigravity Enhancer v3.0.0:
-// F22: Modular Enhancer & Manifest Integrity
+// Comprehensive verification suite for Antigravity Enhancer v3.1.0:
+// F22: Modular Enhancer & Manifest Integrity + 9-Language New Conversation Prompts
 // F23: Lossless ASAR v4 Micro-Bootstrapper (2.31.2+)
 // F24: Secure In-App Self-Updater & Rollback (x2tora/antigravity-enhancer)
-// F25: Antigravity 2.31.2 UI/Model Compatibility & Persistent Guardian
+// F25: Antigravity 2.31.2 UI/Model Compatibility & OS-Localized Installer
 
 const fs = require('fs');
 const os = require('os');
@@ -25,8 +25,9 @@ const INSTALLER_DIR = path.join(ROOT_DIR, 'installer');
 const asarPatcher = require(path.join(ENHANCER_DIR, 'asar-patcher.js'));
 const mainEnhancer = require(path.join(ENHANCER_DIR, 'main-enhancer.js'));
 
-function createRendererHarness() {
+function createRendererHarness(initialLang = 'ko', seedDomFn = null) {
   const { window, document, localStorage } = createMockEnvironment();
+  if (initialLang) localStorage.setItem('antigravity_ui_language', initialLang);
   const invoked = [];
   const ipcListeners = {};
 
@@ -102,12 +103,10 @@ function createRendererHarness() {
       invoked.push({ channel, arg });
       if (channel === 'enhancer:get-status') {
         return {
-          enhancerVersion: '3.0.0',
+          enhancerVersion: '3.1.0',
           appVersion: '2.31.2',
           asarBootstrapped: true,
-          smartLauncherInstalled: true,
-          logonTaskRegistered: true,
-          backup: { available: true, version: '2.9.9' }
+          backup: { available: true, version: '3.0.0' }
         };
       }
       if (channel === 'enhancer:check-update') {
@@ -115,8 +114,8 @@ function createRendererHarness() {
           ok: true,
           hasUpdate: true,
           canApplyInApp: true,
-          currentVersion: '3.0.0',
-          remoteVersion: '3.1.0',
+          currentVersion: '3.1.0',
+          remoteVersion: '3.2.0',
           releaseNotes: 'Test update'
         };
       }
@@ -134,7 +133,7 @@ function createRendererHarness() {
 
   const payload = {
     disabled: false,
-    version: '3.0.0',
+    version: '3.1.0',
     repo: 'x2tora/antigravity-enhancer',
     code: rendererCode,
     gsapCode,
@@ -199,6 +198,7 @@ function createRendererHarness() {
   patchEl(headerParent);
   patchEl(auxBtn);
   patchEl(modelTrigger);
+  if (typeof seedDomFn === 'function') seedDomFn(document, patchEl);
 
   vm.createContext(sandbox);
   vm.runInContext(rendererCode, sandbox, { filename: 'renderer-enhancer.js' });
@@ -209,11 +209,11 @@ function createRendererHarness() {
 // ============================================================================
 // F22: Modular Enhancer & Manifest Integrity
 // ============================================================================
-registerTest(1, 'F22', 'manifest.json v3.0.0 points to x2tora/antigravity-enhancer & matches SHA-256 digests', () => {
+registerTest(1, 'F22', 'manifest.json v3.1.0 points to x2tora/antigravity-enhancer & matches SHA-256 digests', () => {
   const manifestPath = path.join(ENHANCER_DIR, 'manifest.json');
   assert.ok(fs.existsSync(manifestPath), 'enhancer/manifest.json missing');
   const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-  assert.strictEqual(manifest.version, '3.0.0');
+  assert.strictEqual(manifest.version, '3.1.0');
   assert.strictEqual(manifest.repo, 'x2tora/antigravity-enhancer');
   assert.strictEqual(manifest.testedAppVersion, '2.31.2');
 
@@ -225,6 +225,106 @@ registerTest(1, 'F22', 'manifest.json v3.0.0 points to x2tora/antigravity-enhanc
     const actualSha = crypto.createHash('sha256').update(buf).digest('hex');
     assert.strictEqual(actualSha, meta.sha256, `SHA-256 mismatch for ${fname}`);
   }
+});
+
+registerTest(1, 'F22', 'Renderer translates all 2.31.2 & 2.30.0 New Conversation greetings/placeholders across all 9 languages and preserves editables', () => {
+  const langs = ['ko', 'ja', 'zh-CN', 'zh-TW', 'es', 'fr', 'de', 'ru'];
+  const textPrompts = [
+    'Hey there, what should we build today?',
+    'Welcome back. Where should we pick up?',
+    "Good to see you. What's next?",
+    'Good to see you. What\u2019s next?',
+    'Hey Tora, what should we build today?',
+    'Welcome back, Alice. Where should we pick up?',
+    "Good to see you, Tora. What's next?",
+    'Hi Tora, what can we get done today?',
+    'What can we get done today?',
+    'Welcome back, Tora.',
+    'Good to see you, Tora.',
+    'Hello, Tora.',
+    'Hi Tora.',
+    'Hi there.',
+    'Hello.',
+    'Welcome back.',
+    'Good to see you.',
+    'Select a model in the model selector',
+    'Select model with Ctrl+/',
+    'Find plugins - bundles of skills, agents, MCP servers, UI extensions and more, and install them in one click.'
+  ];
+
+  for (const lang of langs) {
+    let nodes = [];
+    let inputEl;
+    let taEl;
+    let lexicalEl;
+    let typedChild;
+
+    createRendererHarness(lang, (doc, patchEl) => {
+      nodes = textPrompts.map((src) => {
+        const el = patchEl(new MockElement('div'));
+        el.appendChild(new MockText(src));
+        doc.body.appendChild(el);
+        return { src, el };
+      });
+      inputEl = patchEl(new MockElement('input'));
+      inputEl.setAttribute('placeholder', 'Ask anything, @ to mention, / for actions');
+      inputEl.value = 'User typed input';
+      doc.body.appendChild(inputEl);
+
+      taEl = patchEl(new MockElement('textarea'));
+      taEl.setAttribute('placeholder', 'Ask anything');
+      doc.body.appendChild(taEl);
+
+      lexicalEl = patchEl(new MockElement('div'));
+      lexicalEl.setAttribute('contenteditable', 'true');
+      lexicalEl.isContentEditable = true;
+      lexicalEl.setAttribute('data-placeholder', 'Ask anything, @ to mention');
+      typedChild = patchEl(new MockElement('p'));
+      typedChild.appendChild(new MockText('Select a model in the model selector'));
+      lexicalEl.appendChild(typedChild);
+      doc.body.appendChild(lexicalEl);
+    });
+
+    for (const { src, el } of nodes) {
+      assert.notStrictEqual(el.textContent, src, `[${lang}] Must translate prompt: ${src}`);
+      if (src.includes('Tora')) {
+        assert.ok(el.textContent.includes('Tora'), `[${lang}] Must preserve user name in greeting: ${el.textContent}`);
+      }
+      if (src.includes('Alice')) {
+        assert.ok(el.textContent.includes('Alice'), `[${lang}] Must preserve user name in greeting: ${el.textContent}`);
+      }
+      if (src === 'Select model with Ctrl+/') {
+        assert.ok(el.textContent.includes('Ctrl+/'), `[${lang}] Must preserve hotkey in: ${el.textContent}`);
+      }
+      if (lang === 'ko' && src === 'Select a model in the model selector') {
+        assert.ok(!el.textContent.includes('model selector'), `Korean translation must not leak English fallback: ${el.textContent}`);
+      }
+    }
+
+    assert.notStrictEqual(inputEl.getAttribute('placeholder'), 'Ask anything, @ to mention, / for actions', `[${lang}] <input placeholder> must translate`);
+    assert.strictEqual(inputEl.value, 'User typed input', `[${lang}] <input>.value must never be altered`);
+    assert.notStrictEqual(taEl.getAttribute('placeholder'), 'Ask anything', `[${lang}] <textarea placeholder> must translate`);
+    assert.notStrictEqual(lexicalEl.getAttribute('data-placeholder'), 'Ask anything, @ to mention', `[${lang}] [contenteditable] data-placeholder must translate`);
+    assert.strictEqual(typedChild.textContent, 'Select a model in the model selector', `[${lang}] Typed child inside [contenteditable] must NOT be altered`);
+  }
+
+  // Verify cycling ru -> en reverts both text nodes and input placeholder attributes cleanly
+  let ruNodes = [];
+  let ruInput;
+  const { window } = createRendererHarness('ru', (doc, patchEl) => {
+    const d = patchEl(new MockElement('div'));
+    d.appendChild(new MockText('Hey Tora, what should we build today?'));
+    doc.body.appendChild(d);
+    ruNodes.push(d);
+    ruInput = patchEl(new MockElement('input'));
+    ruInput.setAttribute('placeholder', 'Ask anything, @ to mention, / for actions');
+    doc.body.appendChild(ruInput);
+  });
+  assert.notStrictEqual(ruNodes[0].textContent, 'Hey Tora, what should we build today?');
+  assert.notStrictEqual(ruInput.getAttribute('placeholder'), 'Ask anything, @ to mention, / for actions');
+  window.dispatchEvent({ type: 'keydown', altKey: true, shiftKey: true, key: 'L', preventDefault: () => {} }); // ru -> en
+  assert.strictEqual(ruNodes[0].textContent, 'Hey Tora, what should we build today?', 'Switching to en must revert greeting');
+  assert.strictEqual(ruInput.getAttribute('placeholder'), 'Ask anything, @ to mention, / for actions', 'Switching to en must revert input placeholder');
 });
 
 registerTest(1, 'F22', 'dictionaries.json contains 2.31.2 strings across all 8 target languages', () => {
@@ -427,21 +527,28 @@ registerTest(1, 'F25', 'build_exe_installer.ps1 uses safe build hygiene, #0B0B0E
   assert.ok(!rendererSrc.includes('brightness(1.12)'), 'Global IDE hover brightness animation must be removed');
 
   assert.ok(fs.existsSync(path.join(INSTALLER_DIR, 'AsarMicroPatcher.cs')));
-  assert.ok(fs.existsSync(path.join(INSTALLER_DIR, 'Launcher.cs')));
+  assert.ok(!fs.existsSync(path.join(INSTALLER_DIR, 'Launcher.cs')), 'Launcher.cs must be removed');
+  assert.ok(!fs.existsSync(path.join(ROOT_DIR, 'AntigravityEnhancerLauncher.exe')), 'AntigravityEnhancerLauncher.exe must not be built');
+  assert.ok(!ps1Src.includes('AntigravityEnhancerLauncher'), 'build_exe_installer.ps1 must not reference AntigravityEnhancerLauncher');
+
+  const mainSrc = fs.readFileSync(path.join(ENHANCER_DIR, 'main-enhancer.js'), 'utf8');
+  assert.ok(!mainSrc.includes('AntigravityEnhancerLauncher'), 'main-enhancer.js must not reference AntigravityEnhancerLauncher');
+  assert.ok(!mainSrc.includes('schtasks'), 'main-enhancer.js must not reference schtasks');
+
   assert.ok(fs.existsSync(path.join(ROOT_DIR, '.github', 'workflows', 'release.yml')), 'GitHub Actions release workflow must exist');
   assert.ok(fs.existsSync(path.join(ROOT_DIR, 'Antigravity-Enhancer-Setup.exe')));
-  assert.ok(fs.existsSync(path.join(ROOT_DIR, 'AntigravityEnhancerLauncher.exe')));
-  assert.ok(fs.existsSync(path.join(ROOT_DIR, 'Antigravity-Enhancer-v3.0.0-Setup.exe')));
-  assert.ok(fs.existsSync(path.join(ROOT_DIR, 'Antigravity-Enhancer-v3.0.0-Win.zip')));
+  assert.ok(fs.existsSync(path.join(ROOT_DIR, 'Antigravity-Enhancer-v3.1.0-Setup.exe')));
+  assert.ok(fs.existsSync(path.join(ROOT_DIR, 'Antigravity-Enhancer-v3.1.0-Win.zip')));
   assert.ok(fs.existsSync(path.join(ROOT_DIR, 'SHA256SUMS.txt')));
 
   const sums = fs.readFileSync(path.join(ROOT_DIR, 'SHA256SUMS.txt'), 'utf8');
+  assert.ok(!sums.includes('AntigravityEnhancerLauncher.exe'), 'SHA256SUMS.txt must not list removed launcher');
   const setupHash = crypto.createHash('sha256').update(fs.readFileSync(path.join(ROOT_DIR, 'Antigravity-Enhancer-Setup.exe'))).digest('hex');
   assert.ok(sums.includes(setupHash + '  Antigravity-Enhancer-Setup.exe'), 'SHA256SUMS.txt must match Antigravity-Enhancer-Setup.exe');
 });
 
 // ============================================================================
-// Tier 4: Real-World Updater Staging, Tamper Rejection, Rollback & Guardian
+// Tier 4: Real-World Updater Staging, Tamper Rejection, Rollback & Installer i18n
 // ============================================================================
 registerTest(4, 'F24', 'Main updater rejects SHA-256 tampering cleanly, atomically stages valid updates, & rolls back to snapshot', async () => {
   const { EventEmitter } = require('events');
@@ -452,11 +559,11 @@ registerTest(4, 'F24', 'Main updater rejects SHA-256 tampering cleanly, atomical
   fs.mkdirSync(tmpAppDir, { recursive: true });
 
   try {
-    const initialRenderer = Buffer.from('/* v3.0.0 initial */', 'utf8');
+    const initialRenderer = Buffer.from('/* v3.1.0 initial */', 'utf8');
     const initialSha = crypto.createHash('sha256').update(initialRenderer).digest('hex');
     fs.writeFileSync(path.join(tmpEnhDir, 'renderer-enhancer.js'), initialRenderer);
     fs.writeFileSync(path.join(tmpEnhDir, 'manifest.json'), JSON.stringify({
-      version: '3.0.0',
+      version: '3.1.0',
       repo: 'x2tora/antigravity-enhancer',
       files: { 'renderer-enhancer.js': { sha256: initialSha, size: initialRenderer.length } }
     }));
@@ -508,83 +615,161 @@ registerTest(4, 'F24', 'Main updater rejects SHA-256 tampering cleanly, atomical
     const fileUrl = 'https://raw.githubusercontent.com/x2tora/antigravity-enhancer/main/enhancer/renderer-enhancer.js';
 
     // 1. Tamper test: digest mismatch must abort BEFORE overwriting live enhancerDir
-    const v31Tampered = Buffer.from('/* v3.1.0 TAMPERED */', 'utf8');
+    const v32Tampered = Buffer.from('/* v3.2.0 TAMPERED */', 'utf8');
     remoteResponses.set(manifestUrl, JSON.stringify({
-      version: '3.1.0',
-      files: { 'renderer-enhancer.js': { sha256: 'a'.repeat(64), size: v31Tampered.length } }
+      version: '3.2.0',
+      files: { 'renderer-enhancer.js': { sha256: 'a'.repeat(64), size: v32Tampered.length } }
     }));
-    remoteResponses.set(fileUrl, v31Tampered);
+    remoteResponses.set(fileUrl, v32Tampered);
     await assert.rejects(() => isolated.applyInAppUpdate('main'), /SHA-256 verification failed/);
-    assert.strictEqual(fs.readFileSync(path.join(tmpEnhDir, 'renderer-enhancer.js'), 'utf8'), '/* v3.0.0 initial */');
-    assert.strictEqual(JSON.parse(fs.readFileSync(path.join(tmpEnhDir, 'manifest.json'), 'utf8')).version, '3.0.0');
+    assert.strictEqual(fs.readFileSync(path.join(tmpEnhDir, 'renderer-enhancer.js'), 'utf8'), '/* v3.1.0 initial */');
+    assert.strictEqual(JSON.parse(fs.readFileSync(path.join(tmpEnhDir, 'manifest.json'), 'utf8')).version, '3.1.0');
 
     // 2. Valid atomic staging + backup snapshot
-    const v31Valid = Buffer.from('/* v3.1.0 valid */', 'utf8');
-    const v31Sha = crypto.createHash('sha256').update(v31Valid).digest('hex');
+    const v32Valid = Buffer.from('/* v3.2.0 valid */', 'utf8');
+    const v32Sha = crypto.createHash('sha256').update(v32Valid).digest('hex');
     remoteResponses.set(manifestUrl, JSON.stringify({
-      version: '3.1.0',
-      files: { 'renderer-enhancer.js': { sha256: v31Sha, size: v31Valid.length } }
+      version: '3.2.0',
+      files: { 'renderer-enhancer.js': { sha256: v32Sha, size: v32Valid.length } }
     }));
-    remoteResponses.set(fileUrl, v31Valid);
+    remoteResponses.set(fileUrl, v32Valid);
     const applyRes = await isolated.applyInAppUpdate('main');
     assert.strictEqual(applyRes.ok, true);
-    assert.strictEqual(applyRes.newVersion, '3.1.0');
-    assert.strictEqual(fs.readFileSync(path.join(tmpEnhDir, 'renderer-enhancer.js'), 'utf8'), '/* v3.1.0 valid */');
-    assert.strictEqual(JSON.parse(fs.readFileSync(path.join(tmpEnhDir, 'manifest.json'), 'utf8')).version, '3.1.0');
+    assert.strictEqual(applyRes.newVersion, '3.2.0');
+    assert.strictEqual(fs.readFileSync(path.join(tmpEnhDir, 'renderer-enhancer.js'), 'utf8'), '/* v3.2.0 valid */');
+    assert.strictEqual(JSON.parse(fs.readFileSync(path.join(tmpEnhDir, 'manifest.json'), 'utf8')).version, '3.2.0');
     assert.ok(fs.existsSync(path.join(tmpEnhDir, 'backup', 'latest', 'manifest.json')), 'Rollback snapshot must exist');
 
-    // 3. Rollback to backup/latest restores exact v3.0.0 payload
+    // 3. Rollback to backup/latest restores exact v3.1.0 payload
     const rbRes = isolated.restoreFromBackupDir(path.join(tmpEnhDir, 'backup', 'latest'));
     assert.strictEqual(rbRes.ok, true);
-    assert.strictEqual(rbRes.restoredVersion, '3.0.0');
-    assert.strictEqual(fs.readFileSync(path.join(tmpEnhDir, 'renderer-enhancer.js'), 'utf8'), '/* v3.0.0 initial */');
-    assert.strictEqual(JSON.parse(fs.readFileSync(path.join(tmpEnhDir, 'manifest.json'), 'utf8')).version, '3.0.0');
+    assert.strictEqual(rbRes.restoredVersion, '3.1.0');
+    assert.strictEqual(fs.readFileSync(path.join(tmpEnhDir, 'renderer-enhancer.js'), 'utf8'), '/* v3.1.0 initial */');
+    assert.strictEqual(JSON.parse(fs.readFileSync(path.join(tmpEnhDir, 'manifest.json'), 'utf8')).version, '3.1.0');
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
 });
 
-registerTest(4, 'F25', 'Compiled AntigravityEnhancerLauncher.exe --check-only --app-dir self-heals vanilla 2.31.2 ASAR copy idempotently', () => {
+registerTest(4, 'F25', 'Installer OS language auto-detection (9 languages + English fallback) and C# ASAR bootstrap idempotency', () => {
   const { execFileSync } = require('child_process');
   const csc = 'C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\csc.exe';
   const liveAsar = path.join(process.env.LOCALAPPDATA || '', 'Programs', 'Antigravity', 'resources', 'app.asar');
-  if (!fs.existsSync(csc) || !fs.existsSync(liveAsar)) return;
+  if (!fs.existsSync(csc)) return;
 
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'agy-launcher-t4-'));
+  const ps1Src = fs.readFileSync(path.join(ROOT_DIR, 'build_exe_installer.ps1'), 'utf8');
+  const match = ps1Src.match(/\$csSource = @'\r?\n([\s\S]*?)\r?\n'@/);
+  assert.ok(match, 'Must extract WPF C# source from build_exe_installer.ps1');
+
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'agy-installer-i18n-t4-'));
   try {
-    const tmpAppDir = path.join(tmpDir, 'App');
-    const tmpResDir = path.join(tmpAppDir, 'resources');
-    fs.mkdirSync(tmpResDir, { recursive: true });
-    fs.writeFileSync(path.join(tmpAppDir, 'Antigravity.exe'), Buffer.from('MZ'));
-    const workAsar = path.join(tmpResDir, 'app.asar');
-    fs.copyFileSync(liveAsar, workAsar);
-    // Normalize temp copy to vanilla if host app.asar is currently patched
-    if (asarPatcher.inspectAsarStatus(workAsar).bootstrapped || asarPatcher.inspectAsarStatus(workAsar).hasLegacy) {
-      asarPatcher.unpatchAsar(workAsar);
-    }
-    const origSha = crypto.createHash('sha256').update(fs.readFileSync(workAsar)).digest('hex');
+    const installerCsPath = path.join(tmpDir, 'InstallerWPF.cs');
+    // Rename App.Main out so test harness can define entry point cleanly
+    const modifiedCs = match[1]
+      .replace('__ENHANCER_VERSION__', '3.1.0')
+      .replace('public static void Main()', 'public static void MainWpfDisabled()');
+    fs.writeFileSync(installerCsPath, '\uFEFF' + modifiedCs, 'utf8');
 
-    const launcherExe = path.join(tmpDir, 'AntigravityEnhancerLauncher.exe');
+    const probeCsPath = path.join(tmpDir, 'Probe.cs');
+    const probeCode = `
+using System;
+using AntigravityEnhancer;
+
+public static class ProbeMain
+{
+    public static int Main(string[] args)
+    {
+        if (args.Length >= 1 && args[0] == "--check-i18n")
+        {
+            string[] cultures = new string[] {
+                "en-US:en", "en-GB:en", "ko-KR:ko", "ja-JP:ja",
+                "zh-CN:zh-CN", "zh-SG:zh-CN", "zh-Hans:zh-CN",
+                "zh-TW:zh-TW", "zh-HK:zh-TW", "zh-Hant:zh-TW",
+                "es-ES:es", "es-419:es", "fr-FR:fr", "fr-CA:fr",
+                "de-DE:de", "ru-RU:ru", "pt-BR:en", "it-IT:en", "vi-VN:en", ":en"
+            };
+            foreach (string pair in cultures)
+            {
+                string[] parts = pair.Split(':');
+                string actual = InstallerI18n.ResolveCultureCode(parts[0], "");
+                if (actual != parts[1])
+                {
+                    Console.Error.WriteLine("Culture mismatch for " + parts[0] + ": expected " + parts[1] + ", got " + actual);
+                    return 2;
+                }
+            }
+            string envDetected = InstallerI18n.DetectLanguage();
+            Console.WriteLine("DETECTED:" + envDetected);
+            foreach (string lang in InstallerI18n.SupportedLanguages)
+            {
+                string title = InstallerI18n.Get(lang, "HeroTitle");
+                string install = InstallerI18n.Get(lang, "BtnInstall");
+                if (string.IsNullOrEmpty(title) || string.IsNullOrEmpty(install) || title == "HeroTitle" || install == "BtnInstall")
+                {
+                    Console.Error.WriteLine("Missing translation key for " + lang);
+                    return 3;
+                }
+            }
+            return 0;
+        }
+        if (args.Length >= 2 && args[0] == "--asar-check")
+        {
+            AsarMicroPatcher.EnsureBootstrapped(args[1], false);
+            return AsarMicroPatcher.IsBootstrapped(args[1]) ? 0 : 4;
+        }
+        return 1;
+    }
+}
+`;
+    fs.writeFileSync(probeCsPath, '\uFEFF' + probeCode, 'utf8');
+
+    const probeExe = path.join(tmpDir, 'InstallerProbe.exe');
     execFileSync(csc, [
-      '/nologo', '/target:winexe', '/optimize+', '/platform:x64',
-      `/win32manifest:${path.join(INSTALLER_DIR, 'app.manifest')}`,
-      `/out:${launcherExe}`,
-      '/r:System.dll', '/r:System.Web.Extensions.dll',
+      '/nologo', '/target:exe', '/optimize+', '/platform:x64', '/codepage:65001',
+      `/out:${probeExe}`,
+      '/lib:C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\WPF',
+      '/r:System.dll', '/r:System.Web.Extensions.dll', '/r:System.Xaml.dll',
+      '/r:System.Windows.Forms.dll', '/r:WindowsBase.dll', '/r:PresentationCore.dll',
+      '/r:PresentationFramework.dll',
       path.join(INSTALLER_DIR, 'AsarMicroPatcher.cs'),
-      path.join(INSTALLER_DIR, 'Launcher.cs')
+      installerCsPath,
+      probeCsPath
     ], { stdio: 'pipe', timeout: 30000 });
 
-    execFileSync(launcherExe, ['--check-only', '--app-dir', tmpAppDir], { stdio: 'pipe', timeout: 15000 });
-    assert.strictEqual(asarPatcher.inspectAsarStatus(workAsar).bootstrapped, true, 'Launcher --check-only must micro-bootstrap vanilla ASAR');
+    const out = execFileSync(probeExe, ['--check-i18n'], {
+      env: { ...process.env, ANTIGRAVITY_ENHANCER_LANG: 'ja-JP' },
+      encoding: 'utf8',
+      timeout: 15000
+    });
+    assert.ok(out.includes('DETECTED:ja'), 'DetectLanguage must resolve ja-JP -> ja');
 
-    const afterFirstSha = crypto.createHash('sha256').update(fs.readFileSync(workAsar)).digest('hex');
-    execFileSync(launcherExe, ['--check-only', '--app-dir', tmpAppDir], { stdio: 'pipe', timeout: 15000 });
-    const afterSecondSha = crypto.createHash('sha256').update(fs.readFileSync(workAsar)).digest('hex');
-    assert.strictEqual(afterSecondSha, afterFirstSha, 'Second --check-only run must be byte-identical idempotent');
+    const fallbackOut = execFileSync(probeExe, ['--check-i18n'], {
+      env: { ...process.env, ANTIGRAVITY_ENHANCER_LANG: 'pt-BR' },
+      encoding: 'utf8',
+      timeout: 15000
+    });
+    assert.ok(fallbackOut.includes('DETECTED:en'), 'DetectLanguage must fall back unsupported pt-BR -> en');
 
-    asarPatcher.unpatchAsar(workAsar);
-    const restoredSha = crypto.createHash('sha256').update(fs.readFileSync(workAsar)).digest('hex');
-    assert.strictEqual(restoredSha, origSha, 'Node unpatchAsar must cleanly reverse C# Launcher micro-bootstrap');
+    if (fs.existsSync(liveAsar)) {
+      const workAsar = path.join(tmpDir, 'app.asar');
+      fs.copyFileSync(liveAsar, workAsar);
+      if (asarPatcher.inspectAsarStatus(workAsar).bootstrapped || asarPatcher.inspectAsarStatus(workAsar).hasLegacy) {
+        asarPatcher.unpatchAsar(workAsar);
+      }
+      const origSha = crypto.createHash('sha256').update(fs.readFileSync(workAsar)).digest('hex');
+
+      execFileSync(probeExe, ['--asar-check', workAsar], { stdio: 'pipe', timeout: 15000 });
+      assert.strictEqual(asarPatcher.inspectAsarStatus(workAsar).bootstrapped, true, 'C# AsarMicroPatcher must micro-bootstrap vanilla ASAR');
+
+      const afterFirstSha = crypto.createHash('sha256').update(fs.readFileSync(workAsar)).digest('hex');
+      execFileSync(probeExe, ['--asar-check', workAsar], { stdio: 'pipe', timeout: 15000 });
+      const afterSecondSha = crypto.createHash('sha256').update(fs.readFileSync(workAsar)).digest('hex');
+      assert.strictEqual(afterSecondSha, afterFirstSha, 'Second C# bootstrap must be byte-identical idempotent');
+
+      asarPatcher.unpatchAsar(workAsar);
+      const restoredSha = crypto.createHash('sha256').update(fs.readFileSync(workAsar)).digest('hex');
+      assert.strictEqual(restoredSha, origSha, 'Node unpatchAsar must cleanly reverse C# micro-bootstrap');
+    }
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }

@@ -1,15 +1,15 @@
 {
-  "version": "3.0.0",
+  "version": "3.1.0",
   "channel": "stable",
   "minAppVersion": "2.30.0",
   "testedAppVersion": "2.31.2",
   "repo": "x2tora/antigravity-enhancer",
-  "updatedAt": "2026-11-12T23:34:27.988Z",
-  "releaseNotes": "v3.0.0: Antigravity 2.31.2 full support (Gemini 4 Hydrogen & Coordinators i18n), Hybrid Zero-Resident Persistence across official app updates, and direct In-App Enhancer Hub self-updater.",
+  "updatedAt": "2026-11-13T00:05:05.646Z",
+  "releaseNotes": "v3.1.0: Full 9-language New Conversation greetings & placeholders, OS-language auto-detected Windows installer, and streamlined direct launch without standalone launcher executable.",
   "files": {
     "main-enhancer.js": {
-      "size": 27743,
-      "sha256": "03a6a1712ba5d0af3f750dfd19b73a620a017651c6452e7a7d05d8b1c633ca5c",
+      "size": 24438,
+      "sha256": "cb3df8d3f14bcf174f1d8b922c9b5da05e2623502298a471d065aca5d19346b1",
       "restartRequired": true
     },
     "asar-patcher.js": {
@@ -18,8 +18,8 @@
       "restartRequired": true
     },
     "renderer-enhancer.js": {
-      "size": 106296,
-      "sha256": "6dcee3386230e0b7175fa4c9affe3e89a00acf19acf8651c58bcb99c21947f90",
+      "size": 105195,
+      "sha256": "71682cd2acfce061388c23ddbc77ce534f838e89f83d6d412631780f2254ce3a",
       "restartRequired": false
     },
     "gsap-core.js": {
@@ -28,8 +28,8 @@
       "restartRequired": false
     },
     "dictionaries.json": {
-      "size": 3514595,
-      "sha256": "b120f03de2b4f628e569911bf692c538154bbcef4b4d98e0b7150695a22e9063",
+      "size": 3530340,
+      "sha256": "7a2a51dce73eaaa22c9601166b9533915253e13e42dd31859408223e79d05a17",
       "restartRequired": false
     }
   }

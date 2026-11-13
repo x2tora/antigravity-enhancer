@@ -1,4 +1,4 @@
-# Antigravity Enhancer (v3.0.0)
+# Antigravity Enhancer (v3.1.0)
 
 Community localization and usage-display patch for **Antigravity**.
 
@@ -14,10 +14,10 @@ Community localization and usage-display patch for **Antigravity**.
    - Shows remaining **5-Hour** and **Weekly** quota percentages in the top bar and alongside the active model selector in the composer.
    - Displays per-group breakdown cards and reset countdown timers in a click popover.
 
-3. **Persistence Across App Updates & In-App Updates**
+3. **In-App Updates & Localization**
    - Keeps enhancer modules outside `resources/app.asar` (`%APPDATA%\Antigravity\enhancer`) with a minimal bootstrapper (`asar-patcher`).
-   - Includes a standalone launcher helper (`AntigravityEnhancerLauncher.exe`) to re-apply the bootstrapper after official app updates.
    - Open the Enhancer panel (`Alt + Shift + E` or top bar button) to check and apply updates from `x2tora/antigravity-enhancer` with SHA-256 verification and automatic rollback support.
+   - Installer automatically detects the Windows OS UI language across all 9 supported languages (falling back to English).
 
 ---
 
@@ -29,7 +29,7 @@ Community localization and usage-display patch for **Antigravity**.
 3. Run `Antigravity-Enhancer-Setup.exe` and click install (or restore original files at any time).
 
 ### Option 2: Portable Archive (`.zip`)
-1. Download `Antigravity-Enhancer-v3.0.0-Win.zip` from **[Releases](https://github.com/x2tora/antigravity-enhancer/releases/latest)**.
+1. Download `Antigravity-Enhancer-v3.1.0-Win.zip` from **[Releases](https://github.com/x2tora/antigravity-enhancer/releases/latest)**.
 2. Extract and run `Antigravity-Enhancer-Setup.exe`.
 
 ---
@@ -40,8 +40,8 @@ Community localization and usage-display patch for **Antigravity**.
 # Regenerate enhancer/manifest.json SHA-256 hashes
 node .\generate_enhancer_manifest.js
 
-# Build Antigravity-Enhancer-Setup.exe, AntigravityEnhancerLauncher.exe, SHA256SUMS.txt, and ZIP
-powershell -NoProfile -ExecutionPolicy Bypass -File .\build_exe_installer.ps1 -Version "3.0.0"
+# Build Antigravity-Enhancer-Setup.exe, SHA256SUMS.txt, and ZIP
+powershell -NoProfile -ExecutionPolicy Bypass -File .\build_exe_installer.ps1 -Version "3.1.0"
 
 # Run E2E verification suite
 node .\tests\e2e\runner.js --summary -NoKill

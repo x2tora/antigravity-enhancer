@@ -1,5 +1,5 @@
 ﻿param(
-    [string]$Version = "3.0.0",
+    [string]$Version = "3.1.0",
     [string]$OutputExe = "",
     [string]$SignCertThumbprint = ""
 )
@@ -25,7 +25,6 @@ $manifestPath = Join-Path $installerSrcDir "app.manifest"
 
 if (-not (Test-Path (Join-Path $enhancerSrcDir "main-enhancer.js"))) { throw "enhancer modules not found at $enhancerSrcDir" }
 if (-not (Test-Path (Join-Path $installerSrcDir "AsarMicroPatcher.cs"))) { throw "AsarMicroPatcher.cs not found at $installerSrcDir" }
-if (-not (Test-Path (Join-Path $installerSrcDir "Launcher.cs"))) { throw "Launcher.cs not found at $installerSrcDir" }
 if (-not (Test-Path $manifestPath)) { throw "app.manifest not found at $manifestPath" }
 
 # 1. Convert icon.png to valid Windows .ico if needed
@@ -53,8 +52,10 @@ if ((Test-Path $pngPath) -and (-not (Test-Path $icoPath))) {
 # 2. WPF Installer C# Source (.NET 4.0)
 $csSource = @'
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Reflection;
@@ -72,15 +73,282 @@ using System.Windows.Threading;
 using Microsoft.Win32;
 
 [assembly: AssemblyTitle("Antigravity Enhancer Setup")]
-[assembly: AssemblyDescription("Antigravity Korean Language Pack and Model Quota Installer")]
+[assembly: AssemblyDescription("Antigravity Multilingual UI and Model Quota Installer")]
 [assembly: AssemblyCompany("x2tora")]
 [assembly: AssemblyProduct("Antigravity Enhancer")]
 [assembly: AssemblyCopyright("Copyright (C) 2026 x2tora")]
-[assembly: AssemblyVersion("3.0.0.0")]
-[assembly: AssemblyFileVersion("3.0.0.0")]
+[assembly: AssemblyVersion("__ENHANCER_VERSION__.0")]
+[assembly: AssemblyFileVersion("__ENHANCER_VERSION__.0")]
 
 namespace AntigravityEnhancer
 {
+    public static class InstallerI18n
+    {
+        public static readonly string[] SupportedLanguages = new string[]
+        {
+            "en", "ko", "ja", "zh-CN", "zh-TW", "es", "fr", "de", "ru"
+        };
+
+        public static string ResolveCultureCode(string cultureName, string twoLetterIso)
+        {
+            string name = (cultureName ?? "").Trim();
+            string lowerName = name.ToLowerInvariant();
+            string two = (twoLetterIso ?? "").Trim().ToLowerInvariant();
+            if (string.IsNullOrEmpty(two) && !string.IsNullOrEmpty(lowerName))
+            {
+                int dash = lowerName.IndexOf('-');
+                two = (dash > 0) ? lowerName.Substring(0, dash) : lowerName;
+            }
+
+            if (two == "ko") return "ko";
+            if (two == "ja") return "ja";
+            if (two == "zh")
+            {
+                if (lowerName.Contains("-tw") || lowerName.Contains("-hk") || lowerName.Contains("-mo") || lowerName.Contains("hant"))
+                {
+                    return "zh-TW";
+                }
+                return "zh-CN";
+            }
+            if (two == "es") return "es";
+            if (two == "fr") return "fr";
+            if (two == "de") return "de";
+            if (two == "ru") return "ru";
+            return "en";
+        }
+
+        public static string DetectLanguage()
+        {
+            try
+            {
+                string envLang = Environment.GetEnvironmentVariable("ANTIGRAVITY_ENHANCER_LANG");
+                if (!string.IsNullOrEmpty(envLang))
+                {
+                    string trimmed = envLang.Trim();
+                    foreach (string s in SupportedLanguages)
+                    {
+                        if (string.Equals(s, trimmed, StringComparison.OrdinalIgnoreCase)) return s;
+                    }
+                    return ResolveCultureCode(trimmed, "");
+                }
+            }
+            catch { }
+
+            try
+            {
+                CultureInfo ui = CultureInfo.CurrentUICulture;
+                if (ui == null || string.IsNullOrEmpty(ui.Name)) ui = CultureInfo.InstalledUICulture;
+                if (ui != null) return ResolveCultureCode(ui.Name, ui.TwoLetterISOLanguageName);
+            }
+            catch { }
+            return "en";
+        }
+
+        private static readonly Dictionary<string, Dictionary<string, string>> Tables = BuildTables();
+
+        private static void AddAll(Dictionary<string, Dictionary<string, string>> t, string key,
+            string en, string ko, string ja, string zhCn, string zhTw, string es, string fr, string de, string ru)
+        {
+            t["en"][key] = en;
+            t["ko"][key] = ko;
+            t["ja"][key] = ja;
+            t["zh-CN"][key] = zhCn;
+            t["zh-TW"][key] = zhTw;
+            t["es"][key] = es;
+            t["fr"][key] = fr;
+            t["de"][key] = de;
+            t["ru"][key] = ru;
+        }
+
+        private static Dictionary<string, Dictionary<string, string>> BuildTables()
+        {
+            var t = new Dictionary<string, Dictionary<string, string>>(StringComparer.OrdinalIgnoreCase);
+            foreach (string lang in SupportedLanguages)
+            {
+                t[lang] = new Dictionary<string, string>(StringComparer.Ordinal);
+            }
+
+            AddAll(t, "HeroTitle",
+                "Antigravity Language & Usage Patch",
+                "Antigravity 다국어 · 사용량 패치",
+                "Antigravity 多言語・使用量パッチ",
+                "Antigravity 多语言与用量补丁",
+                "Antigravity 多語言與用量修補",
+                "Parche de idioma y uso de Antigravity",
+                "Patch langue et quota Antigravity",
+                "Antigravity Sprach- & Kontingent-Patch",
+                "Патч локализации и квот Antigravity");
+
+            AddAll(t, "HeroSub",
+                "9 languages · In-app updates · Quota viewer",
+                "9개 언어 지원 · 인앱 업데이트 · 사용량 표시",
+                "9言語対応 · アプリ内更新 · 使用量表示",
+                "支持 9 种语言 · 应用内更新 · 用量显示",
+                "支援 9 種語言 · 應用程式內更新 · 用量顯示",
+                "9 idiomas · Actualización integrada · Visor de uso",
+                "9 langues · Mises à jour intégrées · Quotas",
+                "9 Sprachen · In-App-Updates · Kontingentanzeige",
+                "9 языков · Обновления в приложении · Индикатор квот");
+
+            AddAll(t, "BadgeVerified",
+                "Verified", "확인됨", "確認済み", "已验证", "已驗證", "Verificado", "Vérifié", "Bestätigt", "Проверено");
+
+            AddAll(t, "BadgePatched",
+                "Patched", "패치 적용됨", "パッチ適用済み", "已应用补丁", "已套用修補", "Parcheado", "Patch appliqué", "Gepatcht", "Патч активен");
+
+            AddAll(t, "BadgeNotFound",
+                "Path Not Found", "설치 경로 미감지", "パス未検出", "未检测到路径", "未偵測到路徑", "Ruta no detectada", "Chemin introuvable", "Pfad nicht gefunden", "Путь не найден");
+
+            AddAll(t, "BadgeCheckPath",
+                "Check Path", "경로 확인 필요", "パス要確認", "请检查路径", "請檢查路徑", "Verificar ruta", "Vérifier le chemin", "Pfad prüfen", "Проверьте путь");
+
+            AddAll(t, "PathLabel",
+                "Install Location", "설치 경로", "インストール先", "安装路径", "安裝路徑", "Ruta de instalación", "Dossier d’installation", "Installationspfad", "Путь установки");
+
+            AddAll(t, "BtnBrowse",
+                "Browse", "찾아보기", "参照", "浏览", "瀏覽", "Examinar", "Parcourir", "Durchsuchen", "Обзор");
+
+            AddAll(t, "BrowseDesc",
+                "Select the Antigravity installation folder.",
+                "Antigravity가 설치된 디렉터리를 선택하세요.",
+                "Antigravity がインストールされているフォルダを選択してください。",
+                "请选择 Antigravity 的安装目录。",
+                "請選擇 Antigravity 的安裝目錄。",
+                "Seleccione la carpeta donde está instalado Antigravity.",
+                "Sélectionnez le dossier d’installation d’Antigravity.",
+                "Wählen Sie den Installationsordner von Antigravity.",
+                "Выберите папку установки Antigravity.");
+
+            AddAll(t, "BtnInstall",
+                "Install Patch", "패치 설치", "パッチ適用", "安装补丁", "安裝修補", "Instalar parche", "Installer le patch", "Patch installieren", "Установить патч");
+
+            AddAll(t, "BtnRestore",
+                "Restore Original", "원본 복구", "オリジナル復元", "恢复原版", "還原原版", "Restaurar original", "Restaurer l’original", "Original wiederherstellen", "Восстановить оригинал");
+
+            AddAll(t, "BtnLaunch",
+                "Launch Antigravity", "Antigravity 실행", "Antigravity を起動", "启动 Antigravity", "啟動 Antigravity", "Iniciar Antigravity", "Lancer Antigravity", "Antigravity starten", "Запустить Antigravity");
+
+            AddAll(t, "StatusReady",
+                "Ready", "준비됨", "準備完了", "就绪", "就緒", "Listo", "Prêt", "Bereit", "Готово");
+
+            AddAll(t, "LogTitle",
+                "Activity Log", "작업 로그", "作業ログ", "操作日志", "作業日誌", "Registro", "Journal", "Protokoll", "Журнал");
+
+            AddAll(t, "CountdownFmt",
+                "Launching in {0}s", "{0}초 후 실행", "{0}秒後に起動", "{0}秒后启动", "{0}秒後啟動", "Iniciando en {0}s", "Lancement dans {0}s", "Start in {0}s", "Запуск через {0} с");
+
+            AddAll(t, "CountdownLaunching",
+                "Launching...", "실행 중", "起動中", "正在启动", "啟動中", "Iniciando", "Lancement", "Starte...", "Запуск...");
+
+            AddAll(t, "BtnLaunchNow",
+                "Launch Now", "바로 실행", "今すぐ起動", "立即启动", "立即啟動", "Iniciar ahora", "Lancer", "Jetzt starten", "Запустить");
+
+            AddAll(t, "BtnCancel",
+                "Cancel", "취소", "キャンセル", "取消", "取消", "Cancelar", "Annuler", "Abbrechen", "Отмена");
+
+            AddAll(t, "LogCancelled",
+                "Auto-launch cancelled.",
+                "자동 실행이 취소되었습니다.",
+                "自動起動をキャンセルしました。",
+                "已取消自动启动。",
+                "已取消自動啟動。",
+                "Inicio automático cancelado.",
+                "Lancement automatique annulé.",
+                "Automatischer Start abgebrochen.",
+                "Автозапуск отменён.");
+
+            AddAll(t, "LogReadyFmt",
+                "Ready (v{0})", "준비됨 (v{0})", "準備完了 (v{0})", "就绪 (v{0})", "就緒 (v{0})", "Listo (v{0})", "Prêt (v{0})", "Bereit (v{0})", "Готово (v{0})");
+
+            AddAll(t, "PrepInstall",
+                "Preparing install...", "설치 준비 중...", "インストールを準備中...", "正在准备安装...", "正在準備安裝...", "Preparando instalación...", "Préparation de l’installation...", "Installation wird vorbereitet...", "Подготовка установки...");
+
+            AddAll(t, "PrepRestore",
+                "Preparing restore...", "복구 준비 중...", "復元を準備中...", "正在准备恢复...", "正在準備還原...", "Preparando restauración...", "Préparation de la restauration...", "Wiederherstellung wird vorbereitet...", "Подготовка восстановления...");
+
+            AddAll(t, "ProgKill",
+                "Closing Antigravity...", "Antigravity 프로세스 종료 중...", "Antigravity を終了中...", "正在关闭 Antigravity 进程...", "正在關閉 Antigravity 處理程序...", "Cerrando Antigravity...", "Fermeture d’Antigravity...", "Antigravity wird beendet...", "Закрытие Antigravity...");
+
+            AddAll(t, "ProgDeploy",
+                "Copying patch files...", "패치 파일 배치 중...", "パッチファイルを配置中...", "正在部署补丁文件...", "正在部署修補檔案...", "Copiando archivos del parche...", "Copie des fichiers du patch...", "Patch-Dateien werden kopiert...", "Копирование файлов патча...");
+
+            AddAll(t, "ProgAsar",
+                "Updating app.asar...", "app.asar 적용 중...", "app.asar に適用中...", "正在应用 app.asar...", "正在套用 app.asar...", "Aplicando en app.asar...", "Application sur app.asar...", "app.asar wird angepasst...", "Применение к app.asar...");
+
+            AddAll(t, "ProgClean",
+                "Clearing cache...", "캐시 정리 중...", "キャッシュを整理中...", "正在清理缓存...", "正在清理快取...", "Limpiando caché...", "Nettoyage du cache...", "Cache wird geleert...", "Очистка кэша...");
+
+            AddAll(t, "ProgInstallDone",
+                "Installation complete.", "설치가 완료되었습니다.", "インストールが完了しました。", "安装完成。", "安裝完成。", "Instalación completada.", "Installation terminée.", "Installation abgeschlossen.", "Установка завершена.");
+
+            AddAll(t, "ProgRestoring",
+                "Restoring original files...", "원본 상태 복원 중...", "オリジナル状態を復元中...", "正在恢复原版状态...", "正在還原原版狀態...", "Restaurando archivos originales...", "Restauration des fichiers d’origine...", "Originalzustand wird wiederhergestellt...", "Восстановление оригинала...");
+
+            AddAll(t, "ProgRestoreDone",
+                "Restored to original state.", "원본 상태로 복구되었습니다.", "オリジナル状態に復元しました。", "已恢复为原版状态。", "已還原為原版狀態。", "Restaurado al estado original.", "État d’origine restauré.", "Originalzustand wiederhergestellt.", "Оригинал восстановлен.");
+
+            AddAll(t, "ErrStatus",
+                "Action Failed", "작업 실패", "処理に失敗しました", "操作失败", "作業失敗", "Operación fallida", "Échec de l’opération", "Vorgang fehlgeschlagen", "Ошибка");
+
+            AddAll(t, "ErrPrefix",
+                "Error: ", "오류: ", "エラー: ", "错误: ", "錯誤: ", "Error: ", "Erreur : ", "Fehler: ", "Ошибка: ");
+
+            AddAll(t, "ErrTitle",
+                "Error", "오류", "エラー", "错误", "錯誤", "Error", "Erreur", "Fehler", "Ошибка");
+
+            AddAll(t, "ErrMissingResFmt",
+                "Embedded resource not found: {0}",
+                "임베디드 리소스를 찾을 수 없습니다: {0}",
+                "埋め込みリソースが見つかりません: {0}",
+                "找不到嵌入式资源: {0}",
+                "找不到內嵌資源: {0}",
+                "Recurso incrustado no encontrado: {0}",
+                "Ressource intégrée introuvable : {0}",
+                "Eingebettete Ressource nicht gefunden: {0}",
+                "Встроенный ресурс не найден: {0}");
+
+            AddAll(t, "LogAutoLaunch",
+                "Done. Launching Antigravity in 3s.",
+                "완료되었습니다. 3초 후 Antigravity를 실행합니다.",
+                "完了しました。3秒後に Antigravity を起動します。",
+                "已完成。将在 3 秒后启动 Antigravity。",
+                "已完成。將於 3 秒後啟動 Antigravity。",
+                "Completado. Iniciando Antigravity en 3s.",
+                "Terminé. Lancement d’Antigravity dans 3s.",
+                "Fertig. Antigravity startet in 3s.",
+                "Готово. Запуск Antigravity через 3 с.");
+
+            AddAll(t, "LogLaunching",
+                "Launching Antigravity...", "Antigravity를 실행합니다.", "Antigravity を起動します。", "正在启动 Antigravity。", "正在啟動 Antigravity。", "Iniciando Antigravity...", "Lancement d’Antigravity...", "Antigravity wird gestartet...", "Запуск Antigravity...");
+
+            AddAll(t, "LogLaunched",
+                "Antigravity launched.", "Antigravity를 실행했습니다.", "Antigravity を起動しました。", "已启动 Antigravity。", "已啟動 Antigravity。", "Antigravity iniciado.", "Antigravity lancé.", "Antigravity gestartet.", "Antigravity запущен.");
+
+            AddAll(t, "LogLaunchFail",
+                "Launch failed: ", "실행 실패: ", "起動に失敗しました: ", "启动失败: ", "啟動失敗: ", "Error al iniciar: ", "Échec du lancement : ", "Start fehlgeschlagen: ", "Ошибка запуска: ");
+
+            AddAll(t, "LogExeMissing",
+                "Executable not found: ", "실행 파일을 찾을 수 없습니다: ", "実行ファイルが見つかりません: ", "找不到可执行文件: ", "找不到可執行檔: ", "Ejecutable no encontrado: ", "Exécutable introuvable : ", "Ausführbare Datei nicht gefunden: ", "Исполняемый файл не найден: ");
+
+            return t;
+        }
+
+        public static string Get(string lang, string key)
+        {
+            Dictionary<string, string> dict;
+            string val;
+            if (!string.IsNullOrEmpty(lang) && Tables.TryGetValue(lang, out dict) && dict.TryGetValue(key, out val))
+            {
+                return val;
+            }
+            if (Tables.TryGetValue("en", out dict) && dict.TryGetValue(key, out val))
+            {
+                return val;
+            }
+            return key;
+        }
+    }
+
     public class App : Application
     {
         [STAThread]
@@ -132,11 +400,17 @@ namespace AntigravityEnhancer
         private string appExePath = "";
         private string asarPath = "";
         private string backupAsarPath = "";
+        private readonly string uiLang = InstallerI18n.DetectLanguage();
+
+        private string T(string key)
+        {
+            return InstallerI18n.Get(uiLang, key);
+        }
 
         public MainWindow()
         {
             this.Title = "Antigravity Enhancer";
-            this.Width = 660;
+            this.Width = 680;
             this.Height = 580;
             this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             this.WindowStyle = WindowStyle.None;
@@ -225,7 +499,7 @@ namespace AntigravityEnhancer
                 Margin = new Thickness(10, 0, 0, 0),
                 VerticalAlignment = VerticalAlignment.Center
             };
-            TextBlock tbVersion = new TextBlock { Text = "v3.0.0", Foreground = new SolidColorBrush(AccentColor), FontSize = 10, FontWeight = FontWeights.SemiBold };
+            TextBlock tbVersion = new TextBlock { Text = "v__ENHANCER_VERSION__", Foreground = new SolidColorBrush(AccentColor), FontSize = 10, FontWeight = FontWeights.SemiBold };
             badge.Child = tbVersion;
 
             titleLeft.Children.Add(tbBrand1);
@@ -269,14 +543,14 @@ namespace AntigravityEnhancer
             StackPanel heroLeft = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
             TextBlock tbHeroTitle = new TextBlock
             {
-                Text = "Antigravity 한국어 · 사용량 패치",
+                Text = T("HeroTitle"),
                 FontWeight = FontWeights.Bold,
                 FontSize = 13.5,
                 Foreground = new SolidColorBrush(TextPrimary)
             };
             TextBlock tbHeroSub = new TextBlock
             {
-                Text = "업데이트 후 자동 유지 · 인앱 업데이트 · 9개 언어 지원",
+                Text = T("HeroSub"),
                 FontSize = 11,
                 Foreground = new SolidColorBrush(TextMuted),
                 Margin = new Thickness(0, 4, 0, 0)
@@ -307,7 +581,7 @@ namespace AntigravityEnhancer
 
             lblPathStatus = new TextBlock
             {
-                Text = "확인됨",
+                Text = T("BadgeVerified"),
                 Foreground = new SolidColorBrush(AccentColor),
                 FontWeight = FontWeights.SemiBold,
                 FontSize = 11,
@@ -339,7 +613,7 @@ namespace AntigravityEnhancer
             StackPanel pathStack = new StackPanel();
             TextBlock tbPathLabel = new TextBlock
             {
-                Text = "설치 경로",
+                Text = T("PathLabel"),
                 Foreground = new SolidColorBrush(TextMuted),
                 FontSize = 11,
                 Margin = new Thickness(0, 0, 0, 6)
@@ -362,7 +636,7 @@ namespace AntigravityEnhancer
             };
             txtPath.TextChanged += (s, e) => { OnPathChanged(); };
 
-            Button btnBrowse = CreateActionButton("찾아보기", BgSurface, Color.FromRgb(28, 30, 40), new SolidColorBrush(TextPrimary), 11, 28);
+            Button btnBrowse = CreateActionButton(T("BtnBrowse"), BgSurface, Color.FromRgb(28, 30, 40), new SolidColorBrush(TextPrimary), 11, 28);
             btnBrowse.Margin = new Thickness(8, 0, 0, 0);
             btnBrowse.Padding = new Thickness(12, 0, 12, 0);
             btnBrowse.Click += (s, e) => { BrowseFolder(); };
@@ -380,19 +654,19 @@ namespace AntigravityEnhancer
 
             // 4. Action Buttons
             actionGrid = new Grid { Margin = new Thickness(18, 0, 18, 10) };
-            actionGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(2.2, GridUnitType.Star) });
+            actionGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(2.0, GridUnitType.Star) });
             actionGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(10) });
-            actionGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1.8, GridUnitType.Star) });
+            actionGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(2.0, GridUnitType.Star) });
             actionGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(10) });
-            actionGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1.9, GridUnitType.Star) });
+            actionGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(2.0, GridUnitType.Star) });
 
-            btnInstall = CreateAccentButton("패치 설치");
+            btnInstall = CreateAccentButton(T("BtnInstall"));
             btnInstall.Click += (s, e) => { StartAction("Install"); };
 
-            btnRestore = CreateActionButton("원본 복구", BgSurface, Color.FromRgb(28, 30, 40), new SolidColorBrush(TextPrimary), 12.5, 40);
+            btnRestore = CreateActionButton(T("BtnRestore"), BgSurface, Color.FromRgb(28, 30, 40), new SolidColorBrush(TextPrimary), 12.0, 40);
             btnRestore.Click += (s, e) => { StartAction("Restore"); };
 
-            btnLaunch = CreateActionButton("Antigravity 실행", BgSurface, Color.FromRgb(26, 28, 42), new SolidColorBrush(AccentColor), 12.5, 40, true, AccentColor);
+            btnLaunch = CreateActionButton(T("BtnLaunch"), BgSurface, Color.FromRgb(26, 28, 42), new SolidColorBrush(AccentColor), 12.0, 40, true, AccentColor);
             btnLaunch.Click += (s, e) => { LaunchAntigravity(); };
 
             Grid.SetColumn(btnInstall, 0);
@@ -422,10 +696,11 @@ namespace AntigravityEnhancer
 
             lblStatus = new TextBlock
             {
-                Text = "준비됨",
+                Text = T("StatusReady"),
                 Foreground = new SolidColorBrush(TextPrimary),
                 FontSize = 11,
-                VerticalAlignment = VerticalAlignment.Center
+                VerticalAlignment = VerticalAlignment.Center,
+                TextTrimming = TextTrimming.CharacterEllipsis
             };
 
             pnlCountdown = new Border
@@ -441,7 +716,7 @@ namespace AntigravityEnhancer
             StackPanel countdownStack = new StackPanel { Orientation = Orientation.Horizontal };
             lblCountdownText = new TextBlock
             {
-                Text = "3초 후 실행",
+                Text = string.Format(T("CountdownFmt"), 3),
                 Foreground = new SolidColorBrush(AccentColor),
                 FontWeight = FontWeights.SemiBold,
                 FontSize = 11,
@@ -449,12 +724,12 @@ namespace AntigravityEnhancer
                 Margin = new Thickness(0, 0, 8, 0)
             };
 
-            btnImmediateLaunch = CreateSmallButton("바로 실행", AccentColor, new SolidColorBrush(BgPrimary));
+            btnImmediateLaunch = CreateSmallButton(T("BtnLaunchNow"), AccentColor, new SolidColorBrush(BgPrimary));
             btnImmediateLaunch.Click += (s, e) => { StopAutoLaunchTimer(); LaunchAntigravity(); Application.Current.Shutdown(); };
 
-            btnCancelLaunch = CreateSmallButton("취소", Color.FromRgb(38, 40, 56), new SolidColorBrush(TextPrimary));
+            btnCancelLaunch = CreateSmallButton(T("BtnCancel"), Color.FromRgb(38, 40, 56), new SolidColorBrush(TextPrimary));
             btnCancelLaunch.Margin = new Thickness(4, 0, 0, 0);
-            btnCancelLaunch.Click += (s, e) => { StopAutoLaunchTimer(); pnlCountdown.Visibility = Visibility.Collapsed; Log("자동 실행이 취소되었습니다."); };
+            btnCancelLaunch.Click += (s, e) => { StopAutoLaunchTimer(); pnlCountdown.Visibility = Visibility.Collapsed; Log(T("LogCancelled")); };
 
             countdownStack.Children.Add(lblCountdownText);
             countdownStack.Children.Add(btnImmediateLaunch);
@@ -496,7 +771,7 @@ namespace AntigravityEnhancer
 
             TextBlock tbTermTitle = new TextBlock
             {
-                Text = "작업 로그",
+                Text = T("LogTitle"),
                 Foreground = new SolidColorBrush(TextMuted),
                 FontSize = 10.5,
                 FontWeight = FontWeights.SemiBold,
@@ -547,7 +822,7 @@ namespace AntigravityEnhancer
             worker.ProgressChanged += Worker_ProgressChanged;
             worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
 
-            Log("준비됨 (v3.0.0)");
+            Log(string.Format(T("LogReadyFmt"), "__ENHANCER_VERSION__"));
         }
 
         private void RunFadeEntrance()
@@ -823,7 +1098,7 @@ namespace AntigravityEnhancer
             }
             else
             {
-                lblPathStatus.Text = "설치 경로 미감지";
+                lblPathStatus.Text = T("BadgeNotFound");
                 lblPathStatus.Foreground = new SolidColorBrush(Color.FromRgb(248, 113, 113));
                 statusBadgeDot.Background = new SolidColorBrush(Color.FromRgb(248, 113, 113));
             }
@@ -839,7 +1114,7 @@ namespace AntigravityEnhancer
             if (File.Exists(asarPath))
             {
                 bool patched = AsarMicroPatcher.IsBootstrapped(asarPath);
-                lblPathStatus.Text = patched ? "패치 적용됨" : "확인됨";
+                lblPathStatus.Text = patched ? T("BadgePatched") : T("BadgeVerified");
                 lblPathStatus.Foreground = new SolidColorBrush(AccentColor);
                 statusBadgeDot.Background = new SolidColorBrush(AccentColor);
                 btnInstall.IsEnabled = true;
@@ -848,7 +1123,7 @@ namespace AntigravityEnhancer
             }
             else
             {
-                lblPathStatus.Text = "경로 확인 필요";
+                lblPathStatus.Text = T("BadgeCheckPath");
                 lblPathStatus.Foreground = new SolidColorBrush(Color.FromRgb(248, 113, 113));
                 statusBadgeDot.Background = new SolidColorBrush(Color.FromRgb(248, 113, 113));
                 btnInstall.IsEnabled = false;
@@ -861,7 +1136,7 @@ namespace AntigravityEnhancer
         {
             using (var dlg = new System.Windows.Forms.FolderBrowserDialog())
             {
-                dlg.Description = "Antigravity가 설치된 디렉터리를 선택하세요.";
+                dlg.Description = T("BrowseDesc");
                 if (Directory.Exists(txtPath.Text)) dlg.SelectedPath = txtPath.Text;
                 if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
@@ -884,7 +1159,7 @@ namespace AntigravityEnhancer
             SetUIBusy(true);
             AnimateProgressBar(0);
             lblStatus.Foreground = new SolidColorBrush(TextPrimary);
-            lblStatus.Text = (action == "Install") ? "설치 준비 중..." : "복구 준비 중...";
+            lblStatus.Text = (action == "Install") ? T("PrepInstall") : T("PrepRestore");
             worker.RunWorkerAsync(action);
         }
 
@@ -894,18 +1169,17 @@ namespace AntigravityEnhancer
             string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             string enhancerDir = Path.Combine(appData, @"Antigravity\enhancer");
-            string launcherDir = Path.Combine(localAppData, "AntigravityEnhancer");
-            string launcherExe = Path.Combine(launcherDir, "AntigravityEnhancerLauncher.exe");
+            string legacyLauncherDir = Path.Combine(localAppData, "AntigravityEnhancer");
 
             try
             {
-                worker.ReportProgress(10, "Antigravity 프로세스 종료 중...");
+                worker.ReportProgress(10, T("ProgKill"));
                 CloseAntigravityProcesses();
                 Thread.Sleep(400);
 
                 if (action == "Install")
                 {
-                    worker.ReportProgress(25, "패치 파일 배치 중...");
+                    worker.ReportProgress(25, T("ProgDeploy"));
                     Directory.CreateDirectory(enhancerDir);
                     string disabledFlag = Path.Combine(enhancerDir, "disabled.flag");
                     if (File.Exists(disabledFlag)) { try { File.Delete(disabledFlag); } catch { } }
@@ -926,63 +1200,39 @@ namespace AntigravityEnhancer
                         ExtractEmbeddedGzip("enhancer_" + mf + ".gz", Path.Combine(enhancerDir, mf));
                     }
 
-                    worker.ReportProgress(55, "app.asar 적용 중...");
+                    worker.ReportProgress(60, T("ProgAsar"));
                     AsarMicroPatcher.EnsureBootstrapped(asarPath, false);
-
-                    worker.ReportProgress(75, "런처 및 바로가기 설정 중...");
-                    string siblingLauncher = Path.Combine(AppDomain.CurrentDomain.BaseDirectory ?? "", "AntigravityEnhancerLauncher.exe");
-                    if (File.Exists(siblingLauncher) && !string.Equals(siblingLauncher, launcherExe, StringComparison.OrdinalIgnoreCase))
-                    {
-                        Directory.CreateDirectory(launcherDir);
-                        File.Copy(siblingLauncher, launcherExe, true);
-                    }
 
                     using (var key = Registry.CurrentUser.CreateSubKey(@"Software\AntigravityEnhancer"))
                     {
                         if (key != null) key.SetValue("AppDir", detectedAppDir);
                     }
 
-                    if (File.Exists(launcherExe))
+                    if (Directory.Exists(legacyLauncherDir))
                     {
-                        Process scProc = Process.Start(new ProcessStartInfo
-                        {
-                            FileName = launcherExe,
-                            Arguments = "--setup-shortcuts",
-                            UseShellExecute = false,
-                            CreateNoWindow = true
-                        });
-                        if (scProc != null) scProc.WaitForExit(8000);
+                        try { Directory.Delete(legacyLauncherDir, true); } catch { }
                     }
 
-                    worker.ReportProgress(90, "캐시 정리 중...");
+                    worker.ReportProgress(90, T("ProgClean"));
                     PurgeCacheDirectories();
 
-                    worker.ReportProgress(100, "설치가 완료되었습니다.");
+                    worker.ReportProgress(100, T("ProgInstallDone"));
                     e.Result = "InstallSuccess";
                 }
                 else if (action == "Restore")
                 {
-                    worker.ReportProgress(35, "원본 상태 복원 중...");
-                    if (File.Exists(launcherExe))
+                    worker.ReportProgress(35, T("ProgRestoring"));
+                    AsarMicroPatcher.UnpatchVanilla(asarPath);
+
+                    if (Directory.Exists(legacyLauncherDir))
                     {
-                        Process unpProc = Process.Start(new ProcessStartInfo
-                        {
-                            FileName = launcherExe,
-                            Arguments = "--restore-vanilla",
-                            UseShellExecute = false,
-                            CreateNoWindow = true
-                        });
-                        if (unpProc != null) unpProc.WaitForExit(12000);
-                    }
-                    else
-                    {
-                        AsarMicroPatcher.UnpatchVanilla(asarPath);
+                        try { Directory.Delete(legacyLauncherDir, true); } catch { }
                     }
 
-                    worker.ReportProgress(85, "캐시 정리 중...");
+                    worker.ReportProgress(85, T("ProgClean"));
                     PurgeCacheDirectories();
 
-                    worker.ReportProgress(100, "원본 상태로 복구되었습니다.");
+                    worker.ReportProgress(100, T("ProgRestoreDone"));
                     e.Result = "RestoreSuccess";
                 }
             }
@@ -1010,15 +1260,17 @@ namespace AntigravityEnhancer
 
             if (result != null && result.StartsWith("Error: "))
             {
-                lblStatus.Text = "작업 실패";
+                string detail = result.Substring(7);
+                lblStatus.Text = T("ErrStatus");
                 lblStatus.Foreground = new SolidColorBrush(Color.FromRgb(248, 113, 113));
-                Log("오류: " + result);
-                MessageBox.Show(this, result, "오류", MessageBoxButton.OK, MessageBoxImage.Error);
+                Log(T("ErrPrefix") + detail);
+                MessageBox.Show(this, detail, T("ErrTitle"), MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
             lblStatus.Foreground = new SolidColorBrush(AccentColor);
             AnimateProgressBar(100);
+            OnPathChanged();
 
             StartAutoLaunchCountdown();
         }
@@ -1026,10 +1278,10 @@ namespace AntigravityEnhancer
         private void StartAutoLaunchCountdown()
         {
             countdownSeconds = 3;
-            lblCountdownText.Text = "3초 후 실행";
+            lblCountdownText.Text = string.Format(T("CountdownFmt"), countdownSeconds);
             pnlCountdown.Visibility = Visibility.Visible;
             autoLaunchTimer.Start();
-            Log("완료되었습니다. 3초 후 Antigravity를 실행합니다.");
+            Log(T("LogAutoLaunch"));
         }
 
         private void StopAutoLaunchTimer()
@@ -1043,13 +1295,13 @@ namespace AntigravityEnhancer
             countdownSeconds--;
             if (countdownSeconds > 0)
             {
-                lblCountdownText.Text = string.Format("{0}초 후 실행", countdownSeconds);
+                lblCountdownText.Text = string.Format(T("CountdownFmt"), countdownSeconds);
             }
             else
             {
                 autoLaunchTimer.Stop();
-                lblCountdownText.Text = "실행 중";
-                Log("Antigravity를 실행합니다.");
+                lblCountdownText.Text = T("CountdownLaunching");
+                Log(T("LogLaunching"));
                 LaunchAntigravity();
 
                 DispatcherTimer exitTimer = new DispatcherTimer();
@@ -1092,7 +1344,7 @@ namespace AntigravityEnhancer
             {
                 if (resStream == null)
                 {
-                    throw new FileNotFoundException("임베디드 리소스를 찾을 수 없습니다: " + resourceName);
+                    throw new FileNotFoundException(string.Format(T("ErrMissingResFmt"), resourceName));
                 }
                 using (GZipStream gz = new GZipStream(resStream, CompressionMode.Decompress))
                 using (FileStream fs = new FileStream(outputPath, FileMode.Create, FileAccess.Write, FileShare.None))
@@ -1130,12 +1382,7 @@ namespace AntigravityEnhancer
 
         private void LaunchAntigravity()
         {
-            string enhancerLauncher = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                @"AntigravityEnhancer\AntigravityEnhancerLauncher.exe");
-            string targetExe = (File.Exists(enhancerLauncher) && File.Exists(asarPath) && AsarMicroPatcher.IsBootstrapped(asarPath))
-                ? enhancerLauncher
-                : appExePath;
+            string targetExe = appExePath;
 
             if (File.Exists(targetExe))
             {
@@ -1148,16 +1395,16 @@ namespace AntigravityEnhancer
                         UseShellExecute = true
                     };
                     Process.Start(psi);
-                    Log("Antigravity를 실행했습니다.");
+                    Log(T("LogLaunched"));
                 }
                 catch (Exception ex)
                 {
-                    Log("실행 실패: " + ex.Message);
+                    Log(T("LogLaunchFail") + ex.Message);
                 }
             }
             else
             {
-                Log("실행 파일을 찾을 수 없습니다: " + targetExe);
+                Log(T("LogExeMissing") + targetExe);
             }
         }
 
@@ -1192,7 +1439,7 @@ try {
     # Ensure enhancer/manifest.json SHA-256 digests are current
     $manifestGen = Join-Path $projectRoot "generate_enhancer_manifest.js"
     if ((Get-Command node -ErrorAction SilentlyContinue) -and (Test-Path $manifestGen)) {
-        Write-Host "[1/5] Refreshing enhancer/manifest.json SHA-256 digests..." -ForegroundColor Cyan
+        Write-Host "[1/4] Refreshing enhancer/manifest.json SHA-256 digests..." -ForegroundColor Cyan
         & node $manifestGen
         if ($LASTEXITCODE -ne 0) { throw "Manifest generation failed" }
     }
@@ -1206,31 +1453,10 @@ try {
         return $res.Status
     }
 
-    # Compile Standalone Helper Executable
-    Write-Host "[2/5] Compiling AntigravityEnhancerLauncher.exe..." -ForegroundColor Cyan
-    $launcherExeOut = Join-Path $projectRoot "AntigravityEnhancerLauncher.exe"
     $asarPatcherCs = Join-Path $installerSrcDir "AsarMicroPatcher.cs"
-    $launcherCs = Join-Path $installerSrcDir "Launcher.cs"
-    $launcherArgs = @(
-        "/nologo",
-        "/target:winexe",
-        "/optimize+",
-        "/platform:x64",
-        "/codepage:65001",
-        "/win32manifest:$manifestPath",
-        "/out:$launcherExeOut",
-        "/r:System.dll",
-        "/r:System.Web.Extensions.dll"
-    )
-    if (Test-Path $icoPath) { $launcherArgs += "/win32icon:$icoPath" }
-    $launcherArgs += $asarPatcherCs
-    $launcherArgs += $launcherCs
-    & $csc @launcherArgs
-    if ($LASTEXITCODE -ne 0) { throw "Launcher csc.exe compilation failed with exit code $LASTEXITCODE" }
-    $launcherSig = Maybe-SignBinary $launcherExeOut
 
     # Embed enhancer modules and icon asset (no nested PE binaries or temp source compilers)
-    Write-Host "[3/5] Compressing modular enhancer & icon payloads (GZip)..." -ForegroundColor Cyan
+    Write-Host "[2/4] Compressing modular enhancer & icon payloads (GZip)..." -ForegroundColor Cyan
     $resourceFlags = @()
     $iconGz = Join-Path $buildTmp "app_icon.ico.gz"
     Compress-ToGzipFile -srcFile $icoPath -dstGz $iconGz
@@ -1246,9 +1472,10 @@ try {
 
     $csFile = Join-Path $buildTmp "InstallerWPF.cs"
     $utf8WithBom = New-Object System.Text.UTF8Encoding($true)
-    [System.IO.File]::WriteAllText($csFile, $csSource, $utf8WithBom)
+    $csCompiledSource = $csSource.Replace('__ENHANCER_VERSION__', $Version)
+    [System.IO.File]::WriteAllText($csFile, $csCompiledSource, $utf8WithBom)
 
-    Write-Host "[4/5] Compiling Antigravity-Enhancer-Setup.exe v$Version..." -ForegroundColor Cyan
+    Write-Host "[3/4] Compiling Antigravity-Enhancer-Setup.exe v$Version..." -ForegroundColor Cyan
     $cscArgs = @(
         "/nologo",
         "/target:winexe",
@@ -1283,10 +1510,10 @@ try {
     Copy-Item -Path $OutputExe -Destination $versionedExe -Force
 
     # Generate SHA256SUMS.txt and release archive
-    Write-Host "[5/5] Writing SHA256SUMS.txt & packaging Antigravity-Enhancer-v$Version-Win.zip..." -ForegroundColor Cyan
+    Write-Host "[4/4] Writing SHA256SUMS.txt & packaging Antigravity-Enhancer-v$Version-Win.zip..." -ForegroundColor Cyan
     $shaFile = Join-Path $projectRoot "SHA256SUMS.txt"
     $hashLines = @()
-    foreach ($f in @($OutputExe, $versionedExe, $launcherExeOut)) {
+    foreach ($f in @($OutputExe, $versionedExe)) {
         $h = (Get-FileHash -Path $f -Algorithm SHA256).Hash.ToLowerInvariant()
         $hashLines += "$h  $(Split-Path $f -Leaf)"
     }
@@ -1295,7 +1522,6 @@ try {
     $zipPath = Join-Path $projectRoot "Antigravity-Enhancer-v$Version-Win.zip"
     $zipItems = @(
         $OutputExe,
-        $launcherExeOut,
         $enhancerSrcDir,
         $icoPath,
         $shaFile
@@ -1307,7 +1533,6 @@ try {
     $zipMb = [math]::Round((Get-Item $zipPath).Length / 1MB, 2)
     Write-Host "`n[SUCCESS] Build Complete:" -ForegroundColor Green
     Write-Host "  Setup EXE  : $OutputExe ($sizeMb MB) [$sigStatus]" -ForegroundColor White
-    Write-Host "  Launcher   : $launcherExeOut [$launcherSig]" -ForegroundColor White
     Write-Host "  Versioned  : $versionedExe" -ForegroundColor White
     Write-Host "  Checksums  : $shaFile" -ForegroundColor White
     Write-Host "  ZIP Archive: $zipPath ($zipMb MB)" -ForegroundColor White
