@@ -4,10 +4,10 @@ Parche de localización multilingüe y visualización de cuota de modelos para *
 
 [English](../README.md) · [한국어](README.ko.md) · [日本語](README.ja.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · **Español** · [Français](README.fr.md) · [Deutsch](README.de.md) · [Русский](README.ru.md)
 
-[![Download Latest (v3.3.1)](https://img.shields.io/badge/Descargar_última_versión-v3.3.1_(Windows_x64)-A0A3F6?style=for-the-badge&logo=windows&logoColor=0B0B0E)](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-Setup.exe)
-[![All Releases](https://img.shields.io/badge/Releases-v3.3.1-0B0B0E?style=for-the-badge&labelColor=0B0B0E&color=CAD3F5)](https://github.com/x2tora/antigravity-enhancer/releases/latest)
+[![Download Latest (v3.3.2)](https://img.shields.io/badge/Descargar_última_versión-v3.3.2_(Windows_x64)-A0A3F6?style=for-the-badge&logo=windows&logoColor=0B0B0E)](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-Setup.exe)
+[![All Releases](https://img.shields.io/badge/Releases-v3.3.2-0B0B0E?style=for-the-badge&labelColor=0B0B0E&color=CAD3F5)](https://github.com/x2tora/antigravity-enhancer/releases/latest)
 
-Descargas directas: [`Antigravity-Enhancer-Setup.exe`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-Setup.exe) · [`Antigravity-Enhancer-v3.3.1-Win.zip`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-v3.3.1-Win.zip) · [`SHA256SUMS.txt`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/SHA256SUMS.txt)
+Descargas directas: [`Antigravity-Enhancer-Setup.exe`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-Setup.exe) · [`Antigravity-Enhancer-v3.3.2-Win.zip`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-v3.3.2-Win.zip) · [`SHA256SUMS.txt`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/SHA256SUMS.txt)
 
 ---
 
@@ -34,7 +34,7 @@ Descargas directas: [`Antigravity-Enhancer-Setup.exe`](https://github.com/x2tora
 
 ### Archivo portable (`.zip`)
 
-1. Descarga [`Antigravity-Enhancer-v3.3.1-Win.zip`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-v3.3.1-Win.zip) desde [Releases](https://github.com/x2tora/antigravity-enhancer/releases/latest).
+1. Descarga [`Antigravity-Enhancer-v3.3.2-Win.zip`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-v3.3.2-Win.zip) desde [Releases](https://github.com/x2tora/antigravity-enhancer/releases/latest).
 2. Extrae el contenido y ejecuta `Antigravity-Enhancer-Setup.exe`.
 
 ---
@@ -46,7 +46,7 @@ Descargas directas: [`Antigravity-Enhancer-Setup.exe`](https://github.com/x2tora
 node .\generate_enhancer_manifest.js
 
 # Compilar Antigravity-Enhancer-Setup.exe, ZIP y SHA256SUMS.txt
-powershell -NoProfile -ExecutionPolicy Bypass -File .\build_exe_installer.ps1 -Version "3.3.1"
+powershell -NoProfile -ExecutionPolicy Bypass -File .\build_exe_installer.ps1 -Version "3.3.2"
 
 # Ejecutar pruebas E2E
 node .\tests\e2e\runner.js --summary -NoKill

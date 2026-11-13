@@ -1,5 +1,5 @@
 /**
- * Antigravity Enhancer v3.3.1 - Modular Renderer Enhancer Engine
+ * Antigravity Enhancer v3.3.2 - Modular Renderer Enhancer Engine
  * Features: 9-Language Zero-Restart i18n, GSAP v3.15.1 Zero-Bounce Motion,
  *           AI Model Quota HUD & Composer Inline Hover Card (2.31.2 Hydrogen/Argon/Gemini/Other),
  *           Native Title-Menu Patch Integration & In-App Updater (x2tora/antigravity-enhancer)
@@ -11,7 +11,7 @@
   const ipc = electron_1 ? electron_1.ipcRenderer : null;
   const payload = (typeof __ENHANCER_PAYLOAD__ !== 'undefined' && __ENHANCER_PAYLOAD__) ? __ENHANCER_PAYLOAD__ : {};
   const ENHANCER_REPO = payload.repo || 'x2tora/antigravity-enhancer';
-  const ENHANCER_CURRENT_VERSION = payload.version || '3.3.1';
+  const ENHANCER_CURRENT_VERSION = payload.version || '3.3.2';
 
   // ---------------------------------------------------------------------------
   // 1. Install GSAP Core into Preload World
@@ -1745,7 +1745,18 @@
           const stored = localStorage.getItem('antigravity_ui_language');
           if (stored && QUOTA_I18N[stored]) return stored;
         } catch (_) {}
-        return activeLanguage || 'en';
+        try {
+          const nav = (typeof navigator !== 'undefined' && ((Array.isArray(navigator.languages) && navigator.languages[0]) || navigator.language || navigator.userLanguage)) || 'en';
+          const low = String(nav).trim().toLowerCase().replace('_', '-');
+          if (low.startsWith('ko')) return 'ko';
+          if (low.startsWith('ja')) return 'ja';
+          if (low.startsWith('zh')) return (low.includes('tw') || low.includes('hk') || low.includes('mo') || low.includes('hant')) ? 'zh-TW' : 'zh-CN';
+          if (low.startsWith('es')) return 'es';
+          if (low.startsWith('fr')) return 'fr';
+          if (low.startsWith('de')) return 'de';
+          if (low.startsWith('ru')) return 'ru';
+        } catch (_) {}
+        return 'en';
       }
       function getQuotaStrings() { return QUOTA_I18N[getActiveLang()] || QUOTA_I18N.en; }
       function isQuotaWidgetVisible() { try { return localStorage.getItem(SHOW_QUOTA_KEY) !== 'false'; } catch (_) { return true; } }
