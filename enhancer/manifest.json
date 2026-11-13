@@ -1,15 +1,15 @@
 {
-  "version": "3.2.0",
+  "version": "3.3.0",
   "channel": "stable",
   "minAppVersion": "2.30.0",
   "testedAppVersion": "2.31.2",
   "repo": "x2tora/antigravity-enhancer",
-  "updatedAt": "2026-11-13T04:08:50.833Z",
-  "releaseNotes": "v3.2.0: Antigravity Enhanced title badge & native menu integration (Patch Version / Check Patch Updates / Restore Original), unified native styling, composer hover-only single-model quota card, and 9-language README & release docs.",
+  "updatedAt": "2026-11-13T04:34:15.728Z",
+  "releaseNotes": "v3.3.0: Flush AntigravityEnhanced title branding, 10-minute update polling with native-style Update Available top-bar pill, localized Other quota group & fixed ACTIVE badge wrapping, Hydrogen in Gemini model list (nonexistent Pro removed), OS language auto-detection on first launch, 9-language copy toast & quota setting labels, and dead rollback code cleanup.",
   "files": {
     "main-enhancer.js": {
-      "size": 24438,
-      "sha256": "6bf107cb60c321f13d1b09e2bf812272de91c6a60636e04a3065287f0a38f164",
+      "size": 21936,
+      "sha256": "2fc02d98e8efac6645bb6c80ce985e475209eac783127bf36ae68dc2566b1e29",
       "restartRequired": true
     },
     "asar-patcher.js": {
@@ -18,8 +18,8 @@
       "restartRequired": true
     },
     "renderer-enhancer.js": {
-      "size": 116733,
-      "sha256": "52c51df2b1bd974f3b3319891d17d6651ff35b781378dfc8dfcef5804163a3c4",
+      "size": 124293,
+      "sha256": "111700c5c664909d31858cc940a90fcf42ffae99680b60111be0652d30296926",
       "restartRequired": false
     },
     "gsap-core.js": {

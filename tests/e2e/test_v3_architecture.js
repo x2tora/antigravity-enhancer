@@ -103,7 +103,7 @@ function createRendererHarness(initialLang = 'ko', seedDomFn = null) {
       invoked.push({ channel, arg });
       if (channel === 'enhancer:get-status') {
         return {
-          enhancerVersion: '3.2.0',
+          enhancerVersion: '3.3.0',
           appVersion: '2.31.2',
           asarBootstrapped: true
         };
@@ -113,8 +113,8 @@ function createRendererHarness(initialLang = 'ko', seedDomFn = null) {
           ok: true,
           hasUpdate: true,
           canApplyInApp: true,
-          currentVersion: '3.2.0',
-          remoteVersion: '3.3.0',
+          currentVersion: '3.3.0',
+          remoteVersion: '3.4.0',
           releaseNotes: 'Test update'
         };
       }
@@ -132,7 +132,7 @@ function createRendererHarness(initialLang = 'ko', seedDomFn = null) {
 
   const payload = {
     disabled: false,
-    version: '3.2.0',
+    version: '3.3.0',
     repo: 'x2tora/antigravity-enhancer',
     code: rendererCode,
     gsapCode,
@@ -208,11 +208,11 @@ function createRendererHarness(initialLang = 'ko', seedDomFn = null) {
 // ============================================================================
 // F22: Modular Enhancer & Manifest Integrity
 // ============================================================================
-registerTest(1, 'F22', 'manifest.json v3.2.0 points to x2tora/antigravity-enhancer & matches SHA-256 digests', () => {
+registerTest(1, 'F22', 'manifest.json v3.3.0 points to x2tora/antigravity-enhancer & matches SHA-256 digests', () => {
   const manifestPath = path.join(ENHANCER_DIR, 'manifest.json');
   assert.ok(fs.existsSync(manifestPath), 'enhancer/manifest.json missing');
   const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-  assert.strictEqual(manifest.version, '3.2.0');
+  assert.strictEqual(manifest.version, '3.3.0');
   assert.strictEqual(manifest.repo, 'x2tora/antigravity-enhancer');
   assert.strictEqual(manifest.testedAppVersion, '2.31.2');
 
@@ -223,6 +223,29 @@ registerTest(1, 'F22', 'manifest.json v3.2.0 points to x2tora/antigravity-enhanc
     assert.strictEqual(buf.length, meta.size, `Size mismatch for ${fname}`);
     const actualSha = crypto.createHash('sha256').update(buf).digest('hex');
     assert.strictEqual(actualSha, meta.sha256, `SHA-256 mismatch for ${fname}`);
+  }
+});
+
+registerTest(1, 'F23', 'Renderer auto-detects OS language on first launch (9 languages + English fallback) and localizes quota setting labels', () => {
+  const src = fs.readFileSync(path.join(ENHANCER_DIR, 'renderer-enhancer.js'), 'utf8');
+  const runDetect = (langs, lang) => {
+    const { window, document, localStorage } = createMockEnvironment();
+    localStorage.removeItem('antigravity_ui_language');
+    const tailIdx = src.lastIndexOf("if (typeof document !== 'undefined')");
+    const patchedSrc = src.slice(0, tailIdx).replace('(function () {', 'return (function () {')
+      + '\nreturn { activeLanguage, COPY_TOAST_I18N, QUOTA_SETTING_I18N };\n})();';
+    const fn = new Function('navigator', 'localStorage', 'window', 'document', patchedSrc);
+    return fn({ languages: langs, language: lang, platform: 'Win32' }, localStorage, window, document);
+  };
+  const jaRes = runDetect(['ja-JP'], 'ja-JP');
+  assert.strictEqual(jaRes.activeLanguage, 'ja', 'First launch with ja-JP OS must resolve to ja');
+  const twRes = runDetect(['zh-Hant-TW'], 'zh-TW');
+  assert.strictEqual(twRes.activeLanguage, 'zh-TW', 'First launch with zh-TW OS must resolve to zh-TW');
+  const ptRes = runDetect(['pt-BR'], 'pt-BR');
+  assert.strictEqual(ptRes.activeLanguage, 'en', 'Unsupported OS language pt-BR must fall back to en');
+  for (const l of ['en', 'ko', 'ja', 'zh-CN', 'zh-TW', 'es', 'fr', 'de', 'ru']) {
+    assert.ok(jaRes.COPY_TOAST_I18N[l] && jaRes.COPY_TOAST_I18N[l].length > 3, `Missing COPY_TOAST_I18N for ${l}`);
+    assert.ok(jaRes.QUOTA_SETTING_I18N[l] && jaRes.QUOTA_SETTING_I18N[l].title && jaRes.QUOTA_SETTING_I18N[l].desc, `Missing QUOTA_SETTING_I18N for ${l}`);
   }
 });
 
@@ -505,6 +528,7 @@ registerTest(3, 'F24', 'Native Antigravity Enhanced title menu integrates Patch 
   const enhancedTag = document.getElementById('antigravity-enhanced-tag');
   assert.ok(enhancedTag, 'Antigravity menu item must show Enhanced tag when patched');
   assert.strictEqual(enhancedTag.textContent, 'Enhanced');
+  assert.ok((enhancedTag.style.cssText || '').includes('margin-left:0'), 'AntigravityEnhanced must render flush with margin-left:0');
   assert.ok((enhancedTag.style.color || '').toUpperCase() === '#A0A3F6' || (enhancedTag.style.cssText || '').toUpperCase().includes('#A0A3F6'), 'Enhanced tag must use #A0A3F6 accent');
 
   const menuSection = agyDropdown.querySelector('#antigravity-enhancer-menu-section');
@@ -514,18 +538,28 @@ registerTest(3, 'F24', 'Native Antigravity Enhanced title menu integrates Patch 
   const patchVerOpt = menuSection.querySelector('#antigravity-menu-patch-version');
   const checkUpdatesOpt = menuSection.querySelector('#antigravity-menu-check-updates');
   const restoreOpt = menuSection.querySelector('#antigravity-menu-restore-vanilla');
-  assert.ok(patchVerOpt && patchVerOpt.textContent.includes('3.2.0'), 'Menu must display Patch Version 3.2.0');
+  assert.ok(patchVerOpt && patchVerOpt.textContent.includes('3.3.0'), 'Menu must display Patch Version 3.3.0');
   assert.ok(checkUpdatesOpt, 'Menu must include Check Patch Updates item');
   assert.ok(restoreOpt, 'Menu must include Restore Original item');
 
+  // Wait for initial checkEnhancerGithubUpdate(false) (2500ms or trigger directly via checkUpdatesOpt)
   await checkUpdatesOpt.onclick({ stopPropagation: () => {}, preventDefault: () => {} });
-  await new Promise(r => setTimeout(r, 25));
+  await new Promise(r => setTimeout(r, 40));
+  const updatePill = document.getElementById('antigravity-enhancer-update-btn');
+  assert.ok(updatePill, 'Native-style Update Available top-bar pill must render when update exists');
+  assert.ok((updatePill.style.cssText || '').toUpperCase().includes('#A0A3F6'), 'Update pill must use #A0A3F6 accent');
+  assert.ok(updatePill.textContent.includes('업데이트 가능') || updatePill.textContent.includes('Update Available'), 'Update pill must show localized label');
+
   const modal = document.getElementById('antigravity-enhancer-modal');
   assert.ok(modal, 'Clicking Check Patch Updates in native menu must open modal');
   assert.ok(modal.querySelector('#agy-hub-check-btn'), 'Check Updates button must exist');
   assert.strictEqual(modal.querySelector('#agy-hub-repair-btn'), null, 'Verify & Repair UI must be removed');
   assert.strictEqual(modal.querySelector('#agy-hub-rollback-btn'), null, 'Rollback UI must be removed');
   assert.ok(modal.querySelector('#agy-hub-vanilla-btn'), 'Restore Original button must exist');
+
+  // Verify 10-minute (600000ms) polling interval in renderer-enhancer.js
+  const rendererSrc = fs.readFileSync(path.join(ENHANCER_DIR, 'renderer-enhancer.js'), 'utf8');
+  assert.ok(rendererSrc.includes('600000'), 'Background update check interval must be 10 minutes (600000 ms)');
 
   // Restore Original from menu opens focused confirmation and invokes IPC on confirm
   await restoreOpt.onclick({ stopPropagation: () => {}, preventDefault: () => {} });
@@ -568,8 +602,8 @@ registerTest(1, 'F25', 'mainWorldQuotaLogic separates composer hover-only single
   localStorage.setItem('antigravity_quota_cache_v1', JSON.stringify({
     groups: [
       { displayName: 'Argon', description: 'Models within this group: Gemini 4 Argon.', buckets: [{ window: '5h', remainingFraction: 0.91 }, { window: 'weekly', remainingFraction: 0.77 }] },
-      { displayName: 'Gemini', description: 'Models within this group: Gemini 4 Hydrogen, Gemini Pro.', buckets: [{ window: '5h', remainingFraction: 0.88 }, { window: 'weekly', remainingFraction: 0.62 }] },
-      { displayName: 'Claude/Other', description: 'Models within this group: Claude Opus, GPT-OSS.', buckets: [{ window: '5h', remainingFraction: 0.54 }, { window: 'weekly', remainingFraction: 0.41 }] }
+      { displayName: 'Gemini', description: 'Models within this group: Gemini 4 Hydrogen, Gemini Flash, Gemini 3.1 Flash Image.', buckets: [{ window: '5h', remainingFraction: 0.88 }, { window: 'weekly', remainingFraction: 0.62 }] },
+      { displayName: 'Other', description: 'Models within this group: Claude Opus, Claude Sonnet, GPT-OSS.', buckets: [{ window: '5h', remainingFraction: 0.54 }, { window: 'weekly', remainingFraction: 0.41 }] }
     ]
   }));
   const scriptEl = document.getElementById('antigravity-quota-main-script');
@@ -578,6 +612,8 @@ registerTest(1, 'F25', 'mainWorldQuotaLogic separates composer hover-only single
 
   const widget = document.getElementById('antigravity-quota-widget');
   assert.ok(widget, 'Top-right quota widget must render');
+  assert.ok(widget.textContent.includes('기타 모델'), 'Top-bar badge must display localized Other label (기타 모델 in ko)');
+  assert.ok(!widget.textContent.includes('Claude'), 'Top-bar badge must NOT display Claude');
   const inlineBadge = modelTrigger.querySelector('.antigravity-inline-model-quota');
   assert.ok(inlineBadge, 'Composer inline quota badge must render inside model-selector-trigger');
 
@@ -591,8 +627,11 @@ registerTest(1, 'F25', 'mainWorldQuotaLogic separates composer hover-only single
   const hoverCard = document.getElementById('antigravity-composer-quota-hovercard');
   assert.ok(hoverCard, 'Hovering composer inline badge must open single-model hover card');
   assert.strictEqual(hoverCard.getAttribute('data-group-key'), 'gemini', 'Hover card must target currently selected model group only');
-  assert.ok(hoverCard.textContent.includes('Gemini') && hoverCard.textContent.includes('88%') && hoverCard.textContent.includes('62%'), 'Hover card must show Gemini quota details');
-  assert.ok(!hoverCard.textContent.includes('Claude/Other') && !hoverCard.textContent.includes('Argon'), 'Hover card must NOT display other model groups');
+  assert.ok(hoverCard.textContent.includes('Gemini') && hoverCard.textContent.includes('Gemini 4 Hydrogen') && hoverCard.textContent.includes('88%') && hoverCard.textContent.includes('62%'), 'Hover card must show Gemini + Hydrogen quota details');
+  assert.ok(!hoverCard.textContent.includes('Gemini Pro'), 'Hover card must NOT include nonexistent Gemini Pro');
+  assert.ok(!hoverCard.textContent.includes('기타 모델') && !hoverCard.textContent.includes('Argon'), 'Hover card must NOT display other model groups');
+  const hoverEm = hoverCard.querySelector('em');
+  assert.ok(hoverEm && hoverEm.style['white-space'] === 'nowrap' && String(hoverEm.style['flex-shrink']) === '0', 'Hover card active pill must enforce nowrap & flex-shrink:0');
   assert.strictEqual(document.getElementById('antigravity-quota-popover'), null, 'Hovering composer badge must NOT open top-right full popover');
 
   inlineBadge.onmouseleave();
@@ -602,7 +641,9 @@ registerTest(1, 'F25', 'mainWorldQuotaLogic separates composer hover-only single
   widget.click();
   const popover = document.getElementById('antigravity-quota-popover');
   assert.ok(popover, 'Clicking top-right quota widget must open full multi-group quota popover');
-  assert.ok(popover.textContent.includes('Argon') && popover.textContent.includes('Gemini') && popover.textContent.includes('Claude/Other'), 'Top-right popover must display all model groups');
+  assert.ok(popover.textContent.includes('Argon') && popover.textContent.includes('Gemini') && popover.textContent.includes('기타 모델'), 'Top-right popover must display Argon, Gemini, and localized Other');
+  const popEm = popover.querySelector('em');
+  assert.ok(popEm && popEm.style['white-space'] === 'nowrap' && String(popEm.style['flex-shrink']) === '0', 'Popover active pill must enforce nowrap & flex-shrink:0');
 });
 
 registerTest(1, 'F25', 'build_exe_installer.ps1 uses safe build hygiene, #0B0B0E/#CAD3F5/#A0A3F6 palette & emits verified artifacts', () => {
@@ -651,8 +692,8 @@ registerTest(1, 'F25', 'build_exe_installer.ps1 uses safe build hygiene, #0B0B0E
     assert.ok(fs.existsSync(path.join(ROOT_DIR, 'docs', `README.${l}.md`)), `docs/README.${l}.md must exist`);
   }
   assert.ok(fs.existsSync(path.join(ROOT_DIR, 'Antigravity-Enhancer-Setup.exe')));
-  assert.ok(fs.existsSync(path.join(ROOT_DIR, 'Antigravity-Enhancer-v3.2.0-Setup.exe')));
-  assert.ok(fs.existsSync(path.join(ROOT_DIR, 'Antigravity-Enhancer-v3.2.0-Win.zip')));
+  assert.ok(fs.existsSync(path.join(ROOT_DIR, 'Antigravity-Enhancer-v3.3.0-Setup.exe')));
+  assert.ok(fs.existsSync(path.join(ROOT_DIR, 'Antigravity-Enhancer-v3.3.0-Win.zip')));
   assert.ok(fs.existsSync(path.join(ROOT_DIR, 'SHA256SUMS.txt')));
 
   const sums = fs.readFileSync(path.join(ROOT_DIR, 'SHA256SUMS.txt'), 'utf8');
@@ -729,37 +770,31 @@ registerTest(4, 'F24', 'Main updater rejects SHA-256 tampering cleanly, atomical
     const fileUrl = 'https://raw.githubusercontent.com/x2tora/antigravity-enhancer/main/enhancer/renderer-enhancer.js';
 
     // 1. Tamper test: digest mismatch must abort BEFORE overwriting live enhancerDir
-    const v32Tampered = Buffer.from('/* v3.2.0 TAMPERED */', 'utf8');
+    const v33Tampered = Buffer.from('/* v3.3.0 TAMPERED */', 'utf8');
     remoteResponses.set(manifestUrl, JSON.stringify({
-      version: '3.2.0',
-      files: { 'renderer-enhancer.js': { sha256: 'a'.repeat(64), size: v32Tampered.length } }
+      version: '3.3.0',
+      files: { 'renderer-enhancer.js': { sha256: 'a'.repeat(64), size: v33Tampered.length } }
     }));
-    remoteResponses.set(fileUrl, v32Tampered);
+    remoteResponses.set(fileUrl, v33Tampered);
     await assert.rejects(() => isolated.applyInAppUpdate('main'), /SHA-256 verification failed/);
     assert.strictEqual(fs.readFileSync(path.join(tmpEnhDir, 'renderer-enhancer.js'), 'utf8'), '/* v3.1.0 initial */');
     assert.strictEqual(JSON.parse(fs.readFileSync(path.join(tmpEnhDir, 'manifest.json'), 'utf8')).version, '3.1.0');
 
-    // 2. Valid atomic staging + backup snapshot
-    const v32Valid = Buffer.from('/* v3.2.0 valid */', 'utf8');
-    const v32Sha = crypto.createHash('sha256').update(v32Valid).digest('hex');
+    // 2. Valid atomic staging & dead rollback code removed
+    assert.strictEqual(isolated.restoreFromBackupDir, undefined, 'Dead restoreFromBackupDir export must be removed');
+    assert.strictEqual(isolated.getFullStatus().backup, undefined, 'Dead backup snapshot metadata must be removed from getFullStatus');
+    const v33Valid = Buffer.from('/* v3.3.0 valid */', 'utf8');
+    const v33Sha = crypto.createHash('sha256').update(v33Valid).digest('hex');
     remoteResponses.set(manifestUrl, JSON.stringify({
-      version: '3.2.0',
-      files: { 'renderer-enhancer.js': { sha256: v32Sha, size: v32Valid.length } }
+      version: '3.3.0',
+      files: { 'renderer-enhancer.js': { sha256: v33Sha, size: v33Valid.length } }
     }));
-    remoteResponses.set(fileUrl, v32Valid);
+    remoteResponses.set(fileUrl, v33Valid);
     const applyRes = await isolated.applyInAppUpdate('main');
     assert.strictEqual(applyRes.ok, true);
-    assert.strictEqual(applyRes.newVersion, '3.2.0');
-    assert.strictEqual(fs.readFileSync(path.join(tmpEnhDir, 'renderer-enhancer.js'), 'utf8'), '/* v3.2.0 valid */');
-    assert.strictEqual(JSON.parse(fs.readFileSync(path.join(tmpEnhDir, 'manifest.json'), 'utf8')).version, '3.2.0');
-    assert.ok(fs.existsSync(path.join(tmpEnhDir, 'backup', 'latest', 'manifest.json')), 'Rollback snapshot must exist');
-
-    // 3. Rollback to backup/latest restores exact v3.1.0 payload
-    const rbRes = isolated.restoreFromBackupDir(path.join(tmpEnhDir, 'backup', 'latest'));
-    assert.strictEqual(rbRes.ok, true);
-    assert.strictEqual(rbRes.restoredVersion, '3.1.0');
-    assert.strictEqual(fs.readFileSync(path.join(tmpEnhDir, 'renderer-enhancer.js'), 'utf8'), '/* v3.1.0 initial */');
-    assert.strictEqual(JSON.parse(fs.readFileSync(path.join(tmpEnhDir, 'manifest.json'), 'utf8')).version, '3.1.0');
+    assert.strictEqual(applyRes.newVersion, '3.3.0');
+    assert.strictEqual(fs.readFileSync(path.join(tmpEnhDir, 'renderer-enhancer.js'), 'utf8'), '/* v3.3.0 valid */');
+    assert.strictEqual(JSON.parse(fs.readFileSync(path.join(tmpEnhDir, 'manifest.json'), 'utf8')).version, '3.3.0');
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
@@ -780,7 +815,7 @@ registerTest(4, 'F25', 'Installer OS language auto-detection (9 languages + Engl
     const installerCsPath = path.join(tmpDir, 'InstallerWPF.cs');
     // Rename App.Main out so test harness can define entry point cleanly
     const modifiedCs = match[1]
-      .replace('__ENHANCER_VERSION__', '3.2.0')
+      .replace('__ENHANCER_VERSION__', '3.3.0')
       .replace('public static void Main()', 'public static void MainWpfDisabled()');
     fs.writeFileSync(installerCsPath, '\uFEFF' + modifiedCs, 'utf8');
 

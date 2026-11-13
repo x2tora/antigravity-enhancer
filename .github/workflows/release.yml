@@ -22,7 +22,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
 
       - name: Verify enhancer manifest and E2E suite (pre-build)
         shell: pwsh
@@ -33,7 +33,7 @@ jobs:
         shell: pwsh
         run: |
           $tag = "${{ github.ref_name }}"
-          $ver = if ($tag -match '^v(\d+\.\d+\.\d+)$') { $Matches[1] } else { "3.2.0" }
+          $ver = if ($tag -match '^v(\d+\.\d+\.\d+)$') { $Matches[1] } else { "3.3.0" }
           powershell -NoProfile -ExecutionPolicy Bypass -File .\build_exe_installer.ps1 -Version $ver
 
       - name: Run v3 architecture E2E suite

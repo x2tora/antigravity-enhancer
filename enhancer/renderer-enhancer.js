@@ -1,7 +1,7 @@
 /**
- * Antigravity Enhancer v3.2.0 - Modular Renderer Enhancer Engine
+ * Antigravity Enhancer v3.3.0 - Modular Renderer Enhancer Engine
  * Features: 9-Language Zero-Restart i18n, GSAP v3.15.1 Zero-Bounce Motion,
- *           AI Model Quota HUD & Composer Inline Hover Card (2.31.2 Hydrogen/Argon/Gemini/Claude),
+ *           AI Model Quota HUD & Composer Inline Hover Card (2.31.2 Hydrogen/Argon/Gemini/Other),
  *           Native Title-Menu Patch Integration & In-App Updater (x2tora/antigravity-enhancer)
  */
 (function () {
@@ -11,7 +11,7 @@
   const ipc = electron_1 ? electron_1.ipcRenderer : null;
   const payload = (typeof __ENHANCER_PAYLOAD__ !== 'undefined' && __ENHANCER_PAYLOAD__) ? __ENHANCER_PAYLOAD__ : {};
   const ENHANCER_REPO = payload.repo || 'x2tora/antigravity-enhancer';
-  const ENHANCER_CURRENT_VERSION = payload.version || '3.2.0';
+  const ENHANCER_CURRENT_VERSION = payload.version || '3.3.0';
 
   // ---------------------------------------------------------------------------
   // 1. Install GSAP Core into Preload World
@@ -172,13 +172,41 @@
     ru: { native: 'Русский', en: 'Russian' }
   };
 
+  function detectOsLanguage() {
+    try {
+      const candidates = [];
+      if (typeof navigator !== 'undefined') {
+        if (Array.isArray(navigator.languages)) candidates.push(...navigator.languages);
+        if (navigator.language) candidates.push(navigator.language);
+        if (navigator.userLanguage) candidates.push(navigator.userLanguage);
+      }
+      for (const raw of candidates) {
+        if (!raw || typeof raw !== 'string') continue;
+        const norm = raw.trim().toLowerCase().replace('_', '-');
+        if (!norm) continue;
+        if (norm.startsWith('ko')) return 'ko';
+        if (norm.startsWith('ja')) return 'ja';
+        if (norm.startsWith('zh')) {
+          return (norm.includes('tw') || norm.includes('hk') || norm.includes('mo') || norm.includes('hant'))
+            ? 'zh-TW'
+            : 'zh-CN';
+        }
+        if (norm.startsWith('es')) return 'es';
+        if (norm.startsWith('fr')) return 'fr';
+        if (norm.startsWith('de')) return 'de';
+        if (norm.startsWith('ru')) return 'ru';
+        if (norm.startsWith('en')) return 'en';
+      }
+    } catch (_) {}
+    return 'en';
+  }
+
   let activeLanguage = (function () {
     try {
       const stored = localStorage.getItem(LANG_STORAGE_KEY);
-      return (stored && LANG_ORDER.includes(stored)) ? stored : 'ko';
-    } catch (_) {
-      return 'ko';
-    }
+      if (stored && LANG_ORDER.includes(stored)) return stored;
+    } catch (_) {}
+    return detectOsLanguage();
   })();
 
   function getCurrentLanguage() { return activeLanguage; }
@@ -435,13 +463,25 @@
   // ---------------------------------------------------------------------------
   // 3. Copy Toast Notification
   // ---------------------------------------------------------------------------
+  const COPY_TOAST_I18N = {
+    en: 'Code copied to clipboard',
+    ko: '코드가 클립보드에 복사되었습니다',
+    ja: 'コードをクリップボードにコピーしました',
+    'zh-CN': '代码已复制到剪贴板',
+    'zh-TW': '程式碼已複製到剪貼簿',
+    es: 'Código copiado al portapapeles',
+    fr: 'Code copié dans le presse-papiers',
+    de: 'Code in die Zwischenablage kopiert',
+    ru: 'Код скопирован в буфер обмена'
+  };
+
   let copyToastTimer = null;
   function showCopyToast() {
     try {
       if (typeof document === 'undefined') return;
       injectFont();
       let toast = document.getElementById('antigravity-copy-toast');
-      const toastText = (activeLanguage === 'ko') ? '코드가 클립보드에 복사되었습니다' : 'Code copied to clipboard';
+      const toastText = COPY_TOAST_I18N[activeLanguage] || COPY_TOAST_I18N.en;
 
       if (!toast) {
         toast = document.createElement('div');
@@ -724,8 +764,24 @@
     }
   };
 
+  const UPDATE_PILL_I18N = {
+    en: 'Update Available',
+    ko: '업데이트 가능',
+    ja: 'アップデート可能',
+    'zh-CN': '有可用更新',
+    'zh-TW': '有可用更新',
+    es: 'Actualización disponible',
+    fr: 'Mise à jour disponible',
+    de: 'Update verfügbar',
+    ru: 'Доступно обновление'
+  };
+
   function getHubStrings() {
-    return HUB_I18N[activeLanguage] || HUB_I18N.en;
+    const base = HUB_I18N[activeLanguage] || HUB_I18N.en;
+    return {
+      ...base,
+      updateAvailablePill: UPDATE_PILL_I18N[activeLanguage] || UPDATE_PILL_I18N.en
+    };
   }
 
   async function refreshHubStatus() {
@@ -989,6 +1045,22 @@
   // ---------------------------------------------------------------------------
   // 5. Settings Panel & Top-Bar Controls (2.31.2 Compatible)
   // ---------------------------------------------------------------------------
+  const QUOTA_SETTING_I18N = {
+    en: { title: 'Top-Bar Quota Widget', desc: 'Show real-time model quota and AI usage widget in the top bar.' },
+    ko: { title: '상단 사용량 표시기', desc: '상단 바에 실시간 모델 할당량 및 사용 현황 위젯을 표시합니다.' },
+    ja: { title: '上部クォータ表示', desc: '上部バーにリアルタイムのモデルクォータと使用状況を表示します。' },
+    'zh-CN': { title: '顶部配额指示器', desc: '在顶部栏显示实时模型配额与 AI 使用情况组件。' },
+    'zh-TW': { title: '頂部配額指示器', desc: '在頂部列顯示即時模型配額與 AI 使用狀況元件。' },
+    es: { title: 'Widget de cuota superior', desc: 'Mostrar la cuota de modelos y el uso de IA en la barra superior.' },
+    fr: { title: 'Widget de quota supérieur', desc: 'Afficher le quota de modèles et l’utilisation de l’IA dans la barre supérieure.' },
+    de: { title: 'Kontingent-Widget (Leiste)', desc: 'Modellkontingent und KI-Nutzung in Echtzeit in der oberen Leiste anzeigen.' },
+    ru: { title: 'Виджет квоты в панели', desc: 'Показывать квоту моделей и использование ИИ в верхней панели.' }
+  };
+
+  function getQuotaSettingStrings(lang) {
+    return QUOTA_SETTING_I18N[lang || activeLanguage] || QUOTA_SETTING_I18N.en;
+  }
+
   function setLanguage(lang) {
     if (activeLanguage === lang) return;
     activeLanguage = lang;
@@ -1044,6 +1116,12 @@
     if (secTitle) secTitle.textContent = (activeLanguage === 'ko') ? '언어 설정' : (safeDictGet(translations[activeLanguage], 'Language') || 'Language');
     if (itemTitle) itemTitle.textContent = (activeLanguage === 'ko') ? '인터페이스 언어' : (safeDictGet(translations[activeLanguage], 'Interface Language') || 'Interface Language');
     if (itemDesc) itemDesc.textContent = (activeLanguage === 'ko') ? '표시할 언어를 선택합니다. (재시작 없이 즉시 변경)' : (safeDictGet(translations[activeLanguage], 'Select display language. (Zero restart)') || 'Select display language. (Zero restart)');
+
+    const qSet = getQuotaSettingStrings(activeLanguage);
+    const quotaTitle = document.getElementById('antigravity-quota-item-title');
+    const quotaDesc = document.getElementById('antigravity-quota-item-desc');
+    if (quotaTitle) quotaTitle.textContent = qSet.title;
+    if (quotaDesc) quotaDesc.textContent = qSet.desc;
 
     const h = getHubStrings();
     const settingsVerSub = document.getElementById('antigravity-settings-hub-subtitle');
@@ -1156,8 +1234,8 @@
         </div>
         <div id="antigravity-quota-setting-row" class="py-2 px-3 w-full bg-transparent flex justify-between gap-4 items-center" style="display:flex;align-items:center;justify-content:space-between;gap:16px;">
           <div class="flex-1 min-w-0 flex flex-col gap-0.5" style="flex:1 1 0%;min-width:180px;">
-            <span class="text-sm font-normal text-foreground" id="antigravity-quota-item-title">${currentLang === 'ko' ? '상단 사용량 표시기' : 'Top-Bar Quota Widget'}</span>
-            <div class="text-xs text-secondary-foreground" id="antigravity-quota-item-desc" style="line-height:1.4;">${currentLang === 'ko' ? '상단 바에 실시간 모델 할당량 및 사용 현황 위젯을 표시합니다.' : 'Show real-time model quota and AI usage widget in the top bar.'}</div>
+            <span class="text-sm font-normal text-foreground" id="antigravity-quota-item-title">${getQuotaSettingStrings(currentLang).title}</span>
+            <div class="text-xs text-secondary-foreground" id="antigravity-quota-item-desc" style="line-height:1.4;">${getQuotaSettingStrings(currentLang).desc}</div>
           </div>
           <button type="button" role="switch" id="antigravity-quota-toggle" aria-checked="${isQuotaOn}" style="position:relative;display:inline-flex;height:20px;width:36px;flex-shrink:0;cursor:pointer;border-radius:9999px;border:2px solid transparent;transition:background-color 0.2s ease-in-out;outline:none;background-color:${isQuotaOn ? '#A0A3F6' : 'rgba(202,211,245,0.22)'};">
             <span id="antigravity-quota-toggle-thumb" style="pointer-events:none;display:inline-block;height:16px;width:16px;border-radius:9999px;background-color:#CAD3F5;box-shadow:0 1px 3px rgba(0,0,0,0.3);transition:transform 0.2s ease-in-out;transform:translateX(${isQuotaOn ? '16px' : '0px'});"></span>
@@ -1165,7 +1243,7 @@
         </div>
         <div class="py-2 px-3 w-full bg-transparent flex justify-between gap-4 items-center notranslate" translate="no" style="display:flex;align-items:center;justify-content:space-between;gap:16px;">
           <div class="flex-1 min-w-0 flex flex-col gap-0.5" style="flex:1 1 0%;min-width:180px;">
-            <span class="text-sm font-normal text-foreground">Antigravity <span style="color:#A0A3F6;font-weight:600;">Enhanced</span></span>
+            <span class="text-sm font-normal text-foreground">Antigravity<span style="color:#A0A3F6;font-weight:600;margin-left:0;">Enhanced</span></span>
             <div class="text-xs text-secondary-foreground" id="antigravity-settings-hub-subtitle" style="line-height:1.4;">${h.patchVersionPrefix} ${ENHANCER_CURRENT_VERSION}</div>
           </div>
           <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
@@ -1311,10 +1389,69 @@
     return { wrapper, btn };
   }
 
+  function injectEnhancerUpdatePill() {
+    if (typeof document === 'undefined' || payload.disabled) return;
+    const existing = document.getElementById('antigravity-enhancer-update-btn');
+    const hasUpdate = Boolean(enhancerUpdateInfo && enhancerUpdateInfo.hasUpdate && enhancerUpdateInfo.remoteVersion);
+    if (!hasUpdate) {
+      if (existing) existing.remove();
+      return;
+    }
+
+    const target = findHeaderActionsContainer();
+    if (!target || !target.container) return;
+
+    const h = getHubStrings();
+    let pill = existing;
+    if (!pill) {
+      pill = document.createElement('div');
+      pill.id = 'antigravity-enhancer-update-btn';
+      pill.setAttribute('role', 'button');
+      pill.setAttribute('tabindex', '0');
+      pill.setAttribute('translate', 'no');
+      pill.className = 'flex items-center whitespace-nowrap cursor-pointer text-[11px] font-medium h-6 pl-2.5 pr-2 rounded-full select-none notranslate';
+      pill.style.cssText = 'display:inline-flex;align-items:center;gap:3px;height:24px;padding:0 8px 0 10px;border-radius:9999px;background:#A0A3F6;color:#0B0B0E;font-size:11px;font-weight:600;line-height:1;white-space:nowrap;flex-shrink:0;cursor:pointer;app-region:no-drag;-webkit-app-region:no-drag;margin-right:6px;z-index:101;transition:opacity 0.15s ease;';
+      pill.innerHTML = `<span id="antigravity-enhancer-update-label">${h.updateAvailablePill}</span><span class="flex items-center" style="display:inline-flex;align-items:center;margin-left:2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span>`;
+      pill.onmouseenter = () => { pill.style.opacity = '0.9'; };
+      pill.onmouseleave = () => { pill.style.opacity = '1'; };
+      pill.onclick = (e) => {
+        if (e) {
+          if (e.stopPropagation) e.stopPropagation();
+          if (e.preventDefault) e.preventDefault();
+        }
+        openEnhancerHubModal('update', { forceOpen: true, autoCheck: true });
+      };
+      pill.onkeydown = (e) => {
+        if (e && (e.key === 'Enter' || e.key === ' ')) {
+          if (e.preventDefault) e.preventDefault();
+          openEnhancerHubModal('update', { forceOpen: true, autoCheck: true });
+        }
+      };
+    } else {
+      const lbl = pill.querySelector('#antigravity-enhancer-update-label');
+      if (lbl && lbl.textContent !== h.updateAvailablePill) lbl.textContent = h.updateAvailablePill;
+    }
+    pill.title = `AntigravityEnhanced v${enhancerUpdateInfo.remoteVersion}`;
+
+    const quickLangBtn = document.getElementById('antigravity-quick-lang-btn');
+    const quotaWidget = document.getElementById('antigravity-quota-widget');
+    const beforeEl = (quickLangBtn && quickLangBtn.parentElement === target.container)
+      ? quickLangBtn
+      : ((quotaWidget && quotaWidget.parentElement === target.container) ? quotaWidget : target.before);
+    if (pill.parentElement !== target.container) {
+      if (beforeEl && beforeEl.parentElement === target.container) {
+        target.container.insertBefore(pill, beforeEl);
+      } else {
+        target.container.appendChild(pill);
+      }
+    }
+  }
+
   function injectTitleMenuIntegration() {
     if (typeof document === 'undefined' || payload.disabled) return;
     const oldHubBtn = document.getElementById('antigravity-enhancer-hub-btn');
     if (oldHubBtn) oldHubBtn.remove();
+    injectEnhancerUpdatePill();
 
     const menuBar = document.querySelector('[data-testid="title-menu-bar"]');
     const items = menuBar
@@ -1337,7 +1474,7 @@
       tag.id = 'antigravity-enhanced-tag';
       tag.className = 'notranslate';
       tag.setAttribute('translate', 'no');
-      tag.style.cssText = 'color:#A0A3F6;font-weight:600;margin-left:4px;letter-spacing:-0.01em;';
+      tag.style.cssText = 'color:#A0A3F6;font-weight:600;margin-left:0;letter-spacing:-0.01em;';
       tag.style.color = '#A0A3F6';
       tag.textContent = 'Enhanced';
       agyMenuBtn.appendChild(tag);
@@ -1537,7 +1674,7 @@
         if (!rawName) return null;
         const lower = rawName.toLowerCase();
         if (lower.includes('argon')) return 'argon';
-        if (lower.includes('hydrogen') || lower.includes('gemini') || lower.includes('flash') || lower.includes('pro')) {
+        if (lower.includes('hydrogen') || lower.includes('gemini') || lower.includes('flash')) {
           return 'gemini';
         }
         if (lower.includes('claude') || lower.includes('sonnet') || lower.includes('opus') || lower.includes('gpt') || lower.includes('haiku')) {
@@ -1570,18 +1707,24 @@
       }
 
       const QUOTA_I18N = {
-        en: { title: 'Model Quota', refresh: 'Refresh', weekly: 'W:', weeklyFull: 'Weekly', h5Full: '5-Hour', resetIn: 'Resets in ', checking: 'Checking...', openSettings: 'Model Settings', lowWarning: 'Low (<20%)', activeTag: 'ACTIVE' },
-        ko: { title: '모델 사용량', refresh: '새로고침', weekly: '주간:', weeklyFull: '주간 사용량', h5Full: '5시간 사용량', resetIn: '후 초기화', checking: '확인 중...', openSettings: '모델 설정', lowWarning: '잔여 부족 (<20%)', activeTag: '사용 중' },
-        ja: { title: 'モデル使用量', refresh: '更新', weekly: '週:', weeklyFull: '週間', h5Full: '5時間', resetIn: '後にリセット', checking: '確認中...', openSettings: 'モデル設定', lowWarning: '残りわずか (<20%)', activeTag: '使用中' },
-        'zh-CN': { title: '模型配额', refresh: '刷新', weekly: '周:', weeklyFull: '每周配额', h5Full: '5小时配额', resetIn: '后重置', checking: '检查中...', openSettings: '模型设置', lowWarning: '配额不足 (<20%)', activeTag: '使用中' },
-        'zh-TW': { title: '模型配額', refresh: '重新整理', weekly: '週:', weeklyFull: '每週配額', h5Full: '5小時配額', resetIn: '後重設', checking: '檢查中...', openSettings: '模型設定', lowWarning: '配額不足 (<20%)', activeTag: '使用中' },
-        es: { title: 'Cuota', refresh: 'Actualizar', weekly: 'Sem:', weeklyFull: 'Semanal', h5Full: '5 horas', resetIn: 'Se restablece en ', checking: 'Comprobando...', openSettings: 'Ajustes de modelo', lowWarning: 'Baja (<20%)', activeTag: 'ACTIVO' },
-        fr: { title: 'Quota', refresh: 'Actualiser', weekly: 'Heb:', weeklyFull: 'Hebdomadaire', h5Full: '5 heures', resetIn: 'Réinitialisation dans ', checking: 'Vérification...', openSettings: 'Paramètres modèles', lowWarning: 'Faible (<20%)', activeTag: 'ACTIF' },
-        de: { title: 'Kontingent', refresh: 'Aktualisieren', weekly: 'Wo:', weeklyFull: 'Wöchentlich', h5Full: '5 Stunden', resetIn: 'Zurücksetzen in ', checking: 'Prüfe...', openSettings: 'Modelleinstellungen', lowWarning: 'Niedrig (<20%)', activeTag: 'AKTIV' },
-        ru: { title: 'Квота', refresh: 'Обновить', weekly: 'Нед:', weeklyFull: 'Недельная', h5Full: '5 часов', resetIn: 'Сброс через ', checking: 'Проверка...', openSettings: 'Настройки моделей', lowWarning: 'Низкая (<20%)', activeTag: 'АКТИВНА' }
+        en: { title: 'Model Quota', refresh: 'Refresh', weekly: 'W:', weeklyFull: 'Weekly', h5Full: '5-Hour', resetIn: 'Resets in ', checking: 'Checking...', openSettings: 'Model Settings', lowWarning: 'Low (<20%)', activeTag: 'ACTIVE', otherLabel: 'Other' },
+        ko: { title: '모델 사용량', refresh: '새로고침', weekly: '주간:', weeklyFull: '주간 사용량', h5Full: '5시간 사용량', resetIn: '후 초기화', checking: '확인 중...', openSettings: '모델 설정', lowWarning: '잔여 부족 (<20%)', activeTag: '사용 중', otherLabel: '기타 모델' },
+        ja: { title: 'モデル使用量', refresh: '更新', weekly: '週:', weeklyFull: '週間', h5Full: '5時間', resetIn: '後にリセット', checking: '確認中...', openSettings: 'モデル設定', lowWarning: '残りわずか (<20%)', activeTag: '使用中', otherLabel: 'その他' },
+        'zh-CN': { title: '模型配额', refresh: '刷新', weekly: '周:', weeklyFull: '每周配额', h5Full: '5小时配额', resetIn: '后重置', checking: '检查中...', openSettings: '模型设置', lowWarning: '配额不足 (<20%)', activeTag: '使用中', otherLabel: '其他模型' },
+        'zh-TW': { title: '模型配額', refresh: '重新整理', weekly: '週:', weeklyFull: '每週配額', h5Full: '5小時配額', resetIn: '後重設', checking: '檢查中...', openSettings: '模型設定', lowWarning: '配額不足 (<20%)', activeTag: '使用中', otherLabel: '其他模型' },
+        es: { title: 'Cuota', refresh: 'Actualizar', weekly: 'Sem:', weeklyFull: 'Semanal', h5Full: '5 horas', resetIn: 'Se restablece en ', checking: 'Comprobando...', openSettings: 'Ajustes de modelo', lowWarning: 'Baja (<20%)', activeTag: 'ACTIVO', otherLabel: 'Otros' },
+        fr: { title: 'Quota', refresh: 'Actualiser', weekly: 'Heb:', weeklyFull: 'Hebdomadaire', h5Full: '5 heures', resetIn: 'Réinitialisation dans ', checking: 'Vérification...', openSettings: 'Paramètres modèles', lowWarning: 'Faible (<20%)', activeTag: 'ACTIF', otherLabel: 'Autres' },
+        de: { title: 'Kontingent', refresh: 'Aktualisieren', weekly: 'Wo:', weeklyFull: 'Wöchentlich', h5Full: '5 Stunden', resetIn: 'Zurücksetzen in ', checking: 'Prüfe...', openSettings: 'Modelleinstellungen', lowWarning: 'Niedrig (<20%)', activeTag: 'AKTIV', otherLabel: 'Andere' },
+        ru: { title: 'Квота', refresh: 'Обновить', weekly: 'Нед:', weeklyFull: 'Недельная', h5Full: '5 часов', resetIn: 'Сброс через ', checking: 'Проверка...', openSettings: 'Настройки моделей', lowWarning: 'Низкая (<20%)', activeTag: 'АКТИВНА', otherLabel: 'Другие' }
       };
 
-      function getActiveLang() { try { return localStorage.getItem('antigravity_ui_language') || 'ko'; } catch (_) { return 'ko'; } }
+      function getActiveLang() {
+        try {
+          const stored = localStorage.getItem('antigravity_ui_language');
+          if (stored && QUOTA_I18N[stored]) return stored;
+        } catch (_) {}
+        return activeLanguage || 'en';
+      }
       function getQuotaStrings() { return QUOTA_I18N[getActiveLang()] || QUOTA_I18N.en; }
       function isQuotaWidgetVisible() { try { return localStorage.getItem(SHOW_QUOTA_KEY) !== 'false'; } catch (_) { return true; } }
       function getCachedQuota() { try { const r = localStorage.getItem(QUOTA_CACHE_KEY); return r ? JSON.parse(r) : null; } catch (_) { return null; } }
@@ -1657,10 +1800,11 @@
       }
 
       function parseGroups(quotaResponse) {
+        const qs = getQuotaStrings();
         const groups = quotaResponse?.groups || [];
         const argon = { id: 'argon', label: 'Argon', color: '#A0A3F6', h5: null, weekly: null, h5TargetTs: null, weeklyTargetTs: null, models: ['Gemini 4 Argon'] };
-        const gemini = { id: 'gemini', label: 'Gemini', color: '#CAD3F5', h5: null, weekly: null, h5TargetTs: null, weeklyTargetTs: null, models: ['Gemini 4 Hydrogen', 'Gemini Flash', 'Gemini Pro'] };
-        const other = { id: 'other', label: 'Claude/Other', color: '#8A93B2', h5: null, weekly: null, h5TargetTs: null, weeklyTargetTs: null, models: ['Claude Opus', 'Claude Sonnet', 'GPT-OSS'] };
+        const gemini = { id: 'gemini', label: 'Gemini', color: '#CAD3F5', h5: null, weekly: null, h5TargetTs: null, weeklyTargetTs: null, models: ['Gemini 4 Hydrogen', 'Gemini Flash', 'Gemini 3.1 Flash Image'] };
+        const other = { id: 'other', label: qs.otherLabel || 'Other', color: '#8A93B2', h5: null, weekly: null, h5TargetTs: null, weeklyTargetTs: null, models: ['Claude Opus', 'Claude Sonnet', 'GPT-OSS'] };
 
         for (const g of groups) {
           const name = (g.displayName || '').toLowerCase();
@@ -1787,7 +1931,7 @@
         const rows = renderBucketHtml(qs.h5Full, grp.h5, grp.h5TargetTs, qs) + renderBucketHtml(qs.weeklyFull, grp.weekly, grp.weeklyTargetTs, qs);
         const modelsTxt = (grp.models || []).join(', ');
 
-        card.innerHTML = `<header style="display:flex;align-items:center;justify-content:space-between;gap:6px;padding-bottom:6px;border-bottom:1px solid rgba(202,211,245,0.1);"><div style="display:inline-flex;align-items:center;gap:6px;"><strong style="font-weight:600;font-size:12.5px;color:${isLow ? '#f87171' : (grp.id === 'argon' ? '#A0A3F6' : '#CAD3F5')};">${grp.label}</strong>${grp.id === currentActiveGroup ? `<em style="font-style:normal;font-size:9.5px;font-weight:700;padding:1px 5px;border-radius:4px;background:rgba(160,163,246,0.14);color:#A0A3F6;border:1px solid rgba(160,163,246,0.4);">${qs.activeTag}</em>` : ''}</div><span style="font-size:10.5px;color:#CAD3F5;opacity:0.6;max-width:155px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${modelsTxt}</span></header><section>${rows || '<p style="margin:6px 0 0;font-size:11px;color:#CAD3F5;opacity:0.65;">--</p>'}</section>`;
+        card.innerHTML = `<header style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding-bottom:6px;border-bottom:1px solid rgba(202,211,245,0.1);"><div style="display:inline-flex;align-items:center;gap:6px;flex-shrink:0;white-space:nowrap;"><strong style="font-weight:600;font-size:12.5px;white-space:nowrap;color:${isLow ? '#f87171' : (grp.id === 'argon' ? '#A0A3F6' : '#CAD3F5')};">${grp.label}</strong>${(grp.id === currentActiveGroup || grp.id === groupKey) ? `<em style="font-style:normal;font-size:9.5px;font-weight:700;padding:1px 5px;border-radius:4px;white-space:nowrap;flex-shrink:0;line-height:1.2;background:rgba(160,163,246,0.14);color:#A0A3F6;border:1px solid rgba(160,163,246,0.4);">${qs.activeTag}</em>` : ''}</div><span style="font-size:10.5px;color:#CAD3F5;opacity:0.6;flex:1;min-width:0;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${modelsTxt}</span></header><section>${rows || '<p style="margin:6px 0 0;font-size:11px;color:#CAD3F5;opacity:0.65;">--</p>'}</section>`;
 
         (document.body || document.documentElement).appendChild(card);
         startCountdownTicker();
@@ -1822,7 +1966,7 @@
           const vals = [g.h5, g.weekly].filter(v => typeof v === 'number');
           const isLow = vals.length > 0 && Math.min(...vals) < 20;
           const borderStyle = isLow ? 'background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.38);' : 'background:rgba(202,211,245,0.03);border:1px solid rgba(202,211,245,0.1);';
-          return `<section class="group-card rounded-lg p-2.5 mb-2" style="${borderStyle}border-radius:8px;padding:8px 10px;margin-bottom:8px;"><header style="display:flex;align-items:center;justify-content:space-between;gap:6px;"><div style="display:inline-flex;align-items:center;gap:5px;"><strong style="font-weight:600;font-size:12px;color:${isLow ? '#f87171' : g.color};">${g.label}</strong>${g.id === currentActiveGroup ? `<em style="font-style:normal;font-size:9.5px;font-weight:700;padding:1px 5px;border-radius:4px;background:rgba(160,163,246,0.14);color:#A0A3F6;border:1px solid rgba(160,163,246,0.4);">${qs.activeTag}</em>` : ''}</div><span style="font-size:10.5px;color:#CAD3F5;opacity:0.6;max-width:185px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${(g.models || []).join(', ')}</span></header><main>${rows || '<p style="margin:4px 0 0;font-size:11px;color:#CAD3F5;opacity:0.65;">--</p>'}</main></section>`;
+          return `<section class="group-card rounded-lg p-2.5 mb-2" style="${borderStyle}border-radius:8px;padding:8px 10px;margin-bottom:8px;"><header style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><div style="display:inline-flex;align-items:center;gap:5px;flex-shrink:0;white-space:nowrap;"><strong style="font-weight:600;font-size:12px;white-space:nowrap;color:${isLow ? '#f87171' : g.color};">${g.label}</strong>${g.id === currentActiveGroup ? `<em style="font-style:normal;font-size:9.5px;font-weight:700;padding:1px 5px;border-radius:4px;white-space:nowrap;flex-shrink:0;line-height:1.2;background:rgba(160,163,246,0.14);color:#A0A3F6;border:1px solid rgba(160,163,246,0.4);">${qs.activeTag}</em>` : ''}</div><span style="font-size:10.5px;color:#CAD3F5;opacity:0.6;flex:1;min-width:0;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${(g.models || []).join(', ')}</span></header><main>${rows || '<p style="margin:4px 0 0;font-size:11px;color:#CAD3F5;opacity:0.65;">--</p>'}</main></section>`;
         }).join('');
 
         pop.innerHTML = `<header style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(202,211,245,0.1);"><span style="font-weight:600;font-size:12.5px;color:#CAD3F5;">${qs.title}</span><button id="antigravity-popover-refresh" title="${qs.refresh}" style="background:none;border:none;color:#CAD3F5;opacity:0.7;cursor:pointer;padding:0;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg></button></header><main>${cardsHtml}</main><footer style="margin-top:2px;padding-top:6px;text-align:right;border-top:1px solid rgba(202,211,245,0.1);"><button id="antigravity-open-models-settings" style="background:none;border:none;color:#A0A3F6;font-size:11px;font-weight:500;cursor:pointer;">${qs.openSettings}</button></footer>`;
@@ -1897,7 +2041,7 @@
           return `<div id="${id}" style="display:inline-flex;align-items:center;gap:3px;padding:2px 5px;border-radius:5px;${borderCss}">${dot}<span style="color:${isLow ? '#fca5a5' : (active ? '#A0A3F6' : color)};font-weight:${active ? '700' : '600'};">${label}</span>${renderDual(g)}</div>`;
         };
 
-        container.innerHTML = `${renderBadge('antigravity-badge-argon', 'Argon', '#A0A3F6', argon, 'argon')}<span style="opacity:0.22;font-size:10px;">•</span>${renderBadge('antigravity-badge-gemini', 'Gemini', '#CAD3F5', gemini, 'gemini')}<span style="opacity:0.22;font-size:10px;">•</span>${renderBadge('antigravity-badge-other', 'Claude', '#8A93B2', other, 'other')}<button id="antigravity-quota-refresh-btn" title="${qs.refresh}" style="background:none;border:none;color:inherit;opacity:0.72;cursor:pointer;padding:0;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg></button>`;
+        container.innerHTML = `${renderBadge('antigravity-badge-argon', 'Argon', '#A0A3F6', argon, 'argon')}<span style="opacity:0.22;font-size:10px;">•</span>${renderBadge('antigravity-badge-gemini', 'Gemini', '#CAD3F5', gemini, 'gemini')}<span style="opacity:0.22;font-size:10px;">•</span>${renderBadge('antigravity-badge-other', qs.otherLabel || 'Other', '#8A93B2', other, 'other')}<button id="antigravity-quota-refresh-btn" title="${qs.refresh}" style="background:none;border:none;color:inherit;opacity:0.72;cursor:pointer;padding:0;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg></button>`;
         container.onclick = (e) => { e.stopPropagation(); toggleQuotaPopover(container, parsed); };
         const refBtn = container.querySelector('#antigravity-quota-refresh-btn');
         if (refBtn) refBtn.onclick = (e) => { e.stopPropagation(); updateQuotaWidget(true); };
@@ -2103,7 +2247,7 @@
     injectQuickLanguageButton();
     injectTitleMenuIntegration();
     setTimeout(() => checkEnhancerGithubUpdate(false), 2500);
-    setInterval(() => checkEnhancerGithubUpdate(true), 3600000);
+    setInterval(() => checkEnhancerGithubUpdate(true), 600000);
 
     const observer = new MutationObserver((mutations) => {
       if (isImeComposing) return;

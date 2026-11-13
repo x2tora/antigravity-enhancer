@@ -1,5 +1,5 @@
 /**
- * Antigravity Enhancer v3.2.0 - Main Process Bridge, Persistence & Secure In-App Updater
+ * Antigravity Enhancer v3.3.0 - Main Process Bridge, Persistence & Secure In-App Updater
  * Source Repo: https://github.com/x2tora/antigravity-enhancer
  */
 'use strict';
@@ -354,69 +354,6 @@ function loadBootstrapPayload(forceRefresh = false) {
   }
 }
 
-function getBackupInfo() {
-  const latestDir = path.join(enhancerDir, 'backup', 'latest');
-  const meta = readJsonSafe(path.join(latestDir, 'meta.json'), null);
-  return {
-    available: Boolean(meta && fs.existsSync(latestDir)),
-    version: meta ? meta.version : null,
-    createdAt: meta ? meta.createdAt : null
-  };
-}
-
-function createBackupSnapshot() {
-  const manifest = getLocalManifest();
-  const ver = manifest.version || '0.0.0';
-  const backupDirs = [
-    path.join(enhancerDir, 'backup', 'latest'),
-    path.join(enhancerDir, 'backup', `v${ver}`)
-  ];
-
-  for (const dir of backupDirs) {
-    fs.mkdirSync(dir, { recursive: true });
-    for (const fileName of ALLOWED_UPDATE_FILES) {
-      const src = path.join(enhancerDir, fileName);
-      if (fs.existsSync(src)) {
-        fs.copyFileSync(src, path.join(dir, fileName));
-      }
-    }
-    writeJsonAtomic(path.join(dir, 'meta.json'), {
-      version: ver,
-      createdAt: new Date().toISOString()
-    });
-  }
-}
-
-function restoreFromBackupDir(backupDir) {
-  if (!fs.existsSync(backupDir)) {
-    throw new Error('Backup snapshot not found');
-  }
-  const currentManifest = getLocalManifest();
-  let restartRequired = false;
-
-  for (const fileName of ALLOWED_UPDATE_FILES) {
-    const src = path.join(backupDir, fileName);
-    if (!fs.existsSync(src)) continue;
-    const dst = path.join(enhancerDir, fileName);
-    const srcBuf = fs.readFileSync(src);
-    if (fileName === 'main-enhancer.js' || fileName === 'asar-patcher.js') {
-      const oldHash = fs.existsSync(dst) ? crypto.createHash('sha256').update(fs.readFileSync(dst)).digest('hex') : '';
-      const newHash = crypto.createHash('sha256').update(srcBuf).digest('hex');
-      if (oldHash !== newHash) restartRequired = true;
-    }
-    writeBufferAtomic(dst, srcBuf);
-  }
-
-  cachedBootstrapPayload = null;
-  const restoredManifest = getLocalManifest();
-  return {
-    ok: true,
-    previousVersion: currentManifest.version,
-    restoredVersion: restoredManifest.version || '3.2.0',
-    restartRequired
-  };
-}
-
 function getFullStatus() {
   const el = getElectron();
   const manifest = getLocalManifest();
@@ -428,7 +365,7 @@ function getFullStatus() {
   } catch (_) {}
 
   return {
-    enhancerVersion: manifest.version || '3.2.0',
+    enhancerVersion: manifest.version || '3.3.0',
     appVersion: (el && el.app && el.app.getVersion) ? el.app.getVersion() : 'unknown',
     repo: ENHANCER_REPO,
     enhancerDir,
@@ -437,7 +374,6 @@ function getFullStatus() {
     safeMode: runtimeState.safeMode,
     disabled: runtimeState.disabled,
     lastError: runtimeState.lastError,
-    backup: getBackupInfo(),
     lastRemoteInfo: runtimeState.lastRemoteInfo
   };
 }
@@ -593,9 +529,6 @@ async function applyInAppUpdate(refBranch = 'main') {
     completed++;
   }
 
-  broadcastEvent('enhancer:update-progress', { phase: 'backup', percent: 85, message: 'Creating rollback snapshot...' });
-  createBackupSnapshot();
-
   broadcastEvent('enhancer:update-progress', { phase: 'apply', percent: 94, message: 'Applying verified update...' });
   let restartRequired = false;
 
@@ -646,15 +579,6 @@ function registerIpcHandlers() {
   ipcMain.handle('enhancer:apply-update', async () => {
     try {
       return await applyInAppUpdate('main');
-    } catch (err) {
-      return { ok: false, error: err.message || String(err) };
-    }
-  });
-
-  ipcMain.handle('enhancer:rollback', async () => {
-    try {
-      const latestDir = path.join(enhancerDir, 'backup', 'latest');
-      return restoreFromBackupDir(latestDir);
     } catch (err) {
       return { ok: false, error: err.message || String(err) };
     }
@@ -740,7 +664,6 @@ module.exports = {
   secureFetchBuffer,
   checkRemoteUpdate,
   applyInAppUpdate,
-  restoreFromBackupDir,
   getFullStatus,
   init
 };

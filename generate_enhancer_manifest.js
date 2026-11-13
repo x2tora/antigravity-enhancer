@@ -7,7 +7,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
-const VERSION = '3.2.0';
+const VERSION = '3.3.0';
 const REPO = 'x2tora/antigravity-enhancer';
 const enhancerDir = path.join(__dirname, 'enhancer');
 
@@ -45,7 +45,7 @@ const manifest = {
   testedAppVersion: '2.31.2',
   repo: REPO,
   updatedAt: new Date().toISOString(),
-  releaseNotes: 'v3.2.0: Antigravity Enhanced title badge & native menu integration (Patch Version / Check Patch Updates / Restore Original), unified native styling, composer hover-only single-model quota card, and 9-language README & release docs.',
+  releaseNotes: 'v3.3.0: Flush AntigravityEnhanced title branding, 10-minute update polling with native-style Update Available top-bar pill, localized Other quota group & fixed ACTIVE badge wrapping, Hydrogen in Gemini model list (nonexistent Pro removed), OS language auto-detection on first launch, 9-language copy toast & quota setting labels, and dead rollback code cleanup.',
   files
 };
 
