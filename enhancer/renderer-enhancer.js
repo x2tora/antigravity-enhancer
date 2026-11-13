@@ -973,6 +973,9 @@
             progWrap.style.display = 'block';
             const res = await ipc.invoke('enhancer:apply-update');
             if (res && res.ok) {
+              enhancerUpdateInfo = { ...(enhancerUpdateInfo || {}), hasUpdate: false, currentVersion: res.newVersion || ENHANCER_CURRENT_VERSION };
+              injectEnhancerUpdatePill();
+              scheduleInjectTitleMenuIntegration();
               progBar.style.width = '100%';
               updateStatusEl.innerHTML = `<span style="color:#A0A3F6;font-weight:600;">v${res.newVersion}${h.updateDoneSuffix}</span>`;
               updateActionsEl.innerHTML = '';

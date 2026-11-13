@@ -4,7 +4,7 @@
   "minAppVersion": "2.30.0",
   "testedAppVersion": "2.31.2",
   "repo": "x2tora/antigravity-enhancer",
-  "updatedAt": "2026-11-13T04:34:15.728Z",
+  "updatedAt": "2026-11-13T04:39:46.898Z",
   "releaseNotes": "v3.3.0: Flush AntigravityEnhanced title branding, 10-minute update polling with native-style Update Available top-bar pill, localized Other quota group & fixed ACTIVE badge wrapping, Hydrogen in Gemini model list (nonexistent Pro removed), OS language auto-detection on first launch, 9-language copy toast & quota setting labels, and dead rollback code cleanup.",
   "files": {
     "main-enhancer.js": {
@@ -18,8 +18,8 @@
       "restartRequired": true
     },
     "renderer-enhancer.js": {
-      "size": 124293,
-      "sha256": "111700c5c664909d31858cc940a90fcf42ffae99680b60111be0652d30296926",
+      "size": 124535,
+      "sha256": "8f91f135618144af6d59c952844342d91d3c13db8480fea7208915c7f95d7aab",
       "restartRequired": false
     },
     "gsap-core.js": {

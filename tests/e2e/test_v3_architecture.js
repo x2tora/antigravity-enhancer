@@ -557,6 +557,13 @@ registerTest(3, 'F24', 'Native Antigravity Enhanced title menu integrates Patch 
   assert.strictEqual(modal.querySelector('#agy-hub-rollback-btn'), null, 'Rollback UI must be removed');
   assert.ok(modal.querySelector('#agy-hub-vanilla-btn'), 'Restore Original button must exist');
 
+  // Applying in-app update must immediately hide the top-bar Update Available pill
+  const applyBtn = modal.querySelector('.agy-enh-primary');
+  assert.ok(applyBtn, 'Apply update button must exist when update is available');
+  await applyBtn.onclick();
+  await new Promise(r => setTimeout(r, 30));
+  assert.strictEqual(document.getElementById('antigravity-enhancer-update-btn'), null, 'Update pill must hide immediately after in-app update succeeds');
+
   // Verify 10-minute (600000ms) polling interval in renderer-enhancer.js
   const rendererSrc = fs.readFileSync(path.join(ENHANCER_DIR, 'renderer-enhancer.js'), 'utf8');
   assert.ok(rendererSrc.includes('600000'), 'Background update check interval must be 10 minutes (600000 ms)');
