@@ -1,9 +1,9 @@
 // tests/e2e/test_v3_architecture.js
 // Comprehensive verification suite for Antigravity Enhancer v3.2.0:
 // F22: Modular Enhancer & Manifest Integrity + 9-Language New Conversation Prompts
-// F23: Lossless ASAR v4 Micro-Bootstrapper (2.31.2+)
+// F23: Lossless ASAR v4 Micro-Bootstrapper (2.32.1+)
 // F24: Secure In-App Self-Updater & Native Menu Integration (x2tora/antigravity-enhancer)
-// F25: Antigravity 2.31.2 UI/Model Compatibility, Composer Hover Quota & Installer Pipeline
+// F25: Antigravity 2.32.1 UI/Model Compatibility, Composer Hover Quota & Installer Pipeline
 
 const fs = require('fs');
 const os = require('os');
@@ -80,7 +80,7 @@ function createRendererHarness(initialLang = 'ko', seedDomFn = null) {
   };
   document.documentElement.scrollTop = 0;
 
-  // Build 2.31.2-accurate header container using mobile-toggle-aux-sidebar (NO concierge-titlebar-more-actions)
+  // Build 2.32.1-accurate header container using mobile-toggle-aux-sidebar (NO concierge-titlebar-more-actions)
   const headerParent = new MockElement('div');
   headerParent.setAttribute('class', 'flex items-center gap-1');
   const auxBtn = new MockElement('button');
@@ -103,8 +103,8 @@ function createRendererHarness(initialLang = 'ko', seedDomFn = null) {
       invoked.push({ channel, arg });
       if (channel === 'enhancer:get-status') {
         return {
-          enhancerVersion: '3.3.4',
-          appVersion: '2.31.2',
+          enhancerVersion: '3.4.0',
+          appVersion: '2.32.1',
           asarBootstrapped: true
         };
       }
@@ -113,7 +113,7 @@ function createRendererHarness(initialLang = 'ko', seedDomFn = null) {
           ok: true,
           hasUpdate: true,
           canApplyInApp: true,
-          currentVersion: '3.3.4',
+          currentVersion: '3.4.0',
           remoteVersion: '3.4.0',
           releaseNotes: 'English test update',
           releaseNotesI18n: {
@@ -136,7 +136,7 @@ function createRendererHarness(initialLang = 'ko', seedDomFn = null) {
 
   const payload = {
     disabled: false,
-    version: '3.3.4',
+    version: '3.4.0',
     repo: 'x2tora/antigravity-enhancer',
     code: rendererCode,
     gsapCode,
@@ -212,13 +212,13 @@ function createRendererHarness(initialLang = 'ko', seedDomFn = null) {
 // ============================================================================
 // F22: Modular Enhancer & Manifest Integrity
 // ============================================================================
-registerTest(1, 'F22', 'manifest.json v3.3.4 points to x2tora/antigravity-enhancer & matches SHA-256 digests', () => {
+registerTest(1, 'F22', 'manifest.json v3.4.0 points to x2tora/antigravity-enhancer & matches SHA-256 digests', () => {
   const manifestPath = path.join(ENHANCER_DIR, 'manifest.json');
   assert.ok(fs.existsSync(manifestPath), 'enhancer/manifest.json missing');
   const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-  assert.strictEqual(manifest.version, '3.3.4');
+  assert.strictEqual(manifest.version, '3.4.0');
   assert.strictEqual(manifest.repo, 'x2tora/antigravity-enhancer');
-  assert.strictEqual(manifest.testedAppVersion, '2.31.2');
+  assert.strictEqual(manifest.testedAppVersion, '2.32.1');
   assert.ok(manifest.releaseNotesI18n && typeof manifest.releaseNotesI18n === 'object', 'manifest.json must include releaseNotesI18n');
   for (const l of ['en', 'ko', 'ja', 'zh-CN', 'zh-TW', 'es', 'fr', 'de', 'ru']) {
     assert.ok(typeof manifest.releaseNotesI18n[l] === 'string' && manifest.releaseNotesI18n[l].length > 10, `Missing manifest releaseNotesI18n for ${l}`);
@@ -257,7 +257,7 @@ registerTest(1, 'F23', 'Renderer auto-detects OS language on first launch (9 lan
   }
 });
 
-registerTest(1, 'F22', 'Renderer translates all 2.31.2 & 2.30.0 New Conversation greetings/placeholders across all 9 languages and preserves editables', () => {
+registerTest(1, 'F22', 'Renderer translates all 2.32.1 & 2.30.0 New Conversation greetings/placeholders across all 9 languages and preserves editables', () => {
   const langs = ['ko', 'ja', 'zh-CN', 'zh-TW', 'es', 'fr', 'de', 'ru'];
   const textPrompts = [
     'Hey there, what should we build today?',
@@ -357,7 +357,7 @@ registerTest(1, 'F22', 'Renderer translates all 2.31.2 & 2.30.0 New Conversation
   assert.strictEqual(ruInput.getAttribute('placeholder'), 'Ask anything, @ to mention, / for actions', 'Switching to en must revert input placeholder');
 });
 
-registerTest(1, 'F22', 'dictionaries.json contains 2.31.2 strings across all 8 target languages', () => {
+registerTest(1, 'F22', 'dictionaries.json contains 2.32.1 strings across all 8 target languages', () => {
   const dicts = JSON.parse(fs.readFileSync(path.join(ENHANCER_DIR, 'dictionaries.json'), 'utf8'));
   const keys = ['Environments', 'Coordinators', 'New Coordinator', 'You said', 'Agent working', 'Ask /btw', 'Code Preview', 'Plan upgrade required'];
   for (const k of keys) {
@@ -376,9 +376,9 @@ registerTest(2, 'F22', 'All enhancer/*.js files compile with zero syntax errors 
 });
 
 // ============================================================================
-// F23: Lossless ASAR v4 Micro-Bootstrapper (2.31.2+)
+// F23: Lossless ASAR v4 Micro-Bootstrapper (2.32.1+)
 // ============================================================================
-registerTest(1, 'F23', 'asar-patcher.js losslessly bootstraps 2.31.2 app.asar, preserves APIs, & restores byte-identically', () => {
+registerTest(1, 'F23', 'asar-patcher.js losslessly bootstraps 2.32.1 app.asar, preserves APIs, & restores byte-identically', () => {
   const liveAsar = path.join(process.env.LOCALAPPDATA || '', 'Programs', 'Antigravity', 'resources', 'app.asar');
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'agy-asar-test-'));
   try {
@@ -402,13 +402,13 @@ registerTest(1, 'F23', 'asar-patcher.js losslessly bootstraps 2.31.2 app.asar, p
     assert.strictEqual(st.hasMain, true);
     assert.strictEqual(st.hasPreload, true);
 
-    // Verify 2.31.2 preload APIs & every file integrity digest remain valid
+    // Verify 2.32.1 preload APIs & every file integrity digest remain valid
     const pBuf = fs.readFileSync(workAsar);
     const { headerObj, payloadStart } = asarPatcher.parseAsarHeader(pBuf);
     const preloadEntry = asarPatcher.getEntry(headerObj, ['dist', 'preload.js']);
     const preloadStr = asarPatcher.readEntryBuffer(pBuf, payloadStart, preloadEntry).toString('utf8');
-    assert.ok(preloadStr.includes('setWebviewAgentControlled'), 'Must preserve 2.31.2 setWebviewAgentControlled');
-    assert.ok(preloadStr.includes('resolveWebviewDownload'), 'Must preserve 2.31.2 resolveWebviewDownload');
+    assert.ok(preloadStr.includes('setWebviewAgentControlled'), 'Must preserve 2.32.1 setWebviewAgentControlled');
+    assert.ok(preloadStr.includes('resolveWebviewDownload'), 'Must preserve 2.32.1 resolveWebviewDownload');
 
     // Re-running patchAsar is idempotent
     const res2 = asarPatcher.patchAsar(workAsar);
@@ -505,7 +505,7 @@ registerTest(3, 'F24', 'Native Antigravity Enhanced title menu integrates Patch 
     const optVerWrap = patchEl(new MockElement('div'));
     const optVerBtn = patchEl(new MockElement('button'));
     optVerBtn.setAttribute('data-testid', 'title-menu-bar-option');
-    optVerBtn.appendChild(new MockText('버전 2.31.2'));
+    optVerBtn.appendChild(new MockText('버전 2.32.1'));
     optVerWrap.appendChild(optVerBtn);
     agyDropdown.appendChild(optVerWrap);
     agyWrap.appendChild(agyDropdown);
@@ -546,7 +546,7 @@ registerTest(3, 'F24', 'Native Antigravity Enhanced title menu integrates Patch 
   const patchVerOpt = menuSection.querySelector('#antigravity-menu-patch-version');
   const checkUpdatesOpt = menuSection.querySelector('#antigravity-menu-check-updates');
   const restoreOpt = menuSection.querySelector('#antigravity-menu-restore-vanilla');
-  assert.ok(patchVerOpt && patchVerOpt.textContent.includes('3.3.4'), 'Menu must display Patch Version 3.3.4');
+  assert.ok(patchVerOpt && patchVerOpt.textContent.includes('3.4.0'), 'Menu must display Patch Version 3.4.0');
   assert.ok(checkUpdatesOpt, 'Menu must include Check Patch Updates item');
   assert.ok(restoreOpt, 'Menu must include Restore Original item');
 
@@ -602,12 +602,12 @@ registerTest(3, 'F24', 'Native Antigravity Enhanced title menu integrates Patch 
 });
 
 // ============================================================================
-// F25: Antigravity 2.31.2 Models, Top-Bar Fallback & Installer Pipeline
+// F25: Antigravity 2.32.1 Models, Top-Bar Fallback & Installer Pipeline
 // ============================================================================
-registerTest(1, 'F25', 'Renderer finds mobile-toggle-aux-sidebar fallback & translates 2.31.2 Coordinators / Code Preview', () => {
+registerTest(1, 'F25', 'Renderer finds mobile-toggle-aux-sidebar fallback & translates 2.32.1 Coordinators / Code Preview', () => {
   const { window, document } = createRendererHarness();
   const quickBtn = document.getElementById('antigravity-quick-lang-btn');
-  assert.ok(quickBtn, 'Quick language button should mount beside mobile-toggle-aux-sidebar in 2.31.2');
+  assert.ok(quickBtn, 'Quick language button should mount beside mobile-toggle-aux-sidebar in 2.32.1');
 
   const node = new MockElement('div');
   node.appendChild(new MockText('Coordinators'));
@@ -726,8 +726,8 @@ registerTest(1, 'F25', 'build_exe_installer.ps1 uses safe build hygiene, #0B0B0E
     assert.ok(fs.existsSync(path.join(ROOT_DIR, 'docs', `README.${l}.md`)), `docs/README.${l}.md must exist`);
   }
   assert.ok(fs.existsSync(path.join(ROOT_DIR, 'Antigravity-Enhancer-Setup.exe')));
-  assert.ok(fs.existsSync(path.join(ROOT_DIR, 'Antigravity-Enhancer-v3.3.4-Setup.exe')));
-  assert.ok(fs.existsSync(path.join(ROOT_DIR, 'Antigravity-Enhancer-v3.3.4-Win.zip')));
+  assert.ok(fs.existsSync(path.join(ROOT_DIR, 'Antigravity-Enhancer-v3.4.0-Setup.exe')));
+  assert.ok(fs.existsSync(path.join(ROOT_DIR, 'Antigravity-Enhancer-v3.4.0-Win.zip')));
   assert.ok(fs.existsSync(path.join(ROOT_DIR, 'SHA256SUMS.txt')));
 
   const sums = fs.readFileSync(path.join(ROOT_DIR, 'SHA256SUMS.txt'), 'utf8');
@@ -783,7 +783,7 @@ registerTest(4, 'F24', 'Main updater rejects SHA-256 tampering cleanly, atomical
     };
 
     const mockElectron = {
-      app: { getVersion: () => '2.31.2', isReady: () => false, getAppPath: () => tmpAppDir, whenReady: async () => {} },
+      app: { getVersion: () => '2.32.1', isReady: () => false, getAppPath: () => tmpAppDir, whenReady: async () => {} },
       ipcMain: { on: () => {}, handle: () => {} },
       BrowserWindow: { getAllWindows: () => [] }
     };
@@ -804,9 +804,9 @@ registerTest(4, 'F24', 'Main updater rejects SHA-256 tampering cleanly, atomical
     const fileUrl = 'https://raw.githubusercontent.com/x2tora/antigravity-enhancer/main/enhancer/renderer-enhancer.js';
 
     // 1. Tamper test: digest mismatch must abort BEFORE overwriting live enhancerDir
-    const v33Tampered = Buffer.from('/* v3.3.4 TAMPERED */', 'utf8');
+    const v33Tampered = Buffer.from('/* v3.4.0 TAMPERED */', 'utf8');
     remoteResponses.set(manifestUrl, JSON.stringify({
-      version: '3.3.4',
+      version: '3.4.0',
       files: { 'renderer-enhancer.js': { sha256: 'a'.repeat(64), size: v33Tampered.length } }
     }));
     remoteResponses.set(fileUrl, v33Tampered);
@@ -817,18 +817,18 @@ registerTest(4, 'F24', 'Main updater rejects SHA-256 tampering cleanly, atomical
     // 2. Valid atomic staging & dead rollback code removed
     assert.strictEqual(isolated.restoreFromBackupDir, undefined, 'Dead restoreFromBackupDir export must be removed');
     assert.strictEqual(isolated.getFullStatus().backup, undefined, 'Dead backup snapshot metadata must be removed from getFullStatus');
-    const v33Valid = Buffer.from('/* v3.3.4 valid */', 'utf8');
+    const v33Valid = Buffer.from('/* v3.4.0 valid */', 'utf8');
     const v33Sha = crypto.createHash('sha256').update(v33Valid).digest('hex');
     remoteResponses.set(manifestUrl, JSON.stringify({
-      version: '3.3.4',
+      version: '3.4.0',
       files: { 'renderer-enhancer.js': { sha256: v33Sha, size: v33Valid.length } }
     }));
     remoteResponses.set(fileUrl, v33Valid);
     const applyRes = await isolated.applyInAppUpdate('main');
     assert.strictEqual(applyRes.ok, true);
-    assert.strictEqual(applyRes.newVersion, '3.3.4');
-    assert.strictEqual(fs.readFileSync(path.join(tmpEnhDir, 'renderer-enhancer.js'), 'utf8'), '/* v3.3.4 valid */');
-    assert.strictEqual(JSON.parse(fs.readFileSync(path.join(tmpEnhDir, 'manifest.json'), 'utf8')).version, '3.3.4');
+    assert.strictEqual(applyRes.newVersion, '3.4.0');
+    assert.strictEqual(fs.readFileSync(path.join(tmpEnhDir, 'renderer-enhancer.js'), 'utf8'), '/* v3.4.0 valid */');
+    assert.strictEqual(JSON.parse(fs.readFileSync(path.join(tmpEnhDir, 'manifest.json'), 'utf8')).version, '3.4.0');
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
@@ -849,7 +849,7 @@ registerTest(4, 'F25', 'Installer OS language auto-detection (9 languages + Engl
     const installerCsPath = path.join(tmpDir, 'InstallerWPF.cs');
     // Rename App.Main out so test harness can define entry point cleanly
     const modifiedCs = match[1]
-      .replace('__ENHANCER_VERSION__', '3.3.4')
+      .replace('__ENHANCER_VERSION__', '3.4.0')
       .replace('public static void Main()', 'public static void MainWpfDisabled()');
     fs.writeFileSync(installerCsPath, '\uFEFF' + modifiedCs, 'utf8');
 

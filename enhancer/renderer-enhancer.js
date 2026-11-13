@@ -1,7 +1,7 @@
 /**
- * Antigravity Enhancer v3.3.4 - Modular Renderer Enhancer Engine
+ * Antigravity Enhancer v3.4.0 - Modular Renderer Enhancer Engine
  * Features: 9-Language Zero-Restart i18n, GSAP v3.15.1 Zero-Bounce Motion,
- *           AI Model Quota HUD & Composer Inline Hover Card (2.31.2 Hydrogen/Argon/Gemini/Other),
+ *           AI Model Quota HUD & Composer Inline Hover Card (2.32.1 Hydrogen/Argon/Gemini/Other),
  *           Native Title-Menu Patch Integration & In-App Updater (x2tora/antigravity-enhancer)
  */
 (function () {
@@ -11,7 +11,7 @@
   const ipc = electron_1 ? electron_1.ipcRenderer : null;
   const payload = (typeof __ENHANCER_PAYLOAD__ !== 'undefined' && __ENHANCER_PAYLOAD__) ? __ENHANCER_PAYLOAD__ : {};
   const ENHANCER_REPO = payload.repo || 'x2tora/antigravity-enhancer';
-  const ENHANCER_CURRENT_VERSION = payload.version || '3.3.4';
+  const ENHANCER_CURRENT_VERSION = payload.version || '3.4.0';
 
   // ---------------------------------------------------------------------------
   // 1. Install GSAP Core into Preload World
@@ -864,7 +864,7 @@
     }
     const status = await refreshHubStatus() || {
       enhancerVersion: ENHANCER_CURRENT_VERSION,
-      appVersion: '2.31.2',
+      appVersion: '2.32.1',
       asarBootstrapped: true
     };
     let h = getHubStrings();
@@ -924,7 +924,7 @@
           </div>
           <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;">
             <span style="font-size:12px;color:#9DA7C7;">${h.appVer}</span>
-            <span style="font-size:12px;font-weight:500;color:#CAD3F5;font-variant-numeric:tabular-nums;">v${status.appVersion || '2.31.2'}</span>
+            <span style="font-size:12px;font-weight:500;color:#CAD3F5;font-variant-numeric:tabular-nums;">v${status.appVersion || '2.32.1'}</span>
           </div>
         </section>
 
@@ -1076,7 +1076,7 @@
   }
 
   // ---------------------------------------------------------------------------
-  // 5. Settings Panel & Top-Bar Controls (2.31.2 Compatible)
+  // 5. Settings Panel & Top-Bar Controls (2.32.1 Compatible)
   // ---------------------------------------------------------------------------
   const QUOTA_SETTING_I18N = {
     en: { title: 'Top-Bar Quota Widget', desc: 'Show real-time model quota and AI usage widget in the top bar.' },
@@ -1680,7 +1680,7 @@
   }
 
   // ---------------------------------------------------------------------------
-  // 7. Main-World Quota Widget & Composer Inline Model Badge (2.31.2 Ready)
+  // 7. Main-World Quota Widget & Composer Inline Model Badge (2.32.1 Ready)
   // ---------------------------------------------------------------------------
   function injectMainWorldQuotaWidget() {
     if (document.getElementById('antigravity-quota-main-script')) return;
