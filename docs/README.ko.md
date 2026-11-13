@@ -4,10 +4,10 @@
 
 [English](../README.md) · **한국어** · [日本語](README.ja.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Русский](README.ru.md)
 
-[![Download Latest (v3.3.3)](https://img.shields.io/badge/최신_버전_다운로드-v3.3.3_(Windows_x64)-A0A3F6?style=for-the-badge&logo=windows&logoColor=0B0B0E)](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-Setup.exe)
-[![All Releases](https://img.shields.io/badge/Releases-v3.3.3-0B0B0E?style=for-the-badge&labelColor=0B0B0E&color=CAD3F5)](https://github.com/x2tora/antigravity-enhancer/releases/latest)
+[![Download Latest (v3.3.4)](https://img.shields.io/badge/최신_버전_다운로드-v3.3.4_(Windows_x64)-A0A3F6?style=for-the-badge&logo=windows&logoColor=0B0B0E)](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-Setup.exe)
+[![All Releases](https://img.shields.io/badge/Releases-v3.3.4-0B0B0E?style=for-the-badge&labelColor=0B0B0E&color=CAD3F5)](https://github.com/x2tora/antigravity-enhancer/releases/latest)
 
-직접 다운로드: [`Antigravity-Enhancer-Setup.exe`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-Setup.exe) · [`Antigravity-Enhancer-v3.3.3-Win.zip`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-v3.3.3-Win.zip) · [`SHA256SUMS.txt`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/SHA256SUMS.txt)
+직접 다운로드: [`Antigravity-Enhancer-Setup.exe`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-Setup.exe) · [`Antigravity-Enhancer-v3.3.4-Win.zip`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-v3.3.4-Win.zip) · [`SHA256SUMS.txt`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/SHA256SUMS.txt)
 
 ---
 
@@ -34,7 +34,7 @@
 
 ### 무설치 압축 파일 (`.zip`)
 
-1. [Releases](https://github.com/x2tora/antigravity-enhancer/releases/latest)에서 [`Antigravity-Enhancer-v3.3.3-Win.zip`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-v3.3.3-Win.zip)을 받습니다.
+1. [Releases](https://github.com/x2tora/antigravity-enhancer/releases/latest)에서 [`Antigravity-Enhancer-v3.3.4-Win.zip`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-v3.3.4-Win.zip)을 받습니다.
 2. 압축을 풀고 `Antigravity-Enhancer-Setup.exe`를 실행합니다.
 
 ---
@@ -46,7 +46,7 @@
 node .\generate_enhancer_manifest.js
 
 # Antigravity-Enhancer-Setup.exe, ZIP, SHA256SUMS.txt 빌드
-powershell -NoProfile -ExecutionPolicy Bypass -File .\build_exe_installer.ps1 -Version "3.3.3"
+powershell -NoProfile -ExecutionPolicy Bypass -File .\build_exe_installer.ps1 -Version "3.3.4"
 
 # E2E 테스트 실행
 node .\tests\e2e\runner.js --summary -NoKill

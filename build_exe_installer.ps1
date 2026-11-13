@@ -1,5 +1,5 @@
 ﻿param(
-    [string]$Version = "3.3.3",
+    [string]$Version = "3.3.4",
     [string]$OutputExe = "",
     [string]$SignCertThumbprint = ""
 )
@@ -459,9 +459,9 @@ namespace AntigravityEnhancer
             outerBorder.BorderThickness = new Thickness(1);
             outerBorder.Effect = new DropShadowEffect
             {
-                BlurRadius = 20,
-                ShadowDepth = 2,
-                Opacity = 0.55,
+                BlurRadius = 16,
+                ShadowDepth = 1,
+                Opacity = 0.4,
                 Color = Colors.Black
             };
 
@@ -486,20 +486,20 @@ namespace AntigravityEnhancer
             titleGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
             StackPanel titleLeft = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(16, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center };
-            TextBlock tbBrand1 = new TextBlock { Text = "ANTIGRAVITY", Foreground = new SolidColorBrush(TextPrimary), FontWeight = FontWeights.Bold, FontSize = 12, VerticalAlignment = VerticalAlignment.Center };
-            TextBlock tbBrand2 = new TextBlock { Text = " ENHANCER", Foreground = new SolidColorBrush(AccentColor), FontWeight = FontWeights.Bold, FontSize = 12, VerticalAlignment = VerticalAlignment.Center };
+            TextBlock tbBrand1 = new TextBlock { Text = "Antigravity", Foreground = new SolidColorBrush(TextPrimary), FontWeight = FontWeights.SemiBold, FontSize = 12, VerticalAlignment = VerticalAlignment.Center };
+            TextBlock tbBrand2 = new TextBlock { Text = "Enhancer", Foreground = new SolidColorBrush(AccentColor), FontWeight = FontWeights.SemiBold, FontSize = 12, Margin = new Thickness(4, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center };
 
             Border badge = new Border
             {
                 Background = new SolidColorBrush(Color.FromArgb(30, 160, 163, 246)),
-                BorderBrush = new SolidColorBrush(Color.FromArgb(110, 160, 163, 246)),
+                BorderBrush = new SolidColorBrush(Color.FromArgb(96, 160, 163, 246)),
                 BorderThickness = new Thickness(1),
                 CornerRadius = new CornerRadius(6),
-                Padding = new Thickness(6, 1, 6, 1),
-                Margin = new Thickness(10, 0, 0, 0),
+                Padding = new Thickness(6, 2, 6, 2),
+                Margin = new Thickness(8, 0, 0, 0),
                 VerticalAlignment = VerticalAlignment.Center
             };
-            TextBlock tbVersion = new TextBlock { Text = "v__ENHANCER_VERSION__", Foreground = new SolidColorBrush(AccentColor), FontSize = 10, FontWeight = FontWeights.SemiBold };
+            TextBlock tbVersion = new TextBlock { Text = "v__ENHANCER_VERSION__", Foreground = new SolidColorBrush(AccentColor), FontSize = 11, FontWeight = FontWeights.Medium };
             badge.Child = tbVersion;
 
             titleLeft.Children.Add(tbBrand1);
@@ -532,8 +532,8 @@ namespace AntigravityEnhancer
                 BorderBrush = new SolidColorBrush(BorderSubtle),
                 BorderThickness = new Thickness(1),
                 CornerRadius = new CornerRadius(8),
-                Margin = new Thickness(18, 14, 18, 10),
-                Padding = new Thickness(14, 12, 14, 12)
+                Margin = new Thickness(16, 16, 16, 12),
+                Padding = new Thickness(16, 12, 16, 12)
             };
 
             Grid heroGrid = new Grid();
@@ -544,14 +544,14 @@ namespace AntigravityEnhancer
             TextBlock tbHeroTitle = new TextBlock
             {
                 Text = T("HeroTitle"),
-                FontWeight = FontWeights.Bold,
-                FontSize = 13.5,
+                FontWeight = FontWeights.SemiBold,
+                FontSize = 14,
                 Foreground = new SolidColorBrush(TextPrimary)
             };
             TextBlock tbHeroSub = new TextBlock
             {
                 Text = T("HeroSub"),
-                FontSize = 11,
+                FontSize = 12,
                 Foreground = new SolidColorBrush(TextMuted),
                 Margin = new Thickness(0, 4, 0, 0)
             };
@@ -561,10 +561,10 @@ namespace AntigravityEnhancer
             Border statusBadge = new Border
             {
                 Background = new SolidColorBrush(Color.FromArgb(24, 160, 163, 246)),
-                BorderBrush = new SolidColorBrush(Color.FromArgb(110, 160, 163, 246)),
+                BorderBrush = new SolidColorBrush(Color.FromArgb(96, 160, 163, 246)),
                 BorderThickness = new Thickness(1),
-                CornerRadius = new CornerRadius(10),
-                Padding = new Thickness(10, 4, 10, 4),
+                CornerRadius = new CornerRadius(6),
+                Padding = new Thickness(8, 4, 8, 4),
                 VerticalAlignment = VerticalAlignment.Center
             };
 
@@ -606,8 +606,8 @@ namespace AntigravityEnhancer
                 BorderBrush = new SolidColorBrush(BorderSubtle),
                 BorderThickness = new Thickness(1),
                 CornerRadius = new CornerRadius(8),
-                Margin = new Thickness(18, 0, 18, 10),
-                Padding = new Thickness(14, 10, 14, 10)
+                Margin = new Thickness(16, 0, 16, 12),
+                Padding = new Thickness(16, 12, 16, 12)
             };
 
             StackPanel pathStack = new StackPanel();
@@ -616,7 +616,7 @@ namespace AntigravityEnhancer
                 Text = T("PathLabel"),
                 Foreground = new SolidColorBrush(TextMuted),
                 FontSize = 11,
-                Margin = new Thickness(0, 0, 0, 6)
+                Margin = new Thickness(0, 0, 0, 8)
             };
 
             Grid pathInputGrid = new Grid();
@@ -629,9 +629,9 @@ namespace AntigravityEnhancer
                 Foreground = new SolidColorBrush(TextPrimary),
                 BorderBrush = new SolidColorBrush(BorderSubtle),
                 BorderThickness = new Thickness(1),
-                Padding = new Thickness(8, 5, 8, 5),
+                Padding = new Thickness(8, 4, 8, 4),
                 FontFamily = new FontFamily("Consolas"),
-                FontSize = 11.5,
+                FontSize = 12,
                 VerticalAlignment = VerticalAlignment.Center
             };
             txtPath.TextChanged += (s, e) => { OnPathChanged(); };
@@ -653,11 +653,11 @@ namespace AntigravityEnhancer
             contentGrid.Children.Add(pathCard);
 
             // 4. Action Buttons
-            actionGrid = new Grid { Margin = new Thickness(18, 0, 18, 10) };
+            actionGrid = new Grid { Margin = new Thickness(16, 0, 16, 12) };
             actionGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(2.0, GridUnitType.Star) });
-            actionGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(10) });
+            actionGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(8) });
             actionGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(2.0, GridUnitType.Star) });
-            actionGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(10) });
+            actionGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(8) });
             actionGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(2.0, GridUnitType.Star) });
 
             btnInstall = CreateAccentButton(T("BtnInstall"));
@@ -679,18 +679,18 @@ namespace AntigravityEnhancer
             contentGrid.Children.Add(actionGrid);
 
             // 5. Progress and Status / Auto-Launch
-            progressStack = new StackPanel { Margin = new Thickness(18, 0, 18, 8) };
+            progressStack = new StackPanel { Margin = new Thickness(16, 0, 16, 8) };
 
             prgBar = new ProgressBar
             {
-                Height = 5,
+                Height = 4,
                 Background = new SolidColorBrush(BgSurface),
                 Foreground = new SolidColorBrush(AccentColor),
                 BorderThickness = new Thickness(0),
                 Value = 0
             };
 
-            Grid statusRow = new Grid { Margin = new Thickness(2, 6, 2, 0) };
+            Grid statusRow = new Grid { Margin = new Thickness(0, 8, 0, 0) };
             statusRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             statusRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
@@ -753,7 +753,7 @@ namespace AntigravityEnhancer
                 BorderBrush = new SolidColorBrush(BorderSubtle),
                 BorderThickness = new Thickness(1),
                 CornerRadius = new CornerRadius(8),
-                Margin = new Thickness(18, 0, 18, 16)
+                Margin = new Thickness(16, 0, 16, 16)
             };
 
             Grid termGrid = new Grid();
@@ -766,14 +766,14 @@ namespace AntigravityEnhancer
                 BorderBrush = new SolidColorBrush(BorderSubtle),
                 BorderThickness = new Thickness(0, 0, 0, 1),
                 CornerRadius = new CornerRadius(7, 7, 0, 0),
-                Padding = new Thickness(10, 0, 10, 0)
+                Padding = new Thickness(12, 0, 12, 0)
             };
 
             TextBlock tbTermTitle = new TextBlock
             {
                 Text = T("LogTitle"),
                 Foreground = new SolidColorBrush(TextMuted),
-                FontSize = 10.5,
+                FontSize = 11,
                 FontWeight = FontWeights.SemiBold,
                 VerticalAlignment = VerticalAlignment.Center
             };
@@ -785,7 +785,7 @@ namespace AntigravityEnhancer
             {
                 VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
                 HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
-                Padding = new Thickness(10, 8, 10, 8)
+                Padding = new Thickness(12, 8, 12, 8)
             };
 
             txtLog = new TextBox

@@ -7,7 +7,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
-const VERSION = '3.3.3';
+const VERSION = '3.3.4';
 const REPO = 'x2tora/antigravity-enhancer';
 const enhancerDir = path.join(__dirname, 'enhancer');
 

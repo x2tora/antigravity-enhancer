@@ -1,5 +1,5 @@
 /**
- * Antigravity Enhancer v3.3.3 - Modular Renderer Enhancer Engine
+ * Antigravity Enhancer v3.3.4 - Modular Renderer Enhancer Engine
  * Features: 9-Language Zero-Restart i18n, GSAP v3.15.1 Zero-Bounce Motion,
  *           AI Model Quota HUD & Composer Inline Hover Card (2.31.2 Hydrogen/Argon/Gemini/Other),
  *           Native Title-Menu Patch Integration & In-App Updater (x2tora/antigravity-enhancer)
@@ -11,7 +11,7 @@
   const ipc = electron_1 ? electron_1.ipcRenderer : null;
   const payload = (typeof __ENHANCER_PAYLOAD__ !== 'undefined' && __ENHANCER_PAYLOAD__) ? __ENHANCER_PAYLOAD__ : {};
   const ENHANCER_REPO = payload.repo || 'x2tora/antigravity-enhancer';
-  const ENHANCER_CURRENT_VERSION = payload.version || '3.3.3';
+  const ENHANCER_CURRENT_VERSION = payload.version || '3.3.4';
 
   // ---------------------------------------------------------------------------
   // 1. Install GSAP Core into Preload World
@@ -446,6 +446,12 @@
         #antigravity-enhancer-modal .agy-enh-primary:hover:not(:disabled) {
           opacity: 0.92 !important;
         }
+        #antigravity-popover-refresh:hover {
+          color: #CAD3F5 !important;
+        }
+        #antigravity-open-models-settings:hover {
+          text-decoration: underline !important;
+        }
       `;
       root.appendChild(devStyle);
     }
@@ -553,11 +559,11 @@
       updateSection: 'Updates',
       checkBtn: 'Check',
       checking: 'Checking...',
-      upToDate: 'Up to date.',
+      upToDate: 'Up to date',
       availPrefix: 'Update available: ',
       updateNow: 'Update',
       updating: 'Updating...',
-      updateDoneSuffix: ' installed.',
+      updateDoneSuffix: ' installed',
       openRelease: 'Open Release',
       reloadNow: 'Reload Window',
       restartNow: 'Restart App',
@@ -578,11 +584,11 @@
       updateSection: '업데이트',
       checkBtn: '확인',
       checking: '확인 중...',
-      upToDate: '최신 버전입니다.',
+      upToDate: '최신 버전입니다',
       availPrefix: '새 버전: ',
       updateNow: '업데이트',
       updating: '업데이트 중...',
-      updateDoneSuffix: ' 설치 완료.',
+      updateDoneSuffix: ' 설치 완료',
       openRelease: '릴리즈 열기',
       reloadNow: '창 새로고침',
       restartNow: '앱 재시작',
@@ -913,18 +919,18 @@
 
         <section class="agy-card rounded-xl border divide-y" style="border-radius:8px;background:#111217;border:1px solid rgba(202,211,245,0.08);margin-bottom:12px;overflow:hidden;">
           <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid rgba(202,211,245,0.08);">
-            <span style="font-size:12.5px;color:#9DA7C7;">${h.curVer}</span>
-            <span style="font-size:12.5px;font-weight:600;color:#A0A3F6;font-variant-numeric:tabular-nums;">v${status.enhancerVersion || ENHANCER_CURRENT_VERSION}</span>
+            <span style="font-size:12px;color:#9DA7C7;">${h.curVer}</span>
+            <span style="font-size:12px;font-weight:600;color:#A0A3F6;font-variant-numeric:tabular-nums;">v${status.enhancerVersion || ENHANCER_CURRENT_VERSION}</span>
           </div>
           <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;">
-            <span style="font-size:12.5px;color:#9DA7C7;">${h.appVer}</span>
-            <span style="font-size:12.5px;font-weight:500;color:#CAD3F5;font-variant-numeric:tabular-nums;">v${status.appVersion || '2.31.2'}</span>
+            <span style="font-size:12px;color:#9DA7C7;">${h.appVer}</span>
+            <span style="font-size:12px;font-weight:500;color:#CAD3F5;font-variant-numeric:tabular-nums;">v${status.appVersion || '2.31.2'}</span>
           </div>
         </section>
 
         <section class="agy-card rounded-xl border" style="padding:12px;border-radius:8px;background:#111217;border:1px solid rgba(202,211,245,0.08);margin-bottom:12px;">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;">
-            <span style="font-size:12.5px;font-weight:500;color:#CAD3F5;">${h.updateSection}</span>
+            <span style="font-size:12px;font-weight:500;color:#CAD3F5;">${h.updateSection}</span>
             <button id="agy-hub-check-btn" type="button" class="agy-enh-btn" style="height:24px;padding:0 12px;border-radius:6px;background:rgba(160,163,246,0.14);border:1px solid rgba(160,163,246,0.32);color:#A0A3F6;font-size:12px;font-weight:500;cursor:pointer;">${h.checkBtn}</button>
           </div>
           <p id="agy-hub-update-status" style="margin:0;font-size:12px;color:#9DA7C7;line-height:1.45;"></p>
@@ -932,7 +938,7 @@
             <div style="height:4px;border-radius:9999px;background:rgba(202,211,245,0.1);overflow:hidden;">
               <span id="agy-hub-progress-bar" style="display:block;width:0%;height:100%;background:#A0A3F6;border-radius:9999px;"></span>
             </div>
-            <p id="agy-hub-progress-text" style="margin:4px 0 0;font-size:11px;color:#6E7794;font-variant-numeric:tabular-nums;"></p>
+            <p id="agy-hub-progress-text" style="margin:4px 0 0;font-size:11px;color:#818BA8;font-variant-numeric:tabular-nums;"></p>
           </aside>
           <div id="agy-hub-update-actions" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;"></div>
         </section>
@@ -971,7 +977,7 @@
         const i18nMap = (info && info.releaseNotesI18n && typeof info.releaseNotesI18n === 'object') ? info.releaseNotesI18n : null;
         const localizedNotes = (i18nMap && (i18nMap[activeLanguage] || i18nMap.en)) || info.releaseNotes || '';
         const notesHtml = localizedNotes
-          ? `<div id="agy-hub-release-notes" style="margin-top:8px;padding:8px 12px;border-radius:6px;background:#0B0B0E;border:1px solid rgba(202,211,245,0.08);font-size:11.5px;color:#CAD3F5;max-height:112px;overflow-y:auto;white-space:pre-wrap;line-height:1.5;">${String(localizedNotes).replace(/</g, '&lt;')}</div>`
+          ? `<div id="agy-hub-release-notes" style="margin-top:8px;padding:8px 12px;border-radius:6px;background:#0B0B0E;border:1px solid rgba(202,211,245,0.08);font-size:11px;color:#CAD3F5;max-height:112px;overflow-y:auto;white-space:pre-wrap;line-height:1.5;">${String(localizedNotes).replace(/</g, '&lt;')}</div>`
           : '';
         updateStatusEl.innerHTML = `<span style="color:#A0A3F6;font-weight:600;font-variant-numeric:tabular-nums;">${h.availPrefix}v${info.currentVersion} → v${info.remoteVersion}</span>${notesHtml}`;
 
@@ -1256,7 +1262,7 @@
               <span class="truncate" id="antigravity-lang-current-label">${LANG_DISPLAY_NAMES[currentLang] ? `${LANG_DISPLAY_NAMES[currentLang].native} (${LANG_DISPLAY_NAMES[currentLang].en})` : currentLang}</span>
               <svg id="antigravity-lang-chevron" class="w-3.5 h-3.5 shrink-0 opacity-70 ml-auto pointer-events-none" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </button>
-            <div id="antigravity-lang-dropdown-menu" style="display:none;position:absolute;right:0;top:calc(100% + 4px);z-index:6000;" class="agy-overlay surface-glass border border-border rounded-lg bg-card text-foreground no-focus-ring flex flex-col shadow-md min-w-[160px] p-1 gap-px">${langItemsHtml}</div>
+            <div id="antigravity-lang-dropdown-menu" style="display:none;position:absolute;right:0;top:calc(100% + 4px);z-index:6000;background:#111217;border:1px solid rgba(202,211,245,0.1);box-shadow:0 8px 24px rgba(0,0,0,0.42);border-radius:10px;padding:4px;gap:2px;min-width:176px;" class="agy-overlay text-foreground no-focus-ring flex flex-col">${langItemsHtml}</div>
           </div>
         </div>
         <div id="antigravity-quota-setting-row" class="py-2 px-3 w-full bg-transparent flex justify-between gap-4 items-center" style="display:flex;align-items:center;justify-content:space-between;gap:16px;">
@@ -1264,16 +1270,16 @@
             <span class="text-sm font-normal text-foreground" id="antigravity-quota-item-title">${getQuotaSettingStrings(currentLang).title}</span>
             <div class="text-xs text-secondary-foreground" id="antigravity-quota-item-desc" style="line-height:1.4;">${getQuotaSettingStrings(currentLang).desc}</div>
           </div>
-          <button type="button" role="switch" id="antigravity-quota-toggle" aria-checked="${isQuotaOn}" style="position:relative;display:inline-flex;height:20px;width:36px;flex-shrink:0;cursor:pointer;border-radius:9999px;border:2px solid transparent;transition:background-color 0.2s ease-in-out;outline:none;background-color:${isQuotaOn ? '#A0A3F6' : 'rgba(202,211,245,0.22)'};">
-            <span id="antigravity-quota-toggle-thumb" style="pointer-events:none;display:inline-block;height:16px;width:16px;border-radius:9999px;background-color:#CAD3F5;box-shadow:0 1px 3px rgba(0,0,0,0.3);transition:transform 0.2s ease-in-out;transform:translateX(${isQuotaOn ? '16px' : '0px'});"></span>
+          <button type="button" role="switch" id="antigravity-quota-toggle" aria-checked="${isQuotaOn}" style="position:relative;display:inline-flex;height:20px;width:36px;flex-shrink:0;cursor:pointer;border-radius:9999px;border:2px solid transparent;transition:background-color 150ms cubic-bezier(0.22, 1, 0.36, 1);outline:none;background-color:${isQuotaOn ? '#A0A3F6' : 'rgba(202,211,245,0.2)'};">
+            <span id="antigravity-quota-toggle-thumb" style="pointer-events:none;display:inline-block;height:16px;width:16px;border-radius:9999px;background-color:#CAD3F5;box-shadow:0 1px 2px rgba(0,0,0,0.3);transition:transform 150ms cubic-bezier(0.22, 1, 0.36, 1);transform:translateX(${isQuotaOn ? '16px' : '0px'});"></span>
           </button>
         </div>
         <div class="py-2 px-3 w-full bg-transparent flex justify-between gap-4 items-center notranslate" translate="no" style="display:flex;align-items:center;justify-content:space-between;gap:16px;">
           <div class="flex-1 min-w-0 flex flex-col gap-0.5" style="flex:1 1 0%;min-width:180px;">
             <span class="text-sm font-normal text-foreground">Antigravity<span style="color:#A0A3F6;font-weight:600;margin-left:0;">Enhanced</span></span>
-            <div class="text-xs text-secondary-foreground" id="antigravity-settings-hub-subtitle" style="line-height:1.4;">${h.patchVersionPrefix} ${ENHANCER_CURRENT_VERSION}</div>
+            <div class="text-xs text-secondary-foreground" id="antigravity-settings-hub-subtitle" style="line-height:1.4;font-variant-numeric:tabular-nums;">${h.patchVersionPrefix} ${ENHANCER_CURRENT_VERSION}</div>
           </div>
-          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+          <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
             <button type="button" id="antigravity-settings-open-hub" class="px-2.5 py-1 text-xs font-medium rounded-md bg-secondary text-secondary-foreground hover:text-foreground cursor-pointer border-none transition-colors">${h.checkUpdates}</button>
             <button type="button" id="antigravity-settings-restore-btn" class="px-2.5 py-1 text-xs font-medium rounded-md bg-secondary text-secondary-foreground hover:text-foreground cursor-pointer border-none transition-colors">${h.restoreVanilla}</button>
           </div>
@@ -1408,7 +1414,7 @@
     if (badgeText) {
       const badge = document.createElement('span');
       badge.className = 'antigravity-menu-badge';
-      badge.style.cssText = 'color:#A0A3F6;font-size:11px;font-weight:600;margin-left:10px;';
+      badge.style.cssText = 'color:#A0A3F6;font-size:11px;font-weight:600;margin-left:8px;font-variant-numeric:tabular-nums;';
       badge.textContent = badgeText;
       btn.appendChild(badge);
     }
@@ -1546,7 +1552,7 @@
     section.setAttribute('translate', 'no');
 
     const sep = document.createElement('div');
-    sep.style.cssText = 'height:1px;background:rgba(202,211,245,0.1);margin:4px 0;';
+    sep.style.cssText = 'height:1px;background:rgba(202,211,245,0.08);margin:4px 0;';
     section.appendChild(sep);
 
     const verRow = createNativeMenuRow('antigravity-menu-patch-version', versionText, false, updateBadge);
@@ -1600,7 +1606,7 @@
       const langCode = (activeLanguage || 'ko').toUpperCase();
       quickLangBtn.title = `언어 선택 / Select Language (${langCode}) - Alt+Shift+L`;
       quickLangBtn.style.cssText = 'display:inline-flex;align-items:center;justify-content:center;gap:4px;height:24px;padding:0 8px;border-radius:6px;font-size:11px;font-weight:500;font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable",Pretendard,"Segoe UI",sans-serif;line-height:1;background:#0B0B0E;border:1px solid rgba(202,211,245,0.12);color:#CAD3F5;cursor:pointer;user-select:none;app-region:no-drag;-webkit-app-region:no-drag;outline:none;transition:background-color 150ms cubic-bezier(0.22, 1, 0.36, 1),border-color 150ms cubic-bezier(0.22, 1, 0.36, 1);margin-right:4px;white-space:nowrap;flex-shrink:0;z-index:101;';
-      quickLangBtn.innerHTML = `<svg class="shrink-0 pointer-events-none" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="color:#9DA7C7;"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg><span id="antigravity-quick-lang-label" class="pointer-events-none" style="font-weight:600;font-size:11px;line-height:1;">${langCode}</span><svg class="shrink-0 pointer-events-none" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="color:#6E7794;"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+      quickLangBtn.innerHTML = `<svg class="shrink-0 pointer-events-none" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="color:#9DA7C7;"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg><span id="antigravity-quick-lang-label" class="pointer-events-none" style="font-weight:600;font-size:11px;line-height:1;">${langCode}</span><svg class="shrink-0 pointer-events-none" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="color:#818BA8;"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
       quickLangBtn.onclick = (e) => { e.stopPropagation(); e.preventDefault(); toggleQuickLangMenu(quickLangBtn); };
     } else {
       const lbl = quickLangBtn.querySelector('#antigravity-quick-lang-label');
@@ -1807,7 +1813,7 @@
       }
 
       function getStatusColor(f) {
-        if (f === undefined || f === null || isNaN(f)) return '#6E7794';
+        if (f === undefined || f === null || isNaN(f)) return '#818BA8';
         if (f >= 0.5) return '#CAD3F5';
         if (f >= 0.2) return '#A0A3F6';
         return '#E56B6F';
@@ -1936,7 +1942,7 @@
       function renderBucketHtml(title, pct, ts, qs) {
         if (pct === null || pct === undefined) return '';
         const barColor = pct < 20 ? '#E56B6F' : '#A0A3F6';
-        return `<article class="bucket-row" style="margin-top:8px;"><p style="margin:0 0 4px;display:flex;justify-content:space-between;font-size:11px;"><span style="color:#9DA7C7;">${title}</span><small class="bucket-timer" ${ts ? `data-target-ts="${ts}"` : ''} style="color:#6E7794;font-size:10.5px;font-variant-numeric:tabular-nums;">${ts ? formatCountdown(ts) : qs.checking}</small></p><footer style="display:flex;align-items:center;gap:8px;"><div class="progress-bar-bg" style="flex:1;height:4px;border-radius:9999px;background:rgba(202,211,245,0.1);overflow:hidden;"><span class="progress-bar-fill" style="display:block;width:${Math.max(0, Math.min(100, pct))}%;height:100%;background:${barColor};border-radius:9999px;"></span></div><b style="font-size:11px;font-weight:600;font-variant-numeric:tabular-nums;color:${pct < 20 ? '#E56B6F' : '#CAD3F5'};min-width:32px;text-align:right;">${pct}%</b></footer></article>`;
+        return `<article class="bucket-row" style="margin-top:8px;"><p style="margin:0 0 4px;display:flex;justify-content:space-between;font-size:11px;"><span style="color:#9DA7C7;">${title}</span><small class="bucket-timer" ${ts ? `data-target-ts="${ts}"` : ''} style="color:#818BA8;font-size:11px;font-variant-numeric:tabular-nums;">${ts ? formatCountdown(ts) : qs.checking}</small></p><footer style="display:flex;align-items:center;gap:8px;"><div class="progress-bar-bg" style="flex:1;height:4px;border-radius:9999px;background:rgba(202,211,245,0.1);overflow:hidden;"><span class="progress-bar-fill" style="display:block;width:${Math.max(0, Math.min(100, pct))}%;height:100%;background:${barColor};border-radius:9999px;"></span></div><b style="font-size:11px;font-weight:600;font-variant-numeric:tabular-nums;color:${pct < 20 ? '#E56B6F' : '#CAD3F5'};min-width:32px;text-align:right;">${pct}%</b></footer></article>`;
       }
 
       function showComposerQuotaHoverCard(anchorEl, groupKey, parsed) {
@@ -1968,7 +1974,7 @@
         const rows = renderBucketHtml(qs.h5Full, grp.h5, grp.h5TargetTs, qs) + renderBucketHtml(qs.weeklyFull, grp.weekly, grp.weeklyTargetTs, qs);
         const modelsTxt = (grp.models || []).join(', ');
 
-        card.innerHTML = `<header style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding-bottom:8px;border-bottom:1px solid rgba(202,211,245,0.08);"><div style="display:inline-flex;align-items:center;gap:6px;flex-shrink:0;white-space:nowrap;"><strong style="font-weight:600;font-size:12.5px;white-space:nowrap;color:${isLow ? '#E56B6F' : (grp.id === 'argon' ? '#A0A3F6' : '#CAD3F5')};">${grp.label}</strong>${(grp.id === currentActiveGroup || grp.id === groupKey) ? `<em style="font-style:normal;font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;white-space:nowrap;flex-shrink:0;line-height:1.2;background:rgba(160,163,246,0.14);color:#A0A3F6;border:1px solid rgba(160,163,246,0.32);">${qs.activeTag}</em>` : ''}</div><span style="font-size:11px;color:#6E7794;flex:1;min-width:0;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${modelsTxt}</span></header><section>${rows || '<p style="margin:8px 0 0;font-size:11px;color:#6E7794;">--</p>'}</section>`;
+        card.innerHTML = `<header style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding-bottom:8px;border-bottom:1px solid rgba(202,211,245,0.08);"><div style="display:inline-flex;align-items:center;gap:6px;flex-shrink:0;white-space:nowrap;"><strong style="font-weight:600;font-size:13px;white-space:nowrap;color:${isLow ? '#E56B6F' : (grp.id === 'argon' ? '#A0A3F6' : '#CAD3F5')};">${grp.label}</strong>${(grp.id === currentActiveGroup || grp.id === groupKey) ? `<em style="font-style:normal;font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;white-space:nowrap;flex-shrink:0;line-height:1.2;background:rgba(160,163,246,0.14);color:#A0A3F6;border:1px solid rgba(160,163,246,0.32);">${qs.activeTag}</em>` : ''}</div><span style="font-size:11px;color:#818BA8;flex:1;min-width:0;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${modelsTxt}</span></header><section>${rows || '<p style="margin:8px 0 0;font-size:11px;color:#818BA8;">--</p>'}</section>`;
 
         (document.body || document.documentElement).appendChild(card);
         startCountdownTicker();
@@ -2003,10 +2009,10 @@
           const vals = [g.h5, g.weekly].filter(v => typeof v === 'number');
           const isLow = vals.length > 0 && Math.min(...vals) < 20;
           const borderStyle = isLow ? 'background:rgba(229,107,111,0.08);border:1px solid rgba(229,107,111,0.32);' : 'background:#161820;border:1px solid rgba(202,211,245,0.08);';
-          return `<section class="group-card rounded-lg p-2 mb-2" style="${borderStyle}border-radius:8px;padding:8px 12px;margin-bottom:8px;"><header style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><div style="display:inline-flex;align-items:center;gap:6px;flex-shrink:0;white-space:nowrap;"><strong style="font-weight:600;font-size:12px;white-space:nowrap;color:${isLow ? '#E56B6F' : g.color};">${g.label}</strong>${g.id === currentActiveGroup ? `<em style="font-style:normal;font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;white-space:nowrap;flex-shrink:0;line-height:1.2;background:rgba(160,163,246,0.14);color:#A0A3F6;border:1px solid rgba(160,163,246,0.32);">${qs.activeTag}</em>` : ''}</div><span style="font-size:11px;color:#6E7794;flex:1;min-width:0;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${(g.models || []).join(', ')}</span></header><main>${rows || '<p style="margin:4px 0 0;font-size:11px;color:#6E7794;">--</p>'}</main></section>`;
+          return `<section class="group-card rounded-lg p-2 mb-2" style="${borderStyle}border-radius:8px;padding:8px 12px;margin-bottom:8px;"><header style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><div style="display:inline-flex;align-items:center;gap:6px;flex-shrink:0;white-space:nowrap;"><strong style="font-weight:600;font-size:12px;white-space:nowrap;color:${isLow ? '#E56B6F' : g.color};">${g.label}</strong>${g.id === currentActiveGroup ? `<em style="font-style:normal;font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;white-space:nowrap;flex-shrink:0;line-height:1.2;background:rgba(160,163,246,0.14);color:#A0A3F6;border:1px solid rgba(160,163,246,0.32);">${qs.activeTag}</em>` : ''}</div><span style="font-size:11px;color:#818BA8;flex:1;min-width:0;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${(g.models || []).join(', ')}</span></header><main>${rows || '<p style="margin:4px 0 0;font-size:11px;color:#818BA8;">--</p>'}</main></section>`;
         }).join('');
 
-        pop.innerHTML = `<header style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid rgba(202,211,245,0.08);"><span style="font-weight:600;font-size:12.5px;color:#CAD3F5;">${qs.title}</span><button id="antigravity-popover-refresh" title="${qs.refresh}" style="background:none;border:none;color:#9DA7C7;cursor:pointer;padding:0;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg></button></header><main>${cardsHtml}</main><footer style="margin-top:4px;padding-top:8px;text-align:right;border-top:1px solid rgba(202,211,245,0.08);"><button id="antigravity-open-models-settings" style="background:none;border:none;color:#A0A3F6;font-size:11.5px;font-weight:500;cursor:pointer;">${qs.openSettings}</button></footer>`;
+        pop.innerHTML = `<header style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid rgba(202,211,245,0.08);"><span style="font-weight:600;font-size:13px;color:#CAD3F5;">${qs.title}</span><button id="antigravity-popover-refresh" title="${qs.refresh}" style="background:none;border:none;color:#9DA7C7;cursor:pointer;padding:0;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg></button></header><main>${cardsHtml}</main><footer style="margin-top:4px;padding-top:8px;text-align:right;border-top:1px solid rgba(202,211,245,0.08);"><button id="antigravity-open-models-settings" style="background:none;border:none;color:#A0A3F6;font-size:12px;font-weight:500;cursor:pointer;">${qs.openSettings}</button></footer>`;
         (document.body || document.documentElement).appendChild(pop);
         startCountdownTicker();
 
@@ -2064,10 +2070,10 @@
         const renderDual = (g) => {
           const hasH5 = (g.h5 !== null && g.h5 !== undefined);
           const hasWk = (g.weekly !== null && g.weekly !== undefined);
-          if (hasH5 && hasWk) return `<b style="font-weight:600;color:${g.h5 < 20 ? '#E56B6F' : getStatusColor(g.h5 / 100)};">${g.h5}%</b><span style="color:#6E7794;font-size:10px;">/</span><b style="font-weight:600;color:${g.weekly < 20 ? '#E56B6F' : getStatusColor(g.weekly / 100)};">${qs.weekly}${g.weekly}%</b>`;
+          if (hasH5 && hasWk) return `<b style="font-weight:600;color:${g.h5 < 20 ? '#E56B6F' : getStatusColor(g.h5 / 100)};">${g.h5}%</b><span style="color:#818BA8;font-size:10px;">/</span><b style="font-weight:600;color:${g.weekly < 20 ? '#E56B6F' : getStatusColor(g.weekly / 100)};">${qs.weekly}${g.weekly}%</b>`;
           if (hasH5) return `<b style="font-weight:600;color:${g.h5 < 20 ? '#E56B6F' : getStatusColor(g.h5 / 100)};">${g.h5}%</b>`;
           if (hasWk) return `<b style="font-weight:600;color:${g.weekly < 20 ? '#E56B6F' : getStatusColor(g.weekly / 100)};">${qs.weekly}${g.weekly}%</b>`;
-          return `<b style="font-weight:500;color:#6E7794;">--</b>`;
+          return `<b style="font-weight:500;color:#818BA8;">--</b>`;
         };
         const renderBadge = (id, label, color, g, gid) => {
           const active = (gid === currentActiveGroup);
@@ -2116,7 +2122,7 @@
               inlineBadge = document.createElement('span');
               inlineBadge.className = 'antigravity-inline-model-quota notranslate';
               inlineBadge.setAttribute('translate', 'no');
-              inlineBadge.style.cssText = 'display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 8px;margin-left:4px;margin-right:2px;border-radius:6px;border:1px solid rgba(202,211,245,0.12);font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable",Pretendard,"Segoe UI",sans-serif;font-size:11px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1;cursor:pointer;user-select:none;white-space:nowrap;flex-shrink:0;vertical-align:middle;';
+              inlineBadge.style.cssText = 'display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 8px;margin-left:4px;margin-right:0;border-radius:6px;border:1px solid rgba(202,211,245,0.12);font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable",Pretendard,"Segoe UI",sans-serif;font-size:11px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1;cursor:pointer;user-select:none;white-space:nowrap;flex-shrink:0;vertical-align:middle;transition:border-color 150ms cubic-bezier(0.22, 1, 0.36, 1);';
               if (trigger.lastChild) trigger.insertBefore(inlineBadge, trigger.lastChild);
               else trigger.appendChild(inlineBadge);
             }
@@ -2136,10 +2142,10 @@
             const brandColor = grp?.color || '#A0A3F6';
             const hasH5 = (grp && grp.h5 !== null && grp.h5 !== undefined);
             const hasWk = (grp && grp.weekly !== null && grp.weekly !== undefined);
-            let valHtml = '<span style="color:#6E7794;font-size:10px;">--</span>';
+            let valHtml = '<span style="color:#818BA8;font-size:10px;">--</span>';
             let isLow = false;
             if (hasH5 && hasWk) {
-              valHtml = `<span style="color:${grp.h5 < 20 ? '#E56B6F' : getStatusColor(grp.h5 / 100)};">${grp.h5}%</span><span style="color:#6E7794;margin:0 2px;">/</span><span style="color:${grp.weekly < 20 ? '#E56B6F' : getStatusColor(grp.weekly / 100)};">${qs.weekly}${grp.weekly}%</span>`;
+              valHtml = `<span style="color:${grp.h5 < 20 ? '#E56B6F' : getStatusColor(grp.h5 / 100)};">${grp.h5}%</span><span style="color:#818BA8;margin:0 2px;">/</span><span style="color:${grp.weekly < 20 ? '#E56B6F' : getStatusColor(grp.weekly / 100)};">${qs.weekly}${grp.weekly}%</span>`;
               isLow = grp.h5 < 20 || grp.weekly < 20;
             } else if (hasH5) {
               valHtml = `<span style="color:${grp.h5 < 20 ? '#E56B6F' : getStatusColor(grp.h5 / 100)};">${grp.h5}%</span>`;

@@ -1,26 +1,26 @@
 {
-  "version": "3.3.3",
+  "version": "3.3.4",
   "channel": "stable",
   "minAppVersion": "2.30.0",
   "testedAppVersion": "2.31.2",
   "repo": "x2tora/antigravity-enhancer",
-  "updatedAt": "2026-11-13T11:47:49.323Z",
-  "releaseNotes": "- Refined the UI design across the quota widgets, update hub, and top-bar controls with consistent 4px-grid spacing, surface layering, tabular numeric alignment, unified icon strokes, and calmer copy/feedback transitions.",
+  "updatedAt": "2026-11-13T12:12:30.815Z",
+  "releaseNotes": "- Further refined the UI design across both the renderer overlays and the Windows installer: aligned installer card/button spacing to the 4px grid, unified integer type scales, improved muted text contrast (`#818BA8`), removed glass-blur/period clutter in settings and status copy, and standardized hover/transition polish.",
   "releaseNotesI18n": {
-    "en": "- Refined the UI design across the quota widgets, update hub, and top-bar controls with consistent 4px-grid spacing, surface layering, tabular numeric alignment, unified icon strokes, and calmer copy/feedback transitions.",
-    "ko": "- 사용량 표시기, 업데이트 창 및 상단 바 컨트롤의 디자인을 다듬었습니다. 4px 격자 기준의 여백과 표면 단계, 고정폭 숫자 정렬(`tabular-nums`), 통일된 아이콘 선 굵기, 차분한 복사 피드백 및 모션을 적용했습니다.",
-    "ja": "- クォータウィジェット、更新ハブ、および上部バーのコントロールのデザインを整えました。4pxグリッドに沿った余白とサーフェス階層、等幅数字揃え（`tabular-nums`）、統一されたアイコン線幅、落ち着いたフィードバックとモーションを適用しています。",
-    "zh-CN": "- 打磨了配额组件、更新中心和顶部栏控件的界面设计，统一了 4px 网格间距、层级表面色彩、等宽数字对齐（`tabular-nums`）、图标描边粗细以及更克制的交互反馈。",
-    "zh-TW": "- 調整並優化了配額元件、更新中心與頂部列控制項的介面設計，統一 4px 網格間距、層級表面色彩、等寬數字對齊（`tabular-nums`）、圖示線條粗細與更克制的互動回饋。",
-    "es": "- Se perfeccionó el diseño visual de los widgets de cuota, el centro de actualizaciones y los controles de la barra superior con espaciado en cuadrícula de 4px, jerarquía de superficies, alineación numérica tabular, trazos de iconos unificados y transiciones más sobrias.",
-    "fr": "- Le design des widgets de quota, du centre de mise à jour et des contrôles de la barre supérieure a été affiné : grille d'espacement 4px, hiérarchie de surfaces, chiffres tabulaires, épaisseur d'icônes unifiée et transitions plus sobres.",
-    "de": "- Das UI-Design der Kontingent-Widgets, des Update-Hubs und der oberen Leisten-Steuerelemente wurde verfeinert: 4px-Abstandsnetz, abgestufte Oberflächen, tabellarische Ziffernausrichtung, einheitliche Icon-Strichstärken und ruhigere Übergänge.",
-    "ru": "- Доработан дизайн виджетов квот, центра обновлений и элементов верхней панели: выровнены отступы по сетке 4px, добавлена иерархия поверхностей, табличное выравнивание цифр, единая толщина иконок и более спокойные переходы."
+    "en": "- Further refined the UI design across both the renderer overlays and the Windows installer: aligned installer card/button spacing to the 4px grid, unified integer type scales, improved muted text contrast (`#818BA8`), removed glass-blur/period clutter in settings and status copy, and standardized hover/transition polish.",
+    "ko": "- 앱 내 오버레이와 Windows 인스톨러 전반의 디자인을 한층 더 다듬었습니다. 인스톨러 카드·버튼 간격을 4px 격자에 맞추고, 소수점 폰트 크기를 정수 단위로 통일했으며, 보조 텍스트 대비(`#818BA8`) 개선 및 설정 드롭다운·상태 문구·호버 전환을 정돈했습니다.",
+    "ja": "- アプリ内のオーバーレイとWindowsインストーラー全体のデザインをさらに整えました。インストーラーのカード・ボタン間隔を4pxグリッドに揃え、小数点フォントサイズを整数スケールに統一し、補助テキストのコントラスト（`#818BA8`）や設定ドロップダウン・ホバー遷移を調整しています。",
+    "zh-CN": "- 进一步打磨了应用内浮层与 Windows 安装程序的界面设计：将安装程序卡片与按钮间距对齐至 4px 网格，统一整数字号阶梯，提升辅助文本对比度（`#818BA8`），并优化了设置下拉菜单与悬停过渡细节。",
+    "zh-TW": "- 進一步細化了應用程式內浮層與 Windows 安裝程式的介面設計：將安裝程式卡片與按鈕間距對齊至 4px 網格，統一整數字級階梯，提升輔助文字對比度（`#818BA8`），並整理設定下拉選單與懸停過渡細節。",
+    "es": "- Se refinó aún más el diseño de las vistas superpuestas y del instalador de Windows: espaciado en cuadrícula de 4px para tarjetas y botones del instalador, tamaños de fuente enteros uniformes, mejor contraste del texto secundario (`#818BA8`) y transiciones de estado pulidas.",
+    "fr": "- Le design des panneaux intégrés et de l'installateur Windows a été encore affiné : espacement sur grille 4px, tailles de police entières uniformes, meilleur contraste du texte secondaire (`#818BA8`) et transitions de survol harmonisées.",
+    "de": "- Das UI-Design der In-App-Overlays und des Windows-Installers wurde weiter verfeinert: 4px-Abstandsnetz für Installer-Karten und -Schaltflächen, einheitliche ganzzahlige Schriftgrößen, verbesserter Kontrast für gedämpften Text (`#818BA8`) sowie abgestimmte Hover-Übergänge.",
+    "ru": "- Дополнительно доработан дизайн встроенных панелей и установщика Windows: отступы карточек и кнопок установщика выровнены по сетке 4px, унифицированы целочисленные размеры шрифта, улучшен контраст второстепенного текста (`#818BA8`) и сглажены переходы при наведении."
   },
   "files": {
     "main-enhancer.js": {
       "size": 23143,
-      "sha256": "e5092dafce064367a81081e20271a4d3fbb777198bd583bf9b27236277ad643a",
+      "sha256": "75916e826b5be931aa8200d9daa07156ed0f00cba7d58b4efef50a82c6117011",
       "restartRequired": true
     },
     "asar-patcher.js": {
@@ -29,8 +29,8 @@
       "restartRequired": true
     },
     "renderer-enhancer.js": {
-      "size": 126737,
-      "sha256": "d38cd94f665b48480e9e237aa4ce219b0e4a0ec2a835ac5d6a7b1fa6813775b6",
+      "size": 127143,
+      "sha256": "77cfb577f49b44c2c84d80730f7f6b7b81ba8ec3822dd6873c3ea61a689c67ab",
       "restartRequired": false
     },
     "gsap-core.js": {
