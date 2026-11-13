@@ -1,8 +1,8 @@
-# Antigravity Enhancer v3.3.2
+# Antigravity Enhancer v3.3.3
 
 ## Changes
 
-- Fixed a `ReferenceError: activeLanguage is not defined` inside the main-world quota widget script (`mainWorldQuotaLogic`) when no saved language existed in `localStorage`, restoring both the top-bar quota widget and composer inline quota badge.
+- Refined the UI design across the quota widgets, update hub, and top-bar controls with consistent 4px-grid spacing, surface layering, tabular numeric alignment, unified icon strokes, and calmer copy/feedback transitions.
 
 ---
 
@@ -11,55 +11,55 @@
 <details>
 <summary>한국어</summary>
 
-- 저장된 언어 설정이 없는 상태에서 메인 월드 사용량 위젯 스크립트(`mainWorldQuotaLogic`)가 프리로드 전용 변수 `activeLanguage`를 참조해 발생하던 `ReferenceError`를 수정하여 상단 바 및 입력 창 사용량 표시기가 정상 동작하도록 복구했습니다.
+- 사용량 표시기, 업데이트 창 및 상단 바 컨트롤의 디자인을 다듬었습니다. 4px 격자 기준의 여백과 표면 단계, 고정폭 숫자 정렬(`tabular-nums`), 통일된 아이콘 선 굵기, 차분한 복사 피드백 및 모션을 적용했습니다.
 
 </details>
 
 <details>
 <summary>日本語</summary>
 
-- 保存された言語設定がない状態でメインワールドのクォータスクリプト（`mainWorldQuotaLogic`）がプリロード専用変数 `activeLanguage` を参照して発生していた `ReferenceError` を修正し、上部バーと入力欄のクォータ表示を復旧しました。
+- クォータウィジェット、更新ハブ、および上部バーのコントロールのデザインを整えました。4pxグリッドに沿った余白とサーフェス階層、等幅数字揃え（`tabular-nums`）、統一されたアイコン線幅、落ち着いたフィードバックとモーションを適用しています。
 
 </details>
 
 <details>
 <summary>简体中文</summary>
 
-- 修复了未保存语言设置时主世界配额脚本（`mainWorldQuotaLogic`）引用预加载作用域变量 `activeLanguage` 导致的 `ReferenceError`，恢复了顶部栏和输入框配额指示器显示。
+- 打磨了配额组件、更新中心和顶部栏控件的界面设计，统一了 4px 网格间距、层级表面色彩、等宽数字对齐（`tabular-nums`）、图标描边粗细以及更克制的交互反馈。
 
 </details>
 
 <details>
 <summary>繁體中文</summary>
 
-- 修復了未儲存語言設定時主世界配額腳本（`mainWorldQuotaLogic`）參照預載作用域變數 `activeLanguage` 所導致的 `ReferenceError`，恢復頂部列與輸入框配額指示器顯示。
+- 調整並優化了配額元件、更新中心與頂部列控制項的介面設計，統一 4px 網格間距、層級表面色彩、等寬數字對齊（`tabular-nums`）、圖示線條粗細與更克制的互動回饋。
 
 </details>
 
 <details>
 <summary>Español</summary>
 
-- Se corrigió un error `ReferenceError: activeLanguage is not defined` en el script de cuota del mundo principal (`mainWorldQuotaLogic`) cuando no había idioma guardado en `localStorage`, restaurando el widget superior y el indicador del compositor.
+- Se perfeccionó el diseño visual de los widgets de cuota, el centro de actualizaciones y los controles de la barra superior con espaciado en cuadrícula de 4px, jerarquía de superficies, alineación numérica tabular, trazos de iconos unificados y transiciones más sobrias.
 
 </details>
 
 <details>
 <summary>Français</summary>
 
-- Correction d'une erreur `ReferenceError: activeLanguage is not defined` dans le script de quota du monde principal (`mainWorldQuotaLogic`) lorsqu'aucune langue n'était enregistrée dans `localStorage`, rétablissant le widget supérieur et le badge de l'éditeur.
+- Le design des widgets de quota, du centre de mise à jour et des contrôles de la barre supérieure a été affiné : grille d'espacement 4px, hiérarchie de surfaces, chiffres tabulaires, épaisseur d'icônes unifiée et transitions plus sobres.
 
 </details>
 
 <details>
 <summary>Deutsch</summary>
 
-- Fehler `ReferenceError: activeLanguage is not defined` im Main-World-Kontingent-Skript (`mainWorldQuotaLogic`) bei fehlender `localStorage`-Sprache behoben und damit das obere Widget sowie das Composer-Badge wiederhergestellt.
+- Das UI-Design der Kontingent-Widgets, des Update-Hubs und der oberen Leisten-Steuerelemente wurde verfeinert: 4px-Abstandsnetz, abgestufte Oberflächen, tabellarische Ziffernausrichtung, einheitliche Icon-Strichstärken und ruhigere Übergänge.
 
 </details>
 
 <details>
 <summary>Русский</summary>
 
-- Исправлена ошибка `ReferenceError: activeLanguage is not defined` в скрипте виджета квот (`mainWorldQuotaLogic`) при отсутствии сохранённого языка в `localStorage`, что восстановило отображение индикаторов в верхней панели и поле ввода.
+- Доработан дизайн виджетов квот, центра обновлений и элементов верхней панели: выровнены отступы по сетке 4px, добавлена иерархия поверхностей, табличное выравнивание цифр, единая толщина иконок и более спокойные переходы.
 
 </details>

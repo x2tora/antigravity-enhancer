@@ -1,5 +1,5 @@
 /**
- * Antigravity Enhancer v3.3.2 - Modular Renderer Enhancer Engine
+ * Antigravity Enhancer v3.3.3 - Modular Renderer Enhancer Engine
  * Features: 9-Language Zero-Restart i18n, GSAP v3.15.1 Zero-Bounce Motion,
  *           AI Model Quota HUD & Composer Inline Hover Card (2.31.2 Hydrogen/Argon/Gemini/Other),
  *           Native Title-Menu Patch Integration & In-App Updater (x2tora/antigravity-enhancer)
@@ -11,7 +11,7 @@
   const ipc = electron_1 ? electron_1.ipcRenderer : null;
   const payload = (typeof __ENHANCER_PAYLOAD__ !== 'undefined' && __ENHANCER_PAYLOAD__) ? __ENHANCER_PAYLOAD__ : {};
   const ENHANCER_REPO = payload.repo || 'x2tora/antigravity-enhancer';
-  const ENHANCER_CURRENT_VERSION = payload.version || '3.3.2';
+  const ENHANCER_CURRENT_VERSION = payload.version || '3.3.3';
 
   // ---------------------------------------------------------------------------
   // 1. Install GSAP Core into Preload World
@@ -415,16 +415,15 @@
           font-family: D2Coding, JetBrains Mono, Consolas, monospace !important;
         }
         @keyframes antigravity-copy-pulse {
-          0% { transform: scale(1); outline: 2px solid rgba(34, 197, 94, 0.9); outline-offset: 1px; color: #22c55e; }
-          50% { transform: scale(1.12); outline: 2px solid rgba(34, 197, 94, 0.4); outline-offset: 3px; color: #22c55e; }
-          100% { transform: scale(1); outline: 2px solid transparent; outline-offset: 4px; }
+          0% { color: #4CC38A; }
+          100% { color: #4CC38A; }
         }
         .antigravity-copy-success, .antigravity-copy-pulse {
-          animation: antigravity-copy-pulse 0.6s ease-out !important;
-          color: #22c55e !important;
+          animation: antigravity-copy-pulse 0.5s cubic-bezier(0.22, 1, 0.36, 1) !important;
+          color: #4CC38A !important;
         }
         .antigravity-copy-success svg, .antigravity-copy-pulse svg {
-          stroke: #22c55e !important;
+          stroke: #4CC38A !important;
         }
         #antigravity-quick-lang-menu .agy-overlay-item:hover,
         #antigravity-lang-dropdown-menu .agy-overlay-item:hover {
@@ -432,10 +431,17 @@
         }
         #antigravity-quick-lang-btn:hover,
         #antigravity-quota-widget:hover {
-          border-color: rgba(160, 163, 246, 0.45) !important;
+          border-color: rgba(160, 163, 246, 0.4) !important;
+        }
+        #antigravity-quick-lang-btn:focus-visible,
+        #antigravity-quota-widget:focus-visible,
+        #antigravity-enhancer-update-btn:focus-visible,
+        #antigravity-enhancer-modal button:focus-visible {
+          outline: 1.5px solid #A0A3F6 !important;
+          outline-offset: 1px;
         }
         #antigravity-enhancer-modal .agy-enh-btn:hover:not(:disabled) {
-          background: rgba(202, 211, 245, 0.14) !important;
+          background: rgba(202, 211, 245, 0.12) !important;
         }
         #antigravity-enhancer-modal .agy-enh-primary:hover:not(:disabled) {
           opacity: 0.92 !important;
@@ -486,8 +492,8 @@
       if (!toast) {
         toast = document.createElement('div');
         toast.id = 'antigravity-copy-toast';
-        toast.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:99999;display:flex;align-items:center;gap:8px;padding:8px 14px;background:#0B0B0E;color:#CAD3F5;font-size:13px;font-weight:500;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;border-radius:8px;border:1px solid rgba(160,163,246,0.35);box-shadow:0 8px 24px rgba(0,0,0,0.45);pointer-events:none;opacity:0;';
-        toast.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A0A3F6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"></polyline></svg><span id="antigravity-copy-toast-text">${toastText}</span>`;
+        toast.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:99999;display:flex;align-items:center;gap:8px;padding:8px 12px;background:#111217;color:#CAD3F5;font-size:13px;font-weight:500;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;border-radius:8px;border:1px solid rgba(202,211,245,0.1);box-shadow:0 8px 24px rgba(0,0,0,0.4);pointer-events:none;opacity:0;';
+        toast.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4CC38A" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"></polyline></svg><span id="antigravity-copy-toast-text">${toastText}</span>`;
         (document.body || document.documentElement).appendChild(toast);
       } else {
         const textSpan = toast.querySelector('#antigravity-copy-toast-text');
@@ -868,20 +874,20 @@
     modal.id = 'antigravity-enhancer-modal';
     modal.className = 'agy-overlay border rounded-xl text-foreground shadow-lg notranslate';
     modal.setAttribute('translate', 'no');
-    modal.style.cssText = 'width:400px;max-width:94vw;max-height:88vh;overflow-y:auto;border-radius:12px;background:#0B0B0E;border:1px solid rgba(202,211,245,0.14);box-shadow:0 16px 40px rgba(0,0,0,0.6);padding:16px;color:#CAD3F5;font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable",Pretendard,"Segoe UI",sans-serif;font-size:13px;';
+    modal.style.cssText = 'width:400px;max-width:94vw;max-height:88vh;overflow-y:auto;border-radius:12px;background:#0B0B0E;border:1px solid rgba(202,211,245,0.1);box-shadow:0 12px 32px rgba(0,0,0,0.48);padding:16px;color:#CAD3F5;font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable",Pretendard,"Segoe UI",sans-serif;font-size:13px;';
 
     const renderModalContent = (activeMode) => {
       h = getHubStrings();
       if (activeMode === 'restore') {
         modal.innerHTML = `
-          <header style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:12px;border-bottom:1px solid rgba(202,211,245,0.1);">
-            <span style="font-size:14px;font-weight:600;color:#CAD3F5;letter-spacing:-0.01em;">${h.restoreConfirmTitle}</span>
-            <button id="agy-hub-close" type="button" class="agy-enh-btn" style="background:rgba(202,211,245,0.06);border:1px solid rgba(202,211,245,0.12);color:#CAD3F5;border-radius:6px;width:24px;height:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;line-height:1;">×</button>
+          <header style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:12px;border-bottom:1px solid rgba(202,211,245,0.08);">
+            <span style="font-size:14px;font-weight:600;color:#CAD3F5;">${h.restoreConfirmTitle}</span>
+            <button id="agy-hub-close" type="button" class="agy-enh-btn" style="background:#181A22;border:1px solid rgba(202,211,245,0.1);color:#CAD3F5;border-radius:6px;width:24px;height:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;line-height:1;">×</button>
           </header>
-          <p style="margin:0;padding:14px 0 16px;font-size:12.5px;color:#CAD3F5;line-height:1.5;opacity:0.9;">${h.restoreConfirmDesc}</p>
-          <footer style="display:flex;align-items:center;justify-content:flex-end;gap:8px;padding-top:10px;border-top:1px solid rgba(202,211,245,0.1);">
-            <button id="agy-hub-cancel-restore" type="button" class="agy-enh-btn" style="padding:6px 12px;border-radius:6px;background:rgba(202,211,245,0.06);border:1px solid rgba(202,211,245,0.14);color:#CAD3F5;font-size:12px;font-weight:500;cursor:pointer;">${h.cancelBtn}</button>
-            <button id="agy-hub-confirm-restore" type="button" class="agy-enh-primary" style="padding:6px 12px;border-radius:6px;background:#A0A3F6;border:none;color:#0B0B0E;font-size:12px;font-weight:600;cursor:pointer;">${h.restoreVanilla}</button>
+          <p style="margin:0;padding:12px 0 16px;font-size:13px;color:#9DA7C7;line-height:1.5;">${h.restoreConfirmDesc}</p>
+          <footer style="display:flex;align-items:center;justify-content:flex-end;gap:8px;padding-top:12px;border-top:1px solid rgba(202,211,245,0.08);">
+            <button id="agy-hub-cancel-restore" type="button" class="agy-enh-btn" style="height:28px;padding:0 12px;border-radius:6px;background:#181A22;border:1px solid rgba(202,211,245,0.1);color:#CAD3F5;font-size:12px;font-weight:500;cursor:pointer;">${h.cancelBtn}</button>
+            <button id="agy-hub-confirm-restore" type="button" class="agy-enh-primary" style="height:28px;padding:0 12px;border-radius:6px;background:#A0A3F6;border:none;color:#0B0B0E;font-size:12px;font-weight:600;cursor:pointer;">${h.restoreVanilla}</button>
           </footer>
         `;
         modal.querySelector('#agy-hub-close').onclick = () => closeEnhancerHubModal();
@@ -896,45 +902,44 @@
       }
 
       modal.innerHTML = `
-        <header style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:12px;border-bottom:1px solid rgba(202,211,245,0.1);margin-bottom:12px;">
-          <div style="display:flex;align-items:center;gap:6px;">
-            <span style="font-size:14px;font-weight:600;color:#CAD3F5;letter-spacing:-0.01em;">Antigravity</span>
-            <span style="font-size:14px;font-weight:600;color:#A0A3F6;letter-spacing:-0.01em;">Enhanced</span>
+        <header style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:12px;border-bottom:1px solid rgba(202,211,245,0.08);margin-bottom:12px;">
+          <div style="display:flex;align-items:center;gap:0;">
+            <span style="font-size:14px;font-weight:600;color:#CAD3F5;">Antigravity</span><span style="font-size:14px;font-weight:600;color:#A0A3F6;">Enhanced</span>
           </div>
-          <button id="agy-hub-close" type="button" class="agy-enh-btn" style="background:rgba(202,211,245,0.06);border:1px solid rgba(202,211,245,0.12);color:#CAD3F5;border-radius:6px;width:24px;height:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;line-height:1;">×</button>
+          <button id="agy-hub-close" type="button" class="agy-enh-btn" style="background:#181A22;border:1px solid rgba(202,211,245,0.1);color:#CAD3F5;border-radius:6px;width:24px;height:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;line-height:1;">×</button>
         </header>
 
-        ${status.safeMode ? `<p style="margin:0 0 12px;padding:8px 10px;border-radius:8px;background:rgba(160,163,246,0.1);border:1px solid rgba(160,163,246,0.35);color:#CAD3F5;font-size:11.5px;">${h.safeModeWarn}</p>` : ''}
+        ${status.safeMode ? `<p style="margin:0 0 12px;padding:8px 12px;border-radius:8px;background:rgba(160,163,246,0.1);border:1px solid rgba(160,163,246,0.28);color:#CAD3F5;font-size:12px;">${h.safeModeWarn}</p>` : ''}
 
-        <section class="agy-card rounded-xl border divide-y" style="border-radius:10px;background:rgba(202,211,245,0.03);border:1px solid rgba(202,211,245,0.1);margin-bottom:12px;overflow:hidden;">
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border-bottom:1px solid rgba(202,211,245,0.08);">
-            <span style="font-size:12.5px;color:#CAD3F5;">${h.curVer}</span>
-            <span style="font-size:12.5px;font-weight:600;color:#A0A3F6;">v${status.enhancerVersion || ENHANCER_CURRENT_VERSION}</span>
+        <section class="agy-card rounded-xl border divide-y" style="border-radius:8px;background:#111217;border:1px solid rgba(202,211,245,0.08);margin-bottom:12px;overflow:hidden;">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid rgba(202,211,245,0.08);">
+            <span style="font-size:12.5px;color:#9DA7C7;">${h.curVer}</span>
+            <span style="font-size:12.5px;font-weight:600;color:#A0A3F6;font-variant-numeric:tabular-nums;">v${status.enhancerVersion || ENHANCER_CURRENT_VERSION}</span>
           </div>
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;">
-            <span style="font-size:12.5px;color:#CAD3F5;">${h.appVer}</span>
-            <span style="font-size:12.5px;font-weight:500;color:#CAD3F5;opacity:0.85;">v${status.appVersion || '2.31.2'}</span>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;">
+            <span style="font-size:12.5px;color:#9DA7C7;">${h.appVer}</span>
+            <span style="font-size:12.5px;font-weight:500;color:#CAD3F5;font-variant-numeric:tabular-nums;">v${status.appVersion || '2.31.2'}</span>
           </div>
         </section>
 
-        <section class="agy-card rounded-xl border" style="padding:10px 12px;border-radius:10px;background:rgba(202,211,245,0.03);border:1px solid rgba(202,211,245,0.12);margin-bottom:12px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;">
-            <span style="font-size:12.5px;font-weight:600;color:#CAD3F5;">${h.updateSection}</span>
-            <button id="agy-hub-check-btn" type="button" class="agy-enh-btn" style="padding:4px 10px;border-radius:6px;background:rgba(160,163,246,0.14);border:1px solid rgba(160,163,246,0.38);color:#A0A3F6;font-size:11.5px;font-weight:600;cursor:pointer;">${h.checkBtn}</button>
+        <section class="agy-card rounded-xl border" style="padding:12px;border-radius:8px;background:#111217;border:1px solid rgba(202,211,245,0.08);margin-bottom:12px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;">
+            <span style="font-size:12.5px;font-weight:500;color:#CAD3F5;">${h.updateSection}</span>
+            <button id="agy-hub-check-btn" type="button" class="agy-enh-btn" style="height:24px;padding:0 12px;border-radius:6px;background:rgba(160,163,246,0.14);border:1px solid rgba(160,163,246,0.32);color:#A0A3F6;font-size:12px;font-weight:500;cursor:pointer;">${h.checkBtn}</button>
           </div>
-          <p id="agy-hub-update-status" style="margin:0;font-size:12px;color:#CAD3F5;line-height:1.45;"></p>
+          <p id="agy-hub-update-status" style="margin:0;font-size:12px;color:#9DA7C7;line-height:1.45;"></p>
           <aside id="agy-hub-progress-wrap" style="display:none;margin-top:8px;">
-            <div style="height:4px;border-radius:9999px;background:rgba(202,211,245,0.12);overflow:hidden;">
+            <div style="height:4px;border-radius:9999px;background:rgba(202,211,245,0.1);overflow:hidden;">
               <span id="agy-hub-progress-bar" style="display:block;width:0%;height:100%;background:#A0A3F6;border-radius:9999px;"></span>
             </div>
-            <p id="agy-hub-progress-text" style="margin:4px 0 0;font-size:11px;color:#CAD3F5;opacity:0.7;"></p>
+            <p id="agy-hub-progress-text" style="margin:4px 0 0;font-size:11px;color:#6E7794;font-variant-numeric:tabular-nums;"></p>
           </aside>
-          <div id="agy-hub-update-actions" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;"></div>
+          <div id="agy-hub-update-actions" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;"></div>
         </section>
 
-        <footer style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:10px;border-top:1px solid rgba(202,211,245,0.1);">
-          <button id="agy-hub-vanilla-btn" type="button" class="agy-enh-btn" style="padding:5px 11px;border-radius:6px;background:rgba(202,211,245,0.06);border:1px solid rgba(202,211,245,0.14);color:#CAD3F5;font-size:12px;font-weight:500;cursor:pointer;">${h.restoreVanilla}</button>
-          <button id="agy-hub-close-footer" type="button" class="agy-enh-btn" style="padding:5px 11px;border-radius:6px;background:rgba(202,211,245,0.06);border:1px solid rgba(202,211,245,0.14);color:#CAD3F5;font-size:12px;font-weight:500;cursor:pointer;">${h.closeBtn}</button>
+        <footer style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:12px;border-top:1px solid rgba(202,211,245,0.08);">
+          <button id="agy-hub-vanilla-btn" type="button" class="agy-enh-btn" style="height:28px;padding:0 12px;border-radius:6px;background:#181A22;border:1px solid rgba(202,211,245,0.1);color:#CAD3F5;font-size:12px;font-weight:500;cursor:pointer;">${h.restoreVanilla}</button>
+          <button id="agy-hub-close-footer" type="button" class="agy-enh-btn" style="height:28px;padding:0 12px;border-radius:6px;background:#181A22;border:1px solid rgba(202,211,245,0.1);color:#CAD3F5;font-size:12px;font-weight:500;cursor:pointer;">${h.closeBtn}</button>
         </footer>
       `;
 
@@ -955,27 +960,27 @@
           return;
         }
         if (!info.ok) {
-          updateStatusEl.innerHTML = `<span style="color:#f87171;">${info.error || 'Error checking updates'}</span>`;
+          updateStatusEl.innerHTML = `<span style="color:#E56B6F;">${info.error || 'Error checking updates'}</span>`;
           return;
         }
         if (!info.hasUpdate) {
-          updateStatusEl.innerHTML = `<span style="color:#A0A3F6;">${h.upToDate} (v${info.currentVersion})</span>`;
+          updateStatusEl.innerHTML = `<span style="color:#A0A3F6;font-variant-numeric:tabular-nums;">${h.upToDate} (v${info.currentVersion})</span>`;
           return;
         }
 
         const i18nMap = (info && info.releaseNotesI18n && typeof info.releaseNotesI18n === 'object') ? info.releaseNotesI18n : null;
         const localizedNotes = (i18nMap && (i18nMap[activeLanguage] || i18nMap.en)) || info.releaseNotes || '';
         const notesHtml = localizedNotes
-          ? `<div id="agy-hub-release-notes" style="margin-top:6px;padding:7px 9px;border-radius:6px;background:#0B0B0E;border:1px solid rgba(202,211,245,0.1);font-size:11px;color:#CAD3F5;max-height:110px;overflow-y:auto;white-space:pre-wrap;line-height:1.45;">${String(localizedNotes).replace(/</g, '&lt;')}</div>`
+          ? `<div id="agy-hub-release-notes" style="margin-top:8px;padding:8px 12px;border-radius:6px;background:#0B0B0E;border:1px solid rgba(202,211,245,0.08);font-size:11.5px;color:#CAD3F5;max-height:112px;overflow-y:auto;white-space:pre-wrap;line-height:1.5;">${String(localizedNotes).replace(/</g, '&lt;')}</div>`
           : '';
-        updateStatusEl.innerHTML = `<span style="color:#A0A3F6;font-weight:600;">${h.availPrefix}v${info.currentVersion} → v${info.remoteVersion}</span>${notesHtml}`;
+        updateStatusEl.innerHTML = `<span style="color:#A0A3F6;font-weight:600;font-variant-numeric:tabular-nums;">${h.availPrefix}v${info.currentVersion} → v${info.remoteVersion}</span>${notesHtml}`;
 
         if (info.canApplyInApp) {
           const applyBtn = document.createElement('button');
           applyBtn.type = 'button';
           applyBtn.className = 'agy-enh-primary';
           applyBtn.textContent = h.updateNow;
-          applyBtn.style.cssText = 'padding:5px 12px;border-radius:6px;background:#A0A3F6;border:none;color:#0B0B0E;font-size:12px;font-weight:600;cursor:pointer;';
+          applyBtn.style.cssText = 'height:28px;padding:0 12px;border-radius:6px;background:#A0A3F6;border:none;color:#0B0B0E;font-size:12px;font-weight:600;cursor:pointer;';
           applyBtn.onclick = async () => {
             applyBtn.disabled = true;
             applyBtn.textContent = h.updating;
@@ -986,19 +991,19 @@
               injectEnhancerUpdatePill();
               scheduleInjectTitleMenuIntegration();
               progBar.style.width = '100%';
-              updateStatusEl.innerHTML = `<span style="color:#A0A3F6;font-weight:600;">v${res.newVersion}${h.updateDoneSuffix}</span>`;
+              updateStatusEl.innerHTML = `<span style="color:#A0A3F6;font-weight:600;font-variant-numeric:tabular-nums;">v${res.newVersion}${h.updateDoneSuffix}</span>`;
               updateActionsEl.innerHTML = '';
               const finishBtn = document.createElement('button');
               finishBtn.type = 'button';
               finishBtn.className = 'agy-enh-primary';
               finishBtn.textContent = res.restartRequired ? h.restartNow : h.reloadNow;
-              finishBtn.style.cssText = 'padding:5px 12px;border-radius:6px;background:#A0A3F6;border:none;color:#0B0B0E;font-size:12px;font-weight:600;cursor:pointer;';
+              finishBtn.style.cssText = 'height:28px;padding:0 12px;border-radius:6px;background:#A0A3F6;border:none;color:#0B0B0E;font-size:12px;font-weight:600;cursor:pointer;';
               finishBtn.onclick = () => ipc.invoke(res.restartRequired ? 'enhancer:relaunch' : 'enhancer:reload-windows');
               updateActionsEl.appendChild(finishBtn);
             } else {
               applyBtn.disabled = false;
               applyBtn.textContent = h.updateNow;
-              updateStatusEl.innerHTML = `<span style="color:#f87171;">${(res && res.error) || 'Update failed'}</span>`;
+              updateStatusEl.innerHTML = `<span style="color:#E56B6F;">${(res && res.error) || 'Update failed'}</span>`;
             }
           };
           updateActionsEl.appendChild(applyBtn);
@@ -1009,7 +1014,7 @@
           relBtn.type = 'button';
           relBtn.className = 'agy-enh-btn';
           relBtn.textContent = h.openRelease;
-          relBtn.style.cssText = 'padding:5px 10px;border-radius:6px;background:rgba(202,211,245,0.06);border:1px solid rgba(202,211,245,0.14);color:#CAD3F5;font-size:11.5px;font-weight:500;cursor:pointer;';
+          relBtn.style.cssText = 'height:28px;padding:0 12px;border-radius:6px;background:#181A22;border:1px solid rgba(202,211,245,0.1);color:#CAD3F5;font-size:12px;font-weight:500;cursor:pointer;';
           relBtn.onclick = () => {
             const targetUrl = info.exeDownloadUrl || info.releasePageUrl;
             try { ipc.invoke('shell:open-external', targetUrl); } catch (_) { window.open(targetUrl, '_blank'); }
@@ -1344,13 +1349,13 @@
     menu.id = 'antigravity-quick-lang-menu';
     menu.className = 'agy-overlay border rounded-xl no-focus-ring flex flex-col shadow-lg min-w-[175px] p-1 gap-px notranslate';
     menu.setAttribute('translate', 'no');
-    menu.style.cssText = `position:fixed;top:${topPx}px;right:${rightPx}px;min-width:175px;padding:4px;gap:1px;display:flex;flex-direction:column;border-radius:10px;background:#0B0B0E;border:1px solid rgba(202,211,245,0.14);box-shadow:0 12px 28px rgba(0,0,0,0.58);color:#CAD3F5;font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable",Pretendard,"Segoe UI",sans-serif;z-index:99999;user-select:none;app-region:no-drag;-webkit-app-region:no-drag;`;
+    menu.style.cssText = `position:fixed;top:${topPx}px;right:${rightPx}px;min-width:176px;padding:4px;gap:2px;display:flex;flex-direction:column;border-radius:10px;background:#111217;border:1px solid rgba(202,211,245,0.1);box-shadow:0 8px 24px rgba(0,0,0,0.42);color:#CAD3F5;font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable",Pretendard,"Segoe UI",sans-serif;z-index:99999;user-select:none;app-region:no-drag;-webkit-app-region:no-drag;`;
 
     menu.innerHTML = LANG_ORDER.map(l => {
       const info = LANG_DISPLAY_NAMES[l] || { native: l, en: l };
       const isSelected = (activeLanguage === l);
       const labelText = (l === 'en') ? 'English (English)' : `${info.native} (${info.en})`;
-      return `<div id="antigravity-quick-opt-${l}" data-lang="${l}" class="agy-overlay-item w-full text-left whitespace-nowrap transition-colors duration-150 select-none rounded-md flex items-center justify-between gap-2 px-2 py-1 text-[13px] outline-none no-focus-ring cursor-pointer" style="color:${isSelected ? '#A0A3F6' : '#CAD3F5'};font-weight:${isSelected ? '600' : '400'};"><span class="truncate">${labelText}</span><svg id="antigravity-quick-lang-check-${l}" class="w-3.5 h-3.5 shrink-0 ml-auto pointer-events-none" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A0A3F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:${isSelected ? 'flex' : 'none'};flex-shrink:0;"><polyline points="20 6 9 17 4 12"></polyline></svg></div>`;
+      return `<div id="antigravity-quick-opt-${l}" data-lang="${l}" class="agy-overlay-item w-full text-left whitespace-nowrap transition-colors duration-150 select-none rounded-md flex items-center justify-between gap-2 px-2 py-1 text-[13px] outline-none no-focus-ring cursor-pointer" style="color:${isSelected ? '#A0A3F6' : '#CAD3F5'};font-weight:${isSelected ? '600' : '400'};"><span class="truncate">${labelText}</span><svg id="antigravity-quick-lang-check-${l}" class="w-3.5 h-3.5 shrink-0 ml-auto pointer-events-none" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A0A3F6" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="display:${isSelected ? 'flex' : 'none'};flex-shrink:0;"><polyline points="20 6 9 17 4 12"></polyline></svg></div>`;
     }).join('');
 
     for (const l of LANG_ORDER) {
@@ -1431,9 +1436,9 @@
       pill.setAttribute('role', 'button');
       pill.setAttribute('tabindex', '0');
       pill.setAttribute('translate', 'no');
-      pill.className = 'flex items-center whitespace-nowrap cursor-pointer text-[11px] font-medium h-6 pl-2.5 pr-2 rounded-full select-none notranslate';
-      pill.style.cssText = 'display:inline-flex;align-items:center;gap:3px;height:24px;padding:0 8px 0 10px;border-radius:9999px;background:#A0A3F6;color:#0B0B0E;font-size:11px;font-weight:600;line-height:1;white-space:nowrap;flex-shrink:0;cursor:pointer;app-region:no-drag;-webkit-app-region:no-drag;margin-right:6px;z-index:101;transition:opacity 0.15s ease;';
-      pill.innerHTML = `<span id="antigravity-enhancer-update-label">${h.updateAvailablePill}</span><span class="flex items-center" style="display:inline-flex;align-items:center;margin-left:2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span>`;
+      pill.className = 'flex items-center whitespace-nowrap cursor-pointer text-[11px] font-medium h-6 pl-2 pr-2 rounded-md select-none notranslate';
+      pill.style.cssText = 'display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 8px;border-radius:6px;background:#A0A3F6;color:#0B0B0E;font-size:11px;font-weight:600;line-height:1;white-space:nowrap;flex-shrink:0;cursor:pointer;app-region:no-drag;-webkit-app-region:no-drag;margin-right:4px;z-index:101;transition:opacity 150ms cubic-bezier(0.22, 1, 0.36, 1);';
+      pill.innerHTML = `<span id="antigravity-enhancer-update-label">${h.updateAvailablePill}</span><span class="flex items-center" style="display:inline-flex;align-items:center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span>`;
       pill.onmouseenter = () => { pill.style.opacity = '0.9'; };
       pill.onmouseleave = () => { pill.style.opacity = '1'; };
       pill.onclick = (e) => {
@@ -1496,7 +1501,7 @@
       tag.id = 'antigravity-enhanced-tag';
       tag.className = 'notranslate';
       tag.setAttribute('translate', 'no');
-      tag.style.cssText = 'color:#A0A3F6;font-weight:600;margin-left:0;letter-spacing:-0.01em;';
+      tag.style.cssText = 'color:#A0A3F6;font-weight:600;margin-left:0;';
       tag.style.color = '#A0A3F6';
       tag.textContent = 'Enhanced';
       agyMenuBtn.appendChild(tag);
@@ -1594,8 +1599,8 @@
       quickLangBtn.setAttribute('aria-label', 'Quick switch language');
       const langCode = (activeLanguage || 'ko').toUpperCase();
       quickLangBtn.title = `언어 선택 / Select Language (${langCode}) - Alt+Shift+L`;
-      quickLangBtn.style.cssText = 'display:inline-flex;align-items:center;justify-content:center;gap:4px;height:24px;padding:2px 7px;border-radius:6px;font-size:11px;font-weight:600;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;letter-spacing:0.3px;line-height:1;background:rgba(128,128,128,0.12);border:1px solid rgba(128,128,128,0.22);color:inherit;cursor:pointer;user-select:none;app-region:no-drag;-webkit-app-region:no-drag;outline:none;transition:background 0.15s ease,border-color 0.15s ease,transform 0.1s ease;margin-right:6px;white-space:nowrap;flex-shrink:0;z-index:101;';
-      quickLangBtn.innerHTML = `<svg class="shrink-0 pointer-events-none" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.85;"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg><span id="antigravity-quick-lang-label" class="pointer-events-none" style="font-weight:600;font-size:11px;line-height:1;">${langCode}</span><svg class="shrink-0 pointer-events-none" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.65;margin-left:1px;"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+      quickLangBtn.style.cssText = 'display:inline-flex;align-items:center;justify-content:center;gap:4px;height:24px;padding:0 8px;border-radius:6px;font-size:11px;font-weight:500;font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable",Pretendard,"Segoe UI",sans-serif;line-height:1;background:#0B0B0E;border:1px solid rgba(202,211,245,0.12);color:#CAD3F5;cursor:pointer;user-select:none;app-region:no-drag;-webkit-app-region:no-drag;outline:none;transition:background-color 150ms cubic-bezier(0.22, 1, 0.36, 1),border-color 150ms cubic-bezier(0.22, 1, 0.36, 1);margin-right:4px;white-space:nowrap;flex-shrink:0;z-index:101;';
+      quickLangBtn.innerHTML = `<svg class="shrink-0 pointer-events-none" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="color:#9DA7C7;"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg><span id="antigravity-quick-lang-label" class="pointer-events-none" style="font-weight:600;font-size:11px;line-height:1;">${langCode}</span><svg class="shrink-0 pointer-events-none" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="color:#6E7794;"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
       quickLangBtn.onclick = (e) => { e.stopPropagation(); e.preventDefault(); toggleQuickLangMenu(quickLangBtn); };
     } else {
       const lbl = quickLangBtn.querySelector('#antigravity-quick-lang-label');
@@ -1802,11 +1807,10 @@
       }
 
       function getStatusColor(f) {
-        if (f === undefined || f === null || isNaN(f)) return '#8A93B2';
+        if (f === undefined || f === null || isNaN(f)) return '#6E7794';
         if (f >= 0.5) return '#CAD3F5';
         if (f >= 0.2) return '#A0A3F6';
-        if (f >= 0.1) return '#f87171';
-        return '#ef4444';
+        return '#E56B6F';
       }
 
       async function fetchQuotaData(force = false) {
@@ -1931,8 +1935,8 @@
 
       function renderBucketHtml(title, pct, ts, qs) {
         if (pct === null || pct === undefined) return '';
-        const barColor = pct < 20 ? '#f87171' : '#A0A3F6';
-        return `<article class="bucket-row" style="margin-top:6px;"><p style="margin:0 0 3px;display:flex;justify-content:space-between;font-size:11px;"><span style="color:#CAD3F5;opacity:0.9;">${title}</span><small class="bucket-timer" ${ts ? `data-target-ts="${ts}"` : ''} style="color:#CAD3F5;opacity:0.65;font-size:10.5px;font-variant-numeric:tabular-nums;">${ts ? formatCountdown(ts) : qs.checking}</small></p><footer style="display:flex;align-items:center;gap:8px;"><div class="progress-bar-bg" style="flex:1;height:5px;border-radius:9999px;background:rgba(202,211,245,0.12);overflow:hidden;"><span class="progress-bar-fill" style="display:block;width:${Math.max(0, Math.min(100, pct))}%;height:100%;background:${barColor};border-radius:9999px;"></span></div><b style="font-size:11px;font-weight:700;color:${pct < 20 ? '#f87171' : '#CAD3F5'};min-width:32px;text-align:right;">${pct}%</b></footer></article>`;
+        const barColor = pct < 20 ? '#E56B6F' : '#A0A3F6';
+        return `<article class="bucket-row" style="margin-top:8px;"><p style="margin:0 0 4px;display:flex;justify-content:space-between;font-size:11px;"><span style="color:#9DA7C7;">${title}</span><small class="bucket-timer" ${ts ? `data-target-ts="${ts}"` : ''} style="color:#6E7794;font-size:10.5px;font-variant-numeric:tabular-nums;">${ts ? formatCountdown(ts) : qs.checking}</small></p><footer style="display:flex;align-items:center;gap:8px;"><div class="progress-bar-bg" style="flex:1;height:4px;border-radius:9999px;background:rgba(202,211,245,0.1);overflow:hidden;"><span class="progress-bar-fill" style="display:block;width:${Math.max(0, Math.min(100, pct))}%;height:100%;background:${barColor};border-radius:9999px;"></span></div><b style="font-size:11px;font-weight:600;font-variant-numeric:tabular-nums;color:${pct < 20 ? '#E56B6F' : '#CAD3F5'};min-width:32px;text-align:right;">${pct}%</b></footer></article>`;
       }
 
       function showComposerQuotaHoverCard(anchorEl, groupKey, parsed) {
@@ -1957,14 +1961,14 @@
           ? `bottom:${Math.max(12, winH - rect.top + 8)}px;top:auto;`
           : `top:${Math.max(12, (rect.bottom || 32) + 8)}px;bottom:auto;`;
 
-        card.style.cssText = `position:fixed;${vertCss}left:${leftPx}px;width:280px;padding:10px 12px;border-radius:12px;background:#0B0B0E;border:1px solid rgba(202,211,245,0.14);box-shadow:0 14px 34px rgba(0,0,0,0.6);color:#CAD3F5;font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable",Pretendard,"Segoe UI",sans-serif;font-size:12px;z-index:99998;pointer-events:none;user-select:none;app-region:no-drag;-webkit-app-region:no-drag;`;
+        card.style.cssText = `position:fixed;${vertCss}left:${leftPx}px;width:280px;padding:12px;border-radius:12px;background:#111217;border:1px solid rgba(202,211,245,0.1);box-shadow:0 12px 28px rgba(0,0,0,0.45);color:#CAD3F5;font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable",Pretendard,"Segoe UI",sans-serif;font-size:12px;z-index:99998;pointer-events:none;user-select:none;app-region:no-drag;-webkit-app-region:no-drag;`;
 
         const vals = [grp.h5, grp.weekly].filter(v => typeof v === 'number');
         const isLow = vals.length > 0 && Math.min(...vals) < 20;
         const rows = renderBucketHtml(qs.h5Full, grp.h5, grp.h5TargetTs, qs) + renderBucketHtml(qs.weeklyFull, grp.weekly, grp.weeklyTargetTs, qs);
         const modelsTxt = (grp.models || []).join(', ');
 
-        card.innerHTML = `<header style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding-bottom:6px;border-bottom:1px solid rgba(202,211,245,0.1);"><div style="display:inline-flex;align-items:center;gap:6px;flex-shrink:0;white-space:nowrap;"><strong style="font-weight:600;font-size:12.5px;white-space:nowrap;color:${isLow ? '#f87171' : (grp.id === 'argon' ? '#A0A3F6' : '#CAD3F5')};">${grp.label}</strong>${(grp.id === currentActiveGroup || grp.id === groupKey) ? `<em style="font-style:normal;font-size:9.5px;font-weight:700;padding:1px 5px;border-radius:4px;white-space:nowrap;flex-shrink:0;line-height:1.2;background:rgba(160,163,246,0.14);color:#A0A3F6;border:1px solid rgba(160,163,246,0.4);">${qs.activeTag}</em>` : ''}</div><span style="font-size:10.5px;color:#CAD3F5;opacity:0.6;flex:1;min-width:0;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${modelsTxt}</span></header><section>${rows || '<p style="margin:6px 0 0;font-size:11px;color:#CAD3F5;opacity:0.65;">--</p>'}</section>`;
+        card.innerHTML = `<header style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding-bottom:8px;border-bottom:1px solid rgba(202,211,245,0.08);"><div style="display:inline-flex;align-items:center;gap:6px;flex-shrink:0;white-space:nowrap;"><strong style="font-weight:600;font-size:12.5px;white-space:nowrap;color:${isLow ? '#E56B6F' : (grp.id === 'argon' ? '#A0A3F6' : '#CAD3F5')};">${grp.label}</strong>${(grp.id === currentActiveGroup || grp.id === groupKey) ? `<em style="font-style:normal;font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;white-space:nowrap;flex-shrink:0;line-height:1.2;background:rgba(160,163,246,0.14);color:#A0A3F6;border:1px solid rgba(160,163,246,0.32);">${qs.activeTag}</em>` : ''}</div><span style="font-size:11px;color:#6E7794;flex:1;min-width:0;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${modelsTxt}</span></header><section>${rows || '<p style="margin:8px 0 0;font-size:11px;color:#6E7794;">--</p>'}</section>`;
 
         (document.body || document.documentElement).appendChild(card);
         startCountdownTicker();
@@ -1992,17 +1996,17 @@
           ? `bottom:${Math.max(12, winH - rect.top + 8)}px;top:auto;left:${Math.max(12, Math.min(winW - 330, rect.left || 12))}px;right:auto;`
           : `top:${Math.max(32, (rect.bottom || 32) + 6)}px;bottom:auto;right:${Math.max(12, winW - (rect.right || 1180))}px;left:auto;`;
 
-        pop.style.cssText = `position:fixed;${posCss}width:315px;padding:12px;border-radius:12px;background:#0B0B0E;border:1px solid rgba(202,211,245,0.14);box-shadow:0 16px 36px rgba(0,0,0,0.6);color:#CAD3F5;font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable",Pretendard,"Segoe UI",sans-serif;font-size:12px;z-index:99999;user-select:none;app-region:no-drag;-webkit-app-region:no-drag;`;
+        pop.style.cssText = `position:fixed;${posCss}width:320px;padding:12px;border-radius:12px;background:#111217;border:1px solid rgba(202,211,245,0.1);box-shadow:0 12px 32px rgba(0,0,0,0.48);color:#CAD3F5;font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable",Pretendard,"Segoe UI",sans-serif;font-size:12px;z-index:99999;user-select:none;app-region:no-drag;-webkit-app-region:no-drag;`;
 
         const cardsHtml = groupsList.map(g => {
           const rows = renderBucketHtml(qs.h5Full, g.h5, g.h5TargetTs, qs) + renderBucketHtml(qs.weeklyFull, g.weekly, g.weeklyTargetTs, qs);
           const vals = [g.h5, g.weekly].filter(v => typeof v === 'number');
           const isLow = vals.length > 0 && Math.min(...vals) < 20;
-          const borderStyle = isLow ? 'background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.38);' : 'background:rgba(202,211,245,0.03);border:1px solid rgba(202,211,245,0.1);';
-          return `<section class="group-card rounded-lg p-2.5 mb-2" style="${borderStyle}border-radius:8px;padding:8px 10px;margin-bottom:8px;"><header style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><div style="display:inline-flex;align-items:center;gap:5px;flex-shrink:0;white-space:nowrap;"><strong style="font-weight:600;font-size:12px;white-space:nowrap;color:${isLow ? '#f87171' : g.color};">${g.label}</strong>${g.id === currentActiveGroup ? `<em style="font-style:normal;font-size:9.5px;font-weight:700;padding:1px 5px;border-radius:4px;white-space:nowrap;flex-shrink:0;line-height:1.2;background:rgba(160,163,246,0.14);color:#A0A3F6;border:1px solid rgba(160,163,246,0.4);">${qs.activeTag}</em>` : ''}</div><span style="font-size:10.5px;color:#CAD3F5;opacity:0.6;flex:1;min-width:0;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${(g.models || []).join(', ')}</span></header><main>${rows || '<p style="margin:4px 0 0;font-size:11px;color:#CAD3F5;opacity:0.65;">--</p>'}</main></section>`;
+          const borderStyle = isLow ? 'background:rgba(229,107,111,0.08);border:1px solid rgba(229,107,111,0.32);' : 'background:#161820;border:1px solid rgba(202,211,245,0.08);';
+          return `<section class="group-card rounded-lg p-2 mb-2" style="${borderStyle}border-radius:8px;padding:8px 12px;margin-bottom:8px;"><header style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><div style="display:inline-flex;align-items:center;gap:6px;flex-shrink:0;white-space:nowrap;"><strong style="font-weight:600;font-size:12px;white-space:nowrap;color:${isLow ? '#E56B6F' : g.color};">${g.label}</strong>${g.id === currentActiveGroup ? `<em style="font-style:normal;font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;white-space:nowrap;flex-shrink:0;line-height:1.2;background:rgba(160,163,246,0.14);color:#A0A3F6;border:1px solid rgba(160,163,246,0.32);">${qs.activeTag}</em>` : ''}</div><span style="font-size:11px;color:#6E7794;flex:1;min-width:0;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${(g.models || []).join(', ')}</span></header><main>${rows || '<p style="margin:4px 0 0;font-size:11px;color:#6E7794;">--</p>'}</main></section>`;
         }).join('');
 
-        pop.innerHTML = `<header style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(202,211,245,0.1);"><span style="font-weight:600;font-size:12.5px;color:#CAD3F5;">${qs.title}</span><button id="antigravity-popover-refresh" title="${qs.refresh}" style="background:none;border:none;color:#CAD3F5;opacity:0.7;cursor:pointer;padding:0;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg></button></header><main>${cardsHtml}</main><footer style="margin-top:2px;padding-top:6px;text-align:right;border-top:1px solid rgba(202,211,245,0.1);"><button id="antigravity-open-models-settings" style="background:none;border:none;color:#A0A3F6;font-size:11px;font-weight:500;cursor:pointer;">${qs.openSettings}</button></footer>`;
+        pop.innerHTML = `<header style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid rgba(202,211,245,0.08);"><span style="font-weight:600;font-size:12.5px;color:#CAD3F5;">${qs.title}</span><button id="antigravity-popover-refresh" title="${qs.refresh}" style="background:none;border:none;color:#9DA7C7;cursor:pointer;padding:0;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg></button></header><main>${cardsHtml}</main><footer style="margin-top:4px;padding-top:8px;text-align:right;border-top:1px solid rgba(202,211,245,0.08);"><button id="antigravity-open-models-settings" style="background:none;border:none;color:#A0A3F6;font-size:11.5px;font-weight:500;cursor:pointer;">${qs.openSettings}</button></footer>`;
         (document.body || document.documentElement).appendChild(pop);
         startCountdownTicker();
 
@@ -2055,26 +2059,27 @@
         const isMac = navigator.platform && navigator.platform.toUpperCase().indexOf('MAC') >= 0;
         const rightMargin = isMenuBar ? (isMac ? '20px' : '140px') : '8px';
         container.className = 'agy-quota-capsule';
-        container.style.cssText = `display:${isQuotaWidgetVisible() ? 'inline-flex' : 'none'};align-items:center;gap:5px;padding:2px 7px;height:24px;margin-left:${isMenuBar ? 'auto' : '0'};margin-right:${rightMargin};background:#0B0B0E;border:1px solid rgba(202,211,245,0.18);border-radius:6px;color:#CAD3F5;app-region:no-drag;-webkit-app-region:no-drag;user-select:none;font-size:11px;font-weight:500;line-height:1;cursor:pointer;z-index:100;`;
+        container.style.cssText = `display:${isQuotaWidgetVisible() ? 'inline-flex' : 'none'};align-items:center;gap:4px;padding:0 8px;height:24px;margin-left:${isMenuBar ? 'auto' : '0'};margin-right:${rightMargin};background:#0B0B0E;border:1px solid rgba(202,211,245,0.12);border-radius:6px;color:#CAD3F5;app-region:no-drag;-webkit-app-region:no-drag;user-select:none;font-size:11px;font-weight:500;font-variant-numeric:tabular-nums;line-height:1;cursor:pointer;z-index:100;transition:border-color 150ms cubic-bezier(0.22, 1, 0.36, 1);`;
 
         const renderDual = (g) => {
           const hasH5 = (g.h5 !== null && g.h5 !== undefined);
           const hasWk = (g.weekly !== null && g.weekly !== undefined);
-          if (hasH5 && hasWk) return `<b style="color:${g.h5 < 20 ? '#f87171' : getStatusColor(g.h5 / 100)};">${g.h5}%</b><span style="opacity:0.38;font-size:9.5px;">/</span><b style="color:${g.weekly < 20 ? '#f87171' : getStatusColor(g.weekly / 100)};">${qs.weekly}${g.weekly}%</b>`;
-          if (hasH5) return `<b style="color:${g.h5 < 20 ? '#f87171' : getStatusColor(g.h5 / 100)};">${g.h5}%</b>`;
-          if (hasWk) return `<b style="color:${g.weekly < 20 ? '#f87171' : getStatusColor(g.weekly / 100)};">${qs.weekly}${g.weekly}%</b>`;
-          return `<b style="color:#8A93B2;">--</b>`;
+          if (hasH5 && hasWk) return `<b style="font-weight:600;color:${g.h5 < 20 ? '#E56B6F' : getStatusColor(g.h5 / 100)};">${g.h5}%</b><span style="color:#6E7794;font-size:10px;">/</span><b style="font-weight:600;color:${g.weekly < 20 ? '#E56B6F' : getStatusColor(g.weekly / 100)};">${qs.weekly}${g.weekly}%</b>`;
+          if (hasH5) return `<b style="font-weight:600;color:${g.h5 < 20 ? '#E56B6F' : getStatusColor(g.h5 / 100)};">${g.h5}%</b>`;
+          if (hasWk) return `<b style="font-weight:600;color:${g.weekly < 20 ? '#E56B6F' : getStatusColor(g.weekly / 100)};">${qs.weekly}${g.weekly}%</b>`;
+          return `<b style="font-weight:500;color:#6E7794;">--</b>`;
         };
         const renderBadge = (id, label, color, g, gid) => {
           const active = (gid === currentActiveGroup);
           const vals = [g.h5, g.weekly].filter(v => typeof v === 'number');
           const isLow = vals.length > 0 && Math.min(...vals) < 20;
-          const borderCss = active ? 'border:1px solid rgba(160,163,246,0.5);background:rgba(160,163,246,0.14);' : (isLow ? 'background:rgba(239,68,68,0.14);border:1px solid rgba(239,68,68,0.4);' : 'border:1px solid transparent;');
+          const borderCss = active ? 'border:1px solid rgba(160,163,246,0.38);background:rgba(160,163,246,0.12);' : (isLow ? 'background:rgba(229,107,111,0.12);border:1px solid rgba(229,107,111,0.32);' : 'border:1px solid transparent;');
           const dot = active ? '<span style="width:4px;height:4px;border-radius:50%;background:#A0A3F6;display:inline-block;"></span>' : '';
-          return `<div id="${id}" style="display:inline-flex;align-items:center;gap:3px;padding:2px 5px;border-radius:5px;${borderCss}">${dot}<span style="color:${isLow ? '#fca5a5' : (active ? '#A0A3F6' : color)};font-weight:${active ? '700' : '600'};">${label}</span>${renderDual(g)}</div>`;
+          return `<div id="${id}" style="display:inline-flex;align-items:center;gap:4px;padding:2px 6px;border-radius:4px;${borderCss}">${dot}<span style="color:${isLow ? '#E56B6F' : (active ? '#A0A3F6' : color)};font-weight:${active ? '600' : '500'};">${label}</span>${renderDual(g)}</div>`;
         };
 
-        container.innerHTML = `${renderBadge('antigravity-badge-argon', 'Argon', '#A0A3F6', argon, 'argon')}<span style="opacity:0.22;font-size:10px;">•</span>${renderBadge('antigravity-badge-gemini', 'Gemini', '#CAD3F5', gemini, 'gemini')}<span style="opacity:0.22;font-size:10px;">•</span>${renderBadge('antigravity-badge-other', qs.otherLabel || 'Other', '#8A93B2', other, 'other')}<button id="antigravity-quota-refresh-btn" title="${qs.refresh}" style="background:none;border:none;color:inherit;opacity:0.72;cursor:pointer;padding:0;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg></button>`;
+        const dividerHtml = '<span aria-hidden="true" style="width:1px;height:12px;background:rgba(202,211,245,0.1);display:inline-block;flex-shrink:0;"></span>';
+        container.innerHTML = `${renderBadge('antigravity-badge-argon', 'Argon', '#A0A3F6', argon, 'argon')}${dividerHtml}${renderBadge('antigravity-badge-gemini', 'Gemini', '#CAD3F5', gemini, 'gemini')}${dividerHtml}${renderBadge('antigravity-badge-other', qs.otherLabel || 'Other', '#9DA7C7', other, 'other')}<button id="antigravity-quota-refresh-btn" title="${qs.refresh}" style="background:none;border:none;color:#9DA7C7;cursor:pointer;padding:0;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg></button>`;
         container.onclick = (e) => { e.stopPropagation(); toggleQuotaPopover(container, parsed); };
         const refBtn = container.querySelector('#antigravity-quota-refresh-btn');
         if (refBtn) refBtn.onclick = (e) => { e.stopPropagation(); updateQuotaWidget(true); };
@@ -2111,7 +2116,7 @@
               inlineBadge = document.createElement('span');
               inlineBadge.className = 'antigravity-inline-model-quota notranslate';
               inlineBadge.setAttribute('translate', 'no');
-              inlineBadge.style.cssText = 'display:inline-flex;align-items:center;gap:3.5px;height:19px;padding:0 7px;margin-left:5px;margin-right:2px;border-radius:9999px;font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable",Pretendard,"Segoe UI",sans-serif;font-size:11px;font-weight:700;line-height:1;cursor:pointer;user-select:none;white-space:nowrap;flex-shrink:0;vertical-align:middle;';
+              inlineBadge.style.cssText = 'display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 8px;margin-left:4px;margin-right:2px;border-radius:6px;border:1px solid rgba(202,211,245,0.12);font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable",Pretendard,"Segoe UI",sans-serif;font-size:11px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1;cursor:pointer;user-select:none;white-space:nowrap;flex-shrink:0;vertical-align:middle;';
               if (trigger.lastChild) trigger.insertBefore(inlineBadge, trigger.lastChild);
               else trigger.appendChild(inlineBadge);
             }
@@ -2131,22 +2136,22 @@
             const brandColor = grp?.color || '#A0A3F6';
             const hasH5 = (grp && grp.h5 !== null && grp.h5 !== undefined);
             const hasWk = (grp && grp.weekly !== null && grp.weekly !== undefined);
-            let valHtml = '<span style="color:#8A93B2;font-size:10px;">--</span>';
+            let valHtml = '<span style="color:#6E7794;font-size:10px;">--</span>';
             let isLow = false;
             if (hasH5 && hasWk) {
-              valHtml = `<span style="color:${grp.h5 < 20 ? '#f87171' : getStatusColor(grp.h5 / 100)};">${grp.h5}%</span><span style="opacity:0.35;margin:0 1.5px;">/</span><span style="color:${grp.weekly < 20 ? '#f87171' : getStatusColor(grp.weekly / 100)};">${qs.weekly}${grp.weekly}%</span>`;
+              valHtml = `<span style="color:${grp.h5 < 20 ? '#E56B6F' : getStatusColor(grp.h5 / 100)};">${grp.h5}%</span><span style="color:#6E7794;margin:0 2px;">/</span><span style="color:${grp.weekly < 20 ? '#E56B6F' : getStatusColor(grp.weekly / 100)};">${qs.weekly}${grp.weekly}%</span>`;
               isLow = grp.h5 < 20 || grp.weekly < 20;
             } else if (hasH5) {
-              valHtml = `<span style="color:${grp.h5 < 20 ? '#f87171' : getStatusColor(grp.h5 / 100)};">${grp.h5}%</span>`;
+              valHtml = `<span style="color:${grp.h5 < 20 ? '#E56B6F' : getStatusColor(grp.h5 / 100)};">${grp.h5}%</span>`;
               isLow = grp.h5 < 20;
             } else if (hasWk) {
-              valHtml = `<span style="color:${grp.weekly < 20 ? '#f87171' : getStatusColor(grp.weekly / 100)};">${qs.weekly}${grp.weekly}%</span>`;
+              valHtml = `<span style="color:${grp.weekly < 20 ? '#E56B6F' : getStatusColor(grp.weekly / 100)};">${qs.weekly}${grp.weekly}%</span>`;
               isLow = grp.weekly < 20;
             }
-            inlineBadge.style.borderColor = isLow ? 'rgba(239,68,68,0.45)' : 'rgba(160,163,246,0.35)';
-            inlineBadge.style.background = isLow ? 'rgba(239,68,68,0.16)' : '#0B0B0E';
+            inlineBadge.style.borderColor = isLow ? 'rgba(229,107,111,0.38)' : 'rgba(160,163,246,0.28)';
+            inlineBadge.style.background = isLow ? 'rgba(229,107,111,0.12)' : '#0B0B0E';
             inlineBadge.style.color = '#CAD3F5';
-            inlineBadge.innerHTML = `<span style="width:5px;height:5px;border-radius:50%;background:${isLow ? '#f87171' : brandColor};display:inline-block;"></span>${valHtml}`;
+            inlineBadge.innerHTML = `<span style="width:4px;height:4px;border-radius:50%;background:${isLow ? '#E56B6F' : brandColor};display:inline-block;"></span>${valHtml}`;
           }
         } catch (_) {}
       }

@@ -33,7 +33,7 @@ jobs:
         shell: pwsh
         run: |
           $tag = "${{ github.ref_name }}"
-          $ver = if ($tag -match '^v(\d+\.\d+\.\d+)$') { $Matches[1] } else { "3.3.2" }
+          $ver = if ($tag -match '^v(\d+\.\d+\.\d+)$') { $Matches[1] } else { "3.3.3" }
           powershell -NoProfile -ExecutionPolicy Bypass -File .\build_exe_installer.ps1 -Version $ver
 
       - name: Run v3 architecture E2E suite
