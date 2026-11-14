@@ -1,5 +1,5 @@
 ﻿param(
-    [string]$Version = "3.4.0",
+    [string]$Version = "3.4.1",
     [string]$OutputExe = "",
     [string]$SignCertThumbprint = ""
 )
@@ -1193,7 +1193,8 @@ namespace AntigravityEnhancer
                         "renderer-enhancer.js",
                         "gsap-core.js",
                         "dictionaries.json",
-                        "asar-patcher.js"
+                        "asar-patcher.js",
+                        "auto-repatch.js"
                     };
                     foreach (string mf in moduleFiles)
                     {
@@ -1202,6 +1203,8 @@ namespace AntigravityEnhancer
 
                     worker.ReportProgress(60, T("ProgAsar"));
                     AsarMicroPatcher.EnsureBootstrapped(asarPath, false);
+
+                    RegisterAutoRepatchTask(detectedAppDir, enhancerDir);
 
                     using (var key = Registry.CurrentUser.CreateSubKey(@"Software\AntigravityEnhancer"))
                     {
@@ -1222,6 +1225,8 @@ namespace AntigravityEnhancer
                 else if (action == "Restore")
                 {
                     worker.ReportProgress(35, T("ProgRestoring"));
+                    UnregisterAutoRepatchTask();
+                    try { if (Directory.Exists(enhancerDir)) File.WriteAllText(Path.Combine(enhancerDir, "disabled.flag"), "restored-vanilla\n"); } catch { }
                     AsarMicroPatcher.UnpatchVanilla(asarPath);
 
                     if (Directory.Exists(legacyLauncherDir))
@@ -1336,6 +1341,44 @@ namespace AntigravityEnhancer
                     try { p.Kill(); } catch { }
                 }
             }
+        }
+
+        private void RegisterAutoRepatchTask(string appDir, string enhancerDir)
+        {
+            try
+            {
+                string exePath = Path.Combine(appDir, "Antigravity.exe");
+                string scriptPath = Path.Combine(enhancerDir, "auto-repatch.js");
+                string psCmd = "$env:ELECTRON_RUN_AS_NODE='1'; if (-not (Get-Process Antigravity -ErrorAction SilentlyContinue)) { & '" + exePath.Replace("'", "''") + "' '" + scriptPath.Replace("'", "''") + "' }";
+                string tr = "powershell.exe -NoProfile -NonInteractive -WindowStyle Hidden -Command \"" + psCmd + "\"";
+                var psi = new ProcessStartInfo("schtasks.exe", "/Create /F /TN \"AntigravityEnhancerAutoRepatch\" /SC MINUTE /MO 15 /RL LIMITED /TR \"" + tr.Replace("\"", "\\\"") + "\"")
+                {
+                    CreateNoWindow = true,
+                    UseShellExecute = false
+                };
+                using (Process p = Process.Start(psi))
+                {
+                    if (p != null) p.WaitForExit(5000);
+                }
+            }
+            catch { }
+        }
+
+        private void UnregisterAutoRepatchTask()
+        {
+            try
+            {
+                var psi = new ProcessStartInfo("schtasks.exe", "/Delete /TN \"AntigravityEnhancerAutoRepatch\" /F")
+                {
+                    CreateNoWindow = true,
+                    UseShellExecute = false
+                };
+                using (Process p = Process.Start(psi))
+                {
+                    if (p != null) p.WaitForExit(5000);
+                }
+            }
+            catch { }
         }
 
         private void ExtractEmbeddedGzip(string resourceName, string outputPath)
@@ -1462,7 +1505,7 @@ try {
     Compress-ToGzipFile -srcFile $icoPath -dstGz $iconGz
     $resourceFlags += "/resource:$iconGz,app_icon.ico.gz"
 
-    $moduleNames = @("manifest.json", "main-enhancer.js", "renderer-enhancer.js", "gsap-core.js", "dictionaries.json", "asar-patcher.js")
+    $moduleNames = @("manifest.json", "main-enhancer.js", "renderer-enhancer.js", "gsap-core.js", "dictionaries.json", "asar-patcher.js", "auto-repatch.js")
     foreach ($mod in $moduleNames) {
         $srcMod = Join-Path $enhancerSrcDir $mod
         $dstGz = Join-Path $buildTmp ("enhancer_$mod.gz")

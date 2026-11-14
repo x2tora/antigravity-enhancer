@@ -7,7 +7,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
-const VERSION = '3.4.0';
+const VERSION = '3.4.1';
 const REPO = 'x2tora/antigravity-enhancer';
 const enhancerDir = path.join(__dirname, 'enhancer');
 
@@ -16,7 +16,8 @@ const trackedFiles = [
   { name: 'asar-patcher.js', restartRequired: true },
   { name: 'renderer-enhancer.js', restartRequired: false },
   { name: 'gsap-core.js', restartRequired: false },
-  { name: 'dictionaries.json', restartRequired: false }
+  { name: 'dictionaries.json', restartRequired: false },
+  { name: 'auto-repatch.js', restartRequired: false }
 ];
 
 const files = {};

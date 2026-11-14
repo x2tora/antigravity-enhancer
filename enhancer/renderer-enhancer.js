@@ -1,5 +1,5 @@
 /**
- * Antigravity Enhancer v3.4.0 - Modular Renderer Enhancer Engine
+ * Antigravity Enhancer v3.4.1 - Modular Renderer Enhancer Engine
  * Features: 9-Language Zero-Restart i18n, GSAP v3.15.1 Zero-Bounce Motion,
  *           AI Model Quota HUD & Composer Inline Hover Card (2.32.1 Hydrogen/Argon/Gemini/Other),
  *           Native Title-Menu Patch Integration & In-App Updater (x2tora/antigravity-enhancer)
@@ -11,7 +11,7 @@
   const ipc = electron_1 ? electron_1.ipcRenderer : null;
   const payload = (typeof __ENHANCER_PAYLOAD__ !== 'undefined' && __ENHANCER_PAYLOAD__) ? __ENHANCER_PAYLOAD__ : {};
   const ENHANCER_REPO = payload.repo || 'x2tora/antigravity-enhancer';
-  const ENHANCER_CURRENT_VERSION = payload.version || '3.4.0';
+  const ENHANCER_CURRENT_VERSION = payload.version || '3.4.1';
 
   // ---------------------------------------------------------------------------
   // 1. Install GSAP Core into Preload World

@@ -1,5 +1,5 @@
 /**
- * Antigravity Enhancer v3.4.0 - Main Process Bridge, Persistence & Secure In-App Updater
+ * Antigravity Enhancer v3.4.1 - Main Process Bridge, Persistence & Secure In-App Updater
  * Source Repo: https://github.com/x2tora/antigravity-enhancer
  */
 'use strict';
@@ -27,7 +27,8 @@ const ALLOWED_UPDATE_FILES = new Set([
   'renderer-enhancer.js',
   'gsap-core.js',
   'dictionaries.json',
-  'asar-patcher.js'
+  'asar-patcher.js',
+  'auto-repatch.js'
 ]);
 
 let electronMod = null;
@@ -365,7 +366,7 @@ function getFullStatus() {
   } catch (_) {}
 
   return {
-    enhancerVersion: manifest.version || '3.4.0',
+    enhancerVersion: manifest.version || '3.4.1',
     appVersion: (el && el.app && el.app.getVersion) ? el.app.getVersion() : 'unknown',
     repo: ENHANCER_REPO,
     enhancerDir,
@@ -492,7 +493,7 @@ async function checkRemoteUpdate() {
 
 async function applyInAppUpdate(refBranch = 'main') {
   const local = getLocalManifest();
-  const prevVersion = local.version || '3.4.0';
+  const prevVersion = local.version || '3.4.1';
 
   broadcastEvent('enhancer:update-progress', { phase: 'manifest', percent: 8, message: 'Fetching signed manifest...' });
   const manifestUrl = `https://raw.githubusercontent.com/${ENHANCER_REPO}/${encodeURIComponent(refBranch)}/enhancer/manifest.json?t=${Date.now()}`;
@@ -660,6 +661,7 @@ function registerIpcHandlers() {
       const asarPath = getAppAsarPath();
       const patcher = require(path.join(enhancerDir, 'asar-patcher.js'));
       patcher.unpatchAsar(asarPath);
+      try { fs.writeFileSync(path.join(enhancerDir, 'disabled.flag'), 'restored-vanilla\n', 'utf8'); } catch (_) {}
       setTimeout(() => {
         try {
           app.relaunch();

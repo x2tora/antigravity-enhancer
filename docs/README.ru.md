@@ -4,10 +4,10 @@
 
 [English](../README.md) · [한국어](README.ko.md) · [日本語](README.ja.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · **Русский**
 
-[![Download Latest (v3.4.0)](https://img.shields.io/badge/Скачать_последнюю_версию-v3.4.0_(Windows_x64)-A0A3F6?style=for-the-badge&logo=windows&logoColor=0B0B0E)](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-Setup.exe)
-[![All Releases](https://img.shields.io/badge/Releases-v3.4.0-0B0B0E?style=for-the-badge&labelColor=0B0B0E&color=CAD3F5)](https://github.com/x2tora/antigravity-enhancer/releases/latest)
+[![Download Latest (v3.4.1)](https://img.shields.io/badge/Скачать_последнюю_версию-v3.4.1_(Windows_x64)-A0A3F6?style=for-the-badge&logo=windows&logoColor=0B0B0E)](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-Setup.exe)
+[![All Releases](https://img.shields.io/badge/Releases-v3.4.1-0B0B0E?style=for-the-badge&labelColor=0B0B0E&color=CAD3F5)](https://github.com/x2tora/antigravity-enhancer/releases/latest)
 
-Прямые ссылки: [`Antigravity-Enhancer-Setup.exe`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-Setup.exe) · [`Antigravity-Enhancer-v3.4.0-Win.zip`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-v3.4.0-Win.zip) · [`SHA256SUMS.txt`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/SHA256SUMS.txt)
+Прямые ссылки: [`Antigravity-Enhancer-Setup.exe`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-Setup.exe) · [`Antigravity-Enhancer-v3.4.1-Win.zip`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-v3.4.1-Win.zip) · [`SHA256SUMS.txt`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/SHA256SUMS.txt)
 
 ---
 
@@ -34,7 +34,7 @@
 
 ### Портативный архив (`.zip`)
 
-1. Скачайте [`Antigravity-Enhancer-v3.4.0-Win.zip`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-v3.4.0-Win.zip) со страницы [Releases](https://github.com/x2tora/antigravity-enhancer/releases/latest).
+1. Скачайте [`Antigravity-Enhancer-v3.4.1-Win.zip`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-v3.4.1-Win.zip) со страницы [Releases](https://github.com/x2tora/antigravity-enhancer/releases/latest).
 2. Распакуйте архив и запустите `Antigravity-Enhancer-Setup.exe`.
 
 ---
@@ -46,7 +46,7 @@
 node .\generate_enhancer_manifest.js
 
 # Собрать Antigravity-Enhancer-Setup.exe, ZIP и SHA256SUMS.txt
-powershell -NoProfile -ExecutionPolicy Bypass -File .\build_exe_installer.ps1 -Version "3.4.0"
+powershell -NoProfile -ExecutionPolicy Bypass -File .\build_exe_installer.ps1 -Version "3.4.1"
 
 # Запустить E2E-тесты
 node .\tests\e2e\runner.js --summary -NoKill

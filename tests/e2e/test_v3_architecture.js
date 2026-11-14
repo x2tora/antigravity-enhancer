@@ -103,7 +103,7 @@ function createRendererHarness(initialLang = 'ko', seedDomFn = null) {
       invoked.push({ channel, arg });
       if (channel === 'enhancer:get-status') {
         return {
-          enhancerVersion: '3.4.0',
+          enhancerVersion: '3.4.1',
           appVersion: '2.32.1',
           asarBootstrapped: true
         };
@@ -113,8 +113,8 @@ function createRendererHarness(initialLang = 'ko', seedDomFn = null) {
           ok: true,
           hasUpdate: true,
           canApplyInApp: true,
-          currentVersion: '3.4.0',
-          remoteVersion: '3.4.0',
+          currentVersion: '3.4.1',
+          remoteVersion: '3.4.1',
           releaseNotes: 'English test update',
           releaseNotesI18n: {
             en: 'English test update',
@@ -136,7 +136,7 @@ function createRendererHarness(initialLang = 'ko', seedDomFn = null) {
 
   const payload = {
     disabled: false,
-    version: '3.4.0',
+    version: '3.4.1',
     repo: 'x2tora/antigravity-enhancer',
     code: rendererCode,
     gsapCode,
@@ -212,11 +212,11 @@ function createRendererHarness(initialLang = 'ko', seedDomFn = null) {
 // ============================================================================
 // F22: Modular Enhancer & Manifest Integrity
 // ============================================================================
-registerTest(1, 'F22', 'manifest.json v3.4.0 points to x2tora/antigravity-enhancer & matches SHA-256 digests', () => {
+registerTest(1, 'F22', 'manifest.json v3.4.1 points to x2tora/antigravity-enhancer & matches SHA-256 digests', () => {
   const manifestPath = path.join(ENHANCER_DIR, 'manifest.json');
   assert.ok(fs.existsSync(manifestPath), 'enhancer/manifest.json missing');
   const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-  assert.strictEqual(manifest.version, '3.4.0');
+  assert.strictEqual(manifest.version, '3.4.1');
   assert.strictEqual(manifest.repo, 'x2tora/antigravity-enhancer');
   assert.strictEqual(manifest.testedAppVersion, '2.32.1');
   assert.ok(manifest.releaseNotesI18n && typeof manifest.releaseNotesI18n === 'object', 'manifest.json must include releaseNotesI18n');
@@ -546,7 +546,7 @@ registerTest(3, 'F24', 'Native Antigravity Enhanced title menu integrates Patch 
   const patchVerOpt = menuSection.querySelector('#antigravity-menu-patch-version');
   const checkUpdatesOpt = menuSection.querySelector('#antigravity-menu-check-updates');
   const restoreOpt = menuSection.querySelector('#antigravity-menu-restore-vanilla');
-  assert.ok(patchVerOpt && patchVerOpt.textContent.includes('3.4.0'), 'Menu must display Patch Version 3.4.0');
+  assert.ok(patchVerOpt && patchVerOpt.textContent.includes('3.4.1'), 'Menu must display Patch Version 3.4.1');
   assert.ok(checkUpdatesOpt, 'Menu must include Check Patch Updates item');
   assert.ok(restoreOpt, 'Menu must include Restore Original item');
 
@@ -726,8 +726,8 @@ registerTest(1, 'F25', 'build_exe_installer.ps1 uses safe build hygiene, #0B0B0E
     assert.ok(fs.existsSync(path.join(ROOT_DIR, 'docs', `README.${l}.md`)), `docs/README.${l}.md must exist`);
   }
   assert.ok(fs.existsSync(path.join(ROOT_DIR, 'Antigravity-Enhancer-Setup.exe')));
-  assert.ok(fs.existsSync(path.join(ROOT_DIR, 'Antigravity-Enhancer-v3.4.0-Setup.exe')));
-  assert.ok(fs.existsSync(path.join(ROOT_DIR, 'Antigravity-Enhancer-v3.4.0-Win.zip')));
+  assert.ok(fs.existsSync(path.join(ROOT_DIR, 'Antigravity-Enhancer-v3.4.1-Setup.exe')));
+  assert.ok(fs.existsSync(path.join(ROOT_DIR, 'Antigravity-Enhancer-v3.4.1-Win.zip')));
   assert.ok(fs.existsSync(path.join(ROOT_DIR, 'SHA256SUMS.txt')));
 
   const sums = fs.readFileSync(path.join(ROOT_DIR, 'SHA256SUMS.txt'), 'utf8');
@@ -804,9 +804,9 @@ registerTest(4, 'F24', 'Main updater rejects SHA-256 tampering cleanly, atomical
     const fileUrl = 'https://raw.githubusercontent.com/x2tora/antigravity-enhancer/main/enhancer/renderer-enhancer.js';
 
     // 1. Tamper test: digest mismatch must abort BEFORE overwriting live enhancerDir
-    const v33Tampered = Buffer.from('/* v3.4.0 TAMPERED */', 'utf8');
+    const v33Tampered = Buffer.from('/* v3.4.1 TAMPERED */', 'utf8');
     remoteResponses.set(manifestUrl, JSON.stringify({
-      version: '3.4.0',
+      version: '3.4.1',
       files: { 'renderer-enhancer.js': { sha256: 'a'.repeat(64), size: v33Tampered.length } }
     }));
     remoteResponses.set(fileUrl, v33Tampered);
@@ -817,18 +817,18 @@ registerTest(4, 'F24', 'Main updater rejects SHA-256 tampering cleanly, atomical
     // 2. Valid atomic staging & dead rollback code removed
     assert.strictEqual(isolated.restoreFromBackupDir, undefined, 'Dead restoreFromBackupDir export must be removed');
     assert.strictEqual(isolated.getFullStatus().backup, undefined, 'Dead backup snapshot metadata must be removed from getFullStatus');
-    const v33Valid = Buffer.from('/* v3.4.0 valid */', 'utf8');
+    const v33Valid = Buffer.from('/* v3.4.1 valid */', 'utf8');
     const v33Sha = crypto.createHash('sha256').update(v33Valid).digest('hex');
     remoteResponses.set(manifestUrl, JSON.stringify({
-      version: '3.4.0',
+      version: '3.4.1',
       files: { 'renderer-enhancer.js': { sha256: v33Sha, size: v33Valid.length } }
     }));
     remoteResponses.set(fileUrl, v33Valid);
     const applyRes = await isolated.applyInAppUpdate('main');
     assert.strictEqual(applyRes.ok, true);
-    assert.strictEqual(applyRes.newVersion, '3.4.0');
-    assert.strictEqual(fs.readFileSync(path.join(tmpEnhDir, 'renderer-enhancer.js'), 'utf8'), '/* v3.4.0 valid */');
-    assert.strictEqual(JSON.parse(fs.readFileSync(path.join(tmpEnhDir, 'manifest.json'), 'utf8')).version, '3.4.0');
+    assert.strictEqual(applyRes.newVersion, '3.4.1');
+    assert.strictEqual(fs.readFileSync(path.join(tmpEnhDir, 'renderer-enhancer.js'), 'utf8'), '/* v3.4.1 valid */');
+    assert.strictEqual(JSON.parse(fs.readFileSync(path.join(tmpEnhDir, 'manifest.json'), 'utf8')).version, '3.4.1');
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
@@ -849,7 +849,7 @@ registerTest(4, 'F25', 'Installer OS language auto-detection (9 languages + Engl
     const installerCsPath = path.join(tmpDir, 'InstallerWPF.cs');
     // Rename App.Main out so test harness can define entry point cleanly
     const modifiedCs = match[1]
-      .replace('__ENHANCER_VERSION__', '3.4.0')
+      .replace('__ENHANCER_VERSION__', '3.4.1')
       .replace('public static void Main()', 'public static void MainWpfDisabled()');
     fs.writeFileSync(installerCsPath, '\uFEFF' + modifiedCs, 'utf8');
 
@@ -953,6 +953,119 @@ public static class ProbeMain
       const restoredSha = crypto.createHash('sha256').update(fs.readFileSync(workAsar)).digest('hex');
       assert.strictEqual(restoredSha, origSha, 'Node unpatchAsar must cleanly reverse C# micro-bootstrap');
     }
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+registerTest(4, 'F24', 'auto-repatch.js detects unpatched app.asar, skips incompatible versions, rejects tampering, & re-bootstraps matching patches', async () => {
+  const { EventEmitter } = require('events');
+  const autoRepatch = require(path.join(ENHANCER_DIR, 'auto-repatch.js'));
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'agy-repatch-t4-'));
+  const tmpEnhDir = path.join(tmpDir, 'enhancer');
+  const fakeAsarPath = path.join(tmpDir, 'app.asar');
+  fs.mkdirSync(tmpEnhDir, { recursive: true });
+  fs.writeFileSync(fakeAsarPath, Buffer.from('vanilla-asar-placeholder'));
+
+  try {
+    let isBootstrapped = false;
+    let patchCalls = 0;
+    const mockPatcher = {
+      inspectAsarStatus: () => ({ exists: true, bootstrapped: isBootstrapped }),
+      patchAsar: () => { isBootstrapped = true; patchCalls++; return { changed: true }; }
+    };
+
+    const validRenderer = Buffer.from('/* 3.4.1 renderer */', 'utf8');
+    const validSha = crypto.createHash('sha256').update(validRenderer).digest('hex');
+    const remoteResponses = new Map();
+    const mockHttps = {
+      get(rawUrl, opts, cb) {
+        if (typeof opts === 'function') cb = opts;
+        const req = new EventEmitter();
+        req.destroy = () => {};
+        req.setTimeout = () => {};
+        process.nextTick(() => {
+          const clean = String(rawUrl).split('?')[0];
+          const body = remoteResponses.get(clean);
+          const res = new EventEmitter();
+          res.statusCode = body ? 200 : 404;
+          res.headers = {};
+          res.resume = () => {};
+          cb(res);
+          process.nextTick(() => {
+            if (body) res.emit('data', Buffer.isBuffer(body) ? body : Buffer.from(String(body), 'utf8'));
+            res.emit('end');
+          });
+        });
+        return req;
+      }
+    };
+
+    const manifestUrl = 'https://raw.githubusercontent.com/x2tora/antigravity-enhancer/main/enhancer/manifest.json';
+    const fileUrl = 'https://raw.githubusercontent.com/x2tora/antigravity-enhancer/main/enhancer/renderer-enhancer.js';
+
+    remoteResponses.set(manifestUrl, JSON.stringify({
+      version: '3.4.1',
+      repo: 'x2tora/antigravity-enhancer',
+      minAppVersion: '2.30.0',
+      testedAppVersion: '2.32.1',
+      files: { 'renderer-enhancer.js': { sha256: validSha, size: validRenderer.length } }
+    }));
+    const waitRes = await autoRepatch.runAutoRepatch({
+      enhancerDir: tmpEnhDir,
+      asarPath: fakeAsarPath,
+      installedAppVersion: '2.33.0',
+      httpsMod: mockHttps,
+      asarPatcher: mockPatcher
+    });
+    assert.strictEqual(waitRes.skipped, true);
+    assert.strictEqual(waitRes.reason, 'waiting-for-matching-patch');
+    assert.strictEqual(patchCalls, 0);
+
+    remoteResponses.set(fileUrl, Buffer.from('/* TAMPERED */', 'utf8'));
+    await assert.rejects(() => autoRepatch.runAutoRepatch({
+      enhancerDir: tmpEnhDir,
+      asarPath: fakeAsarPath,
+      installedAppVersion: '2.32.1',
+      httpsMod: mockHttps,
+      asarPatcher: mockPatcher
+    }), /SHA-256 mismatch/);
+    assert.strictEqual(patchCalls, 0);
+
+    remoteResponses.set(fileUrl, validRenderer);
+    const okRes = await autoRepatch.runAutoRepatch({
+      enhancerDir: tmpEnhDir,
+      asarPath: fakeAsarPath,
+      installedAppVersion: '2.32.1',
+      httpsMod: mockHttps,
+      asarPatcher: mockPatcher
+    });
+    assert.strictEqual(okRes.repatched, true);
+    assert.strictEqual(patchCalls, 1);
+    assert.strictEqual(isBootstrapped, true);
+    assert.strictEqual(fs.readFileSync(path.join(tmpEnhDir, 'renderer-enhancer.js'), 'utf8'), '/* 3.4.1 renderer */');
+
+    const skipRes = await autoRepatch.runAutoRepatch({
+      enhancerDir: tmpEnhDir,
+      asarPath: fakeAsarPath,
+      installedAppVersion: '2.32.1',
+      httpsMod: mockHttps,
+      asarPatcher: mockPatcher
+    });
+    assert.strictEqual(skipRes.skipped, true);
+    assert.strictEqual(skipRes.reason, 'already-bootstrapped');
+
+    isBootstrapped = false;
+    fs.writeFileSync(path.join(tmpEnhDir, 'disabled.flag'), 'restored-vanilla\n');
+    const disRes = await autoRepatch.runAutoRepatch({
+      enhancerDir: tmpEnhDir,
+      asarPath: fakeAsarPath,
+      installedAppVersion: '2.32.1',
+      httpsMod: mockHttps,
+      asarPatcher: mockPatcher
+    });
+    assert.strictEqual(disRes.skipped, true);
+    assert.strictEqual(disRes.reason, 'disabled');
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
