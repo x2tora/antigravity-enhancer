@@ -1,26 +1,26 @@
 {
-  "version": "3.4.2",
+  "version": "3.4.3",
   "channel": "stable",
   "minAppVersion": "2.30.0",
-  "testedAppVersion": "2.32.2",
+  "testedAppVersion": "2.33.0",
   "repo": "x2tora/antigravity-enhancer",
-  "updatedAt": "2026-11-18T12:03:05.272Z",
-  "releaseNotes": "- Updated compatibility and verified lossless ASAR v4 bootstrapping & byte-identical restore for Antigravity **2.32.2** (`testedAppVersion: \"2.32.2\"`).",
+  "updatedAt": "2026-11-19T02:59:12.339Z",
+  "releaseNotes": "- Updated compatibility and verified lossless ASAR v4 bootstrapping & byte-identical restore for Antigravity **2.33.0** (`testedAppVersion: \"2.33.0\"`).",
   "releaseNotesI18n": {
-    "en": "- Updated compatibility and verified lossless ASAR v4 bootstrapping & byte-identical restore for Antigravity **2.32.2** (`testedAppVersion: \"2.32.2\"`).",
-    "ko": "- Antigravity **2.32.2** 버전(`testedAppVersion: \"2.32.2\"`)에 대한 호환성을 업데이트하고 무손실 ASAR v4 부트스트랩 및 바이트 단위 원본 복구를 검증했습니다.",
-    "ja": "- Antigravity **2.32.2**（`testedAppVersion: \"2.32.2\"`）への互換性を更新し、ロスレス ASAR v4 ブートストラップおよびバイト単位の復元を検証しました。",
-    "zh-CN": "- 更新了对 Antigravity **2.32.2**（`testedAppVersion: \"2.32.2\"`）的兼容性，并验证了无损 ASAR v4 引导与逐字节原版还原。",
-    "zh-TW": "- 更新了對 Antigravity **2.32.2**（`testedAppVersion: \"2.32.2\"`）的相容性，並驗證了無損 ASAR v4 引導與逐位元組原版還原。",
-    "es": "- Se actualizó la compatibilidad con Antigravity **2.32.2** (`testedAppVersion: \"2.32.2\"`) y se verificó el arranque ASAR v4 sin pérdidas y la restauración idéntica byte a byte.",
-    "fr": "- Mise à jour de la compatibilité pour Antigravity **2.32.2** (`testedAppVersion: \"2.32.2\"`) et vérification de l'amorçage ASAR v4 sans perte et de la restauration à l'octet près.",
-    "de": "- Kompatibilität für Antigravity **2.32.2** (`testedAppVersion: \"2.32.2\"`) aktualisiert und verlustfreies ASAR-v4-Bootstrapping sowie byte-identische Wiederherstellung verifiziert.",
-    "ru": "- Обновлена совместимость с Antigravity **2.32.2** (`testedAppVersion: \"2.32.2\"`) и проверены загрузка ASAR v4 без потерь и побайтовое восстановление оригинала."
+    "en": "- Updated compatibility and verified lossless ASAR v4 bootstrapping & byte-identical restore for Antigravity **2.33.0** (`testedAppVersion: \"2.33.0\"`).",
+    "ko": "- Antigravity **2.33.0** 버전(`testedAppVersion: \"2.33.0\"`)에 대한 호환성을 업데이트하고 무손실 ASAR v4 부트스트랩 및 바이트 단위 원본 복구를 검증했습니다.",
+    "ja": "- Antigravity **2.33.0**（`testedAppVersion: \"2.33.0\"`）への互換性を更新し、ロスレス ASAR v4 ブートストラップおよびバイト単位の復元を検証しました。",
+    "zh-CN": "- 更新了对 Antigravity **2.33.0**（`testedAppVersion: \"2.33.0\"`）的兼容性，并验证了无损 ASAR v4 引导与逐字节原版还原。",
+    "zh-TW": "- 更新了對 Antigravity **2.33.0**（`testedAppVersion: \"2.33.0\"`）的相容性，並驗證了無損 ASAR v4 引導與逐位元組原版還原。",
+    "es": "- Se actualizó la compatibilidad con Antigravity **2.33.0** (`testedAppVersion: \"2.33.0\"`) y se verificó el arranque ASAR v4 sin pérdidas y la restauración idéntica byte a byte.",
+    "fr": "- Mise à jour de la compatibilité pour Antigravity **2.33.0** (`testedAppVersion: \"2.33.0\"`) et vérification de l'amorçage ASAR v4 sans perte et de la restauration à l'octet près.",
+    "de": "- Kompatibilität für Antigravity **2.33.0** (`testedAppVersion: \"2.33.0\"`) aktualisiert und verlustfreies ASAR-v4-Bootstrapping sowie byte-identische Wiederherstellung verifiziert.",
+    "ru": "- Обновлена совместимость с Antigravity **2.33.0** (`testedAppVersion: \"2.33.0\"`) и проверены загрузка ASAR v4 без потерь и побайтовое восстановление оригинала."
   },
   "files": {
     "main-enhancer.js": {
       "size": 23280,
-      "sha256": "ddb5d83f2a93c2767959f8044caf203ec2cf74309fadcf8109297f87baefe19b",
+      "sha256": "359e2fdb2b8d08c1f596cc672018be6a236d84a8d1b87263e8832f42f3a64efe",
       "restartRequired": true
     },
     "asar-patcher.js": {
@@ -30,7 +30,7 @@
     },
     "renderer-enhancer.js": {
       "size": 127143,
-      "sha256": "71f109eea3c72fb4f3ea06564f8cb04e99d88388f6ee2bb15b10e88e843e7a2f",
+      "sha256": "643ef33d3e70979df9b17adc3351dabe996e2f672dc683b57ebfef01939406fc",
       "restartRequired": false
     },
     "gsap-core.js": {
@@ -45,7 +45,7 @@
     },
     "auto-repatch.js": {
       "size": 8099,
-      "sha256": "4678864f2acf81038add9fb7713b8425af7c23ae3358e8b84a1b2222dda613d6",
+      "sha256": "2ca27b2cbd85e27741b6f1e856031e763deb16d40cc885057e00c0ba1cfd9faa",
       "restartRequired": false
     }
   }
