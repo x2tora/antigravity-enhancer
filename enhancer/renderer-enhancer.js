@@ -1,8 +1,8 @@
 /**
- * Antigravity Enhancer v3.4.3 - Modular Renderer Enhancer Engine
- * Features: 9-Language Zero-Restart i18n, GSAP v3.15.1 Zero-Bounce Motion,
- *           AI Model Quota HUD & Composer Inline Hover Card (2.33.0 Hydrogen/Argon/Gemini/Other),
- *           Native Title-Menu Patch Integration & In-App Updater (x2tora/antigravity-enhancer)
+ * Antigravity Enhancer v3.5.0 - Modular Renderer Enhancer Engine
+ * Features: 9-Language Zero-Restart i18n, Translation Engine 2.0 (Slice + Glossary),
+ *           Quota Intelligence (Sparklines, Burn-Rate ETA & Alerts),
+ *           Enhancer Control Center & Custom Shortcuts (x2tora/antigravity-enhancer)
  */
 (function () {
   'use strict';
@@ -11,7 +11,24 @@
   const ipc = electron_1 ? electron_1.ipcRenderer : null;
   const payload = (typeof __ENHANCER_PAYLOAD__ !== 'undefined' && __ENHANCER_PAYLOAD__) ? __ENHANCER_PAYLOAD__ : {};
   const ENHANCER_REPO = payload.repo || 'x2tora/antigravity-enhancer';
-  const ENHANCER_CURRENT_VERSION = payload.version || '3.4.3';
+  const ENHANCER_CURRENT_VERSION = payload.version || '3.5.0';
+
+  const DEFAULT_PREFS = {
+    shortcutCycleLang: 'Alt+Shift+L',
+    shortcutOpenCenter: 'Alt+Shift+E',
+    quotaAlertsEnabled: false,
+    quotaLowThreshold: 20,
+    quotaResetAlertsEnabled: false,
+    collectUntranslated: false,
+    showSparklines: true,
+    compactQuotaCard: false
+  };
+  let userPreferences = { ...DEFAULT_PREFS, ...(payload.preferences && typeof payload.preferences === 'object' ? payload.preferences : {}) };
+  let userGlossary = (payload.userGlossary && typeof payload.userGlossary === 'object') ? payload.userGlossary : {};
+  let quotaHistoryState = (payload.quotaHistory && typeof payload.quotaHistory === 'object') ? payload.quotaHistory : {};
+  const untranslatedBuffer = [];
+  const untranslatedSeen = new Set();
+  const loadedLanguages = new Set(['en']);
 
   // ---------------------------------------------------------------------------
   // 1. Install GSAP Core into Preload World
@@ -155,8 +172,61 @@
   }
 
   buildLangIndices('ko', exactDict);
+  if (Object.keys(exactDict).length > 0) loadedLanguages.add('ko');
   for (const l of ['ja', 'zh-CN', 'zh-TW', 'es', 'fr', 'de', 'ru']) {
     buildLangIndices(l, translations[l]);
+    if (translations[l] && Object.keys(translations[l]).length > 0) loadedLanguages.add(l);
+  }
+
+  async function ensureLanguageLoaded(lang) {
+    if (!lang || lang === 'en' || loadedLanguages.has(lang)) return true;
+    if (!ipc || !ipc.invoke) return false;
+    try {
+      const res = await ipc.invoke('enhancer:get-language-dict', lang);
+      if (res && res.ok && res.slice) {
+        const s = res.slice;
+        if (lang === 'ko') {
+          if (s.exactDict) Object.assign(exactDict, s.exactDict);
+          if (s.placeholders) Object.assign(placeholders, s.placeholders);
+          if (Array.isArray(s.fragmentRules) && fragmentRules.length === 0) fragmentRules.push(...s.fragmentRules);
+          if (Array.isArray(s.dynamicRules) && dynamicRules.length === 0) dynamicRules.push(...compileDynamicRules(s.dynamicRules));
+          buildLangIndices('ko', exactDict);
+        } else {
+          if (s.translations && s.translations[lang]) {
+            translations[lang] = s.translations[lang];
+            buildLangIndices(lang, translations[lang]);
+          }
+          if (s.multiLangFragments && s.multiLangFragments[lang]) {
+            multiLangFragments[lang] = s.multiLangFragments[lang];
+          }
+          if (s.multiLangDynamicRules && s.multiLangDynamicRules[lang]) {
+            multiLangDynamicRules[lang] = compileDynamicRules(s.multiLangDynamicRules[lang]);
+          }
+        }
+        loadedLanguages.add(lang);
+        return true;
+      }
+    } catch (_) {}
+    return false;
+  }
+
+  function queueUntranslated(trimmed) {
+    if (!userPreferences.collectUntranslated || !trimmed) return;
+    if (trimmed.length < 2 || trimmed.length > 120) return;
+    if (/^[\d\s.,:%+\-*/()[\]{}]+$/.test(trimmed)) return;
+    if (untranslatedSeen.has(trimmed)) return;
+    untranslatedSeen.add(trimmed);
+    untranslatedBuffer.push(trimmed);
+  }
+
+  if (typeof setInterval === 'function') {
+    const _utTimer = setInterval(() => {
+      if (untranslatedBuffer.length > 0 && ipc && ipc.invoke) {
+        const batch = untranslatedBuffer.splice(0, 50);
+        ipc.invoke('enhancer:record-untranslated', batch).catch(() => {});
+      }
+    }, 3000);
+    if (_utTimer && _utTimer.unref) _utTimer.unref();
   }
 
   const LANG_STORAGE_KEY = 'antigravity_ui_language';
@@ -217,6 +287,14 @@
     if (lang === 'en') return raw;
 
     const trimmed = raw.trim();
+    const glossaryMap = (userGlossary && userGlossary[lang] && typeof userGlossary[lang] === 'object') ? userGlossary[lang] : null;
+    if (glossaryMap) {
+      const gExact = safeDictGet(glossaryMap, trimmed);
+      if (typeof gExact === 'string') return raw.replace(trimmed, () => gExact);
+      const gLower = safeDictGet(glossaryMap, trimmed.toLowerCase());
+      if (typeof gLower === 'string') return raw.replace(trimmed, () => gLower);
+    }
+
     const activeDict = (lang === 'ko')
       ? exactDict
       : (hasOwn.call(translations, lang) ? translations[lang] : null);
@@ -277,6 +355,7 @@
     }
     if (matched) return result;
 
+    queueUntranslated(trimmed);
     return raw;
   }
 
@@ -832,6 +911,335 @@
     });
   }
 
+  function matchesShortcut(e, spec) {
+    if (!e || !spec || typeof spec !== 'string') return false;
+    const parts = spec.split('+').map(p => p.trim().toLowerCase()).filter(Boolean);
+    if (parts.length === 0) return false;
+    const keyPart = parts[parts.length - 1];
+    const mods = new Set(parts.slice(0, -1));
+    if (Boolean(e.ctrlKey) !== mods.has('ctrl')) return false;
+    if (Boolean(e.altKey) !== mods.has('alt')) return false;
+    if (Boolean(e.shiftKey) !== mods.has('shift')) return false;
+    if (Boolean(e.metaKey) !== (mods.has('meta') || mods.has('win') || mods.has('cmd'))) return false;
+    const ek = String(e.key || '').toLowerCase();
+    return ek === keyPart;
+  }
+
+  function formatShortcutFromEvent(e) {
+    if (!e || !e.key) return '';
+    const k = String(e.key);
+    if (['Control', 'Alt', 'Shift', 'Meta'].includes(k)) return '';
+    const parts = [];
+    if (e.ctrlKey) parts.push('Ctrl');
+    if (e.altKey) parts.push('Alt');
+    if (e.shiftKey) parts.push('Shift');
+    if (e.metaKey) parts.push('Meta');
+    parts.push(k.length === 1 ? k.toUpperCase() : k);
+    return parts.join('+');
+  }
+
+  const alertCooldownMap = new Map();
+  const prevQuotaLevels = new Map();
+
+  function evaluateQuotaAlerts(snapshot) {
+    if (!snapshot || typeof snapshot !== 'object') return;
+    const now = Date.now();
+    const cooldownMs = 30 * 60 * 1000;
+    const threshold = Number(userPreferences.quotaLowThreshold) || 20;
+
+    for (const key of ['argon', 'gemini', 'other']) {
+      const g = snapshot[key];
+      if (!g) continue;
+      const vals = [g.h5, g.weekly].filter(v => typeof v === 'number');
+      if (vals.length === 0) continue;
+      const minPct = Math.min(...vals);
+      const prev = prevQuotaLevels.get(key);
+      prevQuotaLevels.set(key, minPct);
+
+      if (userPreferences.quotaAlertsEnabled && minPct < threshold) {
+        const lastAt = alertCooldownMap.get(`low:${key}`) || 0;
+        if ((now - lastAt) >= cooldownMs) {
+          alertCooldownMap.set(`low:${key}`, now);
+          const msg = `${g.label || key}: ${minPct}% (< ${threshold}%)`;
+          showToast(msg);
+          if (ipc && ipc.invoke) ipc.invoke('enhancer:notify', { title: 'Antigravity Quota Low', body: msg }).catch(() => {});
+        }
+      }
+
+      if (userPreferences.quotaResetAlertsEnabled && typeof prev === 'number' && prev <= 5 && minPct >= 80) {
+        const lastAt = alertCooldownMap.get(`reset:${key}`) || 0;
+        if ((now - lastAt) >= cooldownMs) {
+          alertCooldownMap.set(`reset:${key}`, now);
+          const msg = `${g.label || key}: Quota Reset (${minPct}%)`;
+          showToast(msg);
+          if (ipc && ipc.invoke) ipc.invoke('enhancer:notify', { title: 'Antigravity Quota Reset', body: msg }).catch(() => {});
+        }
+      }
+    }
+  }
+
+  if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+    window.addEventListener('antigravity-quota-snapshot', (ev) => {
+      const snap = ev && ev.detail;
+      if (!snap) return;
+      evaluateQuotaAlerts(snap);
+      if (ipc && ipc.invoke) {
+        ipc.invoke('enhancer:record-quota-snapshot', snap).then((res) => {
+          if (res && res.ok && res.history) {
+            quotaHistoryState = res.history;
+            window.dispatchEvent(new CustomEvent('antigravity-quota-history-updated', {
+              detail: { history: quotaHistoryState, preferences: userPreferences }
+            }));
+          }
+        }).catch(() => {});
+      }
+    });
+  }
+
+  function closeControlCenterModal() {
+    const bd = document.getElementById('ag-enhancer-control-center-backdrop');
+    if (bd) bd.remove();
+  }
+
+  function persistPreferences(patch) {
+    userPreferences = { ...userPreferences, ...patch };
+    if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
+      window.dispatchEvent(new CustomEvent('antigravity-quota-history-updated', {
+        detail: { history: quotaHistoryState, preferences: userPreferences }
+      }));
+    }
+    if (ipc && ipc.invoke) {
+      ipc.invoke('enhancer:save-preferences', patch).catch(() => {});
+    }
+  }
+
+  async function openControlCenterModal(initialTab = 'general') {
+    if (typeof document === 'undefined') return;
+    if (document.getElementById('ag-enhancer-control-center-backdrop')) {
+      closeControlCenterModal();
+      return;
+    }
+    closeEnhancerHubModal(true);
+
+    const isKo = activeLanguage === 'ko';
+    const bd = document.createElement('div');
+    bd.id = 'ag-enhancer-control-center-backdrop';
+    bd.className = 'notranslate';
+    bd.setAttribute('translate', 'no');
+    bd.style.cssText = 'position:fixed;inset:0;z-index:100001;background:rgba(7,8,11,0.72);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:16px;';
+
+    const modal = document.createElement('div');
+    modal.id = 'ag-enhancer-control-center';
+    modal.style.cssText = 'width:560px;max-width:94vw;max-height:86vh;display:flex;flex-direction:column;background:#0B0B0E;border:1px solid rgba(202,211,245,0.12);border-radius:14px;box-shadow:0 24px 64px rgba(0,0,0,0.62);color:#CAD3F5;font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable",Pretendard,"Segoe UI",sans-serif;overflow:hidden;';
+
+    const tabs = [
+      { id: 'general', label: isKo ? '일반' : 'General' },
+      { id: 'translation', label: isKo ? '번역 · 용어집' : 'Translation' },
+      { id: 'quota', label: isKo ? '할당량 · 알림' : 'Quota' },
+      { id: 'shortcuts', label: isKo ? '단축키 · 진단' : 'Shortcuts' }
+    ];
+    let currentTab = tabs.some(t => t.id === initialTab) ? initialTab : 'general';
+
+    modal.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid rgba(202,211,245,0.08);background:#111217;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:14px;font-weight:600;color:#CAD3F5;">Antigravity<span style="color:#A0A3F6;">Enhanced</span></span>
+          <span style="font-size:11px;color:#818BA8;font-variant-numeric:tabular-nums;">Control Center · v${ENHANCER_CURRENT_VERSION}</span>
+        </div>
+        <button id="ag-cc-close" style="background:none;border:none;color:#9DA7C7;cursor:pointer;font-size:16px;line-height:1;padding:4px 6px;border-radius:6px;">✕</button>
+      </div>
+      <div id="ag-cc-tabs" style="display:flex;gap:4px;padding:8px 14px;border-bottom:1px solid rgba(202,211,245,0.08);background:#0E0F14;">
+        ${tabs.map(t => `<button data-tab="${t.id}" class="ag-cc-tab" style="padding:6px 12px;border-radius:7px;border:none;cursor:pointer;font-size:12px;font-weight:500;transition:all 120ms ease;">${t.label}</button>`).join('')}
+      </div>
+      <div id="ag-cc-body" style="padding:16px 18px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:12px;"></div>
+    `;
+
+    bd.appendChild(modal);
+    (document.body || document.documentElement).appendChild(bd);
+
+    bd.onclick = (e) => { if (e.target === bd) closeControlCenterModal(); };
+    const closeBtn = modal.querySelector('#ag-cc-close');
+    if (closeBtn) closeBtn.onclick = () => closeControlCenterModal();
+
+    const bodyEl = modal.querySelector('#ag-cc-body');
+    const tabBtns = modal.querySelectorAll('.ag-cc-tab');
+
+    async function renderTab(tabId) {
+      currentTab = tabId;
+      tabBtns.forEach(b => {
+        const active = b.getAttribute('data-tab') === currentTab;
+        b.style.background = active ? 'rgba(160,163,246,0.16)' : 'transparent';
+        b.style.color = active ? '#A0A3F6' : '#9DA7C7';
+      });
+      if (!bodyEl) return;
+
+      if (currentTab === 'general') {
+        const langOpts = LANG_ORDER.map(l => {
+          const info = LANG_DISPLAY_NAMES[l] || { native: l, en: l };
+          return `<option value="${l}" ${activeLanguage === l ? 'selected' : ''}>${info.native} (${info.en})</option>`;
+        }).join('');
+        bodyEl.innerHTML = `
+          <div style="background:#13141A;border:1px solid rgba(202,211,245,0.08);border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <div style="font-size:13px;font-weight:500;">${isKo ? '인터페이스 언어' : 'Interface Language'}</div>
+              <div style="font-size:11px;color:#818BA8;margin-top:2px;">${isKo ? '재시작 없이 즉시 언어를 전환합니다.' : 'Zero-restart live localization.'}</div>
+            </div>
+            <select id="ag-cc-lang-select" style="background:#1B1D26;color:#CAD3F5;border:1px solid rgba(202,211,245,0.14);border-radius:7px;padding:6px 10px;font-size:12px;">${langOpts}</select>
+          </div>
+          <div style="background:#13141A;border:1px solid rgba(202,211,245,0.08);border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <div style="font-size:13px;font-weight:500;">${isKo ? '업데이트 및 복구 허브' : 'Update & Restore Hub'}</div>
+              <div style="font-size:11px;color:#818BA8;margin-top:2px;">v${ENHANCER_CURRENT_VERSION} · ${ENHANCER_REPO}</div>
+            </div>
+            <button id="ag-cc-open-update" style="background:#A0A3F6;color:#0B0B0E;border:none;border-radius:7px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;">${isKo ? '업데이트 확인' : 'Check Updates'}</button>
+          </div>
+        `;
+        const sel = bodyEl.querySelector('#ag-cc-lang-select');
+        if (sel) sel.onchange = () => { setLanguage(sel.value); renderTab('general'); };
+        const updBtn = bodyEl.querySelector('#ag-cc-open-update');
+        if (updBtn) updBtn.onclick = () => { closeControlCenterModal(); openEnhancerHubModal('update', { forceOpen: true, autoCheck: true }); };
+      } else if (currentTab === 'translation') {
+        const langMap = (userGlossary[activeLanguage] && typeof userGlossary[activeLanguage] === 'object') ? userGlossary[activeLanguage] : {};
+        const entries = Object.entries(langMap);
+        const rowsHtml = entries.length > 0
+          ? entries.map(([src, dst]) => `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px;background:#181A22;border-radius:6px;font-size:12px;"><span style="color:#9DA7C7;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(src)}</span><span style="color:#818BA8;">→</span><span style="color:#CAD3F5;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(dst)}</span><button data-del="${escapeHtml(src)}" class="ag-cc-del-glossary" style="background:none;border:none;color:#E56B6F;cursor:pointer;font-size:12px;">✕</button></div>`).join('')
+          : `<div style="font-size:12px;color:#818BA8;">${isKo ? '등록된 사용자 용어집 항목이 없습니다.' : 'No custom glossary entries yet.'}</div>`;
+        bodyEl.innerHTML = `
+          <div style="background:#13141A;border:1px solid rgba(202,211,245,0.08);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;">
+            <div style="font-size:13px;font-weight:500;">${isKo ? `커스텀 용어집 (${activeLanguage.toUpperCase()})` : `Custom Glossary (${activeLanguage.toUpperCase()})`}</div>
+            <div style="display:flex;gap:6px;">
+              <input id="ag-cc-gl-src" placeholder="${isKo ? '원문 (예: Agent)' : 'Source text'}" style="flex:1;background:#1B1D26;color:#CAD3F5;border:1px solid rgba(202,211,245,0.12);border-radius:6px;padding:6px 8px;font-size:12px;" />
+              <input id="ag-cc-gl-dst" placeholder="${isKo ? '번역 (예: 에이전트)' : 'Target text'}" style="flex:1;background:#1B1D26;color:#CAD3F5;border:1px solid rgba(202,211,245,0.12);border-radius:6px;padding:6px 8px;font-size:12px;" />
+              <button id="ag-cc-gl-add" style="background:#A0A3F6;color:#0B0B0E;border:none;border-radius:6px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;">${isKo ? '추가' : 'Add'}</button>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px;max-height:150px;overflow-y:auto;">${rowsHtml}</div>
+          </div>
+          <div style="background:#13141A;border:1px solid rgba(202,211,245,0.08);border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <div style="font-size:13px;font-weight:500;">${isKo ? '미번역 문자열 자동 수집 (Opt-in)' : 'Collect Untranslated Strings (Opt-in)'}</div>
+              <div style="font-size:11px;color:#818BA8;margin-top:2px;">${isKo ? '사전에 없는 UI 문구를 로컬 JSON에 기록합니다.' : 'Logs unmatched UI text locally for review.'}</div>
+            </div>
+            <input type="checkbox" id="ag-cc-ut-toggle" ${userPreferences.collectUntranslated ? 'checked' : ''} style="width:16px;height:16px;accent-color:#A0A3F6;cursor:pointer;" />
+          </div>
+        `;
+        const addBtn = bodyEl.querySelector('#ag-cc-gl-add');
+        if (addBtn) {
+          addBtn.onclick = async () => {
+            const s = (bodyEl.querySelector('#ag-cc-gl-src').value || '').trim();
+            const d = (bodyEl.querySelector('#ag-cc-gl-dst').value || '').trim();
+            if (!s || !d) return;
+            if (!userGlossary[activeLanguage]) userGlossary[activeLanguage] = {};
+            userGlossary[activeLanguage][s] = d;
+            if (ipc && ipc.invoke) await ipc.invoke('enhancer:save-glossary', userGlossary).catch(() => {});
+            if (document.body && activeLanguage !== 'en') { revertToOriginal(document.body); translateNode(document.body); }
+            renderTab('translation');
+          };
+        }
+        bodyEl.querySelectorAll('.ag-cc-del-glossary').forEach(btn => {
+          btn.onclick = async () => {
+            const key = btn.getAttribute('data-del');
+            if (userGlossary[activeLanguage] && key) delete userGlossary[activeLanguage][key];
+            if (ipc && ipc.invoke) await ipc.invoke('enhancer:save-glossary', userGlossary).catch(() => {});
+            if (document.body && activeLanguage !== 'en') { revertToOriginal(document.body); translateNode(document.body); }
+            renderTab('translation');
+          };
+        });
+        const utToggle = bodyEl.querySelector('#ag-cc-ut-toggle');
+        if (utToggle) utToggle.onchange = () => persistPreferences({ collectUntranslated: Boolean(utToggle.checked) });
+      } else if (currentTab === 'quota') {
+        bodyEl.innerHTML = `
+          <div style="background:#13141A;border:1px solid rgba(202,211,245,0.08);border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <div style="font-size:13px;font-weight:500;">${isKo ? '할당량 팝오버 스파크라인' : 'Quota Popover Sparklines'}</div>
+              <div style="font-size:11px;color:#818BA8;margin-top:2px;">${isKo ? '72시간 로컬 사용 추이 그래프를 표시합니다.' : 'Shows 72h local usage trend sparkline.'}</div>
+            </div>
+            <input type="checkbox" id="ag-cc-spark-toggle" ${userPreferences.showSparklines !== false ? 'checked' : ''} style="width:16px;height:16px;accent-color:#A0A3F6;cursor:pointer;" />
+          </div>
+          <div style="background:#13141A;border:1px solid rgba(202,211,245,0.08);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <div style="font-size:13px;font-weight:500;">${isKo ? '저잔량 데스크톱 알림' : 'Low-Quota Desktop Alerts'}</div>
+                <div style="font-size:11px;color:#818BA8;margin-top:2px;">${isKo ? '임계치 미만 도달 시 모델별 1회 알림 (30분 쿨다운)' : 'Alerts once per model below threshold (30m cooldown).'}</div>
+              </div>
+              <input type="checkbox" id="ag-cc-low-alert" ${userPreferences.quotaAlertsEnabled ? 'checked' : ''} style="width:16px;height:16px;accent-color:#A0A3F6;cursor:pointer;" />
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:12px;color:#9DA7C7;">
+              <span>${isKo ? '임계치' : 'Threshold'}: <b id="ag-cc-thresh-val" style="color:#CAD3F5;">${userPreferences.quotaLowThreshold || 20}%</b></span>
+              <input type="range" id="ag-cc-thresh-range" min="5" max="50" step="5" value="${userPreferences.quotaLowThreshold || 20}" style="flex:1;accent-color:#A0A3F6;" />
+            </div>
+          </div>
+          <div style="background:#13141A;border:1px solid rgba(202,211,245,0.08);border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <div style="font-size:13px;font-weight:500;">${isKo ? '할당량 리셋 완료 알림' : 'Quota Reset Alerts'}</div>
+              <div style="font-size:11px;color:#818BA8;margin-top:2px;">${isKo ? '고갈 후 80% 이상 회복 시 알림을 보냅니다.' : 'Notifies when quota recovers above 80% after depletion.'}</div>
+            </div>
+            <input type="checkbox" id="ag-cc-reset-alert" ${userPreferences.quotaResetAlertsEnabled ? 'checked' : ''} style="width:16px;height:16px;accent-color:#A0A3F6;cursor:pointer;" />
+          </div>
+        `;
+        const spark = bodyEl.querySelector('#ag-cc-spark-toggle');
+        if (spark) spark.onchange = () => persistPreferences({ showSparklines: Boolean(spark.checked) });
+        const lowA = bodyEl.querySelector('#ag-cc-low-alert');
+        if (lowA) lowA.onchange = () => persistPreferences({ quotaAlertsEnabled: Boolean(lowA.checked) });
+        const rstA = bodyEl.querySelector('#ag-cc-reset-alert');
+        if (rstA) rstA.onchange = () => persistPreferences({ quotaResetAlertsEnabled: Boolean(rstA.checked) });
+        const rng = bodyEl.querySelector('#ag-cc-thresh-range');
+        const rngVal = bodyEl.querySelector('#ag-cc-thresh-val');
+        if (rng) {
+          rng.oninput = () => { if (rngVal) rngVal.textContent = `${rng.value}%`; };
+          rng.onchange = () => persistPreferences({ quotaLowThreshold: Number(rng.value) || 20 });
+        }
+      } else if (currentTab === 'shortcuts') {
+        let diagHtml = '';
+        if (ipc && ipc.invoke) {
+          try {
+            const st = await ipc.invoke('enhancer:get-status');
+            if (st) {
+              diagHtml = `<div style="font-size:11px;color:#818BA8;line-height:1.6;">App: <b style="color:#CAD3F5;">${escapeHtml(st.appVersion || '')}</b> · ASAR Bootstrap: <b style="color:#4CC38A;">${st.asarBootstrapped ? 'Active' : 'Inactive'}</b><br/>Dir: ${escapeHtml(st.enhancerDir || '')}</div>`;
+            }
+          } catch (_) {}
+        }
+        bodyEl.innerHTML = `
+          <div style="background:#13141A;border:1px solid rgba(202,211,245,0.08);border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:13px;">${isKo ? '언어 순환 단축키' : 'Cycle Language Shortcut'}</span>
+            <button id="ag-cc-rec-lang" style="background:#1B1D26;color:#A0A3F6;border:1px solid rgba(160,163,246,0.3);border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;">${escapeHtml(userPreferences.shortcutCycleLang)}</button>
+          </div>
+          <div style="background:#13141A;border:1px solid rgba(202,211,245,0.08);border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:13px;">${isKo ? 'Control Center 열기' : 'Open Control Center'}</span>
+            <button id="ag-cc-rec-center" style="background:#1B1D26;color:#A0A3F6;border:1px solid rgba(160,163,246,0.3);border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;">${escapeHtml(userPreferences.shortcutOpenCenter)}</button>
+          </div>
+          <div style="background:#13141A;border:1px solid rgba(202,211,245,0.08);border-radius:10px;padding:12px 14px;">
+            <div style="font-size:13px;font-weight:500;margin-bottom:4px;">${isKo ? '시스템 진단' : 'Diagnostics'}</div>
+            ${diagHtml || `<div style="font-size:11px;color:#818BA8;">Enhancer v${ENHANCER_CURRENT_VERSION}</div>`}
+          </div>
+        `;
+        const bindRecorder = (btnId, prefKey) => {
+          const btn = bodyEl.querySelector(btnId);
+          if (!btn) return;
+          btn.onclick = () => {
+            btn.textContent = isKo ? '키 조합 입력...' : 'Press keys...';
+            const onKey = (ev) => {
+              ev.preventDefault();
+              ev.stopPropagation();
+              const spec = formatShortcutFromEvent(ev);
+              if (!spec) return;
+              window.removeEventListener('keydown', onKey, true);
+              persistPreferences({ [prefKey]: spec });
+              btn.textContent = spec;
+            };
+            window.addEventListener('keydown', onKey, true);
+          };
+        };
+        bindRecorder('#ag-cc-rec-lang', 'shortcutCycleLang');
+        bindRecorder('#ag-cc-rec-center', 'shortcutOpenCenter');
+      }
+    }
+
+    tabBtns.forEach(b => {
+      b.onclick = () => renderTab(b.getAttribute('data-tab'));
+    });
+    renderTab(currentTab);
+  }
+
   function closeEnhancerHubModal(immediate = false) {
     activeProgressHandler = null;
     if (activeModalLangHandler && typeof window !== 'undefined' && typeof window.removeEventListener === 'function') {
@@ -1102,11 +1510,19 @@
     const fontStyle = document.getElementById('antigravity-i18n-style');
     if (fontStyle) fontStyle.disabled = (lang === 'en');
 
-    if (document.body) {
-      revertToOriginal(document.body);
-      if (lang !== 'en') translateNode(document.body);
+    const applyDomLang = () => {
+      if (document.body) {
+        revertToOriginal(document.body);
+        if (activeLanguage !== 'en') translateNode(document.body);
+      }
+      updateLanguageSelectorUI();
+    };
+
+    if (lang !== 'en' && !loadedLanguages.has(lang) && ipc && ipc.invoke) {
+      ensureLanguageLoaded(lang).then(() => applyDomLang()).catch(() => applyDomLang());
+    } else {
+      applyDomLang();
     }
-    updateLanguageSelectorUI();
   }
 
   function updateLanguageSelectorUI() {
@@ -1556,8 +1972,18 @@
     section.appendChild(sep);
 
     const verRow = createNativeMenuRow('antigravity-menu-patch-version', versionText, false, updateBadge);
+    const controlRow = createNativeMenuRow('antigravity-menu-control-center', activeLanguage === 'ko' ? 'Control Center 설정...' : 'Control Center...', true, '');
     const checkRow = createNativeMenuRow('antigravity-menu-check-updates', h.checkUpdates, true, '');
     const restoreRow = createNativeMenuRow('antigravity-menu-restore-vanilla', h.restoreVanilla, true, '');
+
+    controlRow.btn.onclick = (e) => {
+      if (e) {
+        if (e.stopPropagation) e.stopPropagation();
+        if (e.preventDefault) e.preventDefault();
+      }
+      closeNativeTitleMenu();
+      openControlCenterModal('general');
+    };
 
     checkRow.btn.onclick = (e) => {
       if (e) {
@@ -1578,6 +2004,7 @@
     };
 
     section.appendChild(verRow.wrapper);
+    section.appendChild(controlRow.wrapper);
     section.appendChild(checkRow.wrapper);
     section.appendChild(restoreRow.wrapper);
     dropdown.appendChild(section);
@@ -1636,16 +2063,17 @@
         const quickMenu = document.getElementById('antigravity-quick-lang-menu');
         if (quickMenu) quickMenu.remove();
         closeEnhancerHubModal();
+        closeControlCenterModal();
       }
-      if (e.altKey && e.shiftKey && (e.key === 'L' || e.key === 'l')) {
+      if (matchesShortcut(e, userPreferences.shortcutCycleLang)) {
         if (e.preventDefault) e.preventDefault();
         if (isImeComposing || e.isComposing || isInputOrEditable(e.target)) return;
         const nextIdx = (LANG_ORDER.indexOf(activeLanguage) + 1) % LANG_ORDER.length;
         setLanguage(LANG_ORDER[nextIdx]);
       }
-      if (e.altKey && e.shiftKey && (e.key === 'E' || e.key === 'e')) {
+      if (matchesShortcut(e, userPreferences.shortcutOpenCenter)) {
         if (e.preventDefault) e.preventDefault();
-        openEnhancerHubModal();
+        openControlCenterModal('general');
       }
     });
   }
@@ -1939,6 +2367,46 @@
         } else { finish(); }
       }
 
+      let quotaHistoryCache = {};
+      let quotaShowSparklines = true;
+      window.addEventListener('antigravity-quota-history-updated', (ev) => {
+        if (ev && ev.detail) {
+          if (ev.detail.history) quotaHistoryCache = ev.detail.history;
+          if (ev.detail.preferences && typeof ev.detail.preferences.showSparklines === 'boolean') {
+            quotaShowSparklines = ev.detail.preferences.showSparklines;
+          }
+        }
+      });
+
+      function calcBurnRateAndEta(points, currentPct) {
+        if (!Array.isArray(points) || points.length < 2 || typeof currentPct !== 'number') return '';
+        const valid = points.filter(p => p && typeof p.ts === 'number' && typeof p.h5 === 'number');
+        if (valid.length < 2) return '';
+        const first = valid[Math.max(0, valid.length - 6)];
+        const last = valid[valid.length - 1];
+        const hours = (last.ts - first.ts) / 3600000;
+        const drop = first.h5 - last.h5;
+        if (hours <= 0.05 || drop <= 0.5) return '';
+        const rate = drop / hours;
+        const etaHours = currentPct / rate;
+        if (!isFinite(etaHours) || etaHours <= 0 || etaHours > 240) return '';
+        const h = Math.floor(etaHours);
+        const m = Math.round((etaHours - h) * 60);
+        return `-${rate.toFixed(1)}%/h · ~${h > 0 ? `${h}h ` : ''}${m}m`;
+      }
+
+      function renderSparklineSvg(points, isLow) {
+        if (!quotaShowSparklines || !Array.isArray(points) || points.length < 2) return '';
+        const vals = points.slice(-24).map(p => (typeof p.h5 === 'number' ? p.h5 : p.weekly)).filter(v => typeof v === 'number');
+        if (vals.length < 2) return '';
+        const w = 64;
+        const h = 16;
+        const step = w / Math.max(1, vals.length - 1);
+        const pts = vals.map((v, idx) => `${(idx * step).toFixed(1)},${(h - 2 - (Math.max(0, Math.min(100, v)) / 100) * (h - 4)).toFixed(1)}`).join(' ');
+        const stroke = isLow ? '#E56B6F' : '#A0A3F6';
+        return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="display:block;flex-shrink:0;" aria-hidden="true"><polyline fill="none" stroke="${stroke}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" points="${pts}"/></svg>`;
+      }
+
       function renderBucketHtml(title, pct, ts, qs) {
         if (pct === null || pct === undefined) return '';
         const barColor = pct < 20 ? '#E56B6F' : '#A0A3F6';
@@ -2008,8 +2476,11 @@
           const rows = renderBucketHtml(qs.h5Full, g.h5, g.h5TargetTs, qs) + renderBucketHtml(qs.weeklyFull, g.weekly, g.weeklyTargetTs, qs);
           const vals = [g.h5, g.weekly].filter(v => typeof v === 'number');
           const isLow = vals.length > 0 && Math.min(...vals) < 20;
+          const hist = quotaHistoryCache[g.id] || [];
+          const spark = renderSparklineSvg(hist, isLow);
+          const etaTxt = calcBurnRateAndEta(hist, g.h5);
           const borderStyle = isLow ? 'background:rgba(229,107,111,0.08);border:1px solid rgba(229,107,111,0.32);' : 'background:#161820;border:1px solid rgba(202,211,245,0.08);';
-          return `<section class="group-card rounded-lg p-2 mb-2" style="${borderStyle}border-radius:8px;padding:8px 12px;margin-bottom:8px;"><header style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><div style="display:inline-flex;align-items:center;gap:6px;flex-shrink:0;white-space:nowrap;"><strong style="font-weight:600;font-size:12px;white-space:nowrap;color:${isLow ? '#E56B6F' : g.color};">${g.label}</strong>${g.id === currentActiveGroup ? `<em style="font-style:normal;font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;white-space:nowrap;flex-shrink:0;line-height:1.2;background:rgba(160,163,246,0.14);color:#A0A3F6;border:1px solid rgba(160,163,246,0.32);">${qs.activeTag}</em>` : ''}</div><span style="font-size:11px;color:#818BA8;flex:1;min-width:0;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${(g.models || []).join(', ')}</span></header><main>${rows || '<p style="margin:4px 0 0;font-size:11px;color:#818BA8;">--</p>'}</main></section>`;
+          return `<section class="group-card rounded-lg p-2 mb-2" style="${borderStyle}border-radius:8px;padding:8px 12px;margin-bottom:8px;"><header style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><div style="display:inline-flex;align-items:center;gap:6px;flex-shrink:0;white-space:nowrap;"><strong style="font-weight:600;font-size:12px;white-space:nowrap;color:${isLow ? '#E56B6F' : g.color};">${g.label}</strong>${g.id === currentActiveGroup ? `<em style="font-style:normal;font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;white-space:nowrap;flex-shrink:0;line-height:1.2;background:rgba(160,163,246,0.14);color:#A0A3F6;border:1px solid rgba(160,163,246,0.32);">${qs.activeTag}</em>` : ''}</div>${spark}<span style="font-size:11px;color:#818BA8;flex:1;min-width:0;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${etaTxt || (g.models || []).join(', ')}</span></header><main>${rows || '<p style="margin:4px 0 0;font-size:11px;color:#818BA8;">--</p>'}</main></section>`;
         }).join('');
 
         pop.innerHTML = `<header style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid rgba(202,211,245,0.08);"><span style="font-weight:600;font-size:13px;color:#CAD3F5;">${qs.title}</span><button id="antigravity-popover-refresh" title="${qs.refresh}" style="background:none;border:none;color:#9DA7C7;cursor:pointer;padding:0;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg></button></header><main>${cardsHtml}</main><footer style="margin-top:4px;padding-top:8px;text-align:right;border-top:1px solid rgba(202,211,245,0.08);"><button id="antigravity-open-models-settings" style="background:none;border:none;color:#A0A3F6;font-size:12px;font-weight:500;cursor:pointer;">${qs.openSettings}</button></footer>`;
@@ -2190,6 +2661,7 @@
           const p = parseGroups(data);
           renderWidget(widget, p, target.isMenuBar);
           updateComposerModelQuota(p, currentActiveGroup);
+          try { window.dispatchEvent(new CustomEvent('antigravity-quota-snapshot', { detail: { ts: Date.now(), argon: p.argon, gemini: p.gemini, other: p.other } })); } catch (_) {}
         } else if (retryCount < MAX_RETRIES) {
           retryCount++;
           clearTimeout(retryTimer);
@@ -2293,6 +2765,21 @@
     setTimeout(() => checkEnhancerGithubUpdate(false), 2500);
     setInterval(() => checkEnhancerGithubUpdate(true), 600000);
 
+    const pendingMutationRoots = new Set();
+    let mutationFlushScheduled = false;
+    function flushMutationRoots() {
+      mutationFlushScheduled = false;
+      if (isImeComposing || activeLanguage === 'en') {
+        pendingMutationRoots.clear();
+        return;
+      }
+      const roots = Array.from(pendingMutationRoots);
+      pendingMutationRoots.clear();
+      for (const root of roots) {
+        if (root && !isInputOrEditable(root)) translateNode(root);
+      }
+    }
+
     const observer = new MutationObserver((mutations) => {
       if (isImeComposing) return;
       if (activeLanguage !== 'en') {
@@ -2300,11 +2787,15 @@
           if (isInputOrEditable(m.target)) continue;
           if (m.type === 'childList') {
             for (const node of m.addedNodes) {
-              if (!isInputOrEditable(node)) translateNode(node);
+              if (!isInputOrEditable(node)) pendingMutationRoots.add(node);
             }
-          } else {
-            translateNode(m.target);
+          } else if (m.target) {
+            pendingMutationRoots.add(m.target);
           }
+        }
+        if (pendingMutationRoots.size > 0 && !mutationFlushScheduled) {
+          mutationFlushScheduled = true;
+          (typeof requestAnimationFrame !== 'undefined' ? requestAnimationFrame : (fn) => setTimeout(fn, 16))(flushMutationRoots);
         }
       }
       scheduleInjectLanguageSetting();

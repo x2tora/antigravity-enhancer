@@ -1,5 +1,5 @@
 /**
- * Antigravity Enhancer v3.4.3 - Main Process Bridge, Persistence & Secure In-App Updater
+ * Antigravity Enhancer v3.5.0 - Main Process Bridge, Persistence & Secure In-App Updater
  * Source Repo: https://github.com/x2tora/antigravity-enhancer
  */
 'use strict';
@@ -95,6 +95,144 @@ function writeBufferAtomic(filePath, buf) {
     if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
   } catch (_) {}
   fs.renameSync(tmp, filePath);
+}
+
+const DEFAULT_PREFERENCES = {
+  shortcutCycleLang: 'Alt+Shift+L',
+  shortcutOpenCenter: 'Alt+Shift+E',
+  quotaAlertsEnabled: false,
+  quotaLowThreshold: 20,
+  quotaResetAlertsEnabled: false,
+  collectUntranslated: false,
+  showSparklines: true,
+  compactQuotaCard: false
+};
+
+function getUserDataPath(filename) {
+  return path.join(enhancerDir, 'user-data', filename);
+}
+
+function buildLanguageSlice(fullDict, langId) {
+  const src = (fullDict && typeof fullDict === 'object') ? fullDict : {};
+  const base = {
+    SUPPORTED_LANGUAGES: src.SUPPORTED_LANGUAGES,
+    LANG_ORDER: src.LANG_ORDER
+  };
+  if (!langId) return src;
+  if (langId === 'en') {
+    return {
+      ...base,
+      exactDict: {},
+      translations: {},
+      fragmentRules: [],
+      placeholders: {},
+      dynamicRules: [],
+      multiLangFragments: {},
+      multiLangDynamicRules: {}
+    };
+  }
+  if (langId === 'ko') {
+    return {
+      ...base,
+      exactDict: src.exactDict || {},
+      fragmentRules: src.fragmentRules || [],
+      placeholders: src.placeholders || {},
+      dynamicRules: src.dynamicRules || []
+    };
+  }
+  return {
+    ...base,
+    translations: { [langId]: (src.translations && src.translations[langId]) ? src.translations[langId] : {} },
+    multiLangFragments: { [langId]: (src.multiLangFragments && src.multiLangFragments[langId]) ? src.multiLangFragments[langId] : [] },
+    multiLangDynamicRules: { [langId]: (src.multiLangDynamicRules && src.multiLangDynamicRules[langId]) ? src.multiLangDynamicRules[langId] : [] }
+  };
+}
+
+function getPreferences() {
+  const stored = readJsonSafe(getUserDataPath('preferences.json'), {});
+  return { ...DEFAULT_PREFERENCES, ...(stored && typeof stored === 'object' ? stored : {}) };
+}
+
+function savePreferences(patch) {
+  const current = getPreferences();
+  const next = { ...current, ...(patch && typeof patch === 'object' ? patch : {}) };
+  if (typeof next.quotaLowThreshold === 'number') {
+    next.quotaLowThreshold = Math.max(5, Math.min(50, Math.round(next.quotaLowThreshold)));
+  }
+  writeJsonAtomic(getUserDataPath('preferences.json'), next);
+  return next;
+}
+
+function getUserGlossary() {
+  const stored = readJsonSafe(getUserDataPath('user-glossary.json'), {});
+  return (stored && typeof stored === 'object' && !Array.isArray(stored)) ? stored : {};
+}
+
+function saveUserGlossary(glossary) {
+  const clean = (glossary && typeof glossary === 'object' && !Array.isArray(glossary)) ? glossary : {};
+  writeJsonAtomic(getUserDataPath('user-glossary.json'), clean);
+  return clean;
+}
+
+function getUntranslated() {
+  const stored = readJsonSafe(getUserDataPath('untranslated.json'), []);
+  return Array.isArray(stored) ? stored : [];
+}
+
+function recordUntranslated(items) {
+  if (!Array.isArray(items) || items.length === 0) return getUntranslated();
+  const current = getUntranslated();
+  const seen = new Set(current.map(x => (typeof x === 'string' ? x : x.text)));
+  const now = Date.now();
+  for (const raw of items) {
+    const text = (typeof raw === 'string' ? raw : (raw && raw.text)) || '';
+    const trimmed = text.trim();
+    if (!trimmed || trimmed.length < 2 || trimmed.length > 120 || seen.has(trimmed)) continue;
+    seen.add(trimmed);
+    current.push({ text: trimmed, ts: now });
+  }
+  const capped = current.slice(-500);
+  writeJsonAtomic(getUserDataPath('untranslated.json'), capped);
+  return capped;
+}
+
+function clearUntranslated() {
+  writeJsonAtomic(getUserDataPath('untranslated.json'), []);
+  return [];
+}
+
+function getQuotaHistory() {
+  const stored = readJsonSafe(getUserDataPath('quota-history.json'), {});
+  return (stored && typeof stored === 'object' && !Array.isArray(stored)) ? stored : {};
+}
+
+function recordQuotaSnapshot(snapshot) {
+  if (!snapshot || typeof snapshot !== 'object') return getQuotaHistory();
+  const history = getQuotaHistory();
+  const now = typeof snapshot.ts === 'number' ? snapshot.ts : Date.now();
+  const cutoff = now - (72 * 60 * 60 * 1000);
+  const minInterval = 15 * 60 * 1000;
+
+  for (const groupKey of ['argon', 'gemini', 'other']) {
+    const g = snapshot[groupKey];
+    if (!g || (typeof g.h5 !== 'number' && typeof g.weekly !== 'number')) continue;
+    const list = Array.isArray(history[groupKey]) ? history[groupKey].filter(p => p && p.ts >= cutoff) : [];
+    const last = list[list.length - 1];
+    const h5Val = typeof g.h5 === 'number' ? g.h5 : null;
+    const wkVal = typeof g.weekly === 'number' ? g.weekly : null;
+    const bigChange = last && ((h5Val !== null && last.h5 !== null && Math.abs(h5Val - last.h5) >= 5) || (wkVal !== null && last.weekly !== null && Math.abs(wkVal - last.weekly) >= 5));
+    if (!last || (now - last.ts) >= minInterval || bigChange) {
+      list.push({ ts: now, h5: h5Val, weekly: wkVal });
+    }
+    history[groupKey] = list.slice(-288);
+  }
+  writeJsonAtomic(getUserDataPath('quota-history.json'), history);
+  return history;
+}
+
+function clearQuotaHistory() {
+  writeJsonAtomic(getUserDataPath('quota-history.json'), {});
+  return {};
 }
 
 function getLocalManifest() {
@@ -317,7 +455,7 @@ function handleCrashFailsafe() {
   if (t.unref) t.unref();
 }
 
-function loadBootstrapPayload(forceRefresh = false) {
+function loadBootstrapPayload(forceRefresh = false, langId = null) {
   if (runtimeState.disabled || runtimeState.safeMode) {
     return {
       disabled: true,
@@ -325,34 +463,39 @@ function loadBootstrapPayload(forceRefresh = false) {
       reason: runtimeState.lastError || 'Enhancer disabled'
     };
   }
-  if (cachedBootstrapPayload && !forceRefresh) {
-    return cachedBootstrapPayload;
+  if (!cachedBootstrapPayload || forceRefresh) {
+    try {
+      const rendererPath = path.join(enhancerDir, 'renderer-enhancer.js');
+      const gsapPath = path.join(enhancerDir, 'gsap-core.js');
+      const dictPath = path.join(enhancerDir, 'dictionaries.json');
+
+      const rendererCode = fs.readFileSync(rendererPath, 'utf8');
+      const gsapCode = fs.existsSync(gsapPath) ? fs.readFileSync(gsapPath, 'utf8') : '';
+      const dictRaw = fs.existsSync(dictPath) ? fs.readFileSync(dictPath, 'utf8') : '{}';
+      const dictionaries = JSON.parse(dictRaw);
+      const manifest = getLocalManifest();
+
+      cachedBootstrapPayload = {
+        disabled: false,
+        version: manifest.version || '3.5.0',
+        repo: ENHANCER_REPO,
+        code: rendererCode,
+        gsapCode,
+        dictionaries
+      };
+    } catch (err) {
+      runtimeState.lastError = err.message;
+      return { disabled: true, error: err.message };
+    }
   }
 
-  try {
-    const rendererPath = path.join(enhancerDir, 'renderer-enhancer.js');
-    const gsapPath = path.join(enhancerDir, 'gsap-core.js');
-    const dictPath = path.join(enhancerDir, 'dictionaries.json');
-
-    const rendererCode = fs.readFileSync(rendererPath, 'utf8');
-    const gsapCode = fs.existsSync(gsapPath) ? fs.readFileSync(gsapPath, 'utf8') : '';
-    const dictRaw = fs.existsSync(dictPath) ? fs.readFileSync(dictPath, 'utf8') : '{}';
-    const dictionaries = JSON.parse(dictRaw);
-    const manifest = getLocalManifest();
-
-    cachedBootstrapPayload = {
-      disabled: false,
-      version: manifest.version || '3.2.0',
-      repo: ENHANCER_REPO,
-      code: rendererCode,
-      gsapCode,
-      dictionaries
-    };
-    return cachedBootstrapPayload;
-  } catch (err) {
-    runtimeState.lastError = err.message;
-    return { disabled: true, error: err.message };
-  }
+  return {
+    ...cachedBootstrapPayload,
+    dictionaries: langId ? buildLanguageSlice(cachedBootstrapPayload.dictionaries, langId) : cachedBootstrapPayload.dictionaries,
+    preferences: getPreferences(),
+    userGlossary: getUserGlossary(),
+    quotaHistory: getQuotaHistory()
+  };
 }
 
 function getFullStatus() {
@@ -366,7 +509,7 @@ function getFullStatus() {
   } catch (_) {}
 
   return {
-    enhancerVersion: manifest.version || '3.4.3',
+    enhancerVersion: manifest.version || '3.5.0',
     appVersion: (el && el.app && el.app.getVersion) ? el.app.getVersion() : 'unknown',
     repo: ENHANCER_REPO,
     enhancerDir,
@@ -493,7 +636,7 @@ async function checkRemoteUpdate() {
 
 async function applyInAppUpdate(refBranch = 'main') {
   const local = getLocalManifest();
-  const prevVersion = local.version || '3.4.3';
+  const prevVersion = local.version || '3.5.0';
 
   broadcastEvent('enhancer:update-progress', { phase: 'manifest', percent: 8, message: 'Fetching signed manifest...' });
   const manifestUrl = `https://raw.githubusercontent.com/${ENHANCER_REPO}/${encodeURIComponent(refBranch)}/enhancer/manifest.json?t=${Date.now()}`;
@@ -594,8 +737,85 @@ function registerIpcHandlers() {
   if (!el || !el.ipcMain) return;
   const { ipcMain, app, webContents } = el;
 
-  ipcMain.on('enhancer:get-bootstrap-sync', (event) => {
-    event.returnValue = loadBootstrapPayload(false);
+  ipcMain.on('enhancer:get-bootstrap-sync', (event, langId) => {
+    event.returnValue = loadBootstrapPayload(false, typeof langId === 'string' ? langId : null);
+  });
+
+  ipcMain.handle('enhancer:get-language-dict', async (_event, langId) => {
+    try {
+      const base = loadBootstrapPayload(false);
+      if (base.disabled) return { ok: false, error: base.reason || 'disabled' };
+      return { ok: true, langId, slice: buildLanguageSlice(base.dictionaries, langId) };
+    } catch (err) {
+      return { ok: false, error: err.message || String(err) };
+    }
+  });
+
+  ipcMain.handle('enhancer:get-preferences', async () => ({ ok: true, preferences: getPreferences() }));
+  ipcMain.handle('enhancer:save-preferences', async (_event, patch) => {
+    try {
+      return { ok: true, preferences: savePreferences(patch) };
+    } catch (err) {
+      return { ok: false, error: err.message || String(err) };
+    }
+  });
+
+  ipcMain.handle('enhancer:get-glossary', async () => ({ ok: true, glossary: getUserGlossary() }));
+  ipcMain.handle('enhancer:save-glossary', async (_event, glossary) => {
+    try {
+      return { ok: true, glossary: saveUserGlossary(glossary) };
+    } catch (err) {
+      return { ok: false, error: err.message || String(err) };
+    }
+  });
+
+  ipcMain.handle('enhancer:get-untranslated', async () => ({ ok: true, items: getUntranslated() }));
+  ipcMain.handle('enhancer:record-untranslated', async (_event, items) => {
+    try {
+      return { ok: true, items: recordUntranslated(items) };
+    } catch (err) {
+      return { ok: false, error: err.message || String(err) };
+    }
+  });
+  ipcMain.handle('enhancer:clear-untranslated', async () => {
+    try {
+      return { ok: true, items: clearUntranslated() };
+    } catch (err) {
+      return { ok: false, error: err.message || String(err) };
+    }
+  });
+
+  ipcMain.handle('enhancer:get-quota-history', async () => ({ ok: true, history: getQuotaHistory() }));
+  ipcMain.handle('enhancer:record-quota-snapshot', async (_event, snapshot) => {
+    try {
+      return { ok: true, history: recordQuotaSnapshot(snapshot) };
+    } catch (err) {
+      return { ok: false, error: err.message || String(err) };
+    }
+  });
+  ipcMain.handle('enhancer:clear-quota-history', async () => {
+    try {
+      return { ok: true, history: clearQuotaHistory() };
+    } catch (err) {
+      return { ok: false, error: err.message || String(err) };
+    }
+  });
+
+  ipcMain.handle('enhancer:notify', async (_event, opts) => {
+    try {
+      if (el && el.Notification && el.Notification.isSupported()) {
+        const n = new el.Notification({
+          title: (opts && opts.title) ? String(opts.title) : 'Antigravity Enhanced',
+          body: (opts && opts.body) ? String(opts.body) : '',
+          silent: Boolean(opts && opts.silent)
+        });
+        n.show();
+        return { ok: true };
+      }
+      return { ok: false, reason: 'unsupported' };
+    } catch (err) {
+      return { ok: false, error: err.message || String(err) };
+    }
   });
 
   ipcMain.handle('enhancer:get-status', async () => getFullStatus());
@@ -698,5 +918,17 @@ module.exports = {
   checkRemoteUpdate,
   applyInAppUpdate,
   getFullStatus,
+  buildLanguageSlice,
+  DEFAULT_PREFERENCES,
+  getPreferences,
+  savePreferences,
+  getUserGlossary,
+  saveUserGlossary,
+  getUntranslated,
+  recordUntranslated,
+  clearUntranslated,
+  getQuotaHistory,
+  recordQuotaSnapshot,
+  clearQuotaHistory,
   init
 };

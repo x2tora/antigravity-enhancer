@@ -25,7 +25,7 @@ const INSTALLER_DIR = path.join(ROOT_DIR, 'installer');
 const asarPatcher = require(path.join(ENHANCER_DIR, 'asar-patcher.js'));
 const mainEnhancer = require(path.join(ENHANCER_DIR, 'main-enhancer.js'));
 
-function createRendererHarness(initialLang = 'ko', seedDomFn = null) {
+function createRendererHarness(initialLang = 'ko', seedDomFn = null, payloadOverrides = null) {
   const { window, document, localStorage } = createMockEnvironment();
   if (initialLang) localStorage.setItem('antigravity_ui_language', initialLang);
   const invoked = [];
@@ -103,7 +103,7 @@ function createRendererHarness(initialLang = 'ko', seedDomFn = null) {
       invoked.push({ channel, arg });
       if (channel === 'enhancer:get-status') {
         return {
-          enhancerVersion: '3.4.3',
+          enhancerVersion: '3.5.0',
           appVersion: '2.33.0',
           asarBootstrapped: true
         };
@@ -113,8 +113,8 @@ function createRendererHarness(initialLang = 'ko', seedDomFn = null) {
           ok: true,
           hasUpdate: true,
           canApplyInApp: true,
-          currentVersion: '3.4.3',
-          remoteVersion: '3.4.3',
+          currentVersion: '3.5.0',
+          remoteVersion: '3.5.0',
           releaseNotes: 'English test update',
           releaseNotesI18n: {
             en: 'English test update',
@@ -136,11 +136,12 @@ function createRendererHarness(initialLang = 'ko', seedDomFn = null) {
 
   const payload = {
     disabled: false,
-    version: '3.4.3',
+    version: '3.5.0',
     repo: 'x2tora/antigravity-enhancer',
     code: rendererCode,
     gsapCode,
-    dictionaries
+    dictionaries,
+    ...(payloadOverrides || {})
   };
 
   const sandbox = {
@@ -212,11 +213,11 @@ function createRendererHarness(initialLang = 'ko', seedDomFn = null) {
 // ============================================================================
 // F22: Modular Enhancer & Manifest Integrity
 // ============================================================================
-registerTest(1, 'F22', 'manifest.json v3.4.3 points to x2tora/antigravity-enhancer & matches SHA-256 digests', () => {
+registerTest(1, 'F22', 'manifest.json v3.5.0 points to x2tora/antigravity-enhancer & matches SHA-256 digests', () => {
   const manifestPath = path.join(ENHANCER_DIR, 'manifest.json');
   assert.ok(fs.existsSync(manifestPath), 'enhancer/manifest.json missing');
   const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-  assert.strictEqual(manifest.version, '3.4.3');
+  assert.strictEqual(manifest.version, '3.5.0');
   assert.strictEqual(manifest.repo, 'x2tora/antigravity-enhancer');
   assert.strictEqual(manifest.testedAppVersion, '2.33.0');
   assert.ok(manifest.releaseNotesI18n && typeof manifest.releaseNotesI18n === 'object', 'manifest.json must include releaseNotesI18n');
@@ -546,7 +547,7 @@ registerTest(3, 'F24', 'Native Antigravity Enhanced title menu integrates Patch 
   const patchVerOpt = menuSection.querySelector('#antigravity-menu-patch-version');
   const checkUpdatesOpt = menuSection.querySelector('#antigravity-menu-check-updates');
   const restoreOpt = menuSection.querySelector('#antigravity-menu-restore-vanilla');
-  assert.ok(patchVerOpt && patchVerOpt.textContent.includes('3.4.3'), 'Menu must display Patch Version 3.4.3');
+  assert.ok(patchVerOpt && patchVerOpt.textContent.includes('3.5.0'), 'Menu must display Patch Version 3.5.0');
   assert.ok(checkUpdatesOpt, 'Menu must include Check Patch Updates item');
   assert.ok(restoreOpt, 'Menu must include Restore Original item');
 
@@ -726,8 +727,8 @@ registerTest(1, 'F25', 'build_exe_installer.ps1 uses safe build hygiene, #0B0B0E
     assert.ok(fs.existsSync(path.join(ROOT_DIR, 'docs', `README.${l}.md`)), `docs/README.${l}.md must exist`);
   }
   assert.ok(fs.existsSync(path.join(ROOT_DIR, 'Antigravity-Enhancer-Setup.exe')));
-  assert.ok(fs.existsSync(path.join(ROOT_DIR, 'Antigravity-Enhancer-v3.4.3-Setup.exe')));
-  assert.ok(fs.existsSync(path.join(ROOT_DIR, 'Antigravity-Enhancer-v3.4.3-Win.zip')));
+  assert.ok(fs.existsSync(path.join(ROOT_DIR, 'Antigravity-Enhancer-v3.5.0-Setup.exe')));
+  assert.ok(fs.existsSync(path.join(ROOT_DIR, 'Antigravity-Enhancer-v3.5.0-Win.zip')));
   assert.ok(fs.existsSync(path.join(ROOT_DIR, 'SHA256SUMS.txt')));
 
   const sums = fs.readFileSync(path.join(ROOT_DIR, 'SHA256SUMS.txt'), 'utf8');
@@ -804,9 +805,9 @@ registerTest(4, 'F24', 'Main updater rejects SHA-256 tampering cleanly, atomical
     const fileUrl = 'https://raw.githubusercontent.com/x2tora/antigravity-enhancer/main/enhancer/renderer-enhancer.js';
 
     // 1. Tamper test: digest mismatch must abort BEFORE overwriting live enhancerDir
-    const v33Tampered = Buffer.from('/* v3.4.3 TAMPERED */', 'utf8');
+    const v33Tampered = Buffer.from('/* v3.5.0 TAMPERED */', 'utf8');
     remoteResponses.set(manifestUrl, JSON.stringify({
-      version: '3.4.3',
+      version: '3.5.0',
       files: { 'renderer-enhancer.js': { sha256: 'a'.repeat(64), size: v33Tampered.length } }
     }));
     remoteResponses.set(fileUrl, v33Tampered);
@@ -817,18 +818,18 @@ registerTest(4, 'F24', 'Main updater rejects SHA-256 tampering cleanly, atomical
     // 2. Valid atomic staging & dead rollback code removed
     assert.strictEqual(isolated.restoreFromBackupDir, undefined, 'Dead restoreFromBackupDir export must be removed');
     assert.strictEqual(isolated.getFullStatus().backup, undefined, 'Dead backup snapshot metadata must be removed from getFullStatus');
-    const v33Valid = Buffer.from('/* v3.4.3 valid */', 'utf8');
+    const v33Valid = Buffer.from('/* v3.5.0 valid */', 'utf8');
     const v33Sha = crypto.createHash('sha256').update(v33Valid).digest('hex');
     remoteResponses.set(manifestUrl, JSON.stringify({
-      version: '3.4.3',
+      version: '3.5.0',
       files: { 'renderer-enhancer.js': { sha256: v33Sha, size: v33Valid.length } }
     }));
     remoteResponses.set(fileUrl, v33Valid);
     const applyRes = await isolated.applyInAppUpdate('main');
     assert.strictEqual(applyRes.ok, true);
-    assert.strictEqual(applyRes.newVersion, '3.4.3');
-    assert.strictEqual(fs.readFileSync(path.join(tmpEnhDir, 'renderer-enhancer.js'), 'utf8'), '/* v3.4.3 valid */');
-    assert.strictEqual(JSON.parse(fs.readFileSync(path.join(tmpEnhDir, 'manifest.json'), 'utf8')).version, '3.4.3');
+    assert.strictEqual(applyRes.newVersion, '3.5.0');
+    assert.strictEqual(fs.readFileSync(path.join(tmpEnhDir, 'renderer-enhancer.js'), 'utf8'), '/* v3.5.0 valid */');
+    assert.strictEqual(JSON.parse(fs.readFileSync(path.join(tmpEnhDir, 'manifest.json'), 'utf8')).version, '3.5.0');
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
@@ -849,7 +850,7 @@ registerTest(4, 'F25', 'Installer OS language auto-detection (9 languages + Engl
     const installerCsPath = path.join(tmpDir, 'InstallerWPF.cs');
     // Rename App.Main out so test harness can define entry point cleanly
     const modifiedCs = match[1]
-      .replace('__ENHANCER_VERSION__', '3.4.3')
+      .replace('__ENHANCER_VERSION__', '3.5.0')
       .replace('public static void Main()', 'public static void MainWpfDisabled()');
     fs.writeFileSync(installerCsPath, '\uFEFF' + modifiedCs, 'utf8');
 
@@ -975,7 +976,7 @@ registerTest(4, 'F24', 'auto-repatch.js detects unpatched app.asar, skips incomp
       patchAsar: () => { isBootstrapped = true; patchCalls++; return { changed: true }; }
     };
 
-    const validRenderer = Buffer.from('/* 3.4.3 renderer */', 'utf8');
+    const validRenderer = Buffer.from('/* 3.5.0 renderer */', 'utf8');
     const validSha = crypto.createHash('sha256').update(validRenderer).digest('hex');
     const remoteResponses = new Map();
     const mockHttps = {
@@ -1005,7 +1006,7 @@ registerTest(4, 'F24', 'auto-repatch.js detects unpatched app.asar, skips incomp
     const fileUrl = 'https://raw.githubusercontent.com/x2tora/antigravity-enhancer/main/enhancer/renderer-enhancer.js';
 
     remoteResponses.set(manifestUrl, JSON.stringify({
-      version: '3.4.3',
+      version: '3.5.0',
       repo: 'x2tora/antigravity-enhancer',
       minAppVersion: '2.30.0',
       testedAppVersion: '2.33.0',
@@ -1043,7 +1044,7 @@ registerTest(4, 'F24', 'auto-repatch.js detects unpatched app.asar, skips incomp
     assert.strictEqual(okRes.repatched, true);
     assert.strictEqual(patchCalls, 1);
     assert.strictEqual(isBootstrapped, true);
-    assert.strictEqual(fs.readFileSync(path.join(tmpEnhDir, 'renderer-enhancer.js'), 'utf8'), '/* 3.4.3 renderer */');
+    assert.strictEqual(fs.readFileSync(path.join(tmpEnhDir, 'renderer-enhancer.js'), 'utf8'), '/* 3.5.0 renderer */');
 
     const skipRes = await autoRepatch.runAutoRepatch({
       enhancerDir: tmpEnhDir,
@@ -1069,4 +1070,104 @@ registerTest(4, 'F24', 'auto-repatch.js detects unpatched app.asar, skips incomp
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
+});
+
+// ============================================================================
+// F26: Translation Engine 2.0 (Language Slice, User Glossary, Untranslated, Batching)
+// ============================================================================
+registerTest(1, 'F26', 'buildLanguageSlice isolates active language dictionary and reduces IPC payload', () => {
+  const mainEnh = require(path.join(ENHANCER_DIR, 'main-enhancer.js'));
+  const fullDict = JSON.parse(fs.readFileSync(path.join(ENHANCER_DIR, 'dictionaries.json'), 'utf8'));
+  const koSlice = mainEnh.buildLanguageSlice(fullDict, 'ko');
+  const jaSlice = mainEnh.buildLanguageSlice(fullDict, 'ja');
+  const enSlice = mainEnh.buildLanguageSlice(fullDict, 'en');
+
+  assert.ok(koSlice.exactDict && Object.keys(koSlice.exactDict).length > 1000, 'ko slice must include exactDict');
+  assert.strictEqual(koSlice.translations, undefined, 'ko slice must omit other languages');
+  assert.ok(jaSlice.translations && jaSlice.translations.ja, 'ja slice must include ja translations');
+  assert.strictEqual(jaSlice.exactDict, undefined, 'ja slice must omit ko exactDict');
+  assert.strictEqual(Object.keys(enSlice.exactDict).length, 0, 'en slice must be empty');
+
+  const fullBytes = Buffer.byteLength(JSON.stringify(fullDict), 'utf8');
+  const koBytes = Buffer.byteLength(JSON.stringify(koSlice), 'utf8');
+  assert.ok(koBytes < fullBytes * 0.4, `ko slice (${koBytes}) should be <40% of full (${fullBytes})`);
+});
+
+registerTest(1, 'F26', 'Renderer userGlossary overrides default dictionary and untranslated collector respects opt-in', () => {
+  let txt = null;
+  createRendererHarness('ko', (document, patchEl) => {
+    txt = patchEl(document.createElement('span'));
+    txt.appendChild(new MockText('Settings'));
+    document.body.appendChild(txt);
+  }, {
+    userGlossary: { ko: { 'Settings': '환경설정(커스텀)' } }
+  });
+
+  assert.strictEqual(txt.textContent, '환경설정(커스텀)');
+});
+
+// ============================================================================
+// F27: Quota Intelligence (72h Ring Buffer, Deduplication, Sparklines & Alerts)
+// ============================================================================
+registerTest(1, 'F27', 'main-enhancer persists 72h quota history ring buffer with 15m dedup & 5% change bypass', () => {
+  const mainEnh = require(path.join(ENHANCER_DIR, 'main-enhancer.js'));
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ag-quota-hist-'));
+  try {
+    mainEnh.init({ enhancerDir: tmpDir, appRoot: tmpDir });
+    const t0 = Date.now() - 3600000;
+    mainEnh.recordQuotaSnapshot({ ts: t0, argon: { h5: 90, weekly: 95 }, gemini: { h5: 100, weekly: 100 } });
+    // Within 15m and <5% change -> deduped
+    mainEnh.recordQuotaSnapshot({ ts: t0 + 60000, argon: { h5: 89, weekly: 95 } });
+    // Within 15m but >=5% change -> recorded
+    mainEnh.recordQuotaSnapshot({ ts: t0 + 120000, argon: { h5: 80, weekly: 95 } });
+
+    const hist = mainEnh.getQuotaHistory();
+    assert.strictEqual(hist.argon.length, 2, 'Should record initial + >=5% drop while deduping minor 1m tick');
+    assert.strictEqual(hist.argon[1].h5, 80);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+// ============================================================================
+// F28: Enhancer Control Center & Preferences Persistence
+// ============================================================================
+registerTest(1, 'F28', 'main-enhancer persists preferences & renderer opens 4-tab Control Center from title menu', () => {
+  const mainEnh = require(path.join(ENHANCER_DIR, 'main-enhancer.js'));
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ag-prefs-'));
+  try {
+    mainEnh.init({ enhancerDir: tmpDir, appRoot: tmpDir });
+    const saved = mainEnh.savePreferences({ shortcutCycleLang: 'Ctrl+Alt+L', quotaLowThreshold: 15, quotaAlertsEnabled: true });
+    assert.strictEqual(saved.shortcutCycleLang, 'Ctrl+Alt+L');
+    assert.strictEqual(saved.quotaLowThreshold, 15);
+    assert.strictEqual(mainEnh.getPreferences().quotaAlertsEnabled, true);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+
+  const env = createRendererHarness('ko', (document, patchEl) => {
+    const titleBar = patchEl(document.createElement('div'));
+    titleBar.setAttribute('data-testid', 'title-menu-bar');
+    const menuWrapper = patchEl(document.createElement('div'));
+    const agyItem = patchEl(document.createElement('button'));
+    agyItem.setAttribute('data-testid', 'title-menu-bar-item');
+    agyItem.appendChild(new MockText('Antigravity'));
+    const dropdown = patchEl(document.createElement('div'));
+    dropdown.setAttribute('data-browser-occluder', 'true');
+    const nativeOpt = patchEl(document.createElement('button'));
+    nativeOpt.setAttribute('data-testid', 'title-menu-bar-option');
+    nativeOpt.appendChild(new MockText('Settings'));
+    dropdown.appendChild(nativeOpt);
+    menuWrapper.appendChild(agyItem);
+    menuWrapper.appendChild(dropdown);
+    titleBar.appendChild(menuWrapper);
+    document.body.appendChild(titleBar);
+  });
+
+  const ccBtn = env.document.getElementById('antigravity-menu-control-center');
+  assert.ok(ccBtn, 'Control Center menu item should be injected in AntigravityEnhanced menu');
+  ccBtn.click();
+  const modal = env.document.getElementById('ag-enhancer-control-center');
+  assert.ok(modal, 'Control Center modal should open on click');
+  assert.strictEqual(modal.querySelectorAll('.ag-cc-tab').length, 4, 'Control Center should have 4 tabs');
 });
