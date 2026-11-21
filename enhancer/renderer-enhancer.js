@@ -1,5 +1,5 @@
 /**
- * Antigravity Enhancer v3.5.1 - Modular Renderer Enhancer Engine
+ * Antigravity Enhancer v3.5.2 - Modular Renderer Enhancer Engine
  * Features: 9-Language Zero-Restart i18n, Translation Engine 2.0 (Slice + Glossary),
  *           Quota Intelligence (Sparklines, Burn-Rate ETA & Alerts),
  *           Enhancer Control Center & Custom Shortcuts (x2tora/antigravity-enhancer)
@@ -11,7 +11,7 @@
   const ipc = electron_1 ? electron_1.ipcRenderer : null;
   const payload = (typeof __ENHANCER_PAYLOAD__ !== 'undefined' && __ENHANCER_PAYLOAD__) ? __ENHANCER_PAYLOAD__ : {};
   const ENHANCER_REPO = payload.repo || 'x2tora/antigravity-enhancer';
-  const ENHANCER_CURRENT_VERSION = payload.version || '3.5.1';
+  const ENHANCER_CURRENT_VERSION = payload.version || '3.5.2';
 
   const DEFAULT_PREFS = {
     shortcutCycleLang: 'Alt+Shift+L',
@@ -515,14 +515,17 @@
         #antigravity-quick-lang-btn:focus-visible,
         #antigravity-quota-widget:focus-visible,
         #antigravity-enhancer-update-btn:focus-visible,
-        #antigravity-enhancer-modal button:focus-visible {
+        #antigravity-enhancer-modal button:focus-visible,
+        #ag-enhancer-control-center button:focus-visible {
           outline: 1.5px solid #A0A3F6 !important;
           outline-offset: 1px;
         }
-        #antigravity-enhancer-modal .agy-enh-btn:hover:not(:disabled) {
+        #antigravity-enhancer-modal .agy-enh-btn:hover:not(:disabled),
+        #ag-enhancer-control-center .agy-enh-btn:hover:not(:disabled) {
           background: rgba(202, 211, 245, 0.12) !important;
         }
-        #antigravity-enhancer-modal .agy-enh-primary:hover:not(:disabled) {
+        #antigravity-enhancer-modal .agy-enh-primary:hover:not(:disabled),
+        #ag-enhancer-control-center .agy-enh-primary:hover:not(:disabled) {
           opacity: 0.92 !important;
         }
         #antigravity-popover-refresh:hover {
@@ -926,8 +929,14 @@
   }
 
   function formatShortcutFromEvent(e) {
-    if (!e || !e.key) return '';
-    const k = String(e.key);
+    if (!e) return '';
+    let k = String(e.key || '');
+    if (['Control', 'Alt', 'Shift', 'Meta', 'Dead', 'Process', 'Unidentified'].includes(k) || k.length > 12) {
+      const code = String(e.code || '');
+      if (code.startsWith('Key') && code.length === 4) k = code.slice(3);
+      else if (code.startsWith('Digit') && code.length === 6) k = code.slice(5);
+      else return '';
+    }
     if (['Control', 'Alt', 'Shift', 'Meta'].includes(k)) return '';
     const parts = [];
     if (e.ctrlKey) parts.push('Ctrl');
@@ -996,6 +1005,15 @@
     });
   }
 
+  function escapeHtml(str) {
+    return String(str == null ? '' : str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   function closeControlCenterModal() {
     const bd = document.getElementById('ag-enhancer-control-center-backdrop');
     if (bd) bd.remove();
@@ -1026,11 +1044,13 @@
     bd.id = 'ag-enhancer-control-center-backdrop';
     bd.className = 'notranslate';
     bd.setAttribute('translate', 'no');
-    bd.style.cssText = 'position:fixed;inset:0;z-index:100001;background:rgba(7,8,11,0.72);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:16px;';
+    bd.style.cssText = 'position:fixed;inset:0;z-index:100001;background:rgba(11,11,14,0.72);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:20px;app-region:no-drag;-webkit-app-region:no-drag;';
 
     const modal = document.createElement('div');
     modal.id = 'ag-enhancer-control-center';
-    modal.style.cssText = 'width:560px;max-width:94vw;max-height:86vh;display:flex;flex-direction:column;background:#0B0B0E;border:1px solid rgba(202,211,245,0.12);border-radius:14px;box-shadow:0 24px 64px rgba(0,0,0,0.62);color:#CAD3F5;font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable",Pretendard,"Segoe UI",sans-serif;overflow:hidden;';
+    modal.className = 'agy-overlay border rounded-xl text-foreground shadow-lg notranslate';
+    modal.setAttribute('translate', 'no');
+    modal.style.cssText = 'width:540px;max-width:94vw;max-height:86vh;display:flex;flex-direction:column;background:#0B0B0E;border:1px solid rgba(202,211,245,0.1);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,0.48);color:#CAD3F5;font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable",Pretendard,"Segoe UI",sans-serif;font-size:13px;overflow:hidden;app-region:no-drag;-webkit-app-region:no-drag;';
 
     const tabs = [
       { id: 'general', label: isKo ? '일반' : 'General' },
@@ -1041,34 +1061,43 @@
     let currentTab = tabs.some(t => t.id === initialTab) ? initialTab : 'general';
 
     modal.innerHTML = `
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid rgba(202,211,245,0.08);background:#111217;">
+      <header style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid rgba(202,211,245,0.08);background:#0B0B0E;">
         <div style="display:flex;align-items:center;gap:8px;">
-          <span style="font-size:14px;font-weight:600;color:#CAD3F5;">Antigravity<span style="color:#A0A3F6;">Enhanced</span></span>
+          <span style="font-size:14px;font-weight:600;color:#CAD3F5;">Antigravity<span style="color:#A0A3F6;margin-left:0;">Enhanced</span></span>
           <span style="font-size:11px;color:#818BA8;font-variant-numeric:tabular-nums;">Control Center · v${ENHANCER_CURRENT_VERSION}</span>
         </div>
-        <button id="ag-cc-close" style="background:none;border:none;color:#9DA7C7;cursor:pointer;font-size:16px;line-height:1;padding:4px 6px;border-radius:6px;">✕</button>
+        <button id="ag-cc-close" type="button" class="agy-enh-btn" style="background:#181A22;border:1px solid rgba(202,211,245,0.1);color:#CAD3F5;border-radius:6px;width:24px;height:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;line-height:1;">×</button>
+      </header>
+      <div id="ag-cc-tabs" style="display:flex;gap:4px;padding:8px 14px;border-bottom:1px solid rgba(202,211,245,0.08);background:#0B0B0E;">
+        ${tabs.map(t => `<button type="button" data-tab="${t.id}" class="ag-cc-tab" style="padding:6px 12px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:500;transition:all 120ms ease;">${t.label}</button>`).join('')}
       </div>
-      <div id="ag-cc-tabs" style="display:flex;gap:4px;padding:8px 14px;border-bottom:1px solid rgba(202,211,245,0.08);background:#0E0F14;">
-        ${tabs.map(t => `<button data-tab="${t.id}" class="ag-cc-tab" style="padding:6px 12px;border-radius:7px;border:none;cursor:pointer;font-size:12px;font-weight:500;transition:all 120ms ease;">${t.label}</button>`).join('')}
-      </div>
-      <div id="ag-cc-body" style="padding:16px 18px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:12px;"></div>
+      <div id="ag-cc-body" style="padding:14px 16px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:10px;background:#0B0B0E;"></div>
     `;
 
     bd.appendChild(modal);
     (document.body || document.documentElement).appendChild(bd);
 
-    bd.onclick = (e) => { if (e.target === bd) closeControlCenterModal(); };
+    let activeRecorderCleanup = null;
+    const cleanupRecorder = () => {
+      if (typeof activeRecorderCleanup === 'function') {
+        activeRecorderCleanup();
+        activeRecorderCleanup = null;
+      }
+    };
+
+    bd.onclick = (e) => { if (e.target === bd) { cleanupRecorder(); closeControlCenterModal(); } };
     const closeBtn = modal.querySelector('#ag-cc-close');
-    if (closeBtn) closeBtn.onclick = () => closeControlCenterModal();
+    if (closeBtn) closeBtn.onclick = () => { cleanupRecorder(); closeControlCenterModal(); };
 
     const bodyEl = modal.querySelector('#ag-cc-body');
     const tabBtns = modal.querySelectorAll('.ag-cc-tab');
 
-    async function renderTab(tabId) {
+    function renderTab(tabId) {
+      cleanupRecorder();
       currentTab = tabId;
       tabBtns.forEach(b => {
         const active = b.getAttribute('data-tab') === currentTab;
-        b.style.background = active ? 'rgba(160,163,246,0.16)' : 'transparent';
+        b.style.background = active ? 'rgba(160,163,246,0.14)' : 'transparent';
         b.style.color = active ? '#A0A3F6' : '#9DA7C7';
       });
       if (!bodyEl) return;
@@ -1079,19 +1108,19 @@
           return `<option value="${l}" ${activeLanguage === l ? 'selected' : ''}>${info.native} (${info.en})</option>`;
         }).join('');
         bodyEl.innerHTML = `
-          <div style="background:#13141A;border:1px solid rgba(202,211,245,0.08);border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;">
+          <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:12px;">
             <div>
-              <div style="font-size:13px;font-weight:500;">${isKo ? '인터페이스 언어' : 'Interface Language'}</div>
+              <div style="font-size:13px;font-weight:500;color:#CAD3F5;">${isKo ? '인터페이스 언어' : 'Interface Language'}</div>
               <div style="font-size:11px;color:#818BA8;margin-top:2px;">${isKo ? '재시작 없이 즉시 언어를 전환합니다.' : 'Zero-restart live localization.'}</div>
             </div>
-            <select id="ag-cc-lang-select" style="background:#1B1D26;color:#CAD3F5;border:1px solid rgba(202,211,245,0.14);border-radius:7px;padding:6px 10px;font-size:12px;">${langOpts}</select>
+            <select id="ag-cc-lang-select" style="background:#181A22;color:#CAD3F5;border:1px solid rgba(202,211,245,0.1);border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;">${langOpts}</select>
           </div>
-          <div style="background:#13141A;border:1px solid rgba(202,211,245,0.08);border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;">
+          <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:12px;">
             <div>
-              <div style="font-size:13px;font-weight:500;">${isKo ? '업데이트 및 복구 허브' : 'Update & Restore Hub'}</div>
+              <div style="font-size:13px;font-weight:500;color:#CAD3F5;">${isKo ? '업데이트 및 복구 허브' : 'Update & Restore Hub'}</div>
               <div style="font-size:11px;color:#818BA8;margin-top:2px;">v${ENHANCER_CURRENT_VERSION} · ${ENHANCER_REPO}</div>
             </div>
-            <button id="ag-cc-open-update" style="background:#A0A3F6;color:#0B0B0E;border:none;border-radius:7px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;">${isKo ? '업데이트 확인' : 'Check Updates'}</button>
+            <button type="button" id="ag-cc-open-update" class="agy-enh-primary" style="background:#A0A3F6;color:#0B0B0E;border:none;border-radius:6px;height:28px;padding:0 12px;font-size:12px;font-weight:600;cursor:pointer;">${isKo ? '업데이트 확인' : 'Check Updates'}</button>
           </div>
         `;
         const sel = bodyEl.querySelector('#ag-cc-lang-select');
@@ -1102,21 +1131,21 @@
         const langMap = (userGlossary[activeLanguage] && typeof userGlossary[activeLanguage] === 'object') ? userGlossary[activeLanguage] : {};
         const entries = Object.entries(langMap);
         const rowsHtml = entries.length > 0
-          ? entries.map(([src, dst]) => `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px;background:#181A22;border-radius:6px;font-size:12px;"><span style="color:#9DA7C7;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(src)}</span><span style="color:#818BA8;">→</span><span style="color:#CAD3F5;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(dst)}</span><button data-del="${escapeHtml(src)}" class="ag-cc-del-glossary" style="background:none;border:none;color:#E56B6F;cursor:pointer;font-size:12px;">✕</button></div>`).join('')
+          ? entries.map(([src, dst]) => `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px;background:#181A22;border:1px solid rgba(202,211,245,0.06);border-radius:6px;font-size:12px;"><span style="color:#9DA7C7;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(src)}</span><span style="color:#818BA8;">→</span><span style="color:#CAD3F5;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(dst)}</span><button type="button" data-del="${escapeHtml(src)}" class="ag-cc-del-glossary" style="background:none;border:none;color:#E56B6F;cursor:pointer;font-size:12px;">✕</button></div>`).join('')
           : `<div style="font-size:12px;color:#818BA8;">${isKo ? '등록된 사용자 용어집 항목이 없습니다.' : 'No custom glossary entries yet.'}</div>`;
         bodyEl.innerHTML = `
-          <div style="background:#13141A;border:1px solid rgba(202,211,245,0.08);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;">
-            <div style="font-size:13px;font-weight:500;">${isKo ? `커스텀 용어집 (${activeLanguage.toUpperCase()})` : `Custom Glossary (${activeLanguage.toUpperCase()})`}</div>
+          <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;">
+            <div style="font-size:13px;font-weight:500;color:#CAD3F5;">${isKo ? `커스텀 용어집 (${activeLanguage.toUpperCase()})` : `Custom Glossary (${activeLanguage.toUpperCase()})`}</div>
             <div style="display:flex;gap:6px;">
-              <input id="ag-cc-gl-src" placeholder="${isKo ? '원문 (예: Agent)' : 'Source text'}" style="flex:1;background:#1B1D26;color:#CAD3F5;border:1px solid rgba(202,211,245,0.12);border-radius:6px;padding:6px 8px;font-size:12px;" />
-              <input id="ag-cc-gl-dst" placeholder="${isKo ? '번역 (예: 에이전트)' : 'Target text'}" style="flex:1;background:#1B1D26;color:#CAD3F5;border:1px solid rgba(202,211,245,0.12);border-radius:6px;padding:6px 8px;font-size:12px;" />
-              <button id="ag-cc-gl-add" style="background:#A0A3F6;color:#0B0B0E;border:none;border-radius:6px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;">${isKo ? '추가' : 'Add'}</button>
+              <input id="ag-cc-gl-src" placeholder="${isKo ? '원문 (예: Agent)' : 'Source text'}" style="flex:1;background:#181A22;color:#CAD3F5;border:1px solid rgba(202,211,245,0.1);border-radius:6px;padding:5px 8px;font-size:12px;" />
+              <input id="ag-cc-gl-dst" placeholder="${isKo ? '번역 (예: 에이전트)' : 'Target text'}" style="flex:1;background:#181A22;color:#CAD3F5;border:1px solid rgba(202,211,245,0.1);border-radius:6px;padding:5px 8px;font-size:12px;" />
+              <button type="button" id="ag-cc-gl-add" class="agy-enh-primary" style="background:#A0A3F6;color:#0B0B0E;border:none;border-radius:6px;padding:0 12px;height:28px;font-size:12px;font-weight:600;cursor:pointer;">${isKo ? '추가' : 'Add'}</button>
             </div>
             <div style="display:flex;flex-direction:column;gap:4px;max-height:150px;overflow-y:auto;">${rowsHtml}</div>
           </div>
-          <div style="background:#13141A;border:1px solid rgba(202,211,245,0.08);border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;">
+          <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">
             <div>
-              <div style="font-size:13px;font-weight:500;">${isKo ? '미번역 문자열 자동 수집 (Opt-in)' : 'Collect Untranslated Strings (Opt-in)'}</div>
+              <div style="font-size:13px;font-weight:500;color:#CAD3F5;">${isKo ? '미번역 문자열 자동 수집 (Opt-in)' : 'Collect Untranslated Strings (Opt-in)'}</div>
               <div style="font-size:11px;color:#818BA8;margin-top:2px;">${isKo ? '사전에 없는 UI 문구를 로컬 JSON에 기록합니다.' : 'Logs unmatched UI text locally for review.'}</div>
             </div>
             <input type="checkbox" id="ag-cc-ut-toggle" ${userPreferences.collectUntranslated ? 'checked' : ''} style="width:16px;height:16px;accent-color:#A0A3F6;cursor:pointer;" />
@@ -1148,29 +1177,29 @@
         if (utToggle) utToggle.onchange = () => persistPreferences({ collectUntranslated: Boolean(utToggle.checked) });
       } else if (currentTab === 'quota') {
         bodyEl.innerHTML = `
-          <div style="background:#13141A;border:1px solid rgba(202,211,245,0.08);border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;">
+          <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">
             <div>
-              <div style="font-size:13px;font-weight:500;">${isKo ? '할당량 팝오버 스파크라인' : 'Quota Popover Sparklines'}</div>
+              <div style="font-size:13px;font-weight:500;color:#CAD3F5;">${isKo ? '할당량 팝오버 스파크라인' : 'Quota Popover Sparklines'}</div>
               <div style="font-size:11px;color:#818BA8;margin-top:2px;">${isKo ? '72시간 로컬 사용 추이 그래프를 표시합니다.' : 'Shows 72h local usage trend sparkline.'}</div>
             </div>
             <input type="checkbox" id="ag-cc-spark-toggle" ${userPreferences.showSparklines !== false ? 'checked' : ''} style="width:16px;height:16px;accent-color:#A0A3F6;cursor:pointer;" />
           </div>
-          <div style="background:#13141A;border:1px solid rgba(202,211,245,0.08);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;">
+          <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;">
             <div style="display:flex;justify-content:space-between;align-items:center;">
               <div>
-                <div style="font-size:13px;font-weight:500;">${isKo ? '저잔량 데스크톱 알림' : 'Low-Quota Desktop Alerts'}</div>
+                <div style="font-size:13px;font-weight:500;color:#CAD3F5;">${isKo ? '저잔량 데스크톱 알림' : 'Low-Quota Desktop Alerts'}</div>
                 <div style="font-size:11px;color:#818BA8;margin-top:2px;">${isKo ? '임계치 미만 도달 시 모델별 1회 알림 (30분 쿨다운)' : 'Alerts once per model below threshold (30m cooldown).'}</div>
               </div>
               <input type="checkbox" id="ag-cc-low-alert" ${userPreferences.quotaAlertsEnabled ? 'checked' : ''} style="width:16px;height:16px;accent-color:#A0A3F6;cursor:pointer;" />
             </div>
             <div style="display:flex;align-items:center;gap:10px;font-size:12px;color:#9DA7C7;">
-              <span>${isKo ? '임계치' : 'Threshold'}: <b id="ag-cc-thresh-val" style="color:#CAD3F5;">${userPreferences.quotaLowThreshold || 20}%</b></span>
+              <span>${isKo ? '임계치' : 'Threshold'}: <b id="ag-cc-thresh-val" style="color:#CAD3F5;font-variant-numeric:tabular-nums;">${userPreferences.quotaLowThreshold || 20}%</b></span>
               <input type="range" id="ag-cc-thresh-range" min="5" max="50" step="5" value="${userPreferences.quotaLowThreshold || 20}" style="flex:1;accent-color:#A0A3F6;" />
             </div>
           </div>
-          <div style="background:#13141A;border:1px solid rgba(202,211,245,0.08);border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;">
+          <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">
             <div>
-              <div style="font-size:13px;font-weight:500;">${isKo ? '할당량 리셋 완료 알림' : 'Quota Reset Alerts'}</div>
+              <div style="font-size:13px;font-weight:500;color:#CAD3F5;">${isKo ? '할당량 리셋 완료 알림' : 'Quota Reset Alerts'}</div>
               <div style="font-size:11px;color:#818BA8;margin-top:2px;">${isKo ? '고갈 후 80% 이상 회복 시 알림을 보냅니다.' : 'Notifies when quota recovers above 80% after depletion.'}</div>
             </div>
             <input type="checkbox" id="ag-cc-reset-alert" ${userPreferences.quotaResetAlertsEnabled ? 'checked' : ''} style="width:16px;height:16px;accent-color:#A0A3F6;cursor:pointer;" />
@@ -1189,53 +1218,65 @@
           rng.onchange = () => persistPreferences({ quotaLowThreshold: Number(rng.value) || 20 });
         }
       } else if (currentTab === 'shortcuts') {
-        let diagHtml = '';
-        if (ipc && ipc.invoke) {
-          try {
-            const st = await ipc.invoke('enhancer:get-status');
-            if (st) {
-              diagHtml = `<div style="font-size:11px;color:#818BA8;line-height:1.6;">App: <b style="color:#CAD3F5;">${escapeHtml(st.appVersion || '')}</b> · ASAR Bootstrap: <b style="color:#4CC38A;">${st.asarBootstrapped ? 'Active' : 'Inactive'}</b><br/>Dir: ${escapeHtml(st.enhancerDir || '')}</div>`;
-            }
-          } catch (_) {}
-        }
         bodyEl.innerHTML = `
-          <div style="background:#13141A;border:1px solid rgba(202,211,245,0.08);border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;">
-            <span style="font-size:13px;">${isKo ? '언어 순환 단축키' : 'Cycle Language Shortcut'}</span>
-            <button id="ag-cc-rec-lang" style="background:#1B1D26;color:#A0A3F6;border:1px solid rgba(160,163,246,0.3);border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;">${escapeHtml(userPreferences.shortcutCycleLang)}</button>
+          <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:13px;color:#CAD3F5;">${isKo ? '언어 순환 단축키' : 'Cycle Language Shortcut'}</span>
+            <button type="button" id="ag-cc-rec-lang" class="agy-enh-btn" style="background:#181A22;color:#A0A3F6;border:1px solid rgba(160,163,246,0.32);border-radius:6px;padding:5px 10px;font-size:12px;font-weight:500;cursor:pointer;font-variant-numeric:tabular-nums;">${escapeHtml(userPreferences.shortcutCycleLang)}</button>
           </div>
-          <div style="background:#13141A;border:1px solid rgba(202,211,245,0.08);border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;">
-            <span style="font-size:13px;">${isKo ? 'Control Center 열기' : 'Open Control Center'}</span>
-            <button id="ag-cc-rec-center" style="background:#1B1D26;color:#A0A3F6;border:1px solid rgba(160,163,246,0.3);border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;">${escapeHtml(userPreferences.shortcutOpenCenter)}</button>
+          <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:13px;color:#CAD3F5;">${isKo ? 'Control Center 열기' : 'Open Control Center'}</span>
+            <button type="button" id="ag-cc-rec-center" class="agy-enh-btn" style="background:#181A22;color:#A0A3F6;border:1px solid rgba(160,163,246,0.32);border-radius:6px;padding:5px 10px;font-size:12px;font-weight:500;cursor:pointer;font-variant-numeric:tabular-nums;">${escapeHtml(userPreferences.shortcutOpenCenter)}</button>
           </div>
-          <div style="background:#13141A;border:1px solid rgba(202,211,245,0.08);border-radius:10px;padding:12px 14px;">
-            <div style="font-size:13px;font-weight:500;margin-bottom:4px;">${isKo ? '시스템 진단' : 'Diagnostics'}</div>
-            ${diagHtml || `<div style="font-size:11px;color:#818BA8;">Enhancer v${ENHANCER_CURRENT_VERSION}</div>`}
+          <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;">
+            <div style="font-size:13px;font-weight:500;color:#CAD3F5;margin-bottom:4px;">${isKo ? '시스템 진단' : 'Diagnostics'}</div>
+            <div id="ag-cc-diag-box" style="font-size:11px;color:#818BA8;line-height:1.6;">Enhancer v${ENHANCER_CURRENT_VERSION}</div>
           </div>
         `;
         const bindRecorder = (btnId, prefKey) => {
           const btn = bodyEl.querySelector(btnId);
           if (!btn) return;
-          btn.onclick = () => {
-            btn.textContent = isKo ? '키 조합 입력...' : 'Press keys...';
+          btn.onclick = (e) => {
+            if (e) e.stopPropagation();
+            cleanupRecorder();
+            const prevSpec = userPreferences[prefKey];
+            btn.textContent = isKo ? '키 조합 입력 (ESC 취소)...' : 'Press keys (ESC cancel)...';
             const onKey = (ev) => {
               ev.preventDefault();
               ev.stopPropagation();
+              if (ev.key === 'Escape') {
+                cleanupRecorder();
+                btn.textContent = prevSpec;
+                return;
+              }
               const spec = formatShortcutFromEvent(ev);
               if (!spec) return;
-              window.removeEventListener('keydown', onKey, true);
+              cleanupRecorder();
               persistPreferences({ [prefKey]: spec });
               btn.textContent = spec;
             };
+            activeRecorderCleanup = () => window.removeEventListener('keydown', onKey, true);
             window.addEventListener('keydown', onKey, true);
           };
         };
         bindRecorder('#ag-cc-rec-lang', 'shortcutCycleLang');
         bindRecorder('#ag-cc-rec-center', 'shortcutOpenCenter');
+
+        if (ipc && ipc.invoke) {
+          ipc.invoke('enhancer:get-status').then((st) => {
+            const box = bodyEl.querySelector('#ag-cc-diag-box');
+            if (st && box) {
+              box.innerHTML = `App: <b style="color:#CAD3F5;">${escapeHtml(st.appVersion || '')}</b> · ASAR Bootstrap: <b style="color:#4CC38A;">${st.asarBootstrapped ? 'Active' : 'Inactive'}</b><br/>Dir: ${escapeHtml(st.enhancerDir || '')}`;
+            }
+          }).catch(() => {});
+        }
       }
     }
 
     tabBtns.forEach(b => {
-      b.onclick = () => renderTab(b.getAttribute('data-tab'));
+      b.onclick = (e) => {
+        if (e) e.stopPropagation();
+        renderTab(b.getAttribute('data-tab'));
+      };
     });
     renderTab(currentTab);
   }
@@ -1955,6 +1996,9 @@
     if (section) {
       const verSpan = section.querySelector('#antigravity-menu-patch-version span');
       if (verSpan && verSpan.textContent !== versionText) verSpan.textContent = versionText;
+      const ccLabel = activeLanguage === 'ko' ? 'Control Center 설정...' : 'Control Center...';
+      const ccSpan = section.querySelector('#antigravity-menu-control-center span');
+      if (ccSpan && ccSpan.textContent !== ccLabel) ccSpan.textContent = ccLabel;
       const chkSpan = section.querySelector('#antigravity-menu-check-updates span');
       if (chkSpan && chkSpan.textContent !== h.checkUpdates) chkSpan.textContent = h.checkUpdates;
       const rstSpan = section.querySelector('#antigravity-menu-restore-vanilla span');

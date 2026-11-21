@@ -1,8 +1,10 @@
-# Antigravity Enhancer v3.5.1
+# Antigravity Enhancer v3.5.2
 
 ## Changes
 
-- Updated compatibility and verified lossless ASAR v4 bootstrapping & byte-identical restore for Antigravity **2.34.0** (`testedAppVersion: "2.34.0"`).
+- **Auto-Repatch Scheduler Fix**: Replaced the >261-char inline `schtasks.exe /TR` command with a lightweight `auto-repatch.ps1` wrapper (<160 chars) scheduled every 5 minutes so Antigravity updates are reliably re-patched in the background.
+- **Control Center Shortcuts Tab Fix**: Made `Shortcuts` tab switching synchronous before async diagnostics loading and added `ev.code` fallback + `Escape` cancel for key recording.
+- **Native UI Visual Alignment**: Aligned `#ag-enhancer-control-center` backdrop, border-radius (`12px`), `#0B0B0E` / `#111217` / `#181A22` / `#CAD3F5` / `#A0A3F6` surfaces, close button, and `-webkit-app-region: no-drag` rules 100% with the native Antigravity & Hub UI.
 
 ---
 
@@ -11,55 +13,71 @@
 <details>
 <summary>한국어</summary>
 
-- Antigravity **2.34.0** 버전(`testedAppVersion: "2.34.0"`)에 대한 호환성을 업데이트하고 무손실 ASAR v4 부트스트랩 및 바이트 단위 원본 복구를 검증했습니다.
+- **자동 재패치 스케줄러 수정**: Windows `schtasks.exe /TR` 261자 길이 제한으로 등록이 누락되던 문제를 `auto-repatch.ps1` 래퍼(5분 주기) 방식으로 해결해 Antigravity 업데이트 후 백그라운드 자동 재패치가 안정적으로 동작하도록 수정했습니다.
+- **Control Center 단축키 탭 수정**: `단축키 · 진단` 탭 전환이 비동기 상태 조회를 기다리지 않고 즉시 전환되도록 수정하고, 키 입력 녹화에 `ev.code` 폴백 및 `ESC` 취소 처리를 추가했습니다.
+- **네이티브 UI 색상/디자인 통일**: Control Center 모달의 배경·카드(`#0B0B0E` / `#111217` / `#181A22`), 포인트(`#A0A3F6`), 닫기 버튼 및 `no-drag` 속성을 네이티브/허브 UI와 100% 일치시켰습니다.
 
 </details>
 
 <details>
 <summary>日本語</summary>
 
-- Antigravity **2.34.0**（`testedAppVersion: "2.34.0"`）への互換性を更新し、ロスレス ASAR v4 ブートストラップおよびバイト単位の復元を検証しました。
+- **自動再パッチスケジューラ修正**: `schtasks.exe /TR` の 261 文字制限を回避する `auto-repatch.ps1` ラッパー（5分間隔）へ変更し、アップデート後の自動再パッチを確実に動作させました。
+- **Control Center ショートカットタブ修正**: タブ切替を同期化し、キー記録に `ev.code` フォールバックと `ESC` キャンセルを追加しました。
+- **ネイティブ UI デザイン統一**: Control Center の配色（`#0B0B0E` / `#111217` / `#181A22` / `#A0A3F6`）・角丸・`no-drag` をネイティブ UI と完全一致させました。
 
 </details>
 
 <details>
 <summary>简体中文</summary>
 
-- 更新了对 Antigravity **2.34.0**（`testedAppVersion: "2.34.0"`）的兼容性，并验证了无损 ASAR v4 引导与逐字节原版还原。
+- **修复自动重打补丁计划任务**：改用 `auto-repatch.ps1` 包装脚本（每 5 分钟检查）绕过 `schtasks.exe /TR` 261 字符限制，确保 Antigravity 更新后可自动重新应用补丁。
+- **修复 Control Center 快捷键标签页**：切换标签页改为立即同步渲染，并为按键录制增加 `ev.code` 回退与 `ESC` 取消。
+- **统一原生 UI 视觉风格**：将 Control Center 的背景、卡片色值（`#0B0B0E` / `#111217` / `#181A22` / `#A0A3F6`）、圆角与 `no-drag` 与原生界面完全对齐。
 
 </details>
 
 <details>
 <summary>繁體中文</summary>
 
-- 更新了對 Antigravity **2.34.0**（`testedAppVersion: "2.34.0"`）的相容性，並驗證了無損 ASAR v4 引導與逐位元組原版還原。
+- **修正自動重打修補排程**：改用 `auto-repatch.ps1` 包裝腳本（每 5 分鐘檢查）避開 `schtasks.exe /TR` 261 字元限制，確保 Antigravity 更新後可自動重新套用修補。
+- **修正 Control Center 快捷鍵分頁**：切換分頁改為立即同步渲染，並為按鍵錄製新增 `ev.code` 回退與 `ESC` 取消。
+- **統一原生 UI 視覺風格**：將 Control Center 的背景、卡片色票（`#0B0B0E` / `#111217` / `#181A22` / `#A0A3F6`）、圓角與 `no-drag` 與原生介面完全對齊。
 
 </details>
 
 <details>
 <summary>Español</summary>
 
-- Se actualizó la compatibilidad con Antigravity **2.34.0** (`testedAppVersion: "2.34.0"`) y se verificó el arranque ASAR v4 sin pérdidas y la restauración idéntica byte a byte.
+- **Corrección de re-parcheo automático**: Se reemplazó el comando `schtasks.exe /TR` (>261 caracteres) por `auto-repatch.ps1` cada 5 minutos.
+- **Corrección de pestaña Atajos**: Cambio síncrono de pestaña, respaldo `ev.code` y cancelación con `ESC`.
+- **Alineación visual nativa 100%**: Paleta `#0B0B0E` / `#111217` / `#181A22` / `#A0A3F6` y `no-drag` unificados con la UI nativa.
 
 </details>
 
 <details>
 <summary>Français</summary>
 
-- Mise à jour de la compatibilité pour Antigravity **2.34.0** (`testedAppVersion: "2.34.0"`) et vérification de l'amorçage ASAR v4 sans perte et de la restauration à l'octet près.
+- **Correctif d'auto-repatch** : Passage à un script `auto-repatch.ps1` (toutes les 5 min) sous la limite des 261 caractères de `schtasks.exe /TR`.
+- **Correctif onglet Raccourcis** : Bascule synchrone de l'onglet, repli `ev.code` et annulation `Échap`.
+- **Alignement visuel natif 100 %** : Palette `#0B0B0E` / `#111217` / `#181A22` / `#A0A3F6` et `no-drag` alignés sur l'interface native.
 
 </details>
 
 <details>
 <summary>Deutsch</summary>
 
-- Kompatibilität für Antigravity **2.34.0** (`testedAppVersion: "2.34.0"`) aktualisiert und verlustfreies ASAR-v4-Bootstrapping sowie byte-identische Wiederherstellung verifiziert.
+- **Auto-Repatch-Fix**: Wechsel auf ein `auto-repatch.ps1`-Skript (alle 5 Min.) unterhalb des 261-Zeichen-Limits von `schtasks.exe /TR`.
+- **Shortcuts-Tab-Fix**: Synchroner Tab-Wechsel, `ev.code`-Fallback und `ESC`-Abbruch.
+- **100 % Natives UI-Design**: Einheitliche `#0B0B0E` / `#111217` / `#181A22` / `#A0A3F6`-Palette und `no-drag`-Regeln.
 
 </details>
 
 <details>
 <summary>Русский</summary>
 
-- Обновлена совместимость с Antigravity **2.34.0** (`testedAppVersion: "2.34.0"`) и проверены загрузка ASAR v4 без потерь и побайтовое восстановление оригинала.
+- **Исправление авто-перепатча**: Переход на обёртку `auto-repatch.ps1` (каждые 5 мин) в пределах лимита 261 символа `schtasks.exe /TR`.
+- **Исправление вкладки горячих клавиш**: Синхронное переключение вкладки, резервный `ev.code` и отмена по `ESC`.
+- **100% соответствие нативному UI**: Палитра `#0B0B0E` / `#111217` / `#181A22` / `#A0A3F6` и `no-drag` приведены к нативному виду.
 
 </details>

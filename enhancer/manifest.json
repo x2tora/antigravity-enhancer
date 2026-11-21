@@ -1,26 +1,26 @@
 {
-  "version": "3.5.1",
+  "version": "3.5.2",
   "channel": "stable",
   "minAppVersion": "2.30.0",
   "testedAppVersion": "2.34.0",
   "repo": "x2tora/antigravity-enhancer",
-  "updatedAt": "2026-11-21T00:55:54.883Z",
-  "releaseNotes": "- Updated compatibility and verified lossless ASAR v4 bootstrapping & byte-identical restore for Antigravity **2.34.0** (`testedAppVersion: \"2.34.0\"`).",
+  "updatedAt": "2026-11-21T17:14:05.084Z",
+  "releaseNotes": "- **Auto-Repatch Scheduler Fix**: Replaced the >261-char inline `schtasks.exe /TR` command with a lightweight `auto-repatch.ps1` wrapper (<160 chars) scheduled every 5 minutes so Antigravity updates are reliably re-patched in the background.\n- **Control Center Shortcuts Tab Fix**: Made `Shortcuts` tab switching synchronous before async diagnostics loading and added `ev.code` fallback + `Escape` cancel for key recording.\n- **Native UI Visual Alignment**: Aligned `#ag-enhancer-control-center` backdrop, border-radius (`12px`), `#0B0B0E` / `#111217` / `#181A22` / `#CAD3F5` / `#A0A3F6` surfaces, close button, and `-webkit-app-region: no-drag` rules 100% with the native Antigravity & Hub UI.",
   "releaseNotesI18n": {
-    "en": "- Updated compatibility and verified lossless ASAR v4 bootstrapping & byte-identical restore for Antigravity **2.34.0** (`testedAppVersion: \"2.34.0\"`).",
-    "ko": "- Antigravity **2.34.0** 버전(`testedAppVersion: \"2.34.0\"`)에 대한 호환성을 업데이트하고 무손실 ASAR v4 부트스트랩 및 바이트 단위 원본 복구를 검증했습니다.",
-    "ja": "- Antigravity **2.34.0**（`testedAppVersion: \"2.34.0\"`）への互換性を更新し、ロスレス ASAR v4 ブートストラップおよびバイト単位の復元を検証しました。",
-    "zh-CN": "- 更新了对 Antigravity **2.34.0**（`testedAppVersion: \"2.34.0\"`）的兼容性，并验证了无损 ASAR v4 引导与逐字节原版还原。",
-    "zh-TW": "- 更新了對 Antigravity **2.34.0**（`testedAppVersion: \"2.34.0\"`）的相容性，並驗證了無損 ASAR v4 引導與逐位元組原版還原。",
-    "es": "- Se actualizó la compatibilidad con Antigravity **2.34.0** (`testedAppVersion: \"2.34.0\"`) y se verificó el arranque ASAR v4 sin pérdidas y la restauración idéntica byte a byte.",
-    "fr": "- Mise à jour de la compatibilité pour Antigravity **2.34.0** (`testedAppVersion: \"2.34.0\"`) et vérification de l'amorçage ASAR v4 sans perte et de la restauration à l'octet près.",
-    "de": "- Kompatibilität für Antigravity **2.34.0** (`testedAppVersion: \"2.34.0\"`) aktualisiert und verlustfreies ASAR-v4-Bootstrapping sowie byte-identische Wiederherstellung verifiziert.",
-    "ru": "- Обновлена совместимость с Antigravity **2.34.0** (`testedAppVersion: \"2.34.0\"`) и проверены загрузка ASAR v4 без потерь и побайтовое восстановление оригинала."
+    "en": "- **Auto-Repatch Scheduler Fix**: Replaced the >261-char inline `schtasks.exe /TR` command with a lightweight `auto-repatch.ps1` wrapper (<160 chars) scheduled every 5 minutes so Antigravity updates are reliably re-patched in the background.\n- **Control Center Shortcuts Tab Fix**: Made `Shortcuts` tab switching synchronous before async diagnostics loading and added `ev.code` fallback + `Escape` cancel for key recording.\n- **Native UI Visual Alignment**: Aligned `#ag-enhancer-control-center` backdrop, border-radius (`12px`), `#0B0B0E` / `#111217` / `#181A22` / `#CAD3F5` / `#A0A3F6` surfaces, close button, and `-webkit-app-region: no-drag` rules 100% with the native Antigravity & Hub UI.",
+    "ko": "- **자동 재패치 스케줄러 수정**: Windows `schtasks.exe /TR` 261자 길이 제한으로 등록이 누락되던 문제를 `auto-repatch.ps1` 래퍼(5분 주기) 방식으로 해결해 Antigravity 업데이트 후 백그라운드 자동 재패치가 안정적으로 동작하도록 수정했습니다.\n- **Control Center 단축키 탭 수정**: `단축키 · 진단` 탭 전환이 비동기 상태 조회를 기다리지 않고 즉시 전환되도록 수정하고, 키 입력 녹화에 `ev.code` 폴백 및 `ESC` 취소 처리를 추가했습니다.\n- **네이티브 UI 색상/디자인 통일**: Control Center 모달의 배경·카드(`#0B0B0E` / `#111217` / `#181A22`), 포인트(`#A0A3F6`), 닫기 버튼 및 `no-drag` 속성을 네이티브/허브 UI와 100% 일치시켰습니다.",
+    "ja": "- **自動再パッチスケジューラ修正**: `schtasks.exe /TR` の 261 文字制限を回避する `auto-repatch.ps1` ラッパー（5分間隔）へ変更し、アップデート後の自動再パッチを確実に動作させました。\n- **Control Center ショートカットタブ修正**: タブ切替を同期化し、キー記録に `ev.code` フォールバックと `ESC` キャンセルを追加しました。\n- **ネイティブ UI デザイン統一**: Control Center の配色（`#0B0B0E` / `#111217` / `#181A22` / `#A0A3F6`）・角丸・`no-drag` をネイティブ UI と完全一致させました。",
+    "zh-CN": "- **修复自动重打补丁计划任务**：改用 `auto-repatch.ps1` 包装脚本（每 5 分钟检查）绕过 `schtasks.exe /TR` 261 字符限制，确保 Antigravity 更新后可自动重新应用补丁。\n- **修复 Control Center 快捷键标签页**：切换标签页改为立即同步渲染，并为按键录制增加 `ev.code` 回退与 `ESC` 取消。\n- **统一原生 UI 视觉风格**：将 Control Center 的背景、卡片色值（`#0B0B0E` / `#111217` / `#181A22` / `#A0A3F6`）、圆角与 `no-drag` 与原生界面完全对齐。",
+    "zh-TW": "- **修正自動重打修補排程**：改用 `auto-repatch.ps1` 包裝腳本（每 5 分鐘檢查）避開 `schtasks.exe /TR` 261 字元限制，確保 Antigravity 更新後可自動重新套用修補。\n- **修正 Control Center 快捷鍵分頁**：切換分頁改為立即同步渲染，並為按鍵錄製新增 `ev.code` 回退與 `ESC` 取消。\n- **統一原生 UI 視覺風格**：將 Control Center 的背景、卡片色票（`#0B0B0E` / `#111217` / `#181A22` / `#A0A3F6`）、圓角與 `no-drag` 與原生介面完全對齊。",
+    "es": "- **Corrección de re-parcheo automático**: Se reemplazó el comando `schtasks.exe /TR` (>261 caracteres) por `auto-repatch.ps1` cada 5 minutos.\n- **Corrección de pestaña Atajos**: Cambio síncrono de pestaña, respaldo `ev.code` y cancelación con `ESC`.\n- **Alineación visual nativa 100%**: Paleta `#0B0B0E` / `#111217` / `#181A22` / `#A0A3F6` y `no-drag` unificados con la UI nativa.",
+    "fr": "- **Correctif d'auto-repatch** : Passage à un script `auto-repatch.ps1` (toutes les 5 min) sous la limite des 261 caractères de `schtasks.exe /TR`.\n- **Correctif onglet Raccourcis** : Bascule synchrone de l'onglet, repli `ev.code` et annulation `Échap`.\n- **Alignement visuel natif 100 %** : Palette `#0B0B0E` / `#111217` / `#181A22` / `#A0A3F6` et `no-drag` alignés sur l'interface native.",
+    "de": "- **Auto-Repatch-Fix**: Wechsel auf ein `auto-repatch.ps1`-Skript (alle 5 Min.) unterhalb des 261-Zeichen-Limits von `schtasks.exe /TR`.\n- **Shortcuts-Tab-Fix**: Synchroner Tab-Wechsel, `ev.code`-Fallback und `ESC`-Abbruch.\n- **100 % Natives UI-Design**: Einheitliche `#0B0B0E` / `#111217` / `#181A22` / `#A0A3F6`-Palette und `no-drag`-Regeln.",
+    "ru": "- **Исправление авто-перепатча**: Переход на обёртку `auto-repatch.ps1` (каждые 5 мин) в пределах лимита 261 символа `schtasks.exe /TR`.\n- **Исправление вкладки горячих клавиш**: Синхронное переключение вкладки, резервный `ev.code` и отмена по `ESC`.\n- **100% соответствие нативному UI**: Палитра `#0B0B0E` / `#111217` / `#181A22` / `#A0A3F6` и `no-drag` приведены к нативному виду."
   },
   "files": {
     "main-enhancer.js": {
       "size": 31663,
-      "sha256": "b12aa469920639e40a5a9fdc19a41720085c0f76452f4c8dde90245124d717fb",
+      "sha256": "87e650516682fd1b72f407a0eb96336a59ac927c061c8f18e3cadb9902d9e3f7",
       "restartRequired": true
     },
     "asar-patcher.js": {
@@ -29,8 +29,8 @@
       "restartRequired": true
     },
     "renderer-enhancer.js": {
-      "size": 156113,
-      "sha256": "fd0b8ab15d86fac417c292e07b63ee1870338e5cc34fd855114e6117ceaa2d89",
+      "size": 158810,
+      "sha256": "686bd0895b57dff5c135b7208d109a6243f5ba1d85fbf44bc9541765d5fb8e6a",
       "restartRequired": false
     },
     "gsap-core.js": {
@@ -45,7 +45,7 @@
     },
     "auto-repatch.js": {
       "size": 8099,
-      "sha256": "209b8a4af572a523e557fa6f2811a56bdd0001c2994d0e27a7de33adf4779ff9",
+      "sha256": "dce1fcfb70f414e28d3e0faabb947816549f1e2245d1e455c97d06bf627510d6",
       "restartRequired": false
     }
   }

@@ -1,5 +1,5 @@
 /**
- * Antigravity Enhancer v3.5.1 - Secure Auto-Re-Patch Guardian
+ * Antigravity Enhancer v3.5.2 - Secure Auto-Re-Patch Guardian
  * Detects when an Antigravity IDE update overwrites app.asar, verifies if a matching
  * patch exists in the remote manifest, downloads SHA-256 verified modules, and
  * atomically re-bootstraps app.asar when Antigravity is not running.
