@@ -1,5 +1,5 @@
 /**
- * Antigravity Enhancer v3.5.0 - Modular Renderer Enhancer Engine
+ * Antigravity Enhancer v3.5.1 - Modular Renderer Enhancer Engine
  * Features: 9-Language Zero-Restart i18n, Translation Engine 2.0 (Slice + Glossary),
  *           Quota Intelligence (Sparklines, Burn-Rate ETA & Alerts),
  *           Enhancer Control Center & Custom Shortcuts (x2tora/antigravity-enhancer)
@@ -11,7 +11,7 @@
   const ipc = electron_1 ? electron_1.ipcRenderer : null;
   const payload = (typeof __ENHANCER_PAYLOAD__ !== 'undefined' && __ENHANCER_PAYLOAD__) ? __ENHANCER_PAYLOAD__ : {};
   const ENHANCER_REPO = payload.repo || 'x2tora/antigravity-enhancer';
-  const ENHANCER_CURRENT_VERSION = payload.version || '3.5.0';
+  const ENHANCER_CURRENT_VERSION = payload.version || '3.5.1';
 
   const DEFAULT_PREFS = {
     shortcutCycleLang: 'Alt+Shift+L',
@@ -1272,7 +1272,7 @@
     }
     const status = await refreshHubStatus() || {
       enhancerVersion: ENHANCER_CURRENT_VERSION,
-      appVersion: '2.33.0',
+      appVersion: '2.34.0',
       asarBootstrapped: true
     };
     let h = getHubStrings();
@@ -1332,7 +1332,7 @@
           </div>
           <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;">
             <span style="font-size:12px;color:#9DA7C7;">${h.appVer}</span>
-            <span style="font-size:12px;font-weight:500;color:#CAD3F5;font-variant-numeric:tabular-nums;">v${status.appVersion || '2.33.0'}</span>
+            <span style="font-size:12px;font-weight:500;color:#CAD3F5;font-variant-numeric:tabular-nums;">v${status.appVersion || '2.34.0'}</span>
           </div>
         </section>
 
@@ -1484,7 +1484,7 @@
   }
 
   // ---------------------------------------------------------------------------
-  // 5. Settings Panel & Top-Bar Controls (2.33.0 Compatible)
+  // 5. Settings Panel & Top-Bar Controls (2.34.0 Compatible)
   // ---------------------------------------------------------------------------
   const QUOTA_SETTING_I18N = {
     en: { title: 'Top-Bar Quota Widget', desc: 'Show real-time model quota and AI usage widget in the top bar.' },
@@ -2108,7 +2108,7 @@
   }
 
   // ---------------------------------------------------------------------------
-  // 7. Main-World Quota Widget & Composer Inline Model Badge (2.33.0 Ready)
+  // 7. Main-World Quota Widget & Composer Inline Model Badge (2.34.0 Ready)
   // ---------------------------------------------------------------------------
   function injectMainWorldQuotaWidget() {
     if (document.getElementById('antigravity-quota-main-script')) return;
