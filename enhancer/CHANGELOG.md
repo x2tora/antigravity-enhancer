@@ -3,6 +3,17 @@
 All notable changes to **Antigravity Enhancer** are documented in this file.
 Older pre-v3 legacy patch logs have been consolidated into milestone summaries below.
 
+## [4.0.1] - 2026-11-23
+
+### Added
+- **Full 9-Language Typography & Webfont Stack**: Added per-language font prioritization and webfont stylesheets (`Pretendard Variable`, `Pretendard JP Variable`, `Noto Sans SC`, `Noto Sans TC`, `Noto Sans`) with native OS fallbacks so Korean, Japanese, Simplified/Traditional Chinese, Cyrillic (Russian), and European languages render cleanly without mixed CJK glyphs.
+
+### Improved
+- **Centered Max-Height Modal Anchor**: Positioned Patch Settings (`#ag-enhancer-control-center`) so its maximum height (`min(86vh, 680px)`) sits vertically centered on screen while keeping the top edge fixed during height transitions.
+- **Installer Logo & Discord Release Webhook**: Replaced the installer icon with the `antigravity.xitora.cc` mark (`assets/icon.png`, `assets/icon.ico`) and updated Discord release notifications with `AntigravityEnhancer` branding, custom avatar, `https://antigravity.xitora.cc` title link, and a `릴리스 다운로드` link button.
+
+---
+
 ## [4.0.0.1] - 2026-11-23
 
 ### Improved

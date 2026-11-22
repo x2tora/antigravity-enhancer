@@ -33,7 +33,7 @@ jobs:
         shell: pwsh
         run: |
           $tag = "${{ github.ref_name }}"
-          $ver = if ($tag -match '^v(\d+\.\d+\.\d+(?:\.\d+)?)$') { $Matches[1] } else { "4.0.0.1" }
+          $ver = if ($tag -match '^v(\d+\.\d+\.\d+(?:\.\d+)?)$') { $Matches[1] } else { "4.0.1" }
           powershell -NoProfile -ExecutionPolicy Bypass -File .\build_exe_installer.ps1 -Version $ver
 
       - name: Run v3 architecture E2E suite
@@ -75,15 +75,37 @@ jobs:
           $notes = if ($manifest.releaseNotesI18n -and $manifest.releaseNotesI18n.ko) { $manifest.releaseNotesI18n.ko } else { $manifest.releaseNotes }
           if ($notes.Length -gt 600) { $notes = $notes.Substring(0, 597) + "..." }
           $releaseUrl = "https://github.com/x2tora/antigravity-enhancer/releases/tag/$($env:TAG_NAME)"
+          $siteUrl = "https://antigravity.xitora.cc"
+          $avatarUrl = "https://raw.githubusercontent.com/x2tora/antigravity-enhancer/main/assets/icon.png"
           $payload = @{
+            username = "AntigravityEnhancer"
+            avatar_url = $avatarUrl
             embeds = @(
               @{
                 title = "Antigravity Enhancer $($env:TAG_NAME) 업데이트"
-                url = $releaseUrl
-                description = "**지원 Antigravity 버전:** ``$($manifest.testedAppVersion)```n`n$notes`n`n[릴리스 다운로드]($releaseUrl)"
+                url = $siteUrl
+                description = "**지원 Antigravity 버전:** ``$($manifest.testedAppVersion)```n`n$notes"
                 color = 10527734
               }
             )
-          } | ConvertTo-Json -Depth 5
+            components = @(
+              @{
+                type = 1
+                components = @(
+                  @{
+                    type = 2
+                    style = 5
+                    label = "릴리스 다운로드"
+                    url = $releaseUrl
+                  }
+                )
+              }
+            )
+          } | ConvertTo-Json -Depth 6
+          $webhookUri = $env:DISCORD_WEBHOOK_URL
+          if ($webhookUri -notmatch 'with_components=') {
+            $sep = if ($webhookUri -match '\?') { '&' } else { '?' }
+            $webhookUri = "$webhookUri${sep}with_components=true"
+          }
           $bytes = [System.Text.Encoding]::UTF8.GetBytes($payload)
-          Invoke-RestMethod -Uri $env:DISCORD_WEBHOOK_URL -Method Post -ContentType "application/json; charset=utf-8" -Body $bytes | Out-Null
+          Invoke-RestMethod -Uri $webhookUri -Method Post -ContentType "application/json; charset=utf-8" -Body $bytes | Out-Null

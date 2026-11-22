@@ -1,5 +1,5 @@
 /**
- * Antigravity Enhancer v4.0.0.1 - Modular Renderer Enhancer Engine
+ * Antigravity Enhancer v4.0.1 - Modular Renderer Enhancer Engine
  * Features: 9-Language Zero-Restart i18n, Translation Engine 2.0 (Slice + Glossary),
  *           Quota Intelligence (Sparklines, Burn-Rate ETA & Alerts),
  *           Enhancer Control Center & Custom Shortcuts (x2tora/antigravity-enhancer)
@@ -11,7 +11,7 @@
   const ipc = electron_1 ? electron_1.ipcRenderer : null;
   const payload = (typeof __ENHANCER_PAYLOAD__ !== 'undefined' && __ENHANCER_PAYLOAD__) ? __ENHANCER_PAYLOAD__ : {};
   const ENHANCER_REPO = payload.repo || 'x2tora/antigravity-enhancer';
-  const ENHANCER_CURRENT_VERSION = payload.version || '4.0.0.1';
+  const ENHANCER_CURRENT_VERSION = payload.version || '4.0.1';
 
   const DEFAULT_PREFS = {
     shortcutCycleLang: 'Alt+Shift+L',
@@ -537,9 +537,54 @@
     }
   }
 
+  const UI_FONT_LINKS = [
+    { id: 'ag-font-pretendard', href: 'https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css' },
+    { id: 'ag-font-pretendard-jp', href: 'https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-jp-dynamic-subset.min.css' },
+    { id: 'ag-font-noto-multilang', href: 'https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap' }
+  ];
+
+  function getUiFontFamily(lang) {
+    switch (lang) {
+      case 'ko':
+        return '-apple-system, BlinkMacSystemFont, "Pretendard Variable", Pretendard, "Malgun Gothic", "맑은 고딕", "Apple SD Gothic Neo", "Segoe UI", sans-serif';
+      case 'ja':
+        return '-apple-system, BlinkMacSystemFont, "Pretendard JP Variable", "Pretendard JP", "Pretendard Variable", "Hiragino Sans", "Yu Gothic UI", "Meiryo", "Segoe UI", sans-serif';
+      case 'zh-CN':
+        return '-apple-system, BlinkMacSystemFont, "Noto Sans SC", "PingFang SC", "Microsoft YaHei UI", "Microsoft YaHei", "Pretendard Variable", "Segoe UI", sans-serif';
+      case 'zh-TW':
+        return '-apple-system, BlinkMacSystemFont, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei UI", "Microsoft JhengHei", "Pretendard Variable", "Segoe UI", sans-serif';
+      default:
+        return '-apple-system, BlinkMacSystemFont, "Pretendard Variable", "Noto Sans", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+    }
+  }
+
+  function buildI18nFontCss(lang) {
+    const family = getUiFontFamily(lang);
+    return `
+        body, button, select {
+          font-family: ${family} !important;
+        }
+        input, textarea {
+          font-family: ${family};
+        }
+      `;
+  }
+
   function injectFont() {
     const root = document.head || document.documentElement;
     if (!root) return;
+
+    try {
+      for (const f of UI_FONT_LINKS) {
+        if (!document.getElementById(f.id)) {
+          const link = document.createElement('link');
+          link.id = f.id;
+          link.rel = 'stylesheet';
+          link.href = f.href;
+          root.appendChild(link);
+        }
+      }
+    } catch (_) {}
 
     if (!document.getElementById('antigravity-developer-style')) {
       const devStyle = document.createElement('style');
@@ -630,14 +675,7 @@
     if (!document.getElementById('antigravity-i18n-style')) {
       const i18nStyle = document.createElement('style');
       i18nStyle.id = 'antigravity-i18n-style';
-      i18nStyle.textContent = `
-        body, button, select {
-          font-family: -apple-system, BlinkMacSystemFont, "Pretendard Variable", Pretendard, "Malgun Gothic", "맑은 고딕", "Apple SD Gothic Neo", sans-serif !important;
-        }
-        input, textarea {
-          font-family: -apple-system, BlinkMacSystemFont, "Pretendard Variable", Pretendard, "Malgun Gothic", "맑은 고딕", "Apple SD Gothic Neo", sans-serif;
-        }
-      `;
+      i18nStyle.textContent = buildI18nFontCss(activeLanguage);
       i18nStyle.disabled = (activeLanguage === 'en');
       root.appendChild(i18nStyle);
     }
@@ -1228,13 +1266,13 @@
     bd.id = 'ag-enhancer-control-center-backdrop';
     bd.className = 'notranslate';
     bd.setAttribute('translate', 'no');
-    bd.style.cssText = 'position:fixed;inset:0;z-index:100001;background:rgba(11,11,14,0.72);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;align-items:flex-start;justify-content:center;padding:min(10vh, 72px) 20px 20px;app-region:no-drag;-webkit-app-region:no-drag;';
+    bd.style.cssText = 'position:fixed;inset:0;z-index:100001;background:rgba(11,11,14,0.72);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;align-items:flex-start;justify-content:center;padding:calc((100vh - min(86vh, 680px)) / 2) 20px 20px;app-region:no-drag;-webkit-app-region:no-drag;';
 
     const modal = document.createElement('div');
     modal.id = 'ag-enhancer-control-center';
     modal.className = 'agy-overlay border rounded-xl text-foreground shadow-lg notranslate';
     modal.setAttribute('translate', 'no');
-    modal.style.cssText = 'width:660px;max-width:94vw;max-height:86vh;display:flex;flex-direction:column;background:#0B0B0E;border:1px solid rgba(202,211,245,0.1);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,0.48);color:#CAD3F5;font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable",Pretendard,"Segoe UI",sans-serif;font-size:13px;overflow:hidden;app-region:no-drag;-webkit-app-region:no-drag;';
+    modal.style.cssText = `width:660px;max-width:94vw;max-height:min(86vh, 680px);display:flex;flex-direction:column;background:#0B0B0E;border:1px solid rgba(202,211,245,0.1);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,0.48);color:#CAD3F5;font-family:${getUiFontFamily(activeLanguage)};font-size:13px;overflow:hidden;app-region:no-drag;-webkit-app-region:no-drag;`;
 
     const sInit = getControlCenterStrings(activeLanguage);
     const tabs = [
@@ -1968,7 +2006,10 @@
     persistPreferences({ language: lang });
 
     const fontStyle = document.getElementById('antigravity-i18n-style');
-    if (fontStyle) fontStyle.disabled = (lang === 'en');
+    if (fontStyle) {
+      fontStyle.textContent = buildI18nFontCss(lang);
+      fontStyle.disabled = (lang === 'en');
+    }
 
     const applyDomLang = () => {
       if (document.body) {
@@ -2231,7 +2272,7 @@
     menu.id = 'antigravity-quick-lang-menu';
     menu.className = 'agy-overlay border rounded-xl no-focus-ring flex flex-col shadow-lg min-w-[175px] p-1 gap-px notranslate';
     menu.setAttribute('translate', 'no');
-    menu.style.cssText = `position:fixed;top:${topPx}px;right:${rightPx}px;min-width:176px;padding:4px;gap:2px;display:flex;flex-direction:column;border-radius:10px;background:#111217;border:1px solid rgba(202,211,245,0.1);box-shadow:0 8px 24px rgba(0,0,0,0.42);color:#CAD3F5;font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable",Pretendard,"Segoe UI",sans-serif;z-index:99999;user-select:none;app-region:no-drag;-webkit-app-region:no-drag;`;
+    menu.style.cssText = `position:fixed;top:${topPx}px;right:${rightPx}px;min-width:176px;padding:4px;gap:2px;display:flex;flex-direction:column;border-radius:10px;background:#111217;border:1px solid rgba(202,211,245,0.1);box-shadow:0 8px 24px rgba(0,0,0,0.42);color:#CAD3F5;font-family:${getUiFontFamily(activeLanguage)};z-index:99999;user-select:none;app-region:no-drag;-webkit-app-region:no-drag;`;
 
     menu.innerHTML = LANG_ORDER.map(l => {
       const info = LANG_DISPLAY_NAMES[l] || { native: l, en: l };
@@ -2469,7 +2510,7 @@
       quickLangBtn.setAttribute('aria-label', 'Quick switch language');
       const langCode = (activeLanguage || 'ko').toUpperCase();
       quickLangBtn.title = `언어 선택 / Select Language (${langCode}) - Alt+Shift+L`;
-      quickLangBtn.style.cssText = 'display:inline-flex;align-items:center;justify-content:center;gap:4px;height:24px;padding:0 8px;border-radius:6px;font-size:11px;font-weight:500;font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable",Pretendard,"Segoe UI",sans-serif;line-height:1;background:#0B0B0E;border:1px solid rgba(202,211,245,0.12);color:#CAD3F5;cursor:pointer;user-select:none;app-region:no-drag;-webkit-app-region:no-drag;outline:none;transition:background-color 150ms cubic-bezier(0.22, 1, 0.36, 1),border-color 150ms cubic-bezier(0.22, 1, 0.36, 1);margin-right:4px;white-space:nowrap;flex-shrink:0;z-index:101;';
+      quickLangBtn.style.cssText = `display:inline-flex;align-items:center;justify-content:center;gap:4px;height:24px;padding:0 8px;border-radius:6px;font-size:11px;font-weight:500;font-family:${getUiFontFamily(activeLanguage)};line-height:1;background:#0B0B0E;border:1px solid rgba(202,211,245,0.12);color:#CAD3F5;cursor:pointer;user-select:none;app-region:no-drag;-webkit-app-region:no-drag;outline:none;transition:background-color 150ms cubic-bezier(0.22, 1, 0.36, 1),border-color 150ms cubic-bezier(0.22, 1, 0.36, 1);margin-right:4px;white-space:nowrap;flex-shrink:0;z-index:101;`;
       quickLangBtn.innerHTML = `<svg class="shrink-0 pointer-events-none" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="color:#9DA7C7;"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg><span id="antigravity-quick-lang-label" class="pointer-events-none" style="font-weight:600;font-size:11px;line-height:1;">${langCode}</span><svg class="shrink-0 pointer-events-none" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="color:#818BA8;"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
       quickLangBtn.onclick = (e) => { e.stopPropagation(); e.preventDefault(); toggleQuickLangMenu(quickLangBtn); };
     } else {
@@ -2874,7 +2915,7 @@
           ? `bottom:${Math.max(12, winH - rect.top + 8)}px;top:auto;`
           : `top:${Math.max(12, (rect.bottom || 32) + 8)}px;bottom:auto;`;
 
-        card.style.cssText = `position:fixed;${vertCss}left:${leftPx}px;width:280px;padding:12px;border-radius:12px;background:#111217;border:1px solid rgba(202,211,245,0.1);box-shadow:0 12px 28px rgba(0,0,0,0.45);color:#CAD3F5;font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable",Pretendard,"Segoe UI",sans-serif;font-size:12px;z-index:99998;pointer-events:none;user-select:none;app-region:no-drag;-webkit-app-region:no-drag;`;
+        card.style.cssText = `position:fixed;${vertCss}left:${leftPx}px;width:280px;padding:12px;border-radius:12px;background:#111217;border:1px solid rgba(202,211,245,0.1);box-shadow:0 12px 28px rgba(0,0,0,0.45);color:#CAD3F5;font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable","Pretendard JP Variable","Noto Sans SC","Noto Sans TC","Noto Sans","Segoe UI",sans-serif;font-size:12px;z-index:99998;pointer-events:none;user-select:none;app-region:no-drag;-webkit-app-region:no-drag;`;
 
         const vals = [grp.h5, grp.weekly].filter(v => typeof v === 'number');
         const isLow = vals.length > 0 && Math.min(...vals) < 20;
@@ -2909,7 +2950,7 @@
           ? `bottom:${Math.max(12, winH - rect.top + 8)}px;top:auto;left:${Math.max(12, Math.min(winW - 330, rect.left || 12))}px;right:auto;`
           : `top:${Math.max(32, (rect.bottom || 32) + 6)}px;bottom:auto;right:${Math.max(12, winW - (rect.right || 1180))}px;left:auto;`;
 
-        pop.style.cssText = `position:fixed;${posCss}width:320px;padding:12px;border-radius:12px;background:#111217;border:1px solid rgba(202,211,245,0.1);box-shadow:0 12px 32px rgba(0,0,0,0.48);color:#CAD3F5;font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable",Pretendard,"Segoe UI",sans-serif;font-size:12px;z-index:99999;user-select:none;app-region:no-drag;-webkit-app-region:no-drag;`;
+        pop.style.cssText = `position:fixed;${posCss}width:320px;padding:12px;border-radius:12px;background:#111217;border:1px solid rgba(202,211,245,0.1);box-shadow:0 12px 32px rgba(0,0,0,0.48);color:#CAD3F5;font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable","Pretendard JP Variable","Noto Sans SC","Noto Sans TC","Noto Sans","Segoe UI",sans-serif;font-size:12px;z-index:99999;user-select:none;app-region:no-drag;-webkit-app-region:no-drag;`;
 
         const cardsHtml = groupsList.map(g => {
           const rows = renderBucketHtml(qs.h5Full, g.h5, g.h5TargetTs, qs) + renderBucketHtml(qs.weeklyFull, g.weekly, g.weeklyTargetTs, qs);
@@ -3034,7 +3075,7 @@
               inlineBadge = document.createElement('span');
               inlineBadge.className = 'antigravity-inline-model-quota notranslate';
               inlineBadge.setAttribute('translate', 'no');
-              inlineBadge.style.cssText = 'display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 8px;margin-left:4px;margin-right:0;border-radius:6px;border:1px solid rgba(202,211,245,0.12);font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable",Pretendard,"Segoe UI",sans-serif;font-size:11px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1;cursor:pointer;user-select:none;white-space:nowrap;flex-shrink:0;vertical-align:middle;transition:border-color 150ms cubic-bezier(0.22, 1, 0.36, 1);';
+              inlineBadge.style.cssText = 'display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 8px;margin-left:4px;margin-right:0;border-radius:6px;border:1px solid rgba(202,211,245,0.12);font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable","Pretendard JP Variable","Noto Sans SC","Noto Sans TC","Noto Sans","Segoe UI",sans-serif;font-size:11px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1;cursor:pointer;user-select:none;white-space:nowrap;flex-shrink:0;vertical-align:middle;transition:border-color 150ms cubic-bezier(0.22, 1, 0.36, 1);';
               if (trigger.lastChild) trigger.insertBefore(inlineBadge, trigger.lastChild);
               else trigger.appendChild(inlineBadge);
             }

@@ -103,7 +103,7 @@ function createRendererHarness(initialLang = 'ko', seedDomFn = null, payloadOver
       invoked.push({ channel, arg });
       if (channel === 'enhancer:get-status') {
         return {
-          enhancerVersion: '4.0.0.1',
+          enhancerVersion: '4.0.1',
           appVersion: '2.34.0',
           asarBootstrapped: true
         };
@@ -113,12 +113,12 @@ function createRendererHarness(initialLang = 'ko', seedDomFn = null, payloadOver
           ok: true,
           hasUpdate: true,
           canApplyInApp: true,
-          currentVersion: '4.0.0.1',
-          remoteVersion: '4.0.0.1',
+          currentVersion: '4.0.1',
+          remoteVersion: '4.0.1',
           releaseNotes: 'English test update',
           releaseNotesI18n: {
             en: 'English test update',
-            ko: '### 주요 변경\n- **한국어 업데이트 변경사항** (`v4.0.0.1`)'
+            ko: '### 주요 변경\n- **한국어 업데이트 변경사항** (`v4.0.1`)'
           }
         };
       }
@@ -142,7 +142,7 @@ function createRendererHarness(initialLang = 'ko', seedDomFn = null, payloadOver
 
   const payload = {
     disabled: false,
-    version: '4.0.0.1',
+    version: '4.0.1',
     repo: 'x2tora/antigravity-enhancer',
     code: rendererCode,
     gsapCode,
@@ -219,11 +219,11 @@ function createRendererHarness(initialLang = 'ko', seedDomFn = null, payloadOver
 // ============================================================================
 // F22: Modular Enhancer & Manifest Integrity
 // ============================================================================
-registerTest(1, 'F22', 'manifest.json v4.0.0.1 points to x2tora/antigravity-enhancer & matches SHA-256 digests', () => {
+registerTest(1, 'F22', 'manifest.json v4.0.1 points to x2tora/antigravity-enhancer & matches SHA-256 digests', () => {
   const manifestPath = path.join(ENHANCER_DIR, 'manifest.json');
   assert.ok(fs.existsSync(manifestPath), 'enhancer/manifest.json missing');
   const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-  assert.strictEqual(manifest.version, '4.0.0.1');
+  assert.strictEqual(manifest.version, '4.0.1');
   assert.strictEqual(manifest.repo, 'x2tora/antigravity-enhancer');
   assert.strictEqual(manifest.testedAppVersion, '2.34.0');
   assert.ok(manifest.releaseNotesI18n && typeof manifest.releaseNotesI18n === 'object', 'manifest.json must include releaseNotesI18n');
@@ -553,7 +553,7 @@ registerTest(3, 'F24', 'Native Antigravity Enhanced title menu integrates Patch 
 
   const patchVerOpt = menuSection.querySelector('#antigravity-menu-patch-version');
   const patchSettingsOpt = menuSection.querySelector('#antigravity-menu-control-center');
-  assert.ok(patchVerOpt && patchVerOpt.textContent.includes('4.0.0.1'), 'Menu must display Patch Version 4.0.0.1');
+  assert.ok(patchVerOpt && patchVerOpt.textContent.includes('4.0.1'), 'Menu must display Patch Version 4.0.1');
   assert.ok(patchSettingsOpt && patchSettingsOpt.textContent.includes('패치 설정'), 'Menu must include unified 패치 설정... item');
   assert.strictEqual(menuSection.querySelector('#antigravity-menu-check-updates'), null, 'Separate Check Updates menu item must be merged into Patch Settings');
   assert.strictEqual(menuSection.querySelector('#antigravity-menu-restore-vanilla'), null, 'Separate Restore Original menu item must be merged into Patch Settings');
@@ -740,8 +740,8 @@ registerTest(1, 'F25', 'build_exe_installer.ps1 uses safe build hygiene, #0B0B0E
     assert.ok(fs.existsSync(path.join(ROOT_DIR, 'docs', `README.${l}.md`)), `docs/README.${l}.md must exist`);
   }
   assert.ok(fs.existsSync(path.join(ROOT_DIR, 'Antigravity-Enhancer-Setup.exe')));
-  assert.ok(fs.existsSync(path.join(ROOT_DIR, 'Antigravity-Enhancer-v4.0.0.1-Setup.exe')));
-  assert.ok(fs.existsSync(path.join(ROOT_DIR, 'Antigravity-Enhancer-v4.0.0.1-Win.zip')));
+  assert.ok(fs.existsSync(path.join(ROOT_DIR, 'Antigravity-Enhancer-v4.0.1-Setup.exe')));
+  assert.ok(fs.existsSync(path.join(ROOT_DIR, 'Antigravity-Enhancer-v4.0.1-Win.zip')));
   assert.ok(fs.existsSync(path.join(ROOT_DIR, 'SHA256SUMS.txt')));
 
   const sums = fs.readFileSync(path.join(ROOT_DIR, 'SHA256SUMS.txt'), 'utf8');
@@ -818,9 +818,9 @@ registerTest(4, 'F24', 'Main updater rejects SHA-256 tampering cleanly, atomical
     const fileUrl = 'https://raw.githubusercontent.com/x2tora/antigravity-enhancer/main/enhancer/renderer-enhancer.js';
 
     // 1. Tamper test: digest mismatch must abort BEFORE overwriting live enhancerDir
-    const v33Tampered = Buffer.from('/* v4.0.0.1 TAMPERED */', 'utf8');
+    const v33Tampered = Buffer.from('/* v4.0.1 TAMPERED */', 'utf8');
     remoteResponses.set(manifestUrl, JSON.stringify({
-      version: '4.0.0.1',
+      version: '4.0.1',
       files: { 'renderer-enhancer.js': { sha256: 'a'.repeat(64), size: v33Tampered.length } }
     }));
     remoteResponses.set(fileUrl, v33Tampered);
@@ -831,18 +831,18 @@ registerTest(4, 'F24', 'Main updater rejects SHA-256 tampering cleanly, atomical
     // 2. Valid atomic staging & dead rollback code removed
     assert.strictEqual(isolated.restoreFromBackupDir, undefined, 'Dead restoreFromBackupDir export must be removed');
     assert.strictEqual(isolated.getFullStatus().backup, undefined, 'Dead backup snapshot metadata must be removed from getFullStatus');
-    const v33Valid = Buffer.from('/* v4.0.0.1 valid */', 'utf8');
+    const v33Valid = Buffer.from('/* v4.0.1 valid */', 'utf8');
     const v33Sha = crypto.createHash('sha256').update(v33Valid).digest('hex');
     remoteResponses.set(manifestUrl, JSON.stringify({
-      version: '4.0.0.1',
+      version: '4.0.1',
       files: { 'renderer-enhancer.js': { sha256: v33Sha, size: v33Valid.length } }
     }));
     remoteResponses.set(fileUrl, v33Valid);
     const applyRes = await isolated.applyInAppUpdate('main');
     assert.strictEqual(applyRes.ok, true);
-    assert.strictEqual(applyRes.newVersion, '4.0.0.1');
-    assert.strictEqual(fs.readFileSync(path.join(tmpEnhDir, 'renderer-enhancer.js'), 'utf8'), '/* v4.0.0.1 valid */');
-    assert.strictEqual(JSON.parse(fs.readFileSync(path.join(tmpEnhDir, 'manifest.json'), 'utf8')).version, '4.0.0.1');
+    assert.strictEqual(applyRes.newVersion, '4.0.1');
+    assert.strictEqual(fs.readFileSync(path.join(tmpEnhDir, 'renderer-enhancer.js'), 'utf8'), '/* v4.0.1 valid */');
+    assert.strictEqual(JSON.parse(fs.readFileSync(path.join(tmpEnhDir, 'manifest.json'), 'utf8')).version, '4.0.1');
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
@@ -863,8 +863,8 @@ registerTest(4, 'F25', 'Installer OS language auto-detection (9 languages + Engl
     const installerCsPath = path.join(tmpDir, 'InstallerWPF.cs');
     // Rename App.Main out so test harness can define entry point cleanly
     const modifiedCs = match[1]
-      .replace(/__ASM_VERSION__/g, '4.0.0.1')
-      .replace(/__ENHANCER_VERSION__/g, '4.0.0.1')
+      .replace(/__ASM_VERSION__/g, '4.0.1')
+      .replace(/__ENHANCER_VERSION__/g, '4.0.1')
       .replace('public static void Main()', 'public static void MainWpfDisabled()');
     fs.writeFileSync(installerCsPath, '\uFEFF' + modifiedCs, 'utf8');
 
@@ -990,7 +990,7 @@ registerTest(4, 'F24', 'auto-repatch.js detects unpatched app.asar, skips incomp
       patchAsar: () => { isBootstrapped = true; patchCalls++; return { changed: true }; }
     };
 
-    const validRenderer = Buffer.from('/* 4.0.0.1 renderer */', 'utf8');
+    const validRenderer = Buffer.from('/* 4.0.1 renderer */', 'utf8');
     const validSha = crypto.createHash('sha256').update(validRenderer).digest('hex');
     const remoteResponses = new Map();
     const mockHttps = {
@@ -1020,7 +1020,7 @@ registerTest(4, 'F24', 'auto-repatch.js detects unpatched app.asar, skips incomp
     const fileUrl = 'https://raw.githubusercontent.com/x2tora/antigravity-enhancer/main/enhancer/renderer-enhancer.js';
 
     remoteResponses.set(manifestUrl, JSON.stringify({
-      version: '4.0.0.1',
+      version: '4.0.1',
       repo: 'x2tora/antigravity-enhancer',
       minAppVersion: '2.30.0',
       testedAppVersion: '2.34.0',
@@ -1058,7 +1058,7 @@ registerTest(4, 'F24', 'auto-repatch.js detects unpatched app.asar, skips incomp
     assert.strictEqual(okRes.repatched, true);
     assert.strictEqual(patchCalls, 1);
     assert.strictEqual(isBootstrapped, true);
-    assert.strictEqual(fs.readFileSync(path.join(tmpEnhDir, 'renderer-enhancer.js'), 'utf8'), '/* 4.0.0.1 renderer */');
+    assert.strictEqual(fs.readFileSync(path.join(tmpEnhDir, 'renderer-enhancer.js'), 'utf8'), '/* 4.0.1 renderer */');
 
     const skipRes = await autoRepatch.runAutoRepatch({
       enhancerDir: tmpEnhDir,
@@ -1223,6 +1223,12 @@ registerTest(1, 'F28', 'main-enhancer persists preferences & renderer opens 4-ta
   assert.ok(backBtn, 'Changelog viewer must render Back button');
   backBtn.click();
   assert.ok(env.document.getElementById('agy-hub-changelog-btn'), 'Clicking Back must return to General tab');
+
+  assert.ok(env.document.getElementById('ag-font-pretendard'), 'Must inject Pretendard webfont link');
+  assert.ok(env.document.getElementById('ag-font-pretendard-jp'), 'Must inject Pretendard JP webfont link');
+  assert.ok(env.document.getElementById('ag-font-noto-multilang'), 'Must inject Noto Sans multilang webfont link');
+  const i18nStyleEl = env.document.getElementById('antigravity-i18n-style');
+  assert.ok(i18nStyleEl && i18nStyleEl.textContent.includes('Pretendard Variable'), 'Korean mode must prioritize Pretendard Variable');
 });
 
 registerTest(2, 'F26', 'main-enhancer ensureAutoRepatchWrappers generates zero-flash .ps1/.vbs & auto-repatch writes status', async () => {
