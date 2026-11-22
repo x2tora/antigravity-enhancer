@@ -1,10 +1,11 @@
-# Antigravity Enhancer v3.5.4
+# Antigravity Enhancer v4.0.0
 
 ## Changes
 
-- **Control Center Full Wiring**: Added glossary JSON Export/Import, collected untranslated string viewer (Copy/Clear), Compact Quota Card toggle, Clear 72h History button, and 9-language dynamic modal re-localization (`CONTROL_CENTER_I18N`).
-- **Auto-Repatch Diagnostics & Self-Healing Wrappers**: Added `user-data/auto-repatch-status.json` tracking in `auto-repatch.js` (shown in Control Center Diagnostics) and `ensureAutoRepatchWrappers()` in `main-enhancer.js` so in-app updates keep the zero-flash `.ps1`/`.vbs` wrappers synced.
-- **Tier 2 E2E Coverage**: Added boundary tests for `ensureAutoRepatchWrappers`, `auto-repatch-status.json`, `ev.code` shortcut fallback, and 9-language Control Center localization.
+- **Unified Patch Settings & Changelog Viewer**: Consolidated Update Check, Restore Original, and title-bar dropdown items into **패치 설정 (`Patch Settings`)**, added a dedicated in-app **Changelog** viewer (`CHANGELOG.md`) with version cards, markdown release-notes rendering, GSAP animations, fixed modal height (`360px`), and inline confirmation for **Clear 72h History**.
+- **Native Right-Click Context Menu Localization**: Hooked Electron `Menu.buildFromTemplate` and synced renderer/main active language preferences so project, group, and conversation right-click menus translate across all supported languages.
+- **Smart Untranslated Collector & Dictionary Expansion**: Filtered out project names, conversation titles, file paths, brand/model names (`Antigravity`, `Argon`, `Gemini`), agent tool/step logs, and dynamic timers (`Still thinking, Ns`), and added 62 new static UI & context-menu translations across 8 languages.
+- **Consolidated `CHANGELOG.md`**: Streamlined historical release logs into clean milestone summaries for v3.0.0–v4.0.0.
 
 ---
 
@@ -13,64 +14,72 @@
 <details>
 <summary>한국어</summary>
 
-- **Control Center 기능 완성**: 커스텀 용어집 JSON 내보내기/가져오기, 수집된 미번역 문자열 보기·복사·비우기, 컴팩트 할당량 카드 토글, 72시간 기록 초기화 버튼 및 9개국어 실시간 모달 재번역을 추가했습니다.
-- **자동 재패치 진단 및 래퍼 동기화**: `auto-repatch.js`가 마지막 점검 상태(`auto-repatch-status.json`)를 기록해 Control Center 진단 화면에 표시하며, `main-enhancer.js`가 인앱 업데이트 시에도 무창(`.ps1`/`.vbs`) 래퍼를 자동 보정합니다.
-- **Tier 2 E2E 테스트 추가**: 래퍼 생성, 재패치 상태 저장, `ev.code` 단축키 폴백 및 9개국어 Control Center 현지화 경계 테스트를 추가했습니다.
+- **패치 설정 통합 UI 및 변경 기록 뷰어**: 업데이트 확인·원본 복구 창과 중복 타이틀 메뉴를 **패치 설정** 모달로 통합하고, 지난 업데이트 기록까지 볼 수 있는 전용 **변경 기록 (`CHANGELOG.md`) 뷰어**, 마크다운 변경 로그 렌더링, GSAP 전환 애니메이션, 고정 높이(`360px`) 및 **72시간 기록 초기화 인라인 확인**을 추가했습니다.
+- **네이티브 우클릭 컨텍스트 메뉴 번역**: Electron `Menu.buildFromTemplate` 후킹과 렌더러-메인 활성 언어 동기화를 통해 프로젝트·그룹·대화 우클릭 메뉴 56종이 선택 언어로 즉시 번역됩니다.
+- **미번역 수집기 필터 고도화 및 사전 확장**: 프로젝트명, 대화 제목, 파일 경로, 브랜드/모델명(`Antigravity`, `Argon`, `Gemini`), 에이전트 작업 로그, 동적 타이머(`Still thinking, Ns`) 노이즈를 걸러내고 62개 신규 UI/컨텍스트 메뉴 번역을 추가했습니다.
+- **`CHANGELOG.md` 정리 및 통합**: 오래된 초기 패치 기록을 정리하고 v3.0.0~v4.0.0 핵심 마일스톤으로 깔끔하게 통합했습니다.
 
 </details>
 
 <details>
 <summary>日本語</summary>
 
-- **Control Center 完全連携**: 用語集 JSON エクスポート/インポート、未翻訳リスト表示・コピー・消去、コンパクトカード切替、72時間履歴消去、9言語リアルタイム再翻訳を追加しました。
-- **自動再パッチ診断・ラッパー同期**: `auto-repatch-status.json` 記録と診断表示、および `ensureAutoRepatchWrappers()` を追加しました。
+- **パッチ設定統合 UI と変更履歴ビューア**: 更新確認・復元画面と重複メニューを **パッチ設定** に統合し、過去の更新履歴を確認できる専用 **変更履歴 (`CHANGELOG.md`) ビューア**、Markdown リリースノート描画、GSAP アニメーション、固定高さ、72時間履歴消去の確認手順を追加しました。
+- **ネイティブ右クリックメニュー翻訳**: `Menu.buildFromTemplate` のフックと言語同期により、プロジェクト・グループ・会話の右クリックメニューを即時翻訳します。
+- **未翻訳収集フィルター強化と辞書拡充**: プロジェクト名・ファイルパス・エージェントログ等のノイズを除外し、62個の新規 UI・メニュー翻訳を追加しました。
 
 </details>
 
 <details>
 <summary>简体中文</summary>
 
-- **完善 Control Center 功能**：新增术语表 JSON 导出/导入、未翻译文本查看/复制/清空、紧凑配额卡片开关、清除 72 小时历史按钮及 9 种语言实时重译。
-- **自动重打补丁诊断与同步**：新增 `auto-repatch-status.json` 状态记录与诊断展示，以及 `ensureAutoRepatchWrappers()` 自动同步。
+- **统一补丁设置与更新日志查看器**：将更新检查与还原功能整合进 **补丁设置** 弹窗，新增专用 **更新日志 (`CHANGELOG.md`) 查看器**、Markdown 渲染、GSAP 动画、固定高度及清除 72 小时历史确认步骤。
+- **原生右键菜单本地化**：通过拦截 `Menu.buildFromTemplate` 并同步活动语言，实现项目、分组和对话右键菜单的即时翻译。
+- **未翻译收集过滤与词典扩展**：过滤项目名、路径与代理工具日志噪声，新增 62 条界面与右键菜单翻译。
 
 </details>
 
 <details>
 <summary>繁體中文</summary>
 
-- **完善 Control Center 功能**：新增詞彙表 JSON 匯出/匯入、未翻譯字串檢視/複製/清空、精簡配額卡片開關、清除 72 小時歷史按鈕及 9 種語言即時重譯。
-- **自動重打修補診斷與同步**：新增 `auto-repatch-status.json` 狀態記錄與診斷顯示，以及 `ensureAutoRepatchWrappers()` 自動同步。
+- **統一修補設定與變更紀錄檢視器**：將檢查更新與還原功能整合進 **修補設定** 視窗，新增專用 **變更紀錄 (`CHANGELOG.md`) 檢視器**、Markdown 渲染、GSAP 動畫、固定高度及清除 72 小時歷史確認步驟。
+- **原生右鍵選單在地化**：透過攔截 `Menu.buildFromTemplate` 並同步使用語言，實現專案、群組與對話右鍵選單的即時翻譯。
+- **未翻譯收集過濾與詞典擴充**：過濾專案名稱、路徑與代理工具日誌雜訊，新增 62 筆介面與右鍵選單翻譯。
 
 </details>
 
 <details>
 <summary>Español</summary>
 
-- **Control Center completo**: Exportar/importar glosario JSON, visor de textos sin traducir, tarjeta compacta, limpiar historial de 72 h y localización dinámica en 9 idiomas.
-- **Diagnóstico de auto-reparcheo**: Registro `auto-repatch-status.json` y sincronización automática de `auto-repatch.ps1`/`.vbs`.
+- **Ajustes del parche unificados y visor de Changelog**: Se unificaron las ventanas de actualización y restauración, añadiendo un visor de **Changelog (`CHANGELOG.md`)**, renderizado Markdown, animaciones GSAP y confirmación para limpiar el historial de 72 h.
+- **Traducción de menús contextuales nativos**: Traducción automática de los menús de clic derecho de proyectos, grupos y conversaciones mediante `Menu.buildFromTemplate`.
+- **Filtro de textos y diccionario ampliado**: Filtrado de rutas y registros de agente, más 62 nuevas traducciones de UI y menú contextual.
 
 </details>
 
 <details>
 <summary>Français</summary>
 
-- **Control Center complet** : Export/import JSON du glossaire, liste des textes non traduits, mode carte compacte, effacement de l'historique 72 h et traduction dynamique en 9 langues.
-- **Diagnostic d'auto-repatch** : Suivi `auto-repatch-status.json` et synchronisation des lanceurs `.ps1`/`.vbs`.
+- **Paramètres du patch unifiés et visionneuse de Changelog** : Intégration des mises à jour/restauration, ajout d’une visionneuse **Changelog (`CHANGELOG.md`)**, rendu Markdown, animations GSAP et confirmation d’effacement de l’historique 72 h.
+- **Traduction des menus contextuels natifs** : Traduction des menus clic droit de projets, groupes et conversations via `Menu.buildFromTemplate`.
+- **Filtrage amélioré et dictionnaire étendu** : Exclusion des chemins/journaux d’agent et ajout de 62 traductions d’interface et menus contextuels.
 
 </details>
 
 <details>
 <summary>Deutsch</summary>
 
-- **Control Center vervollständigt**: Glossar-JSON-Export/-Import, Liste unübersetzter Texte, kompakte Quota-Karten, 72h-Verlauf löschen und 9-Sprachen-Lokalisierung.
-- **Auto-Repatch-Diagnose**: `auto-repatch-status.json` Status-Tracking und automatische `.ps1`/`.vbs`-Synchronisierung.
+- **Vereinheitlichte Patch-Einstellungen & Changelog-Viewer**: Update-Prüfung und Wiederherstellung integriert, eigener **Changelog (`CHANGELOG.md`)**-Viewer, Markdown-Rendering, GSAP-Animationen und Bestätigung beim Löschen des 72h-Verlaufs.
+- **Native Kontextmenü-Übersetzung**: Rechtsklickmenüs für Projekte, Gruppen und Unterhaltungen über `Menu.buildFromTemplate` übersetzt.
+- **Erweiterte Filter & Wörterbuch**: Projekt-/Pfad-/Agent-Log-Filterung sowie 62 neue UI- und Kontextmenü-Übersetzungen.
 
 </details>
 
 <details>
 <summary>Русский</summary>
 
-- **Полная интеграция Control Center**: Экспорт/импорт глоссария JSON, просмотр/копирование/очистка непереведённых строк, компактные карточки квот, сброс истории за 72 ч и локализация на 9 языков.
-- **Диагностика авто-перепатча**: Запись `auto-repatch-status.json` и синхронизация обёрток `.ps1`/`.vbs`.
+- **Единые настройки патча и просмотрщик Changelog**: Объединены проверка обновлений и восстановление, добавлен просмотрщик **Changelog (`CHANGELOG.md`)**, Markdown-рендеринг, GSAP-анимации и подтверждение сброса истории за 72 ч.
+- **Перевод нативных контекстных меню**: Перевод контекстных меню проектов, групп и бесед через `Menu.buildFromTemplate`.
+- **Улучшенная фильтрация и словарь**: Фильтрация путей и логов агента, плюс 62 новых перевода UI и контекстных меню.
 
 </details>

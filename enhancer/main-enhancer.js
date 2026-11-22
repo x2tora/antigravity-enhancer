@@ -1,5 +1,5 @@
 /**
- * Antigravity Enhancer v3.5.4 - Main Process Bridge, Persistence & Secure In-App Updater
+ * Antigravity Enhancer v4.0.0 - Main Process Bridge, Persistence & Secure In-App Updater
  * Source Repo: https://github.com/x2tora/antigravity-enhancer
  */
 'use strict';
@@ -28,7 +28,8 @@ const ALLOWED_UPDATE_FILES = new Set([
   'gsap-core.js',
   'dictionaries.json',
   'asar-patcher.js',
-  'auto-repatch.js'
+  'auto-repatch.js',
+  'CHANGELOG.md'
 ]);
 
 let electronMod = null;
@@ -98,6 +99,7 @@ function writeBufferAtomic(filePath, buf) {
 }
 
 const DEFAULT_PREFERENCES = {
+  language: '',
   shortcutCycleLang: 'Alt+Shift+L',
   shortcutOpenCenter: 'Alt+Shift+E',
   quotaAlertsEnabled: false,
@@ -477,7 +479,7 @@ function loadBootstrapPayload(forceRefresh = false, langId = null) {
 
       cachedBootstrapPayload = {
         disabled: false,
-        version: manifest.version || '3.5.4',
+        version: manifest.version || '4.0.0',
         repo: ENHANCER_REPO,
         code: rendererCode,
         gsapCode,
@@ -498,6 +500,20 @@ function loadBootstrapPayload(forceRefresh = false, langId = null) {
   };
 }
 
+function getChangelogContent() {
+  const candidates = [
+    path.join(enhancerDir, 'CHANGELOG.md'),
+    path.join(__dirname, 'CHANGELOG.md'),
+    path.join(__dirname, '..', 'CHANGELOG.md')
+  ];
+  for (const p of candidates) {
+    try {
+      if (fs.existsSync(p)) return fs.readFileSync(p, 'utf8');
+    } catch (_) {}
+  }
+  return '';
+}
+
 function getFullStatus() {
   const el = getElectron();
   const manifest = getLocalManifest();
@@ -509,7 +525,7 @@ function getFullStatus() {
   } catch (_) {}
 
   return {
-    enhancerVersion: manifest.version || '3.5.4',
+    enhancerVersion: manifest.version || '4.0.0',
     appVersion: (el && el.app && el.app.getVersion) ? el.app.getVersion() : 'unknown',
     repo: ENHANCER_REPO,
     enhancerDir,
@@ -666,7 +682,7 @@ async function checkRemoteUpdate() {
 
 async function applyInAppUpdate(refBranch = 'main') {
   const local = getLocalManifest();
-  const prevVersion = local.version || '3.5.4';
+  const prevVersion = local.version || '4.0.0';
 
   broadcastEvent('enhancer:update-progress', { phase: 'manifest', percent: 8, message: 'Fetching signed manifest...' });
   const manifestUrl = `https://raw.githubusercontent.com/${ENHANCER_REPO}/${encodeURIComponent(refBranch)}/enhancer/manifest.json?t=${Date.now()}`;
@@ -849,6 +865,7 @@ function registerIpcHandlers() {
   });
 
   ipcMain.handle('enhancer:get-status', async () => getFullStatus());
+  ipcMain.handle('enhancer:get-changelog', async () => ({ ok: true, content: getChangelogContent() }));
 
   ipcMain.handle('enhancer:check-update', async () => {
     try {
@@ -925,6 +942,70 @@ function registerIpcHandlers() {
   });
 }
 
+function translateMenuLabel(label, langId) {
+  if (!label || typeof label !== 'string' || !langId || langId === 'en') return label;
+  const trimmed = label.trim();
+  if (!trimmed) return label;
+  const cleanKey = trimmed.replace(/&/g, '');
+  const glossary = getUserGlossary();
+  const gMap = (glossary && glossary[langId] && typeof glossary[langId] === 'object') ? glossary[langId] : null;
+  if (gMap) {
+    if (typeof gMap[trimmed] === 'string') return gMap[trimmed];
+    if (cleanKey !== trimmed && typeof gMap[cleanKey] === 'string') return gMap[cleanKey];
+  }
+  if (!cachedBootstrapPayload || !cachedBootstrapPayload.dictionaries) {
+    try { loadBootstrapPayload(false); } catch (_) {}
+  }
+  let dicts = (cachedBootstrapPayload && cachedBootstrapPayload.dictionaries) ? cachedBootstrapPayload.dictionaries : null;
+  if (!dicts || !dicts.exactDict) {
+    try {
+      const fallbackPath = path.join(__dirname, 'dictionaries.json');
+      if (fs.existsSync(fallbackPath)) dicts = JSON.parse(fs.readFileSync(fallbackPath, 'utf8'));
+    } catch (_) {}
+  }
+  if (!dicts) return label;
+  const targetMap = (langId === 'ko')
+    ? (dicts.exactDict || {})
+    : ((dicts.translations && dicts.translations[langId]) || {});
+  if (Object.prototype.hasOwnProperty.call(targetMap, trimmed) && typeof targetMap[trimmed] === 'string') {
+    return targetMap[trimmed];
+  }
+  if (cleanKey !== trimmed && Object.prototype.hasOwnProperty.call(targetMap, cleanKey) && typeof targetMap[cleanKey] === 'string') {
+    return targetMap[cleanKey];
+  }
+  return label;
+}
+
+function translateMenuTemplate(template, langId) {
+  if (!Array.isArray(template) || !langId || langId === 'en') return template;
+  return template.map((item) => {
+    if (!item || typeof item !== 'object') return item;
+    const copy = { ...item };
+    if (typeof copy.label === 'string') {
+      copy.label = translateMenuLabel(copy.label, langId);
+    }
+    if (Array.isArray(copy.submenu)) {
+      copy.submenu = translateMenuTemplate(copy.submenu, langId);
+    }
+    return copy;
+  });
+}
+
+function installNativeContextMenuTranslator() {
+  const el = getElectron();
+  if (!el || !el.Menu || typeof el.Menu.buildFromTemplate !== 'function' || el.Menu.__agMenuTranslated) {
+    return false;
+  }
+  el.Menu.__agMenuTranslated = true;
+  const origBuildFromTemplate = el.Menu.buildFromTemplate.bind(el.Menu);
+  el.Menu.buildFromTemplate = (template) => {
+    const lang = getPreferences().language || '';
+    const translated = (lang && lang !== 'en') ? translateMenuTemplate(template, lang) : template;
+    return origBuildFromTemplate(translated);
+  };
+  return true;
+}
+
 function init(options = {}) {
   if (initialized) return;
   initialized = true;
@@ -934,6 +1015,7 @@ function init(options = {}) {
   handleCrashFailsafe();
   ensureAutoRepatchWrappers();
   loadBootstrapPayload(true);
+  installNativeContextMenuTranslator();
   registerIpcHandlers();
 }
 
@@ -949,6 +1031,7 @@ module.exports = {
   checkRemoteUpdate,
   applyInAppUpdate,
   getFullStatus,
+  getChangelogContent,
   ensureAutoRepatchWrappers,
   buildLanguageSlice,
   DEFAULT_PREFERENCES,
@@ -962,5 +1045,6 @@ module.exports = {
   getQuotaHistory,
   recordQuotaSnapshot,
   clearQuotaHistory,
+  translateMenuTemplate,
   init
 };

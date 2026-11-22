@@ -1,5 +1,5 @@
 ﻿param(
-    [string]$Version = "3.5.4",
+    [string]$Version = "4.0.0",
     [string]$OutputExe = "",
     [string]$SignCertThumbprint = ""
 )
@@ -1194,7 +1194,8 @@ namespace AntigravityEnhancer
                         "gsap-core.js",
                         "dictionaries.json",
                         "asar-patcher.js",
-                        "auto-repatch.js"
+                        "auto-repatch.js",
+                        "CHANGELOG.md"
                     };
                     foreach (string mf in moduleFiles)
                     {
@@ -1524,7 +1525,7 @@ try {
     Compress-ToGzipFile -srcFile $icoPath -dstGz $iconGz
     $resourceFlags += "/resource:$iconGz,app_icon.ico.gz"
 
-    $moduleNames = @("manifest.json", "main-enhancer.js", "renderer-enhancer.js", "gsap-core.js", "dictionaries.json", "asar-patcher.js", "auto-repatch.js")
+    $moduleNames = @("manifest.json", "main-enhancer.js", "renderer-enhancer.js", "gsap-core.js", "dictionaries.json", "asar-patcher.js", "auto-repatch.js", "CHANGELOG.md")
     foreach ($mod in $moduleNames) {
         $srcMod = Join-Path $enhancerSrcDir $mod
         $dstGz = Join-Path $buildTmp ("enhancer_$mod.gz")

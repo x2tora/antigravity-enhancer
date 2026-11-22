@@ -1,5 +1,5 @@
 /**
- * Antigravity Enhancer v3.5.4 - Modular Renderer Enhancer Engine
+ * Antigravity Enhancer v4.0.0 - Modular Renderer Enhancer Engine
  * Features: 9-Language Zero-Restart i18n, Translation Engine 2.0 (Slice + Glossary),
  *           Quota Intelligence (Sparklines, Burn-Rate ETA & Alerts),
  *           Enhancer Control Center & Custom Shortcuts (x2tora/antigravity-enhancer)
@@ -11,7 +11,7 @@
   const ipc = electron_1 ? electron_1.ipcRenderer : null;
   const payload = (typeof __ENHANCER_PAYLOAD__ !== 'undefined' && __ENHANCER_PAYLOAD__) ? __ENHANCER_PAYLOAD__ : {};
   const ENHANCER_REPO = payload.repo || 'x2tora/antigravity-enhancer';
-  const ENHANCER_CURRENT_VERSION = payload.version || '3.5.4';
+  const ENHANCER_CURRENT_VERSION = payload.version || '4.0.0';
 
   const DEFAULT_PREFS = {
     shortcutCycleLang: 'Alt+Shift+L',
@@ -210,10 +210,68 @@
     return false;
   }
 
+  function isUserContentElement(el) {
+    if (!el || typeof el.closest !== 'function') return false;
+    try {
+      if (el.closest('[role="menu"], [role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"], .agy-overlay')) return false;
+      return Boolean(el.closest(
+        '.prose, .markdown, .monaco-editor, [class*="markdown"], [class*="prose"], [class*="thinking"], [class*="thought"], [class*="message"], [class*="chat"], [class*="artifact"], [class*="explorer"], [data-message-id], [data-testid*="message"], [data-testid*="conversation"], [data-testid*="thread"], [data-testid*="history"], [data-testid*="session"], [data-testid*="workspace"], [data-testid*="project"], [data-testid*="branch"], [data-testid*="file"], [data-testid*="tree"], [data-testid*="agent"], [data-testid*="step"], [data-testid*="tool"], [data-testid*="artifact"], [data-testid*="thought"], [data-testid*="viewer"], [role="log"], [role="tree"], [role="treeitem"]'
+      ));
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function isUntranslatableNoise(trimmed) {
+    if (!trimmed || trimmed.length < 3 || trimmed.length > 120) return true;
+    if (!/[A-Za-z]/.test(trimmed)) return true;
+    // Skip already-localized or non-English scripts (Hangul, Kana, CJK, Cyrillic)
+    if (/[\uAC00-\uD7A3\u1100-\u11FF\u3130-\u318F\u3040-\u30FF\u4E00-\u9FFF\u0400-\u04FF]/.test(trimmed)) return true;
+    if (/^[\d\s.,:%+\-*/()[\]{}]+$/.test(trimmed)) return true;
+    if (/^[A-Z]{2,3}$/.test(trimmed)) return true;
+    // Single lowercase word (prose splits, folder names like assets/docs/main/now)
+    if (/^[a-z]{2,}$/.test(trimmed)) return true;
+    // Keyboard shortcuts & trailing shortcut hints (e.g., Ctrl+/, project_5 (Ctrl+.))
+    if (/^(?:(?:Ctrl|Alt|Shift|Meta|Cmd|Opt)\+)+[^\s]+$/i.test(trimmed)) return true;
+    if (/\((?:Ctrl|Alt|Shift|Meta|Cmd)\+[^)]+\)$/i.test(trimmed)) return true;
+    // Timers / streaming durations / turn counters
+    if (/^\d+\s*[smhd](?:\s+\d+\s*[smhd])*$/i.test(trimmed)) return true;
+    if (/^(?:Thinking for \d+|Still thinking,\s*\d+\s*seconds?|Turn \d+ of \d+|Load older messages)/i.test(trimmed)) return true;
+    // Brand / model / codename standalone labels & dynamic multi-word Close <Title>
+    if (/^(?:Antigravity|Argon|Gemini)$/i.test(trimmed)) return true;
+    if (/^Close\s+\S+\s+\S+/i.test(trimmed)) return true;
+    // Agent tool/step summaries & comma-separated action logs (e.g., "Explored files, ran commands, edited files")
+    if (/^(?:Explored|Searched|Read|Edited|Wrote|Ran|Checked|Listed)\b.*,\s*(?:ran|edited|read|wrote|explored|searched|checked|listed)\b/i.test(trimmed)) return true;
+    // Paths, dotfiles, ALL-CAPS files, URLs, markdown links, CLI flags, mentions, slash commands
+    if (/^(?:@|#|\/|--?)[A-Za-z0-9_.\-]+/.test(trimmed) || /(?:https?|file):\/\//i.test(trimmed)) return true;
+    if (/^\.[A-Za-z0-9_.-]+$/.test(trimmed) || /^(?:LICENSE|README|CHANGELOG|MAKEFILE|DOCKERFILE)$/i.test(trimmed)) return true;
+    if (/^(?:[A-Za-z]:[\\/]|~[\\/]|\.{1,2}[\\/])/.test(trimmed) || trimmed.includes('\\')) return true;
+    if (/^[^\s]*[\\/][^\s]+\.[A-Za-z0-9]{1,8}$/.test(trimmed)) return true;
+    if (/^[A-Za-z0-9_.\-]+\.(?:js|ts|tsx|jsx|mjs|cjs|json|md|ps1|vbs|exe|zip|txt|css|scss|html|yml|yaml|asar|png|jpg|jpeg|svg|ico|log|lock|py|go|rs|java|cpp|c|h|sh|bat|cmd)$/i.test(trimmed)) return true;
+    if (trimmed.includes('](') || /^(?:Project:|Close\s+\S+\.\w+$)/i.test(trimmed)) return true;
+    // Project/branch/code identifiers (snake_case, kebab-case, camelCase, PascalCase, semver, git sha)
+    if (/^[A-Za-z0-9]+(?:[_-][A-Za-z0-9]+)+$/.test(trimmed)) return true;
+    if (/^(?:[a-z]+[A-Z][A-Za-z0-9]*|[A-Z][a-z]+[A-Z][A-Za-z0-9]*)$/.test(trimmed)) return true;
+    if (/^v?\d+\.\d+(?:\.\d+)?(?:-[\w.]+)?$/i.test(trimmed) || /^[0-9a-f]{7,40}$/i.test(trimmed)) return true;
+    // Sentences/phrases containing filenames, code identifiers, test IDs (F24), or kebab/snake tokens
+    const tokens = trimmed.split(/\s+/);
+    if (tokens.length > 7) return true;
+    for (const rawTok of tokens) {
+      const tok = rawTok.replace(/^['"`(\[]+|[.,:;!?'"`)\]]+$/g, '');
+      if (!tok) continue;
+      if (/\.(?:js|ts|tsx|jsx|mjs|cjs|json|md|ps1|vbs|exe|zip|txt|css|scss|html|yml|yaml|asar|py|go|rs)$/i.test(tok)) return true;
+      if (/^F\d{1,3}(?:-F?\d{1,3})?$/.test(tok)) return true;
+      if (/^[A-Za-z0-9]+(?:[_-][A-Za-z0-9]+)+$/.test(tok) && !/^(?:in-memory|in-app|e2e|top-bar|auto-detect|auto-repatch|real-time|one-click|non-empty|built-in|up-to-date)$/i.test(tok)) return true;
+      if (/^(?:[a-z]+[A-Z][A-Za-z0-9]*|[A-Z][a-z]+[A-Z][A-Za-z0-9]*)$/.test(tok) && !/^(?:GitHub|JavaScript|TypeScript|PowerShell|DevTools|YouTube|OpenAI|ChatGPT|OneDrive|macOS|iOS)$/i.test(tok)) return true;
+    }
+    // Code snippets / split prose fragments
+    if (/[`{};=<>]/.test(trimmed) || /[,;:(\[]$/.test(trimmed) || /^[a-z].*\.$/.test(trimmed)) return true;
+    return false;
+  }
+
   function queueUntranslated(trimmed) {
     if (!userPreferences.collectUntranslated || !trimmed) return;
-    if (trimmed.length < 2 || trimmed.length > 120) return;
-    if (/^[\d\s.,:%+\-*/()[\]{}]+$/.test(trimmed)) return;
+    if (isUntranslatableNoise(trimmed)) return;
     if (untranslatedSeen.has(trimmed)) return;
     untranslatedSeen.add(trimmed);
     untranslatedBuffer.push(trimmed);
@@ -281,7 +339,7 @@
 
   function getCurrentLanguage() { return activeLanguage; }
 
-  function translateText(raw, targetLang) {
+  function translateText(raw, targetLang, allowCollect = true) {
     if (!raw || typeof raw !== 'string' || !raw.trim()) return raw;
     const lang = targetLang || activeLanguage || 'ko';
     if (lang === 'en') return raw;
@@ -355,7 +413,7 @@
     }
     if (matched) return result;
 
-    queueUntranslated(trimmed);
+    if (allowCollect) queueUntranslated(trimmed);
     return raw;
   }
 
@@ -363,6 +421,7 @@
   const originalTextMap = new WeakMap();
 
   function translateElementAttrs(el) {
+    const allowCollect = !isUserContentElement(el);
     for (const attr of TRANSLATE_ATTRS) {
       const val = el.getAttribute ? el.getAttribute(attr) : el[attr];
       if (!val) continue;
@@ -373,8 +432,8 @@
       }
       const baseAttrVal = el[origKey] || val;
       const trans = (activeLanguage === 'ko')
-        ? (safeDictGet(placeholders, baseAttrVal) || safeDictGet(exactDict, baseAttrVal) || (typeof baseAttrVal === 'string' ? safeDictGet(exactDict, baseAttrVal.toLowerCase()) : undefined) || translateText(baseAttrVal, 'ko'))
-        : translateText(baseAttrVal, activeLanguage);
+        ? (safeDictGet(placeholders, baseAttrVal) || safeDictGet(exactDict, baseAttrVal) || (typeof baseAttrVal === 'string' ? safeDictGet(exactDict, baseAttrVal.toLowerCase()) : undefined) || translateText(baseAttrVal, 'ko', allowCollect))
+        : translateText(baseAttrVal, activeLanguage, allowCollect);
       if (trans && trans !== val) {
         el[lastTransKey] = trans;
         if (el.setAttribute) el.setAttribute(attr, trans);
@@ -402,7 +461,7 @@
 
       try {
         const sourceText = node._originalText !== undefined ? node._originalText : raw;
-        const translated = translateText(sourceText, activeLanguage);
+        const translated = translateText(sourceText, activeLanguage, !isUserContentElement(parent));
         if (typeof translated === 'string' && translated !== raw) {
           node._isTranslating = true;
           node._lastTranslatedValue = translated;
@@ -527,6 +586,36 @@
         #antigravity-enhancer-modal .agy-enh-primary:hover:not(:disabled),
         #ag-enhancer-control-center .agy-enh-primary:hover:not(:disabled) {
           opacity: 0.92 !important;
+        }
+        #ag-enhancer-control-center .ag-cc-tab:hover {
+          color: #CAD3F5 !important;
+        }
+        #ag-enhancer-control-center .agy-overlay-item:hover {
+          background: rgba(202, 211, 245, 0.08) !important;
+          color: #CAD3F5 !important;
+        }
+        #ag-enhancer-control-center .ag-cc-range {
+          -webkit-appearance: none;
+          appearance: none;
+          height: 4px;
+          border-radius: 9999px;
+          outline: none;
+          cursor: pointer;
+        }
+        #ag-enhancer-control-center .ag-cc-range::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 14px;
+          height: 14px;
+          border-radius: 9999px;
+          background: #CAD3F5;
+          border: 2px solid #A0A3F6;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+          cursor: pointer;
+          transition: transform 120ms cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        #ag-enhancer-control-center .ag-cc-range::-webkit-slider-thumb:hover {
+          transform: scale(1.12);
         }
         #antigravity-popover-refresh:hover {
           color: #CAD3F5 !important;
@@ -1014,9 +1103,47 @@
       .replace(/'/g, '&#39;');
   }
 
-  function closeControlCenterModal() {
+  function canGsapAnimate(el) {
+    return Boolean(el && typeof el.getBoundingClientRect === 'function' && typeof window !== 'undefined' && window.gsap);
+  }
+
+  function closeControlCenterModal(immediate = false) {
+    activeProgressHandler = null;
+    if (activeModalLangHandler && typeof window !== 'undefined' && typeof window.removeEventListener === 'function') {
+      window.removeEventListener('antigravity-lang-changed', activeModalLangHandler);
+      activeModalLangHandler = null;
+    }
     const bd = document.getElementById('ag-enhancer-control-center-backdrop');
-    if (bd) bd.remove();
+    if (!bd) return;
+    const modal = document.getElementById('ag-enhancer-control-center');
+    if (window.gsap && window.gsap.killTweensOf) {
+      window.gsap.killTweensOf(bd);
+      if (modal) window.gsap.killTweensOf(modal);
+    }
+    if (!immediate && canGsapAnimate(bd)) {
+      if (canGsapAnimate(modal)) window.gsap.to(modal, { opacity: 0, scale: 0.98, y: 4, duration: 0.12, ease: 'power1.in' });
+      window.gsap.to(bd, { opacity: 0, duration: 0.12, ease: 'power1.in', onComplete: () => bd.remove() });
+    } else {
+      bd.remove();
+    }
+  }
+
+  function renderNativeSwitch(id, checked) {
+    const on = Boolean(checked);
+    return `<button type="button" role="switch" id="${id}" aria-checked="${on}" style="position:relative;display:inline-flex;height:20px;width:36px;flex-shrink:0;cursor:pointer;border-radius:9999px;border:2px solid transparent;transition:background-color 150ms cubic-bezier(0.22, 1, 0.36, 1);outline:none;background-color:${on ? '#A0A3F6' : 'rgba(202,211,245,0.2)'};"><span class="ag-switch-thumb" style="pointer-events:none;display:inline-block;height:16px;width:16px;border-radius:9999px;background-color:#CAD3F5;box-shadow:0 1px 2px rgba(0,0,0,0.3);transition:transform 150ms cubic-bezier(0.22, 1, 0.36, 1);transform:translateX(${on ? '16px' : '0px'});"></span></button>`;
+  }
+
+  function wireNativeSwitch(btn, onChange) {
+    if (!btn) return;
+    btn.onclick = (e) => {
+      if (e) e.stopPropagation();
+      const next = btn.getAttribute('aria-checked') !== 'true';
+      btn.setAttribute('aria-checked', String(next));
+      btn.style.backgroundColor = next ? '#A0A3F6' : 'rgba(202,211,245,0.2)';
+      const thumb = btn.querySelector('.ag-switch-thumb');
+      if (thumb) thumb.style.transform = next ? 'translateX(16px)' : 'translateX(0px)';
+      if (typeof onChange === 'function') onChange(next);
+    };
   }
 
   function persistPreferences(patch) {
@@ -1033,9 +1160,10 @@
 
   const CONTROL_CENTER_I18N = {
     en: {
+      modalTitle: 'Patch Settings', menuItem: 'Patch Settings...',
       tabs: { general: 'General', translation: 'Translation', quota: 'Quota', shortcuts: 'Shortcuts' },
       ifaceLang: 'Interface Language', ifaceDesc: 'Zero-restart live localization.',
-      hubTitle: 'Update & Restore Hub', checkUpd: 'Check Updates',
+      hubTitle: 'Patch Updates & Restore', checkUpd: 'Check Updates',
       glossaryTitle: 'Custom Glossary', srcPh: 'Source text', dstPh: 'Target text', add: 'Add',
       exportJson: 'Export JSON', importJson: 'Import JSON', apply: 'Apply',
       noGlossary: 'No custom glossary entries yet.',
@@ -1045,14 +1173,16 @@
       compactCard: 'Compact Quota Cards', compactDesc: 'Tightens popover card spacing and hides model list.',
       lowAlert: 'Low-Quota Desktop Alerts', lowDesc: 'Alerts once per model below threshold (30m cooldown).',
       threshold: 'Threshold', resetAlert: 'Quota Reset Alerts', resetDesc: 'Notifies when quota recovers above 80%.',
-      clearHist: 'Clear 72h History', cleared: 'Cleared', copied: 'Copied',
-      cycleKey: 'Cycle Language Shortcut', centerKey: 'Open Control Center',
+      clearHist: 'Clear 72h History', clearHistConfirm: 'Clear all 72h quota history?', confirmClear: 'Confirm Clear', cancel: 'Cancel', cleared: 'Cleared', copied: 'Copied',
+      changelogBtn: 'Changelog', changelogTitle: 'Update Changelog', changelogBack: 'Back', changelogEmpty: 'No changelog entries available.',
+      cycleKey: 'Cycle Language Shortcut', centerKey: 'Open Patch Settings',
       pressKeys: 'Press keys (ESC cancel)...', diagnostics: 'Diagnostics', autoRepatch: 'Auto-Repatch'
     },
     ko: {
+      modalTitle: '패치 설정', menuItem: '패치 설정...',
       tabs: { general: '일반', translation: '번역 · 용어집', quota: '할당량 · 알림', shortcuts: '단축키 · 진단' },
       ifaceLang: '인터페이스 언어', ifaceDesc: '재시작 없이 즉시 언어를 전환합니다.',
-      hubTitle: '업데이트 및 복구 허브', checkUpd: '업데이트 확인',
+      hubTitle: '패치 업데이트 및 복구', checkUpd: '업데이트 확인',
       glossaryTitle: '커스텀 용어집', srcPh: '원문 (예: Agent)', dstPh: '번역 (예: 에이전트)', add: '추가',
       exportJson: 'JSON 내보내기', importJson: 'JSON 가져오기', apply: '적용',
       noGlossary: '등록된 사용자 용어집 항목이 없습니다.',
@@ -1062,17 +1192,18 @@
       compactCard: '컴팩트 할당량 카드', compactDesc: '팝오버 여백을 줄이고 모델 목록을 간소화합니다.',
       lowAlert: '저잔량 데스크톱 알림', lowDesc: '임계치 미만 도달 시 모델별 1회 알림 (30분 쿨다운)',
       threshold: '임계치', resetAlert: '할당량 리셋 완료 알림', resetDesc: '고갈 후 80% 이상 회복 시 알림을 보냅니다.',
-      clearHist: '72시간 기록 초기화', cleared: '초기화됨', copied: '복사됨',
-      cycleKey: '언어 순환 단축키', centerKey: 'Control Center 열기',
+      clearHist: '72시간 기록 초기화', clearHistConfirm: '저장된 72시간 사용량 기록을 모두 초기화할까요?', confirmClear: '초기화 확인', cancel: '취소', cleared: '초기화됨', copied: '복사됨',
+      changelogBtn: '변경 기록', changelogTitle: '업데이트 변경 기록', changelogBack: '뒤로', changelogEmpty: '불러올 변경 기록이 없습니다.',
+      cycleKey: '언어 순환 단축키', centerKey: '패치 설정 열기',
       pressKeys: '키 조합 입력 (ESC 취소)...', diagnostics: '시스템 진단', autoRepatch: '자동 재패치'
     },
-    ja: { tabs: { general: '一般', translation: '翻訳・用語集', quota: 'クォータ・通知', shortcuts: 'ショートカット' }, ifaceLang: 'インターフェース言語', ifaceDesc: '再起動なしで即時に言語を切り替えます。', hubTitle: 'アップデート・復元ハブ', checkUpd: 'アップデート確認', glossaryTitle: 'カスタム用語集', add: '追加', exportJson: 'JSON出力', importJson: 'JSON読込', collectUt: '未翻訳テキスト収集 (Opt-in)', utList: '収集済みリスト', copy: 'コピー', clear: 'クリア', sparklines: 'スパークライン表示', compactCard: 'コンパクトカード', lowAlert: '残量低下通知', threshold: 'しきい値', resetAlert: 'リセット通知', clearHist: '72時間履歴を消去', cycleKey: '言語切替キー', centerKey: 'Control Centerを開く', diagnostics: 'システム診断', autoRepatch: '自動再パッチ' },
-    'zh-CN': { tabs: { general: '常规', translation: '翻译・术语表', quota: '配额・通知', shortcuts: '快捷键・诊断' }, ifaceLang: '界面语言', ifaceDesc: '无需重启即可实时切换语言。', hubTitle: '更新与恢复中心', checkUpd: '检查更新', glossaryTitle: '自定义术语表', add: '添加', exportJson: '导出 JSON', importJson: '导入 JSON', collectUt: '收集未翻译文本 (可选)', utList: '已收集列表', copy: '复制', clear: '清空', sparklines: '显示趋势线', compactCard: '紧凑配额卡片', lowAlert: '低配额桌面通知', threshold: '阈值', resetAlert: '配额重置通知', clearHist: '清除72小时历史', cycleKey: '切换语言快捷键', centerKey: '打开 Control Center', diagnostics: '系统诊断', autoRepatch: '自动重打补丁' },
-    'zh-TW': { tabs: { general: '一般', translation: '翻譯・詞彙表', quota: '配額・通知', shortcuts: '快捷鍵・診斷' }, ifaceLang: '介面語言', ifaceDesc: '無需重新啟動即可即時切換語言。', hubTitle: '更新與還原中心', checkUpd: '檢查更新', glossaryTitle: '自訂詞彙表', add: '新增', exportJson: '匯出 JSON', importJson: '匯入 JSON', collectUt: '收集未翻譯文字 (選用)', utList: '已收集清單', copy: '複製', clear: '清空', sparklines: '顯示趨勢線', compactCard: '精簡配額卡片', lowAlert: '低配額桌面通知', threshold: '閾值', resetAlert: '配額重設通知', clearHist: '清除72小時歷史', cycleKey: '切換語言快捷鍵', centerKey: '開啟 Control Center', diagnostics: '系統診斷', autoRepatch: '自動重打修補' },
-    es: { tabs: { general: 'General', translation: 'Traducción', quota: 'Cuota', shortcuts: 'Atajos' }, ifaceLang: 'Idioma de interfaz', checkUpd: 'Buscar actualizaciones', add: 'Añadir', copy: 'Copiar', clear: 'Limpiar', diagnostics: 'Diagnóstico' },
-    fr: { tabs: { general: 'Général', translation: 'Traduction', quota: 'Quota', shortcuts: 'Raccourcis' }, ifaceLang: 'Langue de l’interface', checkUpd: 'Vérifier les mises à jour', add: 'Ajouter', copy: 'Copier', clear: 'Effacer', diagnostics: 'Diagnostic' },
-    de: { tabs: { general: 'Allgemein', translation: 'Übersetzung', quota: 'Kontingent', shortcuts: 'Tastenkürzel' }, ifaceLang: 'Oberflächensprache', checkUpd: 'Nach Updates suchen', add: 'Hinzufügen', copy: 'Kopieren', clear: 'Leeren', diagnostics: 'Diagnose' },
-    ru: { tabs: { general: 'Общие', translation: 'Перевод', quota: 'Квота', shortcuts: 'Сочетания' }, ifaceLang: 'Язык интерфейса', checkUpd: 'Проверить обновления', add: 'Добавить', copy: 'Копировать', clear: 'Очистить', diagnostics: 'Диагностика' }
+    ja: { modalTitle: 'パッチ設定', menuItem: 'パッチ設定...', tabs: { general: '一般', translation: '翻訳・用語集', quota: 'クォータ・通知', shortcuts: 'ショートカット' }, ifaceLang: 'インターフェース言語', ifaceDesc: '再起動なしで即時に言語を切り替えます。', hubTitle: 'パッチ更新と復元', checkUpd: 'アップデート確認', changelogBtn: '変更履歴', changelogTitle: 'アップデート変更履歴', changelogBack: '戻る', glossaryTitle: 'カスタム用語集', add: '追加', exportJson: 'JSON出力', importJson: 'JSON読込', collectUt: '未翻訳テキスト収集 (Opt-in)', utList: '収集済みリスト', copy: 'コピー', clear: 'クリア', sparklines: 'スパークライン表示', compactCard: 'コンパクトカード', lowAlert: '残量低下通知', threshold: 'しきい値', resetAlert: 'リセット通知', clearHist: '72時間履歴を消去', cycleKey: '言語切替キー', centerKey: 'パッチ設定を開く', diagnostics: 'システム診断', autoRepatch: '自動再パッチ' },
+    'zh-CN': { modalTitle: '补丁设置', menuItem: '补丁设置...', tabs: { general: '常规', translation: '翻译・术语表', quota: '配额・通知', shortcuts: '快捷键・诊断' }, ifaceLang: '界面语言', ifaceDesc: '无需重启即可实时切换语言。', hubTitle: '补丁更新与还原', checkUpd: '检查更新', changelogBtn: '更新日志', changelogTitle: '更新日志记录', changelogBack: '返回', glossaryTitle: '自定义术语表', add: '添加', exportJson: '导出 JSON', importJson: '导入 JSON', collectUt: '收集未翻译文本 (可选)', utList: '已收集列表', copy: '复制', clear: '清空', sparklines: '显示趋势线', compactCard: '紧凑配额卡片', lowAlert: '低配额桌面通知', threshold: '阈值', resetAlert: '配额重置通知', clearHist: '清除72小时历史', cycleKey: '切换语言快捷键', centerKey: '打开补丁设置', diagnostics: '系统诊断', autoRepatch: '自动重打补丁' },
+    'zh-TW': { modalTitle: '修補設定', menuItem: '修補設定...', tabs: { general: '一般', translation: '翻譯・詞彙表', quota: '配額・通知', shortcuts: '快捷鍵・診斷' }, ifaceLang: '介面語言', ifaceDesc: '無需重新啟動即可即時切換語言。', hubTitle: '修補更新與還原', checkUpd: '檢查更新', changelogBtn: '變更紀錄', changelogTitle: '更新變更紀錄', changelogBack: '返回', glossaryTitle: '自訂詞彙表', add: '新增', exportJson: '匯出 JSON', importJson: '匯入 JSON', collectUt: '收集未翻譯文字 (選用)', utList: '已收集清單', copy: '複製', clear: '清空', sparklines: '顯示趨勢線', compactCard: '精簡配額卡片', lowAlert: '低配額桌面通知', threshold: '閾值', resetAlert: '配額重設通知', clearHist: '清除72小時歷史', cycleKey: '切換語言快捷鍵', centerKey: '開啟修補設定', diagnostics: '系統診斷', autoRepatch: '自動重打修補' },
+    es: { modalTitle: 'Ajustes del parche', menuItem: 'Ajustes del parche...', tabs: { general: 'General', translation: 'Traducción', quota: 'Cuota', shortcuts: 'Atajos' }, ifaceLang: 'Idioma de interfaz', checkUpd: 'Buscar actualizaciones', changelogBtn: 'Historial', changelogTitle: 'Historial de cambios', changelogBack: 'Volver', add: 'Añadir', copy: 'Copiar', clear: 'Limpiar', diagnostics: 'Diagnóstico' },
+    fr: { modalTitle: 'Paramètres du patch', menuItem: 'Paramètres du patch...', tabs: { general: 'Général', translation: 'Traduction', quota: 'Quota', shortcuts: 'Raccourcis' }, ifaceLang: 'Langue de l’interface', checkUpd: 'Vérifier les mises à jour', changelogBtn: 'Historique', changelogTitle: 'Journal des modifications', changelogBack: 'Retour', add: 'Ajouter', copy: 'Copier', clear: 'Effacer', diagnostics: 'Diagnostic' },
+    de: { modalTitle: 'Patch-Einstellungen', menuItem: 'Patch-Einstellungen...', tabs: { general: 'Allgemein', translation: 'Übersetzung', quota: 'Kontingent', shortcuts: 'Tastenkürzel' }, ifaceLang: 'Oberflächensprache', checkUpd: 'Nach Updates suchen', changelogBtn: 'Änderungen', changelogTitle: 'Änderungsprotokoll', changelogBack: 'Zurück', add: 'Hinzufügen', copy: 'Kopieren', clear: 'Leeren', diagnostics: 'Diagnose' },
+    ru: { modalTitle: 'Настройки патча', menuItem: 'Настройки патча...', tabs: { general: 'Общие', translation: 'Перевод', quota: 'Квота', shortcuts: 'Сочетания' }, ifaceLang: 'Язык интерфейса', checkUpd: 'Проверить обновления', changelogBtn: 'История', changelogTitle: 'История изменений', changelogBack: 'Назад', add: 'Добавить', copy: 'Копировать', clear: 'Очистить', diagnostics: 'Диагностика' }
   };
 
   function getControlCenterStrings(lang) {
@@ -1081,11 +1212,15 @@
     return { ...base, ...loc, tabs: { ...base.tabs, ...(loc.tabs || {}) } };
   }
 
-  async function openControlCenterModal(initialTab = 'general') {
+  async function openControlCenterModal(initialTab = 'general', opts = {}) {
     if (typeof document === 'undefined') return;
-    if (document.getElementById('ag-enhancer-control-center-backdrop')) {
-      closeControlCenterModal();
-      return;
+    const existingBd = document.getElementById('ag-enhancer-control-center-backdrop');
+    if (existingBd) {
+      if (!opts.forceOpen) {
+        closeControlCenterModal(false);
+        return;
+      }
+      closeControlCenterModal(true);
     }
     closeEnhancerHubModal(true);
 
@@ -1114,18 +1249,24 @@
       <header style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid rgba(202,211,245,0.08);background:#0B0B0E;">
         <div style="display:flex;align-items:center;gap:8px;">
           <span style="font-size:14px;font-weight:600;color:#CAD3F5;">Antigravity<span style="color:#A0A3F6;margin-left:0;">Enhanced</span></span>
-          <span style="font-size:11px;color:#818BA8;font-variant-numeric:tabular-nums;">Control Center · v${ENHANCER_CURRENT_VERSION}</span>
+          <span id="ag-cc-modal-subtitle" style="font-size:11px;color:#818BA8;font-variant-numeric:tabular-nums;">${escapeHtml(sInit.modalTitle)} · v${ENHANCER_CURRENT_VERSION}</span>
         </div>
         <button id="ag-cc-close" type="button" class="agy-enh-btn" style="background:#181A22;border:1px solid rgba(202,211,245,0.1);color:#CAD3F5;border-radius:6px;width:24px;height:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;line-height:1;">×</button>
       </header>
-      <div id="ag-cc-tabs" style="display:flex;gap:4px;padding:8px 14px;border-bottom:1px solid rgba(202,211,245,0.08);background:#0B0B0E;">
-        ${tabs.map(t => `<button type="button" data-tab="${t.id}" class="ag-cc-tab" style="padding:6px 12px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:500;transition:all 120ms ease;">${t.label}</button>`).join('')}
+      <div id="ag-cc-tabs" style="position:relative;display:flex;gap:4px;padding:8px 14px;border-bottom:1px solid rgba(202,211,245,0.08);background:#0B0B0E;">
+        <span id="ag-cc-tab-pill" style="display:block;position:absolute;top:8px;bottom:8px;left:14px;width:0;border-radius:6px;background:rgba(160,163,246,0.14);border:1px solid rgba(160,163,246,0.22);pointer-events:none;z-index:0;"></span>
+        ${tabs.map(t => `<button type="button" data-tab="${t.id}" class="ag-cc-tab" style="position:relative;z-index:1;padding:6px 12px;border-radius:6px;border:none;background:transparent;cursor:pointer;font-size:12px;font-weight:500;transition:color 140ms ease;">${t.label}</button>`).join('')}
       </div>
-      <div id="ag-cc-body" style="padding:14px 16px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:10px;background:#0B0B0E;"></div>
+      <div id="ag-cc-body" style="padding:14px 16px;height:360px;max-height:62vh;overflow-y:auto;overflow-x:hidden;scrollbar-gutter:stable;display:flex;flex-direction:column;gap:10px;background:#0B0B0E;"></div>
     `;
 
     bd.appendChild(modal);
     (document.body || document.documentElement).appendChild(bd);
+
+    if (canGsapAnimate(bd)) {
+      window.gsap.fromTo(bd, { opacity: 0 }, { opacity: 1, duration: 0.16, ease: 'power1.out' });
+      if (canGsapAnimate(modal)) window.gsap.fromTo(modal, { opacity: 0, scale: 0.97, y: 8 }, { opacity: 1, scale: 1, y: 0, duration: 0.2, ease: 'power2.out' });
+    }
 
     let activeRecorderCleanup = null;
     const cleanupRecorder = () => {
@@ -1135,51 +1276,341 @@
       }
     };
 
-    bd.onclick = (e) => { if (e.target === bd) { cleanupRecorder(); closeControlCenterModal(); } };
+    bd.onclick = (e) => { if (e.target === bd) { cleanupRecorder(); closeControlCenterModal(false); } };
     const closeBtn = modal.querySelector('#ag-cc-close');
-    if (closeBtn) closeBtn.onclick = () => { cleanupRecorder(); closeControlCenterModal(); };
+    if (closeBtn) closeBtn.onclick = () => { cleanupRecorder(); closeControlCenterModal(false); };
 
     const bodyEl = modal.querySelector('#ag-cc-body');
     const tabBtns = modal.querySelectorAll('.ag-cc-tab');
+    const tabPill = modal.querySelector('#ag-cc-tab-pill');
+    let restoreConfirmOpen = Boolean(opts.restoreConfirm);
+    let clearHistConfirmOpen = false;
+    let changelogViewOpen = Boolean(opts.changelog);
+    let cachedChangelogText = null;
+    let autoCheckDone = false;
 
-    function renderTab(tabId) {
+    const formatReleaseNotesHtml = (rawText) => {
+      const lines = String(rawText || '').replace(/\r\n/g, '\n').split('\n');
+      const formatInline = (text) => escapeHtml(text)
+        .replace(/\*\*([^*]+)\*\*/g, '<strong style="color:#CAD3F5;font-weight:600;">$1</strong>')
+        .replace(/`([^`]+)`/g, '<code style="background:rgba(160,163,246,0.14);color:#A0A3F6;padding:1px 4px;border-radius:4px;font-family:monospace;font-size:10.5px;">$1</code>');
+      const htmlParts = [];
+      for (const rawLine of lines) {
+        const line = rawLine.trim();
+        if (!line || line === '---') continue;
+        const hMatch = line.match(/^#{1,3}\s+(.+)$/);
+        if (hMatch) {
+          htmlParts.push(`<p style="margin:6px 0 2px;font-size:11.5px;font-weight:600;color:#A0A3F6;">${formatInline(hMatch[1])}</p>`);
+        } else if (/^[-*•]\s+/.test(line)) {
+          const itemText = line.replace(/^[-*•]\s+/, '');
+          htmlParts.push(`<p style="margin:2px 0;padding-left:10px;position:relative;color:#CAD3F5;"><span style="position:absolute;left:0;color:#A0A3F6;">•</span>${formatInline(itemText)}</p>`);
+        } else {
+          htmlParts.push(`<p style="margin:2px 0;color:#CAD3F5;">${formatInline(line)}</p>`);
+        }
+      }
+      return htmlParts.join('');
+    };
+
+    const parseChangelogSections = (mdText) => {
+      const text = String(mdText || '').replace(/\r\n/g, '\n');
+      const lines = text.split('\n');
+      const sections = [];
+      let current = null;
+      for (const line of lines) {
+        const m = line.match(/^##\s+\[([^\]]+)\](?:\s*-\s*(.+))?$/);
+        if (m) {
+          if (current) sections.push(current);
+          current = { version: m[1].trim(), date: (m[2] || '').trim(), lines: [] };
+        } else if (current) {
+          current.lines.push(line);
+        }
+      }
+      if (current) sections.push(current);
+      return sections.map(sec => ({ ...sec, body: sec.lines.join('\n').trim() }));
+    };
+
+    function moveTabPill(targetBtn, animate = true) {
+      if (!tabPill || !targetBtn) return;
+      const left = targetBtn.offsetLeft || 14;
+      const width = targetBtn.offsetWidth || 72;
+      if (animate && canGsapAnimate(tabPill) && width > 0) {
+        window.gsap.to(tabPill, { left, width, duration: 0.2, ease: 'power2.out' });
+      } else {
+        tabPill.style.left = `${left}px`;
+        tabPill.style.width = `${width}px`;
+      }
+    }
+
+    function renderTab(tabId, animateSlide = false) {
       cleanupRecorder();
+      const prevIdx = tabs.findIndex(t => t.id === currentTab);
+      const nextIdx = tabs.findIndex(t => t.id === tabId);
+      if (tabId !== 'quota') clearHistConfirmOpen = false;
+      if (tabId !== 'general') changelogViewOpen = false;
       currentTab = tabId;
       const s = getControlCenterStrings(activeLanguage);
+      let activeBtn = null;
       tabBtns.forEach(b => {
         const tKey = b.getAttribute('data-tab');
         if (s.tabs[tKey]) b.textContent = s.tabs[tKey];
         const active = tKey === currentTab;
-        b.style.background = active ? 'rgba(160,163,246,0.14)' : 'transparent';
+        if (active) activeBtn = b;
         b.style.color = active ? '#A0A3F6' : '#9DA7C7';
       });
+      moveTabPill(activeBtn, animateSlide);
       if (!bodyEl) return;
 
       if (currentTab === 'general') {
-        const langOpts = LANG_ORDER.map(l => {
+        const h = getHubStrings();
+        const subEl = modal.querySelector('#ag-cc-modal-subtitle');
+        if (subEl) subEl.textContent = `${s.modalTitle} · v${ENHANCER_CURRENT_VERSION}`;
+
+        if (changelogViewOpen) {
+          const renderChangelogCards = (mdText) => {
+            const listEl = bodyEl.querySelector('#agy-hub-changelog-list');
+            if (!listEl) return;
+            const sections = parseChangelogSections(mdText);
+            if (sections.length === 0) {
+              listEl.innerHTML = `<p style="margin:12px 0;font-size:12px;color:#818BA8;text-align:center;">${escapeHtml(s.changelogEmpty)}</p>`;
+              return;
+            }
+            listEl.innerHTML = sections.map((sec, idx) => {
+              const isLatest = idx === 0;
+              const badgeHtml = isLatest ? `<span style="font-size:10px;font-weight:600;padding:1px 6px;border-radius:9999px;background:rgba(160,163,246,0.18);color:#A0A3F6;margin-left:6px;">LATEST</span>` : '';
+              const dateHtml = sec.date ? `<span style="font-size:11px;color:#818BA8;font-variant-numeric:tabular-nums;">${escapeHtml(sec.date)}</span>` : '';
+              return `
+                <article class="agy-changelog-card" style="background:#0B0B0E;border:1px solid rgba(202,211,245,0.09);border-radius:8px;overflow:hidden;">
+                  <button type="button" class="agy-changelog-toggle" data-idx="${idx}" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:transparent;border:none;color:#CAD3F5;cursor:pointer;text-align:left;">
+                    <span style="font-size:12.5px;font-weight:600;font-variant-numeric:tabular-nums;">v${escapeHtml(sec.version)}${badgeHtml}</span>
+                    ${dateHtml}
+                  </button>
+                  <div class="agy-changelog-body" style="display:${isLatest ? 'block' : 'none'};padding:0 10px 8px;border-top:1px solid rgba(202,211,245,0.06);font-size:11px;line-height:1.48;">
+                    ${formatReleaseNotesHtml(sec.body)}
+                  </div>
+                </article>
+              `;
+            }).join('');
+            listEl.querySelectorAll('.agy-changelog-toggle').forEach((btn) => {
+              btn.onclick = () => {
+                const card = btn.parentElement;
+                const body = card && card.querySelector('.agy-changelog-body');
+                if (body) body.style.display = body.style.display === 'none' ? 'block' : 'none';
+              };
+            });
+          };
+
+          bodyEl.innerHTML = `
+            <section id="agy-hub-changelog-view" style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;height:100%;box-sizing:border-box;">
+              <header style="display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:1px solid rgba(202,211,245,0.08);padding-bottom:8px;">
+                <strong style="font-size:13px;font-weight:600;color:#CAD3F5;">${escapeHtml(s.changelogTitle)}</strong>
+                <button type="button" id="agy-hub-changelog-back" class="agy-enh-btn" style="height:24px;padding:0 10px;border-radius:6px;background:#181A22;border:1px solid rgba(202,211,245,0.1);color:#CAD3F5;font-size:11px;cursor:pointer;">← ${escapeHtml(s.changelogBack)}</button>
+              </header>
+              <main id="agy-hub-changelog-list" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding-right:2px;">
+                <p style="margin:12px 0;font-size:12px;color:#818BA8;text-align:center;">${escapeHtml(h.checking)}</p>
+              </main>
+            </section>
+          `;
+          const backBtn = bodyEl.querySelector('#agy-hub-changelog-back');
+          if (backBtn) backBtn.onclick = () => { changelogViewOpen = false; renderTab('general', false); };
+          if (cachedChangelogText !== null) {
+            renderChangelogCards(cachedChangelogText);
+          } else if (ipc && ipc.invoke) {
+            ipc.invoke('enhancer:get-changelog').then((res) => {
+              cachedChangelogText = (res && res.ok && typeof res.content === 'string') ? res.content : '';
+              if (changelogViewOpen) renderChangelogCards(cachedChangelogText);
+            }).catch(() => {
+              cachedChangelogText = '';
+              if (changelogViewOpen) renderChangelogCards('');
+            });
+          } else {
+            renderChangelogCards('');
+          }
+          return;
+        }
+
+        if (restoreConfirmOpen) {
+          bodyEl.innerHTML = `
+            <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:12px;">
+              <div style="font-size:13px;font-weight:600;color:#CAD3F5;">${escapeHtml(h.restoreConfirmTitle)}</div>
+              <p style="margin:0;font-size:12px;color:#9DA7C7;line-height:1.55;">${escapeHtml(h.restoreConfirmDesc)}</p>
+              <div style="display:flex;justify-content:flex-end;gap:8px;padding-top:8px;border-top:1px solid rgba(202,211,245,0.08);">
+                <button type="button" id="agy-hub-cancel-restore" class="agy-enh-btn" style="height:28px;padding:0 12px;border-radius:6px;background:#181A22;border:1px solid rgba(202,211,245,0.1);color:#CAD3F5;font-size:12px;font-weight:500;cursor:pointer;">${escapeHtml(h.cancelBtn)}</button>
+                <button type="button" id="agy-hub-confirm-restore" class="agy-enh-primary" style="height:28px;padding:0 12px;border-radius:6px;background:#A0A3F6;border:none;color:#0B0B0E;font-size:12px;font-weight:600;cursor:pointer;">${escapeHtml(h.restoreVanilla)}</button>
+              </div>
+            </div>
+          `;
+          bodyEl.querySelector('#agy-hub-cancel-restore').onclick = () => { restoreConfirmOpen = false; renderTab('general', false); };
+          const confirmBtn = bodyEl.querySelector('#agy-hub-confirm-restore');
+          confirmBtn.onclick = async () => {
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = h.restoring;
+            if (ipc && ipc.invoke) await ipc.invoke('enhancer:restore-vanilla');
+          };
+          return;
+        }
+
+        const curInfo = LANG_DISPLAY_NAMES[activeLanguage] || { native: activeLanguage, en: activeLanguage };
+        const curLabel = activeLanguage === 'en' ? 'English (English)' : `${curInfo.native} (${curInfo.en})`;
+        const langMenuItems = LANG_ORDER.map(l => {
           const info = LANG_DISPLAY_NAMES[l] || { native: l, en: l };
-          return `<option value="${l}" ${activeLanguage === l ? 'selected' : ''}>${info.native} (${info.en})</option>`;
+          const labelText = (l === 'en') ? 'English (English)' : `${info.native} (${info.en})`;
+          const isSel = activeLanguage === l;
+          return `<div class="agy-overlay-item" data-cc-lang="${l}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px;border-radius:6px;font-size:12px;cursor:pointer;color:${isSel ? '#CAD3F5' : '#9DA7C7'};font-weight:${isSel ? '600' : '400'};"><span>${escapeHtml(labelText)}</span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#A0A3F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:${isSel ? 'block' : 'none'};"><polyline points="20 6 9 17 4 12"></polyline></svg></div>`;
         }).join('');
         bodyEl.innerHTML = `
-          <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:12px;">
+          <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:12px;overflow:visible;">
             <div>
               <div style="font-size:13px;font-weight:500;color:#CAD3F5;">${escapeHtml(s.ifaceLang)}</div>
               <div style="font-size:11px;color:#818BA8;margin-top:2px;">${escapeHtml(s.ifaceDesc)}</div>
             </div>
-            <select id="ag-cc-lang-select" style="background:#181A22;color:#CAD3F5;border:1px solid rgba(202,211,245,0.1);border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;">${langOpts}</select>
-          </div>
-          <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:12px;">
-            <div>
-              <div style="font-size:13px;font-weight:500;color:#CAD3F5;">${escapeHtml(s.hubTitle)}</div>
-              <div style="font-size:11px;color:#818BA8;margin-top:2px;">v${ENHANCER_CURRENT_VERSION} · ${ENHANCER_REPO}</div>
+            <div style="position:relative;flex-shrink:0;">
+              <button type="button" id="ag-cc-lang-trigger" class="agy-enh-btn" style="background:#181A22;color:#CAD3F5;border:1px solid rgba(202,211,245,0.1);border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:8px;min-width:168px;justify-content:space-between;">
+                <span id="ag-cc-lang-label" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(curLabel)}</span>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.7;flex-shrink:0;"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+              <div id="ag-cc-lang-menu" class="agy-overlay" style="display:none;position:absolute;right:0;top:calc(100% + 4px);z-index:100010;background:#111217;border:1px solid rgba(202,211,245,0.1);box-shadow:0 8px 24px rgba(0,0,0,0.48);border-radius:10px;padding:4px;min-width:190px;max-height:220px;overflow-y:auto;flex-direction:column;gap:2px;">${langMenuItems}</div>
             </div>
-            <button type="button" id="ag-cc-open-update" class="agy-enh-primary" style="background:#A0A3F6;color:#0B0B0E;border:none;border-radius:6px;height:28px;padding:0 12px;font-size:12px;font-weight:600;cursor:pointer;">${escapeHtml(s.checkUpd)}</button>
+          </div>
+          <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+              <strong style="font-size:13px;font-weight:500;color:#CAD3F5;">${escapeHtml(h.updateSection)} <small style="font-size:11px;font-weight:400;color:#818BA8;font-variant-numeric:tabular-nums;">v${ENHANCER_CURRENT_VERSION}</small></strong>
+              <button id="agy-hub-check-btn" type="button" class="agy-enh-btn" style="height:24px;padding:0 10px;border-radius:6px;background:rgba(160,163,246,0.14);border:1px solid rgba(160,163,246,0.32);color:#A0A3F6;font-size:11px;font-weight:500;cursor:pointer;">${escapeHtml(h.checkBtn)}</button>
+            </div>
+            <p id="agy-hub-update-status" style="margin:0;font-size:12px;color:#9DA7C7;line-height:1.45;"></p>
+            <aside id="agy-hub-progress-wrap" style="display:none;">
+              <div style="height:4px;border-radius:9999px;background:rgba(202,211,245,0.1);overflow:hidden;">
+                <span id="agy-hub-progress-bar" style="display:block;width:0%;height:100%;background:#A0A3F6;border-radius:9999px;"></span>
+              </div>
+              <p id="agy-hub-progress-text" style="margin:4px 0 0;font-size:11px;color:#818BA8;font-variant-numeric:tabular-nums;"></p>
+            </aside>
+            <div id="agy-hub-update-actions" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;">
+              <span id="agy-hub-apply-slot" style="display:flex;gap:8px;"></span>
+              <span style="display:flex;gap:6px;align-items:center;">
+                <button id="agy-hub-changelog-btn" type="button" class="agy-enh-btn" style="height:26px;padding:0 10px;border-radius:6px;background:#181A22;border:1px solid rgba(202,211,245,0.1);color:#CAD3F5;font-size:11px;font-weight:500;cursor:pointer;">${escapeHtml(s.changelogBtn)}</button>
+                <button id="agy-hub-vanilla-btn" type="button" class="agy-enh-btn" style="height:26px;padding:0 10px;border-radius:6px;background:#181A22;border:1px solid rgba(202,211,245,0.1);color:#CAD3F5;font-size:11px;font-weight:500;cursor:pointer;">${escapeHtml(h.restoreVanilla)}</button>
+              </span>
+            </div>
           </div>
         `;
-        const sel = bodyEl.querySelector('#ag-cc-lang-select');
-        if (sel) sel.onchange = () => { setLanguage(sel.value); renderTab('general'); };
-        const updBtn = bodyEl.querySelector('#ag-cc-open-update');
-        if (updBtn) updBtn.onclick = () => { closeControlCenterModal(); openEnhancerHubModal('update', { forceOpen: true, autoCheck: true }); };
+        const trig = bodyEl.querySelector('#ag-cc-lang-trigger');
+        const lMenu = bodyEl.querySelector('#ag-cc-lang-menu');
+        if (trig && lMenu) {
+          trig.onclick = (e) => {
+            if (e) e.stopPropagation();
+            const open = lMenu.style.display !== 'none';
+            if (open) {
+              lMenu.style.display = 'none';
+            } else {
+              lMenu.style.display = 'flex';
+              if (canGsapAnimate(lMenu)) window.gsap.fromTo(lMenu, { opacity: 0, y: -4 }, { opacity: 1, y: 0, duration: 0.12, ease: 'power1.out' });
+            }
+          };
+          lMenu.querySelectorAll('[data-cc-lang]').forEach(opt => {
+            opt.onclick = (e) => {
+              if (e) e.stopPropagation();
+              const nextL = opt.getAttribute('data-cc-lang');
+              lMenu.style.display = 'none';
+              if (nextL) setLanguage(nextL);
+              renderTab('general', false);
+            };
+          });
+        }
+
+        const updateStatusEl = bodyEl.querySelector('#agy-hub-update-status');
+        const applySlotEl = bodyEl.querySelector('#agy-hub-apply-slot');
+        const progWrap = bodyEl.querySelector('#agy-hub-progress-wrap');
+        const progBar = bodyEl.querySelector('#agy-hub-progress-bar');
+        const progText = bodyEl.querySelector('#agy-hub-progress-text');
+
+        const renderUpdateUI = (info) => {
+          if (!applySlotEl || !updateStatusEl) return;
+          applySlotEl.innerHTML = '';
+          if (!info) {
+            updateStatusEl.textContent = h.upToDate;
+            return;
+          }
+          if (!info.ok) {
+            updateStatusEl.innerHTML = `<span style="color:#E56B6F;">${escapeHtml(info.error || 'Error checking updates')}</span>`;
+            return;
+          }
+          if (!info.hasUpdate) {
+            updateStatusEl.innerHTML = `<span style="color:#A0A3F6;font-variant-numeric:tabular-nums;">${escapeHtml(h.upToDate)} (v${escapeHtml(info.currentVersion)})</span>`;
+            return;
+          }
+          const i18nMap = (info && info.releaseNotesI18n && typeof info.releaseNotesI18n === 'object') ? info.releaseNotesI18n : null;
+          const localizedNotes = (i18nMap && (i18nMap[activeLanguage] || i18nMap.en)) || info.releaseNotes || '';
+          const notesHtml = localizedNotes
+            ? `<div id="agy-hub-release-notes" style="margin-top:6px;padding:8px 10px;border-radius:8px;background:#0B0B0E;border:1px solid rgba(202,211,245,0.1);font-size:11px;color:#CAD3F5;max-height:110px;overflow-y:auto;line-height:1.48;">${formatReleaseNotesHtml(localizedNotes)}</div>`
+            : '';
+          updateStatusEl.innerHTML = `<span style="color:#A0A3F6;font-weight:600;font-variant-numeric:tabular-nums;">${escapeHtml(h.availPrefix)}v${escapeHtml(info.currentVersion)} → v${escapeHtml(info.remoteVersion)}</span>${notesHtml}`;
+
+          if (info.canApplyInApp) {
+            const applyBtn = document.createElement('button');
+            applyBtn.type = 'button';
+            applyBtn.className = 'agy-enh-primary';
+            applyBtn.textContent = h.updateNow;
+            applyBtn.style.cssText = 'height:26px;padding:0 12px;border-radius:6px;background:#A0A3F6;border:none;color:#0B0B0E;font-size:11px;font-weight:600;cursor:pointer;';
+            applyBtn.onclick = async () => {
+              applyBtn.disabled = true;
+              applyBtn.textContent = h.updating;
+              if (progWrap) progWrap.style.display = 'block';
+              const res = ipc && ipc.invoke ? await ipc.invoke('enhancer:apply-update') : null;
+              if (res && res.ok) {
+                enhancerUpdateInfo = { ...(enhancerUpdateInfo || {}), hasUpdate: false, currentVersion: res.newVersion || ENHANCER_CURRENT_VERSION };
+                injectEnhancerUpdatePill();
+                scheduleInjectTitleMenuIntegration();
+                if (progBar) progBar.style.width = '100%';
+                updateStatusEl.innerHTML = `<span style="color:#A0A3F6;font-weight:600;font-variant-numeric:tabular-nums;">v${escapeHtml(res.newVersion)}${escapeHtml(h.updateDoneSuffix)}</span>`;
+                applySlotEl.innerHTML = '';
+                const relaunchBtn = document.createElement('button');
+                relaunchBtn.type = 'button';
+                relaunchBtn.className = 'agy-enh-primary';
+                relaunchBtn.textContent = h.relaunchNow;
+                relaunchBtn.style.cssText = 'height:26px;padding:0 12px;border-radius:6px;background:#A0A3F6;border:none;color:#0B0B0E;font-size:11px;font-weight:600;cursor:pointer;';
+                relaunchBtn.onclick = () => ipc && ipc.invoke && ipc.invoke('enhancer:relaunch');
+                applySlotEl.appendChild(relaunchBtn);
+              } else {
+                applyBtn.disabled = false;
+                applyBtn.textContent = h.retryBtn;
+                updateStatusEl.innerHTML = `<span style="color:#E56B6F;">${escapeHtml((res && res.error) || 'Update failed')}</span>`;
+              }
+            };
+            applySlotEl.appendChild(applyBtn);
+          }
+        };
+
+        activeProgressHandler = (p) => {
+          if (!p || !progWrap) return;
+          progWrap.style.display = 'block';
+          if (typeof p.percent === 'number' && progBar) progBar.style.width = `${Math.max(0, Math.min(100, p.percent))}%`;
+          if (p.message && progText) progText.textContent = p.message;
+        };
+
+        const checkBtn = bodyEl.querySelector('#agy-hub-check-btn');
+        const runCheck = async () => {
+          if (checkBtn) checkBtn.disabled = true;
+          if (updateStatusEl) updateStatusEl.textContent = h.checking;
+          const info = await checkEnhancerGithubUpdate(true);
+          if (checkBtn) checkBtn.disabled = false;
+          renderUpdateUI(info);
+        };
+        if (checkBtn) checkBtn.onclick = runCheck;
+
+        const changelogBtn = bodyEl.querySelector('#agy-hub-changelog-btn');
+        if (changelogBtn) changelogBtn.onclick = () => { changelogViewOpen = true; renderTab('general', false); };
+
+        const vanillaBtn = bodyEl.querySelector('#agy-hub-vanilla-btn');
+        if (vanillaBtn) vanillaBtn.onclick = () => { restoreConfirmOpen = true; renderTab('general', false); };
+
+        if (enhancerUpdateInfo && !opts.autoCheck) {
+          renderUpdateUI(enhancerUpdateInfo);
+        } else if (opts.autoCheck && !autoCheckDone) {
+          autoCheckDone = true;
+          runCheck();
+        } else if (updateStatusEl) {
+          updateStatusEl.textContent = enhancerUpdateInfo ? '' : h.upToDate;
+          if (enhancerUpdateInfo) renderUpdateUI(enhancerUpdateInfo);
+        }
       } else if (currentTab === 'translation') {
         const langMap = (userGlossary[activeLanguage] && typeof userGlossary[activeLanguage] === 'object') ? userGlossary[activeLanguage] : {};
         const entries = Object.entries(langMap);
@@ -1196,7 +1627,7 @@
               </div>
             </div>
             <div id="ag-cc-gl-import-box" style="display:none;flex-direction:column;gap:6px;">
-              <textarea id="ag-cc-gl-import-txt" rows="3" placeholder='{"Settings":"설정"}' style="background:#181A22;color:#CAD3F5;border:1px solid rgba(202,211,245,0.1);border-radius:6px;padding:6px 8px;font-size:11px;font-family:monospace;"></textarea>
+              <textarea id="ag-cc-gl-import-txt" rows="2" placeholder='{"Settings":"설정"}' style="background:#181A22;color:#CAD3F5;border:1px solid rgba(202,211,245,0.1);border-radius:6px;padding:6px 8px;font-size:11px;font-family:monospace;"></textarea>
               <button type="button" id="ag-cc-gl-import-apply" class="agy-enh-primary" style="align-self:flex-end;background:#A0A3F6;color:#0B0B0E;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;">${escapeHtml(s.apply)}</button>
             </div>
             <div style="display:flex;gap:6px;">
@@ -1204,7 +1635,7 @@
               <input id="ag-cc-gl-dst" placeholder="${escapeHtml(s.dstPh)}" style="flex:1;background:#181A22;color:#CAD3F5;border:1px solid rgba(202,211,245,0.1);border-radius:6px;padding:5px 8px;font-size:12px;" />
               <button type="button" id="ag-cc-gl-add" class="agy-enh-primary" style="background:#A0A3F6;color:#0B0B0E;border:none;border-radius:6px;padding:0 12px;height:28px;font-size:12px;font-weight:600;cursor:pointer;">${escapeHtml(s.add)}</button>
             </div>
-            <div style="display:flex;flex-direction:column;gap:4px;max-height:110px;overflow-y:auto;">${rowsHtml}</div>
+            <div style="display:flex;flex-direction:column;gap:4px;max-height:84px;overflow-y:auto;">${rowsHtml}</div>
           </div>
           <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;">
             <div style="display:flex;justify-content:space-between;align-items:center;">
@@ -1212,7 +1643,7 @@
                 <div style="font-size:13px;font-weight:500;color:#CAD3F5;">${escapeHtml(s.collectUt)}</div>
                 <div style="font-size:11px;color:#818BA8;margin-top:2px;">${escapeHtml(s.collectUtDesc)}</div>
               </div>
-              <input type="checkbox" id="ag-cc-ut-toggle" ${userPreferences.collectUntranslated ? 'checked' : ''} style="width:16px;height:16px;accent-color:#A0A3F6;cursor:pointer;" />
+              ${renderNativeSwitch('ag-cc-ut-toggle', userPreferences.collectUntranslated)}
             </div>
             <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(202,211,245,0.06);padding-top:8px;">
               <span style="font-size:12px;color:#9DA7C7;">${escapeHtml(s.utList)} (<b id="ag-cc-ut-count" style="color:#CAD3F5;">0</b>)</span>
@@ -1221,7 +1652,7 @@
                 <button type="button" id="ag-cc-ut-clear" class="agy-enh-btn" style="background:#181A22;color:#E56B6F;border:1px solid rgba(229,107,111,0.28);border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;">${escapeHtml(s.clear)}</button>
               </div>
             </div>
-            <div id="ag-cc-ut-list" style="max-height:76px;overflow-y:auto;font-size:11px;color:#818BA8;">${escapeHtml(s.emptyUt)}</div>
+            <div id="ag-cc-ut-list" style="max-height:64px;overflow-y:auto;font-size:11px;color:#818BA8;">${escapeHtml(s.emptyUt)}</div>
           </div>
         `;
         const addBtn = bodyEl.querySelector('#ag-cc-gl-add');
@@ -1234,7 +1665,7 @@
             userGlossary[activeLanguage][srcVal] = dstVal;
             if (ipc && ipc.invoke) await ipc.invoke('enhancer:save-glossary', userGlossary).catch(() => {});
             if (document.body && activeLanguage !== 'en') { revertToOriginal(document.body); translateNode(document.body); }
-            renderTab('translation');
+            renderTab('translation', false);
           };
         }
         const expBtn = bodyEl.querySelector('#ag-cc-gl-export');
@@ -1259,7 +1690,7 @@
                 userGlossary[activeLanguage] = { ...(userGlossary[activeLanguage] || {}), ...parsed };
                 if (ipc && ipc.invoke) await ipc.invoke('enhancer:save-glossary', userGlossary).catch(() => {});
                 if (document.body && activeLanguage !== 'en') { revertToOriginal(document.body); translateNode(document.body); }
-                renderTab('translation');
+                renderTab('translation', false);
               }
             } catch (_) {}
           };
@@ -1270,11 +1701,10 @@
             if (userGlossary[activeLanguage] && key) delete userGlossary[activeLanguage][key];
             if (ipc && ipc.invoke) await ipc.invoke('enhancer:save-glossary', userGlossary).catch(() => {});
             if (document.body && activeLanguage !== 'en') { revertToOriginal(document.body); translateNode(document.body); }
-            renderTab('translation');
+            renderTab('translation', false);
           };
         });
-        const utToggle = bodyEl.querySelector('#ag-cc-ut-toggle');
-        if (utToggle) utToggle.onchange = () => persistPreferences({ collectUntranslated: Boolean(utToggle.checked) });
+        wireNativeSwitch(bodyEl.querySelector('#ag-cc-ut-toggle'), (checked) => persistPreferences({ collectUntranslated: checked }));
 
         let latestUtItems = [];
         if (ipc && ipc.invoke) {
@@ -1311,20 +1741,22 @@
           };
         }
       } else if (currentTab === 'quota') {
+        const threshVal = userPreferences.quotaLowThreshold || 20;
+        const pctFill = Math.round(((threshVal - 5) / 45) * 100);
         bodyEl.innerHTML = `
           <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">
             <div>
               <div style="font-size:13px;font-weight:500;color:#CAD3F5;">${escapeHtml(s.sparklines)}</div>
               <div style="font-size:11px;color:#818BA8;margin-top:2px;">${escapeHtml(s.sparkDesc)}</div>
             </div>
-            <input type="checkbox" id="ag-cc-spark-toggle" ${userPreferences.showSparklines !== false ? 'checked' : ''} style="width:16px;height:16px;accent-color:#A0A3F6;cursor:pointer;" />
+            ${renderNativeSwitch('ag-cc-spark-toggle', userPreferences.showSparklines !== false)}
           </div>
           <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">
             <div>
               <div style="font-size:13px;font-weight:500;color:#CAD3F5;">${escapeHtml(s.compactCard)}</div>
               <div style="font-size:11px;color:#818BA8;margin-top:2px;">${escapeHtml(s.compactDesc)}</div>
             </div>
-            <input type="checkbox" id="ag-cc-compact-toggle" ${userPreferences.compactQuotaCard ? 'checked' : ''} style="width:16px;height:16px;accent-color:#A0A3F6;cursor:pointer;" />
+            ${renderNativeSwitch('ag-cc-compact-toggle', userPreferences.compactQuotaCard)}
           </div>
           <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;">
             <div style="display:flex;justify-content:space-between;align-items:center;">
@@ -1332,11 +1764,11 @@
                 <div style="font-size:13px;font-weight:500;color:#CAD3F5;">${escapeHtml(s.lowAlert)}</div>
                 <div style="font-size:11px;color:#818BA8;margin-top:2px;">${escapeHtml(s.lowDesc)}</div>
               </div>
-              <input type="checkbox" id="ag-cc-low-alert" ${userPreferences.quotaAlertsEnabled ? 'checked' : ''} style="width:16px;height:16px;accent-color:#A0A3F6;cursor:pointer;" />
+              ${renderNativeSwitch('ag-cc-low-alert', userPreferences.quotaAlertsEnabled)}
             </div>
             <div style="display:flex;align-items:center;gap:10px;font-size:12px;color:#9DA7C7;">
-              <span>${escapeHtml(s.threshold)}: <b id="ag-cc-thresh-val" style="color:#CAD3F5;font-variant-numeric:tabular-nums;">${userPreferences.quotaLowThreshold || 20}%</b></span>
-              <input type="range" id="ag-cc-thresh-range" min="5" max="50" step="5" value="${userPreferences.quotaLowThreshold || 20}" style="flex:1;accent-color:#A0A3F6;" />
+              <span>${escapeHtml(s.threshold)}: <b id="ag-cc-thresh-val" style="color:#CAD3F5;font-variant-numeric:tabular-nums;">${threshVal}%</b></span>
+              <input type="range" id="ag-cc-thresh-range" class="ag-cc-range" min="5" max="50" step="5" value="${threshVal}" style="flex:1;background:linear-gradient(90deg, #A0A3F6 ${pctFill}%, rgba(202,211,245,0.14) ${pctFill}%);" />
             </div>
           </div>
           <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">
@@ -1344,34 +1776,58 @@
               <div style="font-size:13px;font-weight:500;color:#CAD3F5;">${escapeHtml(s.resetAlert)}</div>
               <div style="font-size:11px;color:#818BA8;margin-top:2px;">${escapeHtml(s.resetDesc)}</div>
             </div>
-            <input type="checkbox" id="ag-cc-reset-alert" ${userPreferences.quotaResetAlertsEnabled ? 'checked' : ''} style="width:16px;height:16px;accent-color:#A0A3F6;cursor:pointer;" />
+            ${renderNativeSwitch('ag-cc-reset-alert', userPreferences.quotaResetAlertsEnabled)}
           </div>
-          <div style="display:flex;justify-content:flex-end;">
-            <button type="button" id="ag-cc-clear-hist" class="agy-enh-btn" style="background:#181A22;color:#E56B6F;border:1px solid rgba(229,107,111,0.28);border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;">${escapeHtml(s.clearHist)}</button>
+          <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;flex-wrap:wrap;">
+            ${clearHistConfirmOpen ? `
+              <span style="font-size:12px;color:#E56B6F;margin-right:auto;">${escapeHtml(s.clearHistConfirm)}</span>
+              <button type="button" id="ag-cc-cancel-clear-hist" class="agy-enh-btn" style="background:#181A22;color:#CAD3F5;border:1px solid rgba(202,211,245,0.1);border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;">${escapeHtml(s.cancel)}</button>
+              <button type="button" id="ag-cc-confirm-clear-hist" class="agy-enh-btn" style="background:#E56B6F;color:#0B0B0E;border:none;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;">${escapeHtml(s.confirmClear)}</button>
+            ` : `
+              <button type="button" id="ag-cc-clear-hist" class="agy-enh-btn" style="background:#181A22;color:#E56B6F;border:1px solid rgba(229,107,111,0.28);border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;">${escapeHtml(s.clearHist)}</button>
+            `}
           </div>
         `;
-        const spark = bodyEl.querySelector('#ag-cc-spark-toggle');
-        if (spark) spark.onchange = () => persistPreferences({ showSparklines: Boolean(spark.checked) });
-        const cmp = bodyEl.querySelector('#ag-cc-compact-toggle');
-        if (cmp) cmp.onchange = () => persistPreferences({ compactQuotaCard: Boolean(cmp.checked) });
-        const lowA = bodyEl.querySelector('#ag-cc-low-alert');
-        if (lowA) lowA.onchange = () => persistPreferences({ quotaAlertsEnabled: Boolean(lowA.checked) });
-        const rstA = bodyEl.querySelector('#ag-cc-reset-alert');
-        if (rstA) rstA.onchange = () => persistPreferences({ quotaResetAlertsEnabled: Boolean(rstA.checked) });
+        wireNativeSwitch(bodyEl.querySelector('#ag-cc-spark-toggle'), (checked) => persistPreferences({ showSparklines: checked }));
+        wireNativeSwitch(bodyEl.querySelector('#ag-cc-compact-toggle'), (checked) => persistPreferences({ compactQuotaCard: checked }));
+        wireNativeSwitch(bodyEl.querySelector('#ag-cc-low-alert'), (checked) => persistPreferences({ quotaAlertsEnabled: checked }));
+        wireNativeSwitch(bodyEl.querySelector('#ag-cc-reset-alert'), (checked) => persistPreferences({ quotaResetAlertsEnabled: checked }));
         const rng = bodyEl.querySelector('#ag-cc-thresh-range');
         const rngVal = bodyEl.querySelector('#ag-cc-thresh-val');
         if (rng) {
-          rng.oninput = () => { if (rngVal) rngVal.textContent = `${rng.value}%`; };
+          rng.oninput = () => {
+            const v = Number(rng.value) || 20;
+            const fill = Math.round(((v - 5) / 45) * 100);
+            rng.style.background = `linear-gradient(90deg, #A0A3F6 ${fill}%, rgba(202,211,245,0.14) ${fill}%)`;
+            if (rngVal) rngVal.textContent = `${v}%`;
+          };
           rng.onchange = () => persistPreferences({ quotaLowThreshold: Number(rng.value) || 20 });
         }
         const clrHist = bodyEl.querySelector('#ag-cc-clear-hist');
         if (clrHist) {
-          clrHist.onclick = async () => {
+          clrHist.onclick = () => {
+            clearHistConfirmOpen = true;
+            renderTab('quota', false);
+          };
+        }
+        const cancelClrHist = bodyEl.querySelector('#ag-cc-cancel-clear-hist');
+        if (cancelClrHist) {
+          cancelClrHist.onclick = () => {
+            clearHistConfirmOpen = false;
+            renderTab('quota', false);
+          };
+        }
+        const confirmClrHist = bodyEl.querySelector('#ag-cc-confirm-clear-hist');
+        if (confirmClrHist) {
+          confirmClrHist.onclick = async () => {
+            confirmClrHist.disabled = true;
             if (ipc && ipc.invoke) await ipc.invoke('enhancer:clear-quota-history').catch(() => {});
             quotaHistoryState = {};
+            clearHistConfirmOpen = false;
             if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
               window.dispatchEvent(new CustomEvent('antigravity-quota-history-updated', { detail: { history: {}, preferences: userPreferences } }));
             }
+            renderTab('quota', false);
             showToast(s.cleared);
           };
         }
@@ -1430,260 +1886,42 @@
           }).catch(() => {});
         }
       }
+
+      if (animateSlide && prevIdx !== -1 && nextIdx !== -1 && prevIdx !== nextIdx && canGsapAnimate(bodyEl)) {
+        const dir = nextIdx > prevIdx ? 1 : -1;
+        window.gsap.fromTo(bodyEl, { opacity: 0, x: dir * 18 }, { opacity: 1, x: 0, duration: 0.18, ease: 'power2.out' });
+      }
     }
 
     tabBtns.forEach(b => {
       b.onclick = (e) => {
         if (e) e.stopPropagation();
-        renderTab(b.getAttribute('data-tab'));
+        const nextTab = b.getAttribute('data-tab');
+        if (nextTab && nextTab !== currentTab) renderTab(nextTab, true);
       };
     });
-    renderTab(currentTab);
-  }
-
-  function closeEnhancerHubModal(immediate = false) {
-    activeProgressHandler = null;
-    if (activeModalLangHandler && typeof window !== 'undefined' && typeof window.removeEventListener === 'function') {
-      window.removeEventListener('antigravity-lang-changed', activeModalLangHandler);
-      activeModalLangHandler = null;
+    renderTab(currentTab, false);
+    if (typeof requestAnimationFrame === 'function') {
+      requestAnimationFrame(() => moveTabPill(modal.querySelector(`.ag-cc-tab[data-tab="${currentTab}"]`), false));
     }
-    const backdrop = document.getElementById('antigravity-enhancer-modal-backdrop');
-    if (!backdrop) return;
-    if (window.gsap && window.gsap.killTweensOf) window.gsap.killTweensOf(backdrop);
-    if (!immediate && window.gsap) {
-      window.gsap.to(backdrop, {
-        opacity: 0,
-        duration: 0.12,
-        ease: 'power1.in',
-        onComplete: () => backdrop.remove()
-      });
-    } else {
-      backdrop.remove();
-    }
-  }
-
-  async function openEnhancerHubModal(mode = 'update', opts = {}) {
-    const existing = document.getElementById('antigravity-enhancer-modal-backdrop');
-    if (existing) {
-      if (!opts.forceOpen) {
-        closeEnhancerHubModal(false);
-        return;
-      }
-      closeEnhancerHubModal(true);
-    }
-    const status = await refreshHubStatus() || {
-      enhancerVersion: ENHANCER_CURRENT_VERSION,
-      appVersion: '2.34.0',
-      asarBootstrapped: true
-    };
-    let h = getHubStrings();
-    let autoCheckDone = false;
-
-    const backdrop = document.createElement('div');
-    backdrop.id = 'antigravity-enhancer-modal-backdrop';
-    backdrop.className = 'notranslate';
-    backdrop.setAttribute('translate', 'no');
-    backdrop.style.cssText = 'position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;background:rgba(11,11,14,0.72);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);padding:20px;app-region:no-drag;-webkit-app-region:no-drag;';
-
-    const modal = document.createElement('div');
-    modal.id = 'antigravity-enhancer-modal';
-    modal.className = 'agy-overlay border rounded-xl text-foreground shadow-lg notranslate';
-    modal.setAttribute('translate', 'no');
-    modal.style.cssText = 'width:400px;max-width:94vw;max-height:88vh;overflow-y:auto;border-radius:12px;background:#0B0B0E;border:1px solid rgba(202,211,245,0.1);box-shadow:0 12px 32px rgba(0,0,0,0.48);padding:16px;color:#CAD3F5;font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable",Pretendard,"Segoe UI",sans-serif;font-size:13px;';
-
-    const renderModalContent = (activeMode) => {
-      h = getHubStrings();
-      if (activeMode === 'restore') {
-        modal.innerHTML = `
-          <header style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:12px;border-bottom:1px solid rgba(202,211,245,0.08);">
-            <span style="font-size:14px;font-weight:600;color:#CAD3F5;">${h.restoreConfirmTitle}</span>
-            <button id="agy-hub-close" type="button" class="agy-enh-btn" style="background:#181A22;border:1px solid rgba(202,211,245,0.1);color:#CAD3F5;border-radius:6px;width:24px;height:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;line-height:1;">×</button>
-          </header>
-          <p style="margin:0;padding:12px 0 16px;font-size:13px;color:#9DA7C7;line-height:1.5;">${h.restoreConfirmDesc}</p>
-          <footer style="display:flex;align-items:center;justify-content:flex-end;gap:8px;padding-top:12px;border-top:1px solid rgba(202,211,245,0.08);">
-            <button id="agy-hub-cancel-restore" type="button" class="agy-enh-btn" style="height:28px;padding:0 12px;border-radius:6px;background:#181A22;border:1px solid rgba(202,211,245,0.1);color:#CAD3F5;font-size:12px;font-weight:500;cursor:pointer;">${h.cancelBtn}</button>
-            <button id="agy-hub-confirm-restore" type="button" class="agy-enh-primary" style="height:28px;padding:0 12px;border-radius:6px;background:#A0A3F6;border:none;color:#0B0B0E;font-size:12px;font-weight:600;cursor:pointer;">${h.restoreVanilla}</button>
-          </footer>
-        `;
-        modal.querySelector('#agy-hub-close').onclick = () => closeEnhancerHubModal();
-        modal.querySelector('#agy-hub-cancel-restore').onclick = () => closeEnhancerHubModal();
-        const confirmBtn = modal.querySelector('#agy-hub-confirm-restore');
-        confirmBtn.onclick = async () => {
-          confirmBtn.disabled = true;
-          confirmBtn.textContent = h.restoring;
-          await ipc.invoke('enhancer:restore-vanilla');
-        };
-        return;
-      }
-
-      modal.innerHTML = `
-        <header style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:12px;border-bottom:1px solid rgba(202,211,245,0.08);margin-bottom:12px;">
-          <div style="display:flex;align-items:center;gap:0;">
-            <span style="font-size:14px;font-weight:600;color:#CAD3F5;">Antigravity</span><span style="font-size:14px;font-weight:600;color:#A0A3F6;">Enhanced</span>
-          </div>
-          <button id="agy-hub-close" type="button" class="agy-enh-btn" style="background:#181A22;border:1px solid rgba(202,211,245,0.1);color:#CAD3F5;border-radius:6px;width:24px;height:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;line-height:1;">×</button>
-        </header>
-
-        ${status.safeMode ? `<p style="margin:0 0 12px;padding:8px 12px;border-radius:8px;background:rgba(160,163,246,0.1);border:1px solid rgba(160,163,246,0.28);color:#CAD3F5;font-size:12px;">${h.safeModeWarn}</p>` : ''}
-
-        <section class="agy-card rounded-xl border divide-y" style="border-radius:8px;background:#111217;border:1px solid rgba(202,211,245,0.08);margin-bottom:12px;overflow:hidden;">
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid rgba(202,211,245,0.08);">
-            <span style="font-size:12px;color:#9DA7C7;">${h.curVer}</span>
-            <span style="font-size:12px;font-weight:600;color:#A0A3F6;font-variant-numeric:tabular-nums;">v${status.enhancerVersion || ENHANCER_CURRENT_VERSION}</span>
-          </div>
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;">
-            <span style="font-size:12px;color:#9DA7C7;">${h.appVer}</span>
-            <span style="font-size:12px;font-weight:500;color:#CAD3F5;font-variant-numeric:tabular-nums;">v${status.appVersion || '2.34.0'}</span>
-          </div>
-        </section>
-
-        <section class="agy-card rounded-xl border" style="padding:12px;border-radius:8px;background:#111217;border:1px solid rgba(202,211,245,0.08);margin-bottom:12px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;">
-            <span style="font-size:12px;font-weight:500;color:#CAD3F5;">${h.updateSection}</span>
-            <button id="agy-hub-check-btn" type="button" class="agy-enh-btn" style="height:24px;padding:0 12px;border-radius:6px;background:rgba(160,163,246,0.14);border:1px solid rgba(160,163,246,0.32);color:#A0A3F6;font-size:12px;font-weight:500;cursor:pointer;">${h.checkBtn}</button>
-          </div>
-          <p id="agy-hub-update-status" style="margin:0;font-size:12px;color:#9DA7C7;line-height:1.45;"></p>
-          <aside id="agy-hub-progress-wrap" style="display:none;margin-top:8px;">
-            <div style="height:4px;border-radius:9999px;background:rgba(202,211,245,0.1);overflow:hidden;">
-              <span id="agy-hub-progress-bar" style="display:block;width:0%;height:100%;background:#A0A3F6;border-radius:9999px;"></span>
-            </div>
-            <p id="agy-hub-progress-text" style="margin:4px 0 0;font-size:11px;color:#818BA8;font-variant-numeric:tabular-nums;"></p>
-          </aside>
-          <div id="agy-hub-update-actions" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;"></div>
-        </section>
-
-        <footer style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:12px;border-top:1px solid rgba(202,211,245,0.08);">
-          <button id="agy-hub-vanilla-btn" type="button" class="agy-enh-btn" style="height:28px;padding:0 12px;border-radius:6px;background:#181A22;border:1px solid rgba(202,211,245,0.1);color:#CAD3F5;font-size:12px;font-weight:500;cursor:pointer;">${h.restoreVanilla}</button>
-          <button id="agy-hub-close-footer" type="button" class="agy-enh-btn" style="height:28px;padding:0 12px;border-radius:6px;background:#181A22;border:1px solid rgba(202,211,245,0.1);color:#CAD3F5;font-size:12px;font-weight:500;cursor:pointer;">${h.closeBtn}</button>
-        </footer>
-      `;
-
-      modal.querySelector('#agy-hub-close').onclick = () => closeEnhancerHubModal();
-      modal.querySelector('#agy-hub-close-footer').onclick = () => closeEnhancerHubModal();
-      modal.querySelector('#agy-hub-vanilla-btn').onclick = () => renderModalContent('restore');
-
-      const updateStatusEl = modal.querySelector('#agy-hub-update-status');
-      const updateActionsEl = modal.querySelector('#agy-hub-update-actions');
-      const progWrap = modal.querySelector('#agy-hub-progress-wrap');
-      const progBar = modal.querySelector('#agy-hub-progress-bar');
-      const progText = modal.querySelector('#agy-hub-progress-text');
-
-      const renderUpdateUI = (info) => {
-        updateActionsEl.innerHTML = '';
-        if (!info) {
-          updateStatusEl.textContent = h.upToDate;
-          return;
-        }
-        if (!info.ok) {
-          updateStatusEl.innerHTML = `<span style="color:#E56B6F;">${info.error || 'Error checking updates'}</span>`;
-          return;
-        }
-        if (!info.hasUpdate) {
-          updateStatusEl.innerHTML = `<span style="color:#A0A3F6;font-variant-numeric:tabular-nums;">${h.upToDate} (v${info.currentVersion})</span>`;
-          return;
-        }
-
-        const i18nMap = (info && info.releaseNotesI18n && typeof info.releaseNotesI18n === 'object') ? info.releaseNotesI18n : null;
-        const localizedNotes = (i18nMap && (i18nMap[activeLanguage] || i18nMap.en)) || info.releaseNotes || '';
-        const notesHtml = localizedNotes
-          ? `<div id="agy-hub-release-notes" style="margin-top:8px;padding:8px 12px;border-radius:6px;background:#0B0B0E;border:1px solid rgba(202,211,245,0.08);font-size:11px;color:#CAD3F5;max-height:112px;overflow-y:auto;white-space:pre-wrap;line-height:1.5;">${String(localizedNotes).replace(/</g, '&lt;')}</div>`
-          : '';
-        updateStatusEl.innerHTML = `<span style="color:#A0A3F6;font-weight:600;font-variant-numeric:tabular-nums;">${h.availPrefix}v${info.currentVersion} → v${info.remoteVersion}</span>${notesHtml}`;
-
-        if (info.canApplyInApp) {
-          const applyBtn = document.createElement('button');
-          applyBtn.type = 'button';
-          applyBtn.className = 'agy-enh-primary';
-          applyBtn.textContent = h.updateNow;
-          applyBtn.style.cssText = 'height:28px;padding:0 12px;border-radius:6px;background:#A0A3F6;border:none;color:#0B0B0E;font-size:12px;font-weight:600;cursor:pointer;';
-          applyBtn.onclick = async () => {
-            applyBtn.disabled = true;
-            applyBtn.textContent = h.updating;
-            progWrap.style.display = 'block';
-            const res = await ipc.invoke('enhancer:apply-update');
-            if (res && res.ok) {
-              enhancerUpdateInfo = { ...(enhancerUpdateInfo || {}), hasUpdate: false, currentVersion: res.newVersion || ENHANCER_CURRENT_VERSION };
-              injectEnhancerUpdatePill();
-              scheduleInjectTitleMenuIntegration();
-              progBar.style.width = '100%';
-              updateStatusEl.innerHTML = `<span style="color:#A0A3F6;font-weight:600;font-variant-numeric:tabular-nums;">v${res.newVersion}${h.updateDoneSuffix}</span>`;
-              updateActionsEl.innerHTML = '';
-              const finishBtn = document.createElement('button');
-              finishBtn.type = 'button';
-              finishBtn.className = 'agy-enh-primary';
-              finishBtn.textContent = res.restartRequired ? h.restartNow : h.reloadNow;
-              finishBtn.style.cssText = 'height:28px;padding:0 12px;border-radius:6px;background:#A0A3F6;border:none;color:#0B0B0E;font-size:12px;font-weight:600;cursor:pointer;';
-              finishBtn.onclick = () => ipc.invoke(res.restartRequired ? 'enhancer:relaunch' : 'enhancer:reload-windows');
-              updateActionsEl.appendChild(finishBtn);
-            } else {
-              applyBtn.disabled = false;
-              applyBtn.textContent = h.updateNow;
-              updateStatusEl.innerHTML = `<span style="color:#E56B6F;">${(res && res.error) || 'Update failed'}</span>`;
-            }
-          };
-          updateActionsEl.appendChild(applyBtn);
-        }
-
-        if (info.releasePageUrl) {
-          const relBtn = document.createElement('button');
-          relBtn.type = 'button';
-          relBtn.className = 'agy-enh-btn';
-          relBtn.textContent = h.openRelease;
-          relBtn.style.cssText = 'height:28px;padding:0 12px;border-radius:6px;background:#181A22;border:1px solid rgba(202,211,245,0.1);color:#CAD3F5;font-size:12px;font-weight:500;cursor:pointer;';
-          relBtn.onclick = () => {
-            const targetUrl = info.exeDownloadUrl || info.releasePageUrl;
-            try { ipc.invoke('shell:open-external', targetUrl); } catch (_) { window.open(targetUrl, '_blank'); }
-          };
-          updateActionsEl.appendChild(relBtn);
-        }
-      };
-
-      activeProgressHandler = (data) => {
-        if (!document.body.contains(modal)) return;
-        progWrap.style.display = 'block';
-        const pct = Math.max(0, Math.min(100, Number(data && data.percent) || 0));
-        progBar.style.width = `${pct}%`;
-        if (data && data.message) progText.textContent = data.message;
-      };
-
-      renderUpdateUI(enhancerUpdateInfo || status.lastRemoteInfo);
-
-      const checkBtn = modal.querySelector('#agy-hub-check-btn');
-      checkBtn.onclick = async () => {
-        updateStatusEl.textContent = h.checking;
-        const res = await checkEnhancerGithubUpdate(true);
-        if (document.body.contains(modal)) renderUpdateUI(res);
-      };
-
-      if (opts.autoCheck && !autoCheckDone) {
-        autoCheckDone = true;
-        updateStatusEl.textContent = h.checking;
-        checkEnhancerGithubUpdate(true).then((res) => {
-          if (document.body.contains(modal)) renderUpdateUI(res || enhancerUpdateInfo || status.lastRemoteInfo);
-        });
-      }
-    };
-
-    backdrop.appendChild(modal);
-    (document.body || document.documentElement).appendChild(backdrop);
-
-    if (window.gsap) {
-      window.gsap.fromTo(backdrop, { opacity: 0 }, { opacity: 1, duration: 0.12, ease: 'power1.out' });
-    }
-
-    backdrop.onclick = (e) => { if (e.target === backdrop) closeEnhancerHubModal(); };
-    const currentMode = (mode === 'restore' ? 'restore' : 'update');
-    renderModalContent(currentMode);
     if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
       activeModalLangHandler = () => {
-        if (document.getElementById('antigravity-enhancer-modal-backdrop')) {
-          renderModalContent(currentMode);
-        }
+        if (document.getElementById('ag-enhancer-control-center-backdrop')) renderTab(currentTab, false);
       };
       window.addEventListener('antigravity-lang-changed', activeModalLangHandler);
     }
   }
 
+  function closeEnhancerHubModal(immediate = false) {
+    closeControlCenterModal(immediate);
+  }
+
+  async function openEnhancerHubModal(mode = 'update', opts = {}) {
+    return openControlCenterModal('general', {
+      ...opts,
+      restoreConfirm: mode === 'restore'
+    });
+  }
   // ---------------------------------------------------------------------------
   // 5. Settings Panel & Top-Bar Controls (2.34.0 Compatible)
   // ---------------------------------------------------------------------------
@@ -1707,6 +1945,7 @@
     if (activeLanguage === lang) return;
     activeLanguage = lang;
     try { localStorage.setItem(LANG_STORAGE_KEY, lang); } catch (_) {}
+    persistPreferences({ language: lang });
 
     const fontStyle = document.getElementById('antigravity-i18n-style');
     if (fontStyle) fontStyle.disabled = (lang === 'en');
@@ -2153,16 +2392,12 @@
     const versionText = `${h.patchVersionPrefix} ${ENHANCER_CURRENT_VERSION}`;
 
     let section = dropdown.querySelector('#antigravity-enhancer-menu-section');
+    const ccMenuLabel = getControlCenterStrings(activeLanguage).menuItem;
     if (section) {
       const verSpan = section.querySelector('#antigravity-menu-patch-version span');
       if (verSpan && verSpan.textContent !== versionText) verSpan.textContent = versionText;
-      const ccLabel = activeLanguage === 'ko' ? 'Control Center 설정...' : 'Control Center...';
       const ccSpan = section.querySelector('#antigravity-menu-control-center span');
-      if (ccSpan && ccSpan.textContent !== ccLabel) ccSpan.textContent = ccLabel;
-      const chkSpan = section.querySelector('#antigravity-menu-check-updates span');
-      if (chkSpan && chkSpan.textContent !== h.checkUpdates) chkSpan.textContent = h.checkUpdates;
-      const rstSpan = section.querySelector('#antigravity-menu-restore-vanilla span');
-      if (rstSpan && rstSpan.textContent !== h.restoreVanilla) rstSpan.textContent = h.restoreVanilla;
+      if (ccSpan && ccSpan.textContent !== ccMenuLabel) ccSpan.textContent = ccMenuLabel;
       return;
     }
 
@@ -2176,9 +2411,7 @@
     section.appendChild(sep);
 
     const verRow = createNativeMenuRow('antigravity-menu-patch-version', versionText, false, updateBadge);
-    const controlRow = createNativeMenuRow('antigravity-menu-control-center', activeLanguage === 'ko' ? 'Control Center 설정...' : 'Control Center...', true, '');
-    const checkRow = createNativeMenuRow('antigravity-menu-check-updates', h.checkUpdates, true, '');
-    const restoreRow = createNativeMenuRow('antigravity-menu-restore-vanilla', h.restoreVanilla, true, '');
+    const controlRow = createNativeMenuRow('antigravity-menu-control-center', ccMenuLabel, true, '');
 
     controlRow.btn.onclick = (e) => {
       if (e) {
@@ -2186,31 +2419,11 @@
         if (e.preventDefault) e.preventDefault();
       }
       closeNativeTitleMenu();
-      openControlCenterModal('general');
-    };
-
-    checkRow.btn.onclick = (e) => {
-      if (e) {
-        if (e.stopPropagation) e.stopPropagation();
-        if (e.preventDefault) e.preventDefault();
-      }
-      closeNativeTitleMenu();
-      openEnhancerHubModal('update', { forceOpen: true, autoCheck: true });
-    };
-
-    restoreRow.btn.onclick = (e) => {
-      if (e) {
-        if (e.stopPropagation) e.stopPropagation();
-        if (e.preventDefault) e.preventDefault();
-      }
-      closeNativeTitleMenu();
-      openEnhancerHubModal('restore', { forceOpen: true });
+      openControlCenterModal('general', { forceOpen: true });
     };
 
     section.appendChild(verRow.wrapper);
     section.appendChild(controlRow.wrapper);
-    section.appendChild(checkRow.wrapper);
-    section.appendChild(restoreRow.wrapper);
     dropdown.appendChild(section);
   }
 
@@ -2965,6 +3178,9 @@
   }
 
   function init() {
+    if (activeLanguage && userPreferences.language !== activeLanguage) {
+      persistPreferences({ language: activeLanguage });
+    }
     runTranslation();
     setupGsapGlobalInteractions();
     injectMainWorldQuotaWidget();
@@ -3037,7 +3253,8 @@
     window.__agEnhancerTestHooks = {
       formatShortcutFromEvent,
       matchesShortcut,
-      getControlCenterStrings
+      getControlCenterStrings,
+      isUntranslatableNoise
     };
   }
 

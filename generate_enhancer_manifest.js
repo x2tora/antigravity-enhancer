@@ -7,9 +7,14 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
-const VERSION = '3.5.4';
+const VERSION = '4.0.0';
 const REPO = 'x2tora/antigravity-enhancer';
 const enhancerDir = path.join(__dirname, 'enhancer');
+
+const rootChangelogPath = path.join(__dirname, 'CHANGELOG.md');
+if (fs.existsSync(rootChangelogPath)) {
+  fs.copyFileSync(rootChangelogPath, path.join(enhancerDir, 'CHANGELOG.md'));
+}
 
 const trackedFiles = [
   { name: 'main-enhancer.js', restartRequired: true },
@@ -17,7 +22,8 @@ const trackedFiles = [
   { name: 'renderer-enhancer.js', restartRequired: false },
   { name: 'gsap-core.js', restartRequired: false },
   { name: 'dictionaries.json', restartRequired: false },
-  { name: 'auto-repatch.js', restartRequired: false }
+  { name: 'auto-repatch.js', restartRequired: false },
+  { name: 'CHANGELOG.md', restartRequired: false }
 ];
 
 const files = {};

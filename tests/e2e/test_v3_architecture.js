@@ -103,7 +103,7 @@ function createRendererHarness(initialLang = 'ko', seedDomFn = null, payloadOver
       invoked.push({ channel, arg });
       if (channel === 'enhancer:get-status') {
         return {
-          enhancerVersion: '3.5.4',
+          enhancerVersion: '4.0.0',
           appVersion: '2.34.0',
           asarBootstrapped: true
         };
@@ -113,13 +113,19 @@ function createRendererHarness(initialLang = 'ko', seedDomFn = null, payloadOver
           ok: true,
           hasUpdate: true,
           canApplyInApp: true,
-          currentVersion: '3.5.4',
-          remoteVersion: '3.5.4',
+          currentVersion: '4.0.0',
+          remoteVersion: '4.0.0',
           releaseNotes: 'English test update',
           releaseNotesI18n: {
             en: 'English test update',
-            ko: '한국어 업데이트 변경사항'
+            ko: '### 주요 변경\n- **한국어 업데이트 변경사항** (`v4.0.0`)'
           }
+        };
+      }
+      if (channel === 'enhancer:get-changelog') {
+        return {
+          ok: true,
+          content: fs.readFileSync(path.join(ROOT_DIR, 'CHANGELOG.md'), 'utf8')
         };
       }
       return { ok: true };
@@ -136,7 +142,7 @@ function createRendererHarness(initialLang = 'ko', seedDomFn = null, payloadOver
 
   const payload = {
     disabled: false,
-    version: '3.5.4',
+    version: '4.0.0',
     repo: 'x2tora/antigravity-enhancer',
     code: rendererCode,
     gsapCode,
@@ -213,11 +219,11 @@ function createRendererHarness(initialLang = 'ko', seedDomFn = null, payloadOver
 // ============================================================================
 // F22: Modular Enhancer & Manifest Integrity
 // ============================================================================
-registerTest(1, 'F22', 'manifest.json v3.5.4 points to x2tora/antigravity-enhancer & matches SHA-256 digests', () => {
+registerTest(1, 'F22', 'manifest.json v4.0.0 points to x2tora/antigravity-enhancer & matches SHA-256 digests', () => {
   const manifestPath = path.join(ENHANCER_DIR, 'manifest.json');
   assert.ok(fs.existsSync(manifestPath), 'enhancer/manifest.json missing');
   const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-  assert.strictEqual(manifest.version, '3.5.4');
+  assert.strictEqual(manifest.version, '4.0.0');
   assert.strictEqual(manifest.repo, 'x2tora/antigravity-enhancer');
   assert.strictEqual(manifest.testedAppVersion, '2.34.0');
   assert.ok(manifest.releaseNotesI18n && typeof manifest.releaseNotesI18n === 'object', 'manifest.json must include releaseNotesI18n');
@@ -545,24 +551,30 @@ registerTest(3, 'F24', 'Native Antigravity Enhanced title menu integrates Patch 
   assert.strictEqual(wsDropdown.querySelector('#antigravity-enhancer-menu-section'), null, 'Sibling Workspace menu must stay untouched');
 
   const patchVerOpt = menuSection.querySelector('#antigravity-menu-patch-version');
-  const checkUpdatesOpt = menuSection.querySelector('#antigravity-menu-check-updates');
-  const restoreOpt = menuSection.querySelector('#antigravity-menu-restore-vanilla');
-  assert.ok(patchVerOpt && patchVerOpt.textContent.includes('3.5.4'), 'Menu must display Patch Version 3.5.4');
-  assert.ok(checkUpdatesOpt, 'Menu must include Check Patch Updates item');
-  assert.ok(restoreOpt, 'Menu must include Restore Original item');
+  const patchSettingsOpt = menuSection.querySelector('#antigravity-menu-control-center');
+  assert.ok(patchVerOpt && patchVerOpt.textContent.includes('4.0.0'), 'Menu must display Patch Version 4.0.0');
+  assert.ok(patchSettingsOpt && patchSettingsOpt.textContent.includes('패치 설정'), 'Menu must include unified 패치 설정... item');
+  assert.strictEqual(menuSection.querySelector('#antigravity-menu-check-updates'), null, 'Separate Check Updates menu item must be merged into Patch Settings');
+  assert.strictEqual(menuSection.querySelector('#antigravity-menu-restore-vanilla'), null, 'Separate Restore Original menu item must be merged into Patch Settings');
 
-  // Wait for initial checkEnhancerGithubUpdate(false) (2500ms or trigger directly via checkUpdatesOpt)
-  await checkUpdatesOpt.onclick({ stopPropagation: () => {}, preventDefault: () => {} });
+  // Open unified Patch Settings modal from menu and trigger Check Updates inside General tab
+  await patchSettingsOpt.onclick({ stopPropagation: () => {}, preventDefault: () => {} });
+  await new Promise(r => setTimeout(r, 20));
+  const modal = document.getElementById('ag-enhancer-control-center');
+  assert.ok(modal, 'Clicking 패치 설정... in native menu must open unified Patch Settings modal');
+  const checkBtn = modal.querySelector('#agy-hub-check-btn');
+  assert.ok(checkBtn, 'Check Updates button must exist inside General tab');
+  await checkBtn.onclick();
   await new Promise(r => setTimeout(r, 40));
+
   const updatePill = document.getElementById('antigravity-enhancer-update-btn');
   assert.ok(updatePill, 'Native-style Update Available top-bar pill must render when update exists');
   assert.ok((updatePill.style.cssText || '').toUpperCase().includes('#A0A3F6'), 'Update pill must use #A0A3F6 accent');
   assert.ok(updatePill.textContent.includes('업데이트 가능') || updatePill.textContent.includes('Update Available'), 'Update pill must show localized label');
 
-  const modal = document.getElementById('antigravity-enhancer-modal');
-  assert.ok(modal, 'Clicking Check Patch Updates in native menu must open modal');
   const notesBox = modal.querySelector('#agy-hub-release-notes');
   assert.ok(notesBox && notesBox.textContent.includes('한국어 업데이트 변경사항'), 'In-app update notes must display in active app language (ko)');
+  assert.ok(notesBox.innerHTML.includes('<strong') && notesBox.innerHTML.includes('<code'), 'Release notes must render markdown formatting cleanly');
 
   // Switching language while modal is open must immediately re-render modal notes & controls
   const qBtn = document.getElementById('antigravity-quick-lang-btn');
@@ -574,15 +586,17 @@ registerTest(3, 'F24', 'Native Antigravity Enhanced title menu integrates Patch 
     if (enOpt.onclick) enOpt.onclick({ stopPropagation: () => {} });
     else enOpt.click();
     const updatedNotes = modal.querySelector('#agy-hub-release-notes');
-    assert.ok(updatedNotes && updatedNotes.textContent.includes('English test update'), 'Open update modal must re-render release notes on language switch');
+    assert.ok(updatedNotes && updatedNotes.textContent.includes('English test update'), 'Open Patch Settings modal must re-render release notes on language switch');
   }
   assert.ok(modal.querySelector('#agy-hub-check-btn'), 'Check Updates button must exist');
   assert.strictEqual(modal.querySelector('#agy-hub-repair-btn'), null, 'Verify & Repair UI must be removed');
   assert.strictEqual(modal.querySelector('#agy-hub-rollback-btn'), null, 'Rollback UI must be removed');
-  assert.ok(modal.querySelector('#agy-hub-vanilla-btn'), 'Restore Original button must exist');
+  const vanillaBtn = modal.querySelector('#agy-hub-vanilla-btn');
+  assert.ok(vanillaBtn, 'Restore Original button must exist inside General tab');
 
   // Applying in-app update must immediately hide the top-bar Update Available pill
-  const applyBtn = modal.querySelector('.agy-enh-primary');
+  const applySlot = modal.querySelector('#agy-hub-apply-slot');
+  const applyBtn = applySlot && applySlot.querySelector('.agy-enh-primary');
   assert.ok(applyBtn, 'Apply update button must exist when update is available');
   await applyBtn.onclick();
   await new Promise(r => setTimeout(r, 30));
@@ -592,12 +606,10 @@ registerTest(3, 'F24', 'Native Antigravity Enhanced title menu integrates Patch 
   const rendererSrc = fs.readFileSync(path.join(ENHANCER_DIR, 'renderer-enhancer.js'), 'utf8');
   assert.ok(rendererSrc.includes('600000'), 'Background update check interval must be 10 minutes (600000 ms)');
 
-  // Restore Original from menu opens focused confirmation and invokes IPC on confirm
-  await restoreOpt.onclick({ stopPropagation: () => {}, preventDefault: () => {} });
-  await new Promise(r => setTimeout(r, 25));
-  const restoreModal = document.getElementById('antigravity-enhancer-modal');
-  const confirmBtn = restoreModal && restoreModal.querySelector('#agy-hub-confirm-restore');
-  assert.ok(confirmBtn, 'Restore Original menu item must open confirmation modal');
+  // Restore Original button switches General tab to inline confirmation and invokes IPC on confirm
+  vanillaBtn.onclick();
+  const confirmBtn = modal.querySelector('#agy-hub-confirm-restore');
+  assert.ok(confirmBtn, 'Restore Original button must open inline confirmation');
   await confirmBtn.onclick();
   assert.ok(invoked.some(i => i.channel === 'enhancer:restore-vanilla'), 'Confirming restore must invoke enhancer:restore-vanilla');
 });
@@ -727,8 +739,8 @@ registerTest(1, 'F25', 'build_exe_installer.ps1 uses safe build hygiene, #0B0B0E
     assert.ok(fs.existsSync(path.join(ROOT_DIR, 'docs', `README.${l}.md`)), `docs/README.${l}.md must exist`);
   }
   assert.ok(fs.existsSync(path.join(ROOT_DIR, 'Antigravity-Enhancer-Setup.exe')));
-  assert.ok(fs.existsSync(path.join(ROOT_DIR, 'Antigravity-Enhancer-v3.5.4-Setup.exe')));
-  assert.ok(fs.existsSync(path.join(ROOT_DIR, 'Antigravity-Enhancer-v3.5.4-Win.zip')));
+  assert.ok(fs.existsSync(path.join(ROOT_DIR, 'Antigravity-Enhancer-v4.0.0-Setup.exe')));
+  assert.ok(fs.existsSync(path.join(ROOT_DIR, 'Antigravity-Enhancer-v4.0.0-Win.zip')));
   assert.ok(fs.existsSync(path.join(ROOT_DIR, 'SHA256SUMS.txt')));
 
   const sums = fs.readFileSync(path.join(ROOT_DIR, 'SHA256SUMS.txt'), 'utf8');
@@ -805,9 +817,9 @@ registerTest(4, 'F24', 'Main updater rejects SHA-256 tampering cleanly, atomical
     const fileUrl = 'https://raw.githubusercontent.com/x2tora/antigravity-enhancer/main/enhancer/renderer-enhancer.js';
 
     // 1. Tamper test: digest mismatch must abort BEFORE overwriting live enhancerDir
-    const v33Tampered = Buffer.from('/* v3.5.4 TAMPERED */', 'utf8');
+    const v33Tampered = Buffer.from('/* v4.0.0 TAMPERED */', 'utf8');
     remoteResponses.set(manifestUrl, JSON.stringify({
-      version: '3.5.4',
+      version: '4.0.0',
       files: { 'renderer-enhancer.js': { sha256: 'a'.repeat(64), size: v33Tampered.length } }
     }));
     remoteResponses.set(fileUrl, v33Tampered);
@@ -818,18 +830,18 @@ registerTest(4, 'F24', 'Main updater rejects SHA-256 tampering cleanly, atomical
     // 2. Valid atomic staging & dead rollback code removed
     assert.strictEqual(isolated.restoreFromBackupDir, undefined, 'Dead restoreFromBackupDir export must be removed');
     assert.strictEqual(isolated.getFullStatus().backup, undefined, 'Dead backup snapshot metadata must be removed from getFullStatus');
-    const v33Valid = Buffer.from('/* v3.5.4 valid */', 'utf8');
+    const v33Valid = Buffer.from('/* v4.0.0 valid */', 'utf8');
     const v33Sha = crypto.createHash('sha256').update(v33Valid).digest('hex');
     remoteResponses.set(manifestUrl, JSON.stringify({
-      version: '3.5.4',
+      version: '4.0.0',
       files: { 'renderer-enhancer.js': { sha256: v33Sha, size: v33Valid.length } }
     }));
     remoteResponses.set(fileUrl, v33Valid);
     const applyRes = await isolated.applyInAppUpdate('main');
     assert.strictEqual(applyRes.ok, true);
-    assert.strictEqual(applyRes.newVersion, '3.5.4');
-    assert.strictEqual(fs.readFileSync(path.join(tmpEnhDir, 'renderer-enhancer.js'), 'utf8'), '/* v3.5.4 valid */');
-    assert.strictEqual(JSON.parse(fs.readFileSync(path.join(tmpEnhDir, 'manifest.json'), 'utf8')).version, '3.5.4');
+    assert.strictEqual(applyRes.newVersion, '4.0.0');
+    assert.strictEqual(fs.readFileSync(path.join(tmpEnhDir, 'renderer-enhancer.js'), 'utf8'), '/* v4.0.0 valid */');
+    assert.strictEqual(JSON.parse(fs.readFileSync(path.join(tmpEnhDir, 'manifest.json'), 'utf8')).version, '4.0.0');
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
@@ -850,7 +862,7 @@ registerTest(4, 'F25', 'Installer OS language auto-detection (9 languages + Engl
     const installerCsPath = path.join(tmpDir, 'InstallerWPF.cs');
     // Rename App.Main out so test harness can define entry point cleanly
     const modifiedCs = match[1]
-      .replace('__ENHANCER_VERSION__', '3.5.4')
+      .replace('__ENHANCER_VERSION__', '4.0.0')
       .replace('public static void Main()', 'public static void MainWpfDisabled()');
     fs.writeFileSync(installerCsPath, '\uFEFF' + modifiedCs, 'utf8');
 
@@ -976,7 +988,7 @@ registerTest(4, 'F24', 'auto-repatch.js detects unpatched app.asar, skips incomp
       patchAsar: () => { isBootstrapped = true; patchCalls++; return { changed: true }; }
     };
 
-    const validRenderer = Buffer.from('/* 3.5.4 renderer */', 'utf8');
+    const validRenderer = Buffer.from('/* 4.0.0 renderer */', 'utf8');
     const validSha = crypto.createHash('sha256').update(validRenderer).digest('hex');
     const remoteResponses = new Map();
     const mockHttps = {
@@ -1006,7 +1018,7 @@ registerTest(4, 'F24', 'auto-repatch.js detects unpatched app.asar, skips incomp
     const fileUrl = 'https://raw.githubusercontent.com/x2tora/antigravity-enhancer/main/enhancer/renderer-enhancer.js';
 
     remoteResponses.set(manifestUrl, JSON.stringify({
-      version: '3.5.4',
+      version: '4.0.0',
       repo: 'x2tora/antigravity-enhancer',
       minAppVersion: '2.30.0',
       testedAppVersion: '2.34.0',
@@ -1044,7 +1056,7 @@ registerTest(4, 'F24', 'auto-repatch.js detects unpatched app.asar, skips incomp
     assert.strictEqual(okRes.repatched, true);
     assert.strictEqual(patchCalls, 1);
     assert.strictEqual(isBootstrapped, true);
-    assert.strictEqual(fs.readFileSync(path.join(tmpEnhDir, 'renderer-enhancer.js'), 'utf8'), '/* 3.5.4 renderer */');
+    assert.strictEqual(fs.readFileSync(path.join(tmpEnhDir, 'renderer-enhancer.js'), 'utf8'), '/* 4.0.0 renderer */');
 
     const skipRes = await autoRepatch.runAutoRepatch({
       enhancerDir: tmpEnhDir,
@@ -1132,7 +1144,7 @@ registerTest(1, 'F27', 'main-enhancer persists 72h quota history ring buffer wit
 // ============================================================================
 // F28: Enhancer Control Center & Preferences Persistence
 // ============================================================================
-registerTest(1, 'F28', 'main-enhancer persists preferences & renderer opens 4-tab Control Center from title menu', () => {
+registerTest(1, 'F28', 'main-enhancer persists preferences & renderer opens 4-tab Control Center from title menu', async () => {
   const mainEnh = require(path.join(ENHANCER_DIR, 'main-enhancer.js'));
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ag-prefs-'));
   try {
@@ -1172,6 +1184,9 @@ registerTest(1, 'F28', 'main-enhancer persists preferences & renderer opens 4-ta
   const ccTabs = modal.querySelectorAll('.ag-cc-tab');
   assert.strictEqual(ccTabs.length, 4, 'Control Center should have 4 tabs');
   assert.ok(modal.style.cssText.includes('#0B0B0E'), 'Control Center should match native #0B0B0E surface');
+  assert.ok(env.document.getElementById('ag-cc-tab-pill'), 'Control Center should render sliding tab pill');
+  assert.strictEqual(env.document.getElementById('ag-cc-body').style.height, '360px', 'Control Center body should use fixed height to prevent layout shift');
+  assert.ok(env.document.getElementById('ag-cc-lang-trigger'), 'General tab should use custom native-styled language dropdown');
   ccTabs[3].click();
   assert.ok(env.document.getElementById('ag-cc-rec-lang'), 'Shortcuts tab should render #ag-cc-rec-lang immediately on click');
   assert.ok(env.document.getElementById('ag-cc-rec-center'), 'Shortcuts tab should render #ag-cc-rec-center immediately on click');
@@ -1181,8 +1196,29 @@ registerTest(1, 'F28', 'main-enhancer persists preferences & renderer opens 4-ta
   assert.ok(env.document.getElementById('ag-cc-ut-copy'), 'Translation tab should render untranslated copy button');
 
   ccTabs[2].click();
-  assert.ok(env.document.getElementById('ag-cc-compact-toggle'), 'Quota tab should render compact card toggle');
-  assert.ok(env.document.getElementById('ag-cc-clear-hist'), 'Quota tab should render clear history button');
+  const compactSw = env.document.getElementById('ag-cc-compact-toggle');
+  assert.ok(compactSw && compactSw.getAttribute('role') === 'switch', 'Quota tab should render native role=switch toggle');
+  const clearHistBtn = env.document.getElementById('ag-cc-clear-hist');
+  assert.ok(clearHistBtn, 'Quota tab should render clear history button');
+  clearHistBtn.click();
+  assert.ok(env.document.getElementById('ag-cc-confirm-clear-hist'), 'Clicking clear 72h history must show inline confirmation button');
+  assert.ok(env.document.getElementById('ag-cc-cancel-clear-hist'), 'Clicking clear 72h history must show cancel button');
+  env.document.getElementById('ag-cc-cancel-clear-hist').click();
+  assert.ok(env.document.getElementById('ag-cc-clear-hist'), 'Cancelling clear 72h history must restore initial button');
+
+  ccTabs[0].click();
+  const changelogBtn = env.document.getElementById('agy-hub-changelog-btn');
+  assert.ok(changelogBtn, 'General tab must render Changelog button');
+  changelogBtn.click();
+  await new Promise(r => setTimeout(r, 20));
+  const changelogView = env.document.getElementById('agy-hub-changelog-view');
+  assert.ok(changelogView, 'Clicking Changelog button must open dedicated Changelog viewer');
+  const cards = changelogView.querySelectorAll('.agy-changelog-card');
+  assert.ok(cards.length >= 2, 'Changelog viewer must render consolidated version cards');
+  const backBtn = env.document.getElementById('agy-hub-changelog-back');
+  assert.ok(backBtn, 'Changelog viewer must render Back button');
+  backBtn.click();
+  assert.ok(env.document.getElementById('agy-hub-changelog-btn'), 'Clicking Back must return to General tab');
 });
 
 registerTest(2, 'F26', 'main-enhancer ensureAutoRepatchWrappers generates zero-flash .ps1/.vbs & auto-repatch writes status', async () => {
@@ -1230,4 +1266,73 @@ registerTest(2, 'F28', 'formatShortcutFromEvent handles ev.code fallback & Contr
     const s = hooks.getControlCenterStrings(lang);
     assert.ok(s && s.tabs && s.tabs.general && s.tabs.shortcuts, `Control Center strings missing for ${lang}`);
   }
+});
+
+registerTest(2, 'F26', 'isUntranslatableNoise filters Korean/shortcuts/timers/paths & new 2.34.0 UI strings translate', () => {
+  let projBtn = null;
+  let branchBtn = null;
+  let presetBtn = null;
+  let staticSpan = null;
+  const env = createRendererHarness('ko', (document, patchEl) => {
+    projBtn = patchEl(document.createElement('button'));
+    projBtn.setAttribute('aria-label', 'Select project, current: project_5');
+    branchBtn = patchEl(document.createElement('button'));
+    branchBtn.setAttribute('aria-label', 'Branch, current: main');
+    presetBtn = patchEl(document.createElement('button'));
+    presetBtn.setAttribute('aria-label', 'Agent permissions preset selector, current: Turbo');
+    staticSpan = patchEl(document.createElement('span'));
+    staticSpan.appendChild(new MockText('Pinned Actions'));
+    document.body.appendChild(projBtn);
+    document.body.appendChild(branchBtn);
+    document.body.appendChild(presetBtn);
+    document.body.appendChild(staticSpan);
+  });
+
+  const hooks = env.window.__agEnhancerTestHooks;
+  assert.strictEqual(hooks.isUntranslatableNoise('오토클리커'), true, 'Korean text must be filtered');
+  assert.strictEqual(hooks.isUntranslatableNoise('Ctrl+/'), true, 'Keyboard shortcut must be filtered');
+  assert.strictEqual(hooks.isUntranslatableNoise('Thinking for 8s'), true, 'Thinking timer must be filtered');
+  assert.strictEqual(hooks.isUntranslatableNoise('2m 23s'), true, 'Duration must be filtered');
+  assert.strictEqual(hooks.isUntranslatableNoise('KO'), true, '2-letter code must be filtered');
+  assert.strictEqual(hooks.isUntranslatableNoise('#L1080-1315'), true, 'Line anchor must be filtered');
+  assert.strictEqual(hooks.isUntranslatableNoise('tab,'), true, 'Trailing comma fragment must be filtered');
+  assert.strictEqual(hooks.isUntranslatableNoise('project_5'), true, 'snake_case project name must be filtered');
+  assert.strictEqual(hooks.isUntranslatableNoise('antigravity-enhancer'), true, 'kebab-case repo/branch name must be filtered');
+  assert.strictEqual(hooks.isUntranslatableNoise('enhancer/renderer-enhancer.js'), true, 'Relative file path must be filtered');
+  assert.strictEqual(hooks.isUntranslatableNoise('C:\\Users\\user\\test.txt'), true, 'Windows file path must be filtered');
+  assert.strictEqual(hooks.isUntranslatableNoise('Refining Untranslated Glossary Strings and Filtering Project Names Here'), true, 'Long conversation title (>8 words) must be filtered');
+  assert.strictEqual(hooks.isUntranslatableNoise('reflects'), true, 'Single lowercase prose word must be filtered');
+  assert.strictEqual(hooks.isUntranslatableNoise('.gitignore'), true, 'Dotfile must be filtered');
+  assert.strictEqual(hooks.isUntranslatableNoise('LICENSE'), true, 'ALL-CAPS filename must be filtered');
+  assert.strictEqual(hooks.isUntranslatableNoise('SpotifyAccountMigrator'), true, 'PascalCase project identifier must be filtered');
+  assert.strictEqual(hooks.isUntranslatableNoise('project_5 (Ctrl+.)'), true, 'Project shortcut hint must be filtered');
+  assert.strictEqual(hooks.isUntranslatableNoise('Turn 85 of 87'), true, 'Turn counter must be filtered');
+  assert.strictEqual(hooks.isUntranslatableNoise('[Antigravity-Enhancer-Setup.exe](file:///E:/Projects/project_5/Antigravity-Enhancer-Setup.exe)'), true, 'Markdown file link must be filtered');
+  assert.strictEqual(hooks.isUntranslatableNoise('Antigravity'), true, 'Brand name must be filtered');
+  assert.strictEqual(hooks.isUntranslatableNoise('Gemini'), true, 'Model brand name must be filtered');
+  assert.strictEqual(hooks.isUntranslatableNoise('Still thinking, 16 seconds'), true, 'Still thinking timer must be filtered');
+  assert.strictEqual(hooks.isUntranslatableNoise('Close Discord Webhook Update Notification Setup'), true, 'Close + conversation title must be filtered');
+  assert.strictEqual(hooks.isUntranslatableNoise('Locate openEnhancerHubModal in renderer-enhancer.js'), true, 'Agent tool log with symbol/filename must be filtered');
+  assert.strictEqual(hooks.isUntranslatableNoise('Run F22-F28 targeted E2E tests'), true, 'Agent tool log with feature IDs must be filtered');
+  assert.strictEqual(hooks.isUntranslatableNoise('Explored files, ran commands, edited files'), true, 'Agent step summary must be filtered');
+  assert.strictEqual(hooks.isUntranslatableNoise('Pinned Actions'), false, 'Valid English UI string must pass');
+
+  assert.strictEqual(staticSpan.textContent, '고정된 작업');
+  assert.strictEqual(projBtn.getAttribute('aria-label'), '프로젝트 선택, 현재: project_5');
+  assert.strictEqual(branchBtn.getAttribute('aria-label'), '브랜치, 현재: main');
+  assert.strictEqual(presetBtn.getAttribute('aria-label'), '에이전트 권한 프리셋 선택기, 현재: Turbo');
+
+  const mainEnh = require(path.join(ENHANCER_DIR, 'main-enhancer.js'));
+  const translatedMenu = mainEnh.translateMenuTemplate([
+    { label: 'Copy Project Name' },
+    { label: 'Rename' },
+    { label: 'Move to Group', submenu: [{ label: 'New Group' }, { label: 'Remove from Group' }] },
+    { label: 'Delete Project' }
+  ], 'ko');
+  assert.strictEqual(translatedMenu[0].label, '프로젝트 이름 복사');
+  assert.strictEqual(translatedMenu[1].label, '이름 변경');
+  assert.strictEqual(translatedMenu[2].label, '그룹으로 이동');
+  assert.strictEqual(translatedMenu[2].submenu[0].label, '새 그룹');
+  assert.strictEqual(translatedMenu[2].submenu[1].label, '그룹에서 제거');
+  assert.strictEqual(translatedMenu[3].label, '프로젝트 삭제');
 });
