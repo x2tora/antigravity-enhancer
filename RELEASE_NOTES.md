@@ -1,9 +1,10 @@
-# Antigravity Enhancer v4.0.2
+# Antigravity Enhancer v4.0.3
 
 ## Changes
 
-- **Expanded Static UI & Dynamic Pattern Translations**: Added 34 static UI translations (251 entries across 8 languages) for Orchestrator Settings, Interface Layout, Feedback, Viewer headers, and color pickers, plus 72 dynamic regex rules for shortcut `aria-label`s, active conversation counts, token counters, and feedback account prompts.
-- **Stronger Untranslated Collector Filtering**: Filtered out emails, trailing-slash folder names, CSS size units, standalone key names, `Side Question:` titles, model names, split markdown/changelog fragments, and versioned agent logs.
+- **Centered Patch Settings & Glossary Layout Fix**: Removed external `.agy-overlay` class interference so the Patch Settings modal stays horizontally centered, switched the Custom Glossary input row to CSS Grid to prevent the `Add` button from wrapping or overflowing, and unified the Settings page card into a single **Patch Settings** button.
+- **Expanded UI & Dynamic Counter Translations**: Added 18 static UI strings (including Image/File/Diff viewer controls, Subagent Conversation headers, and `Zoom 100%, reset to fit` / `Download image`) and 24 dynamic rules (`lines added/removed`, `excluded`, `active and archived conversations`) across 8 languages.
+- **Stronger Collector Filtering**: Excluded quoted code literals, MCP tool IDs, leading-ellipsis fragments, code comments, and Claude model names.
 
 ---
 
@@ -12,63 +13,64 @@
 <details>
 <summary>한국어</summary>
 
-- **신규 UI 및 동적 패턴 번역 대폭 추가**: 오케스트레이터 설정, 인터페이스 레이아웃, 피드백 보내기, 뷰어 헤더, 색상 선택기 등 정적 UI 34종(8개국어 251개 항목)과 단축키 안내·활성 대화 수·토큰 카운터 등 동적 규칙 9종(72개 규칙)을 추가했습니다.
-- **미번역 수집 필터 고도화**: 이메일, 폴더 경로(`project_11/`), 크기 단위(`14px`), 단독 키 이름, `Side Question:` 제목, 모델명, 깨진 마크다운/변경 로그 조각을 자동으로 걸러냅니다.
+- **패치 설정 정중앙 배치 및 용어집 레이아웃 수정**: 외부 `.agy-overlay` 클래스 간섭을 제거해 패치 설정 창이 항상 화면 가로 정중앙에 오도록 수정했고, 커스텀 용어집 입력 행을 CSS Grid로 바꿔 `추가` 버튼 줄바꿈·삐져나옴을 해결했습니다. 설정 페이지 하단 카드도 `패치 설정` 버튼 하나로 통합했습니다.
+- **신규 UI 및 동적 카운터 번역 추가**: 파일/Diff/이미지 뷰어(`Download image`, `Zoom 100%, reset to fit`), 서브에이전트 대화, `Fold code block` 등 정적 UI 18종과 `lines added/removed`, `excluded`, 활성+보관 대화 수 동적 규칙 24건을 추가했습니다.
+- **미번역 수집 필터 강화**: 따옴표 코드 리터럴, MCP 툴 식별자, 말줄임표 조각, 코드 주석, Claude 모델명 등을 수집 대상에서 제외했습니다.
 
 </details>
 
 <details>
 <summary>日本語</summary>
 
-- **新規 UI・動的パターン翻訳を追加**: オーケストレーター設定、インターフェースレイアウト、フィードバック、ビューアーヘッダー等の静的 UI 34種と、ショートカット説明・会話数・トークン表示の動的ルール 72件を追加しました。
-- **未翻訳収集フィルター強化**: メールアドレス、フォルダ名、サイズ単位、モデル名、分割された Markdown 断片を除外します。
+- **パッチ設定の中央配置と用語集レイアウト修正**: 外部クラスの干渉をなくしモーダルを画面中央に固定しました。カスタム用語集の入力行を CSS Grid 化し、ボタンの折り返し・はみ出しを解消しました。
+- **新規 UI・動的カウンター翻訳とフィルター強化**: 画像/ファイルビューアーやサブエージェント会話などの UI 18種と動的ルール 24件を追加し、コード断片や MCP 識別子の除外を強化しました。
 
 </details>
 
 <details>
 <summary>简体中文</summary>
 
-- **新增界面与动态规则翻译**：新增 34 项静态界面翻译（251 条多语言词条）及 72 条快捷键描述、活跃对话数与令牌计数动态规则。
-- **强化未翻译收集过滤**：自动过滤邮箱、文件夹路径、尺寸单位、模型名与残缺 Markdown 片段。
+- **修复补丁设置居中与术语表布局**：移除外部类干扰确保弹窗水平居中，将自定义术语表输入行改为 CSS Grid 防止按钮换行或溢出，并统一设置页入口按钮。
+- **扩展界面与动态计数翻译**：新增 18 项静态界面（含图片查看器与子代理对话）及 24 条动态规则，并进一步过滤代码字面量与 MCP 工具名。
 
 </details>
 
 <details>
 <summary>繁體中文</summary>
 
-- **新增介面與動態規則翻譯**：新增 34 項靜態介面翻譯（251 筆多語言詞條）及 72 條快速鍵說明、進行中對話數與權杖計數動態規則。
-- **強化未翻譯收集過濾**：自動過濾電子郵件、資料夾路徑、尺寸單位、模型名稱與殘缺 Markdown 片段。
+- **修正修補設定置中與詞彙表版面**：移除外部類別干擾確保視窗水平置中，將自訂詞彙表輸入列改為 CSS Grid 防止按鈕換行或溢出，並統一設定頁入口按鈕。
+- **擴充介面與動態計數翻譯**：新增 18 項靜態介面（含圖片檢視器與子代理對話）及 24 條動態規則，並過濾程式碼字面量與 MCP 工具名稱。
 
 </details>
 
 <details>
 <summary>Español</summary>
 
-- **Más traducciones de interfaz y reglas dinámicas**: 34 cadenas estáticas nuevas (251 entradas en 8 idiomas) y 72 reglas dinámicas para atajos, conversaciones activas y contadores de tokens.
-- **Filtrado mejorado**: Se excluyen correos, rutas de carpetas, unidades CSS, nombres de modelo y fragmentos Markdown.
+- **Centrado del modal y corrección del glosario**: Se eliminó la interferencia de clases externas para centrar el modal, se usó CSS Grid en la fila del glosario y se unificó el botón de ajustes.
+- **Más traducciones y mejor filtrado**: 18 textos estáticos nuevos, 24 reglas dinámicas y filtrado de literales de código e IDs MCP.
 
 </details>
 
 <details>
 <summary>Français</summary>
 
-- **Traductions UI et règles dynamiques étendues** : 34 libellés statiques (251 entrées sur 8 langues) et 72 règles dynamiques pour raccourcis, conversations actives et compteurs de jetons.
-- **Filtrage renforcé** : Exclusion des e-mails, dossiers, unités CSS, noms de modèle et fragments Markdown.
+- **Centrage du panneau et mise en page du glossaire** : Suppression de l’interférence CSS externe pour centrer le panneau, passage en CSS Grid pour le glossaire et bouton unifié.
+- **Traductions et filtrage renforcés** : 18 libellés statiques, 24 règles dynamiques et exclusion des littéraux de code et identifiants MCP.
 
 </details>
 
 <details>
 <summary>Deutsch</summary>
 
-- **Erweiterte UI- & Dynamik-Übersetzungen**: 34 statische UI-Texte (251 Einträge in 8 Sprachen) sowie 72 dynamische Regeln für Kürzel, aktive Unterhaltungen und Token-Zähler.
-- **Verbesserter Filter**: Filtert E-Mails, Ordnernamen, CSS-Einheiten, Modellnamen und Markdown-Fragmente heraus.
+- **Zentriertes Modal & Glossar-Layout**: Externe CSS-Interferenz entfernt, Glossar-Eingabezeile auf CSS Grid umgestellt und Einstellungs-Button vereinheitlicht.
+- **Erweiterte Übersetzungen & Filter**: 18 neue statische UI-Texte, 24 dynamische Regeln sowie Filterung von Code-Literalen und MCP-IDs.
 
 </details>
 
 <details>
 <summary>Русский</summary>
 
-- **Расширенные переводы UI и динамические правила**: Добавлено 34 статических строки (251 запись на 8 языках) и 72 динамических правила для сочетаний клавиш, счётчиков бесед и токенов.
-- **Улучшенная фильтрация**: Исключены email-адреса, папки, единицы CSS, названия моделей и обрывки Markdown.
+- **Центрирование окна и исправление глоссария**: Устранено влияние внешних классов для центрирования окна, строка глоссария переведена на CSS Grid, кнопка настроек унифицирована.
+- **Новые переводы и фильтрация**: Добавлено 18 статических строк UI, 24 динамических правила и фильтрация литералов кода и MCP-идентификаторов.
 
 </details>

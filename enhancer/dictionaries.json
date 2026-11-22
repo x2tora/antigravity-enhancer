@@ -3566,7 +3566,25 @@
     "Executor Model": "실행기 모델",
     "Loading token usage...": "토큰 사용량 불러오는 중...",
     "Other Customizations": "기타 사용자 지정",
-    "Settings for conversations outside of projects.": "프로젝트 외부 대화에 대한 설정입니다."
+    "Settings for conversations outside of projects.": "프로젝트 외부 대화에 대한 설정입니다.",
+    "View File": "파일 보기",
+    "Viewing Diff": "변경 내용(Diff) 보는 중",
+    "Side Questions": "보조 질문",
+    "Fold code block": "코드 블록 접기",
+    "For speed and efficiency in execution tasks": "실행 작업의 속도와 효율성 우선",
+    "For most deep reasoning and complex problems": "대부분의 심층 추론 및 복잡한 문제용",
+    "Plan carefully before executing a task.": "작업을 실행하기 전에 신중하게 계획합니다.",
+    "Unread": "읽지 않음",
+    "Queued message sent": "대기 중인 메시지 전송됨",
+    "Subagent Conversation header": "서브에이전트 대화 헤더",
+    "Subagent Conversation": "서브에이전트 대화",
+    "User cancelled agent execution": "사용자가 에이전트 실행을 취소했습니다",
+    "Medium": "중간",
+    "Low": "낮음",
+    "High": "높음",
+    "Chat Layout": "채팅 레이아웃",
+    "Zoom 100%, reset to fit": "100% 확대, 화면에 맞게 재설정",
+    "Download image": "이미지 다운로드"
   },
   "translations": {
     "ja": {
@@ -6808,7 +6826,25 @@
       "Executor Model": "エグゼキューターモデル",
       "Loading token usage...": "トークン使用量を読み込み中...",
       "Other Customizations": "その他のカスタマイズ",
-      "Settings for conversations outside of projects.": "プロジェクト外の会話に関する設定です。"
+      "Settings for conversations outside of projects.": "プロジェクト外の会話に関する設定です。",
+      "View File": "ファイルを表示",
+      "Viewing Diff": "差分を表示中",
+      "Side Questions": "サイド質問",
+      "Fold code block": "コードブロックを折りたたむ",
+      "For speed and efficiency in execution tasks": "実行タスクの速度と効率を重視",
+      "For most deep reasoning and complex problems": "高度な推論や複雑な問題向け",
+      "Plan carefully before executing a task.": "タスクを実行する前に慎重に計画します。",
+      "Unread": "未読",
+      "Queued message sent": "キュー内のメッセージを送信しました",
+      "Subagent Conversation header": "サブエージェント会話ヘッダー",
+      "Subagent Conversation": "サブエージェント会話",
+      "User cancelled agent execution": "ユーザーがエージェントの実行をキャンセルしました",
+      "Medium": "中",
+      "Low": "低",
+      "High": "高",
+      "Chat Layout": "チャットレイアウト",
+      "Zoom 100%, reset to fit": "100% ズーム、画面に合わせてリセット",
+      "Download image": "画像をダウンロード"
     },
     "zh-CN": {
       "Pinned Conversations": "置顶对话",
@@ -10049,7 +10085,25 @@
       "Executor Model": "执行器模型",
       "Loading token usage...": "正在加载令牌用量...",
       "Other Customizations": "其他自定义",
-      "Settings for conversations outside of projects.": "项目外对话的设置。"
+      "Settings for conversations outside of projects.": "项目外对话的设置。",
+      "View File": "查看文件",
+      "Viewing Diff": "正在查看差异",
+      "Side Questions": "侧边提问",
+      "Fold code block": "折叠代码块",
+      "For speed and efficiency in execution tasks": "注重执行任务的速度与效率",
+      "For most deep reasoning and complex problems": "适用于大多数深度推理与复杂问题",
+      "Plan carefully before executing a task.": "在执行任务前仔细规划。",
+      "Unread": "未读",
+      "Queued message sent": "已发送排队消息",
+      "Subagent Conversation header": "子代理对话标题栏",
+      "Subagent Conversation": "子代理对话",
+      "User cancelled agent execution": "用户已取消代理执行",
+      "Medium": "中",
+      "Low": "低",
+      "High": "高",
+      "Chat Layout": "聊天布局",
+      "Zoom 100%, reset to fit": "缩放到 100%，重置以适应窗口",
+      "Download image": "下载图片"
     },
     "zh-TW": {
       "Send feedback as ": "發送回饋為",
@@ -13290,7 +13344,25 @@
       "Executor Model": "執行器模型",
       "Loading token usage...": "正在載入權杖用量...",
       "Other Customizations": "其他自訂項目",
-      "Settings for conversations outside of projects.": "專案外對話的設定。"
+      "Settings for conversations outside of projects.": "專案外對話的設定。",
+      "View File": "檢視檔案",
+      "Viewing Diff": "正在檢視差異",
+      "Side Questions": "側邊提問",
+      "Fold code block": "摺疊程式碼區塊",
+      "For speed and efficiency in execution tasks": "注重執行任務的速度與效率",
+      "For most deep reasoning and complex problems": "適用於多數深度推理與複雜問題",
+      "Plan carefully before executing a task.": "在執行任務前仔細規劃。",
+      "Unread": "未讀",
+      "Queued message sent": "已傳送排隊訊息",
+      "Subagent Conversation header": "子代理對話標題列",
+      "Subagent Conversation": "子代理對話",
+      "User cancelled agent execution": "使用者已取消代理執行",
+      "Medium": "中",
+      "Low": "低",
+      "High": "高",
+      "Chat Layout": "聊天版面配置",
+      "Zoom 100%, reset to fit": "縮放至 100%，重設以符合視窗",
+      "Download image": "下載圖片"
     },
     "es": {
       "Updater": "Actualizador",
@@ -16531,7 +16603,25 @@
       "Executor Model": "Modelo ejecutor",
       "Loading token usage...": "Cargando uso de tokens...",
       "Other Customizations": "Otras personalizaciones",
-      "Settings for conversations outside of projects.": "Ajustes para conversaciones fuera de proyectos."
+      "Settings for conversations outside of projects.": "Ajustes para conversaciones fuera de proyectos.",
+      "View File": "Ver archivo",
+      "Viewing Diff": "Viendo diferencias",
+      "Side Questions": "Preguntas laterales",
+      "Fold code block": "Plegar bloque de código",
+      "For speed and efficiency in execution tasks": "Para velocidad y eficiencia en tareas de ejecución",
+      "For most deep reasoning and complex problems": "Para razonamiento profundo y problemas complejos",
+      "Plan carefully before executing a task.": "Planifica cuidadosamente antes de ejecutar una tarea.",
+      "Unread": "No leído",
+      "Queued message sent": "Mensaje en cola enviado",
+      "Subagent Conversation header": "Encabezado de conversación de subagente",
+      "Subagent Conversation": "Conversación de subagente",
+      "User cancelled agent execution": "El usuario canceló la ejecución del agente",
+      "Medium": "Medio",
+      "Low": "Bajo",
+      "High": "Alto",
+      "Chat Layout": "Diseño del chat",
+      "Zoom 100%, reset to fit": "Zoom 100%, restablecer para ajustar",
+      "Download image": "Descargar imagen"
     },
     "fr": {
       "Send feedback as ": "Envoyez vos commentaires en tant que",
@@ -19772,7 +19862,25 @@
       "Executor Model": "Modèle exécuteur",
       "Loading token usage...": "Chargement de la consommation de jetons...",
       "Other Customizations": "Autres personnalisations",
-      "Settings for conversations outside of projects.": "Paramètres pour les conversations hors projets."
+      "Settings for conversations outside of projects.": "Paramètres pour les conversations hors projets.",
+      "View File": "Voir le fichier",
+      "Viewing Diff": "Affichage du diff",
+      "Side Questions": "Questions latérales",
+      "Fold code block": "Replier le bloc de code",
+      "For speed and efficiency in execution tasks": "Pour la rapidité et l’efficacité d’exécution",
+      "For most deep reasoning and complex problems": "Pour le raisonnement approfondi et les problèmes complexes",
+      "Plan carefully before executing a task.": "Planifiez soigneusement avant d’exécuter une tâche.",
+      "Unread": "Non lu",
+      "Queued message sent": "Message en file d’attente envoyé",
+      "Subagent Conversation header": "En-tête de conversation du sous-agent",
+      "Subagent Conversation": "Conversation du sous-agent",
+      "User cancelled agent execution": "L’utilisateur a annulé l’exécution de l’agent",
+      "Medium": "Moyen",
+      "Low": "Faible",
+      "High": "Élevé",
+      "Chat Layout": "Disposition du chat",
+      "Zoom 100%, reset to fit": "Zoom 100 %, réinitialiser pour ajuster",
+      "Download image": "Télécharger l’image"
     },
     "de": {
       "Remove individual uploaded files or connected resources in Project Settings, or delete a project or conversation to remove its stored files.": "Entfernen Sie einzelne hochgeladene Dateien oder verbundene Ressourcen in den Projekteinstellungen oder löschen Sie ein Projekt oder eine Konversation, um die darin gespeicherten Dateien zu entfernen.",
@@ -23013,7 +23121,25 @@
       "Executor Model": "Executor-Modell",
       "Loading token usage...": "Token-Nutzung wird geladen...",
       "Other Customizations": "Weitere Anpassungen",
-      "Settings for conversations outside of projects.": "Einstellungen für Unterhaltungen außerhalb von Projekten."
+      "Settings for conversations outside of projects.": "Einstellungen für Unterhaltungen außerhalb von Projekten.",
+      "View File": "Datei anzeigen",
+      "Viewing Diff": "Diff wird angezeigt",
+      "Side Questions": "Nebenfragen",
+      "Fold code block": "Codeblock einklappen",
+      "For speed and efficiency in execution tasks": "Für Tempo und Effizienz bei Ausführungsaufgaben",
+      "For most deep reasoning and complex problems": "Für tiefes Schlussfolgern und komplexe Probleme",
+      "Plan carefully before executing a task.": "Vor der Ausführung einer Aufgabe sorgfältig planen.",
+      "Unread": "Ungelesen",
+      "Queued message sent": "Nachricht aus Warteschlange gesendet",
+      "Subagent Conversation header": "Kopfzeile der Subagent-Unterhaltung",
+      "Subagent Conversation": "Subagent-Unterhaltung",
+      "User cancelled agent execution": "Benutzer hat die Agent-Ausführung abgebrochen",
+      "Medium": "Mittel",
+      "Low": "Niedrig",
+      "High": "Hoch",
+      "Chat Layout": "Chat-Layout",
+      "Zoom 100%, reset to fit": "Zoom 100 %, an Fenster anpassen",
+      "Download image": "Bild herunterladen"
     },
     "ru": {
       "Failed to stop agent": "Не удалось остановить агента",
@@ -26254,7 +26380,25 @@
       "Executor Model": "Модель исполнителя",
       "Loading token usage...": "Загрузка расхода токенов...",
       "Other Customizations": "Прочие настройки",
-      "Settings for conversations outside of projects.": "Настройки для бесед вне проектов."
+      "Settings for conversations outside of projects.": "Настройки для бесед вне проектов.",
+      "View File": "Просмотреть файл",
+      "Viewing Diff": "Просмотр отличий",
+      "Side Questions": "Боковые вопросы",
+      "Fold code block": "Свернуть блок кода",
+      "For speed and efficiency in execution tasks": "Для скорости и эффективности выполнения задач",
+      "For most deep reasoning and complex problems": "Для глубоких рассуждений и сложных задач",
+      "Plan carefully before executing a task.": "Тщательно планируйте перед выполнением задачи.",
+      "Unread": "Непрочитано",
+      "Queued message sent": "Сообщение из очереди отправлено",
+      "Subagent Conversation header": "Заголовок беседы субагента",
+      "Subagent Conversation": "Беседа субагента",
+      "User cancelled agent execution": "Пользователь отменил выполнение агента",
+      "Medium": "Средний",
+      "Low": "Низкий",
+      "High": "Высокий",
+      "Chat Layout": "Макет чата",
+      "Zoom 100%, reset to fit": "Масштаб 100%, сбросить по размеру",
+      "Download image": "Скачать изображение"
     }
   },
   "fragmentRules": [
@@ -27085,6 +27229,21 @@
       "source": "^Add shortcut for\\s+(.+)$",
       "flags": "i",
       "rep": "$1 단축키 추가"
+    },
+    {
+      "source": "^(\\d+)\\s+lines?\\s+added,\\s+(\\d+)\\s+lines?\\s+removed$",
+      "flags": "i",
+      "rep": "$1줄 추가, $2줄 삭제"
+    },
+    {
+      "source": "^(\\d+)\\s+excluded$",
+      "flags": "i",
+      "rep": "$1개 제외"
+    },
+    {
+      "source": "^(\\d+)\\s+active conversations?\\s+and\\s+(\\d+)\\s+archived conversations?$",
+      "flags": "i",
+      "rep": "활성 대화 $1개 및 보관된 대화 $2개"
     }
   ],
   "multiLangFragments": {
@@ -27569,6 +27728,21 @@
         "source": "^Add shortcut for\\s+(.+)$",
         "flags": "i",
         "rep": "$1 のショートカットを追加"
+      },
+      {
+        "source": "^(\\d+)\\s+lines?\\s+added,\\s+(\\d+)\\s+lines?\\s+removed$",
+        "flags": "i",
+        "rep": "$1行追加、$2行削除"
+      },
+      {
+        "source": "^(\\d+)\\s+excluded$",
+        "flags": "i",
+        "rep": "$1件除外"
+      },
+      {
+        "source": "^(\\d+)\\s+active conversations?\\s+and\\s+(\\d+)\\s+archived conversations?$",
+        "flags": "i",
+        "rep": "アクティブな会話 $1件・アーカイブ済み $2件"
       }
     ],
     "zh-CN": [
@@ -27756,6 +27930,21 @@
         "source": "^Add shortcut for\\s+(.+)$",
         "flags": "i",
         "rep": "为 $1 添加快捷键"
+      },
+      {
+        "source": "^(\\d+)\\s+lines?\\s+added,\\s+(\\d+)\\s+lines?\\s+removed$",
+        "flags": "i",
+        "rep": "新增 $1 行，删除 $2 行"
+      },
+      {
+        "source": "^(\\d+)\\s+excluded$",
+        "flags": "i",
+        "rep": "已排除 $1 项"
+      },
+      {
+        "source": "^(\\d+)\\s+active conversations?\\s+and\\s+(\\d+)\\s+archived conversations?$",
+        "flags": "i",
+        "rep": "$1 个活跃对话和 $2 个已归档对话"
       }
     ],
     "zh-TW": [
@@ -27943,6 +28132,21 @@
         "source": "^Add shortcut for\\s+(.+)$",
         "flags": "i",
         "rep": "為 $1 新增快速鍵"
+      },
+      {
+        "source": "^(\\d+)\\s+lines?\\s+added,\\s+(\\d+)\\s+lines?\\s+removed$",
+        "flags": "i",
+        "rep": "新增 $1 行，刪除 $2 行"
+      },
+      {
+        "source": "^(\\d+)\\s+excluded$",
+        "flags": "i",
+        "rep": "已排除 $1 項"
+      },
+      {
+        "source": "^(\\d+)\\s+active conversations?\\s+and\\s+(\\d+)\\s+archived conversations?$",
+        "flags": "i",
+        "rep": "$1 個進行中對話與 $2 個已封存對話"
       }
     ],
     "es": [
@@ -28125,6 +28329,21 @@
         "source": "^Add shortcut for\\s+(.+)$",
         "flags": "i",
         "rep": "Añadir atajo para $1"
+      },
+      {
+        "source": "^(\\d+)\\s+lines?\\s+added,\\s+(\\d+)\\s+lines?\\s+removed$",
+        "flags": "i",
+        "rep": "$1 líneas añadidas, $2 líneas eliminadas"
+      },
+      {
+        "source": "^(\\d+)\\s+excluded$",
+        "flags": "i",
+        "rep": "$1 excluidos"
+      },
+      {
+        "source": "^(\\d+)\\s+active conversations?\\s+and\\s+(\\d+)\\s+archived conversations?$",
+        "flags": "i",
+        "rep": "$1 conversaciones activas y $2 archivadas"
       }
     ],
     "fr": [
@@ -28307,6 +28526,21 @@
         "source": "^Add shortcut for\\s+(.+)$",
         "flags": "i",
         "rep": "Ajouter un raccourci pour $1"
+      },
+      {
+        "source": "^(\\d+)\\s+lines?\\s+added,\\s+(\\d+)\\s+lines?\\s+removed$",
+        "flags": "i",
+        "rep": "$1 lignes ajoutées, $2 lignes supprimées"
+      },
+      {
+        "source": "^(\\d+)\\s+excluded$",
+        "flags": "i",
+        "rep": "$1 exclus"
+      },
+      {
+        "source": "^(\\d+)\\s+active conversations?\\s+and\\s+(\\d+)\\s+archived conversations?$",
+        "flags": "i",
+        "rep": "$1 conversations actives et $2 archivées"
       }
     ],
     "de": [
@@ -28489,6 +28723,21 @@
         "source": "^Add shortcut for\\s+(.+)$",
         "flags": "i",
         "rep": "Kürzel für $1 hinzufügen"
+      },
+      {
+        "source": "^(\\d+)\\s+lines?\\s+added,\\s+(\\d+)\\s+lines?\\s+removed$",
+        "flags": "i",
+        "rep": "$1 Zeilen hinzugefügt, $2 Zeilen entfernt"
+      },
+      {
+        "source": "^(\\d+)\\s+excluded$",
+        "flags": "i",
+        "rep": "$1 ausgeschlossen"
+      },
+      {
+        "source": "^(\\d+)\\s+active conversations?\\s+and\\s+(\\d+)\\s+archived conversations?$",
+        "flags": "i",
+        "rep": "$1 aktive und $2 archivierte Unterhaltungen"
       }
     ],
     "ru": [
@@ -28671,6 +28920,21 @@
         "source": "^Add shortcut for\\s+(.+)$",
         "flags": "i",
         "rep": "Добавить сочетание для «$1»"
+      },
+      {
+        "source": "^(\\d+)\\s+lines?\\s+added,\\s+(\\d+)\\s+lines?\\s+removed$",
+        "flags": "i",
+        "rep": "+$1 строк, -$2 строк"
+      },
+      {
+        "source": "^(\\d+)\\s+excluded$",
+        "flags": "i",
+        "rep": "Исключено: $1"
+      },
+      {
+        "source": "^(\\d+)\\s+active conversations?\\s+and\\s+(\\d+)\\s+archived conversations?$",
+        "flags": "i",
+        "rep": "Активных бесед: $1, в архиве: $2"
       }
     ]
   }

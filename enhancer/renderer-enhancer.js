@@ -1,5 +1,5 @@
 /**
- * Antigravity Enhancer v4.0.2 - Modular Renderer Enhancer Engine
+ * Antigravity Enhancer v4.0.3 - Modular Renderer Enhancer Engine
  * Features: 9-Language Zero-Restart i18n, Translation Engine 2.0 (Slice + Glossary),
  *           Quota Intelligence (Sparklines, Burn-Rate ETA & Alerts),
  *           Enhancer Control Center & Custom Shortcuts (x2tora/antigravity-enhancer)
@@ -11,7 +11,7 @@
   const ipc = electron_1 ? electron_1.ipcRenderer : null;
   const payload = (typeof __ENHANCER_PAYLOAD__ !== 'undefined' && __ENHANCER_PAYLOAD__) ? __ENHANCER_PAYLOAD__ : {};
   const ENHANCER_REPO = payload.repo || 'x2tora/antigravity-enhancer';
-  const ENHANCER_CURRENT_VERSION = payload.version || '4.0.2';
+  const ENHANCER_CURRENT_VERSION = payload.version || '4.0.3';
 
   const DEFAULT_PREFS = {
     shortcutCycleLang: 'Alt+Shift+L',
@@ -238,16 +238,18 @@
     if (/^\d+\s*[smhd](?:\s+\d+\s*[smhd])*$/i.test(trimmed)) return true;
     if (/^(?:Thinking for \d+|Still thinking,\s*\d+\s*seconds?|Turn \d+ of \d+|Load older messages)/i.test(trimmed)) return true;
     // Brand / model / codename standalone labels & dynamic multi-word Close <Title>
-    if (/^(?:Antigravity|Antigravity Enhancer|Argon|Gemini|Migratify|Gero)$/i.test(trimmed)) return true;
-    if (/^(?:Gemini\s+\d+|Google AI\b)/i.test(trimmed)) return true;
+    if (/^(?:Antigravity|Antigravity Enhancer|Argon|Gemini|Migratify|Gero|Supabase|Gmail|Inter|Google Sans|Object|Users|Desktop|e2e|_ns)$/i.test(trimmed)) return true;
+    if (/^(?:Gemini\s+\d+|Google AI\b|Gemini API$|Claude\s+(?:Opus|Sonnet|Haiku)\s+[\d.]+$)/i.test(trimmed)) return true;
     if (/^(?:Ctrl|Alt|Shift|Meta|Cmd|Opt|Enter|Esc|Tab|Space|Backspace|Delete)$/i.test(trimmed)) return true;
     if (/^\d+(?:\.\d+)?(?:px|rem|em|pt|%|ms|s)$/i.test(trimmed)) return true;
     if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) return true;
     if (/^[A-Za-z0-9_.\-]+\/$/.test(trimmed)) return true;
-    if (/^Close\s+\S+\s+\S+/i.test(trimmed) || /^Side Question:\s+/i.test(trimmed)) return true;
+    if (/^['"][^'"]+['"]$/.test(trimmed) || /^mcp:[a-z0-9_:-]+$/i.test(trimmed) || /^…/.test(trimmed) || /^\/\//.test(trimmed)) return true;
+    if (/^(?:Close\s+\S+\s+\S+|Side Question:\s+|Delete side question:\s+)/i.test(trimmed)) return true;
     if (/^(?:Shortcut\s+.+\s+for\s+|Remove shortcut\s+.+\s+for\s+|Add shortcut for\s+|Send feedback as\s+)/i.test(trimmed)) return true;
-    if (/^(?:\d+\s+active conversations?|(?:Rules|Skills|Subagents|Mcp Tools):\s*[\d,]+\s*tokens)$/i.test(trimmed)) return true;
+    if (/^(?:\d+\s+active conversations?(?:\s+and\s+\d+\s+archived conversations?)?|(?:Rules|Skills|Subagents|Mcp Tools):\s*[\d,]+\s*tokens|\d+\s+lines?\s+added,\s+\d+\s+lines?\s+removed|\d+\s+excluded)$/i.test(trimmed)) return true;
     // Agent tool/step summaries & comma-separated action logs (e.g., "Explored files, ran commands, edited files")
+    if (/^(?:Ran commands|Killing subagent|Model Selector & Theme UI Engineer|Check current git status and diff summary)$/i.test(trimmed)) return true;
     if (/^(?:Explored|Searched|Read|Edited|Wrote|Ran|Checked|Listed|Commit)\b.*,\s*(?:ran|edited|read|wrote|explored|searched|checked|listed|tag|and push)\b/i.test(trimmed)) return true;
     // Paths, dotfiles, ALL-CAPS files, URLs, markdown links, CLI flags, mentions, slash commands
     if (/^(?:@|#|\/|--?)[A-Za-z0-9_.\-]+/.test(trimmed) || /(?:https?|file):\/\//i.test(trimmed)) return true;
@@ -1275,13 +1277,13 @@
     bd.id = 'ag-enhancer-control-center-backdrop';
     bd.className = 'notranslate';
     bd.setAttribute('translate', 'no');
-    bd.style.cssText = 'position:fixed;inset:0;z-index:100001;background:rgba(11,11,14,0.72);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;align-items:flex-start;justify-content:center;padding:calc((100vh - min(86vh, 680px)) / 2) 20px 20px;app-region:no-drag;-webkit-app-region:no-drag;';
+    bd.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;width:100vw;height:100vh;margin:0;box-sizing:border-box;z-index:100001;background:rgba(11,11,14,0.72);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;align-items:flex-start;justify-content:center;padding:calc((100vh - min(86vh, 680px)) / 2) 20px 20px;app-region:no-drag;-webkit-app-region:no-drag;';
 
     const modal = document.createElement('div');
     modal.id = 'ag-enhancer-control-center';
-    modal.className = 'agy-overlay border rounded-xl text-foreground shadow-lg notranslate';
+    modal.className = 'notranslate';
     modal.setAttribute('translate', 'no');
-    modal.style.cssText = `width:660px;max-width:94vw;max-height:min(86vh, 680px);display:flex;flex-direction:column;background:#0B0B0E;border:1px solid rgba(202,211,245,0.1);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,0.48);color:#CAD3F5;font-family:${getUiFontFamily(activeLanguage)};font-size:13px;overflow:hidden;app-region:no-drag;-webkit-app-region:no-drag;`;
+    modal.style.cssText = `position:relative;left:auto;right:auto;top:auto;bottom:auto;margin:0;flex-shrink:0;width:660px;max-width:calc(100vw - 40px);max-height:min(86vh, 680px);box-sizing:border-box;display:flex;flex-direction:column;background:#0B0B0E;border:1px solid rgba(202,211,245,0.1);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,0.48);color:#CAD3F5;font-family:${getUiFontFamily(activeLanguage)};font-size:13px;overflow:hidden;app-region:no-drag;-webkit-app-region:no-drag;`;
 
     const sInit = getControlCenterStrings(activeLanguage);
     const tabs = [
@@ -1696,10 +1698,10 @@
               <textarea id="ag-cc-gl-import-txt" rows="2" placeholder='{"Settings":"설정"}' style="background:#181A22;color:#CAD3F5;border:1px solid rgba(202,211,245,0.1);border-radius:6px;padding:6px 8px;font-size:11px;font-family:monospace;"></textarea>
               <button type="button" id="ag-cc-gl-import-apply" class="agy-enh-primary" style="align-self:flex-end;background:#A0A3F6;color:#0B0B0E;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;">${escapeHtml(s.apply)}</button>
             </div>
-            <div style="display:flex;gap:6px;">
-              <input id="ag-cc-gl-src" placeholder="${escapeHtml(s.srcPh)}" style="flex:1;background:#181A22;color:#CAD3F5;border:1px solid rgba(202,211,245,0.1);border-radius:6px;padding:5px 8px;font-size:12px;" />
-              <input id="ag-cc-gl-dst" placeholder="${escapeHtml(s.dstPh)}" style="flex:1;background:#181A22;color:#CAD3F5;border:1px solid rgba(202,211,245,0.1);border-radius:6px;padding:5px 8px;font-size:12px;" />
-              <button type="button" id="ag-cc-gl-add" class="agy-enh-primary" style="background:#A0A3F6;color:#0B0B0E;border:none;border-radius:6px;padding:0 12px;height:28px;font-size:12px;font-weight:600;cursor:pointer;">${escapeHtml(s.add)}</button>
+            <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:6px;align-items:center;">
+              <input id="ag-cc-gl-src" placeholder="${escapeHtml(s.srcPh)}" style="width:100%;min-width:0;background:#181A22;color:#CAD3F5;border:1px solid rgba(202,211,245,0.1);border-radius:6px;padding:5px 8px;font-size:12px;box-sizing:border-box;" />
+              <input id="ag-cc-gl-dst" placeholder="${escapeHtml(s.dstPh)}" style="width:100%;min-width:0;background:#181A22;color:#CAD3F5;border:1px solid rgba(202,211,245,0.1);border-radius:6px;padding:5px 8px;font-size:12px;box-sizing:border-box;" />
+              <button type="button" id="ag-cc-gl-add" class="agy-enh-primary" style="flex-shrink:0;white-space:nowrap;background:#A0A3F6;color:#0B0B0E;border:none;border-radius:6px;padding:0 12px;height:28px;font-size:12px;font-weight:600;cursor:pointer;">${escapeHtml(s.add)}</button>
             </div>
             <div style="display:flex;flex-direction:column;gap:4px;max-height:84px;overflow-y:auto;">${rowsHtml}</div>
           </div>
@@ -2086,9 +2088,7 @@
     const settingsVerSub = document.getElementById('antigravity-settings-hub-subtitle');
     if (settingsVerSub) settingsVerSub.textContent = `${h.patchVersionPrefix} ${ENHANCER_CURRENT_VERSION}`;
     const settingsCheckBtn = document.getElementById('antigravity-settings-open-hub');
-    if (settingsCheckBtn) settingsCheckBtn.textContent = h.checkUpdates;
-    const settingsRestoreBtn = document.getElementById('antigravity-settings-restore-btn');
-    if (settingsRestoreBtn) settingsRestoreBtn.textContent = h.restoreVanilla;
+    if (settingsCheckBtn) settingsCheckBtn.textContent = getControlCenterStrings(activeLanguage).modalTitle;
     scheduleInjectTitleMenuIntegration();
 
     window.dispatchEvent(new CustomEvent('antigravity-lang-changed', { detail: { lang: activeLanguage } }));
@@ -2206,8 +2206,7 @@
             <div class="text-xs text-secondary-foreground" id="antigravity-settings-hub-subtitle" style="line-height:1.4;font-variant-numeric:tabular-nums;">${h.patchVersionPrefix} ${ENHANCER_CURRENT_VERSION}</div>
           </div>
           <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-            <button type="button" id="antigravity-settings-open-hub" class="px-2.5 py-1 text-xs font-medium rounded-md bg-secondary text-secondary-foreground hover:text-foreground cursor-pointer border-none transition-colors">${h.checkUpdates}</button>
-            <button type="button" id="antigravity-settings-restore-btn" class="px-2.5 py-1 text-xs font-medium rounded-md bg-secondary text-secondary-foreground hover:text-foreground cursor-pointer border-none transition-colors">${h.restoreVanilla}</button>
+            <button type="button" id="antigravity-settings-open-hub" class="px-2.5 py-1 text-xs font-medium rounded-md bg-secondary text-secondary-foreground hover:text-foreground cursor-pointer border-none transition-colors">${escapeHtml(getControlCenterStrings(currentLang).modalTitle)}</button>
           </div>
         </div>
       </div>
@@ -2244,9 +2243,7 @@
       quotaToggle.onclick = (e) => { e.stopPropagation(); toggleVis(); };
     }
     const settingsHubBtn = section.querySelector('#antigravity-settings-open-hub');
-    if (settingsHubBtn) settingsHubBtn.onclick = (e) => { e.stopPropagation(); openEnhancerHubModal('update', { forceOpen: true, autoCheck: true }); };
-    const settingsRestoreBtn = section.querySelector('#antigravity-settings-restore-btn');
-    if (settingsRestoreBtn) settingsRestoreBtn.onclick = (e) => { e.stopPropagation(); openEnhancerHubModal('restore', { forceOpen: true }); };
+    if (settingsHubBtn) settingsHubBtn.onclick = (e) => { e.stopPropagation(); openControlCenterModal('general'); };
 
     parentContainer.insertBefore(section, targetSection);
     updateLanguageSelectorUI();

@@ -3,6 +3,17 @@
 All notable changes to **Antigravity Enhancer** are documented in this file.
 Older pre-v3 legacy patch logs have been consolidated into milestone summaries below.
 
+## [4.0.3] - 2026-11-23
+
+### Added
+- **Viewer, Subagent & Dynamic Counter Translations**: Added 18 static UI translations (`View File`, `Viewing Diff`, `Side Questions`, `Fold code block`, `Unread`, `Queued message sent`, `Subagent Conversation`, `User cancelled agent execution`, `Chat Layout`, `Zoom 100%, reset to fit`, `Download image`, `Low`/`Medium`/`High`, model descriptions) and 24 dynamic regex rules (`lines added, lines removed`, `excluded`, `active and archived conversations`) across all 8 target languages.
+
+### Improved
+- **Patch Settings Modal Centering & Glossary Grid Layout**: Removed external `.agy-overlay` class interference and enforced explicit viewport centering (`100vw × 100vh`) so Patch Settings always centers horizontally; switched the custom glossary add row to CSS Grid (`minmax(0, 1fr) minmax(0, 1fr) auto`) with `white-space: nowrap` to prevent button wrapping or overflow; unified the Settings page `AntigravityEnhanced` card into a single `패치 설정` button.
+- **Collector Noise Filtering**: Excluded quoted code literals (`'fs'`), MCP tool IDs (`mcp:rea:...`), leading-ellipsis fragments (`…`), code comments (`// ...`), model names (`Claude Opus/Sonnet 5.5`), and `Delete side question:` titles.
+
+---
+
 ## [4.0.2] - 2026-11-23
 
 ### Added
