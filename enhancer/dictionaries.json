@@ -3584,7 +3584,51 @@
     "High": "높음",
     "Chat Layout": "채팅 레이아웃",
     "Zoom 100%, reset to fit": "100% 확대, 화면에 맞게 재설정",
-    "Download image": "이미지 다운로드"
+    "Download image": "이미지 다운로드",
+    "SSH Host…": "SSH 호스트…",
+    "Open SSH Host": "SSH 호스트 열기",
+    "Then create the project in its window.": "그런 다음 해당 창에서 프로젝트를 만듭니다.",
+    "SSH host": "SSH 호스트",
+    "Loading hosts…": "호스트 불러오는 중…",
+    "No hosts in": "호스트가 없습니다:",
+    "Choose which key sends a message in the chat composer.": "채팅 입력창에서 메시지를 전송할 키를 선택합니다.",
+    "Configure built-in browser, link opening, and browser subagent preferences.": "내장 브라우저, 링크 열기 및 브라우저 서브에이전트 환경설정을 구성합니다.",
+    "Enter always submits. This adds a second shortcut.": "Enter는 항상 전송합니다. 이 설정은 보조 단축키를 추가합니다.",
+    "Full interface for coding, developer tools, and managing agents.": "코딩, 개발자 도구 및 에이전트 관리를 위한 전체 인터페이스입니다.",
+    "Simplified interface for research, writing, and everyday tasks.": "리서치, 글쓰기 및 일상 작업을 위한 간소화된 인터페이스입니다.",
+    "Starting terminal…": "터미널 시작 중…",
+    "Terminal header": "터미널 헤더",
+    "Terminal input": "터미널 입력",
+    "Resolving link…": "링크 확인 중…",
+    "New Side Question": "새 보조 질문",
+    "Create with Prompt": "프롬프트로 만들기",
+    "Add automation": "자동화 추가",
+    "New": "신규",
+    "Scheduled": "예약됨",
+    "Next run": "다음 실행",
+    "Last run": "마지막 실행",
+    "No runs yet": "아직 실행 기록 없음",
+    "Instructions": "지침",
+    "Runs": "실행 기록",
+    "Loading runs…": "실행 기록 불러오는 중…",
+    "No custom agents yet.": "아직 사용자 지정 에이전트가 없습니다.",
+    "Loading available plugins...": "사용 가능한 플러그인 불러오는 중...",
+    "Featured": "추천",
+    "See more": "더 보기",
+    "Create": "만들기",
+    "All": "전체",
+    "Loading customizations...": "사용자 지정 항목 불러오는 중...",
+    "Design, Creative & Media": "디자인, 크리에이티브 및 미디어",
+    "Design, creative, and media tools.": "디자인, 크리에이티브 및 미디어 도구입니다.",
+    "Productivity & Project Management": "생산성 및 프로젝트 관리",
+    "Cloud Hosting & Deployment": "클라우드 호스팅 및 배포",
+    "Developer Tools": "개발자 도구",
+    "Business": "비즈니스",
+    "Read, draft, and edit docs.": "문서를 읽고, 초안을 작성하고, 편집합니다.",
+    "Read, write, and format spreadsheets.": "스프레드시트를 읽고, 쓰고, 서식을 지정합니다.",
+    "Read, edit, and export presentations.": "프레젠테이션을 읽고, 편집하고, 내보냅니다.",
+    "Search, upload, download, and share files.": "파일을 검색, 업로드, 다운로드 및 공유합니다.",
+    "Check availability, schedule events, and RSVP.": "일정을 확인하고, 이벤트를 예약하며, 참석 여부를 회신합니다."
   },
   "translations": {
     "ja": {
@@ -6844,7 +6888,51 @@
       "High": "高",
       "Chat Layout": "チャットレイアウト",
       "Zoom 100%, reset to fit": "100% ズーム、画面に合わせてリセット",
-      "Download image": "画像をダウンロード"
+      "Download image": "画像をダウンロード",
+      "SSH Host…": "SSH ホスト…",
+      "Open SSH Host": "SSH ホストを開く",
+      "Then create the project in its window.": "その後、そのウィンドウ内でプロジェクトを作成します。",
+      "SSH host": "SSH ホスト",
+      "Loading hosts…": "ホストを読み込み中…",
+      "No hosts in": "ホストがありません:",
+      "Choose which key sends a message in the chat composer.": "チャット入力欄でメッセージを送信するキーを選択します。",
+      "Configure built-in browser, link opening, and browser subagent preferences.": "内蔵ブラウザ、リンクの開き方、ブラウザサブエージェント設定を構成します。",
+      "Enter always submits. This adds a second shortcut.": "Enter は常に送信します。これは2つ目のショートカットを追加します。",
+      "Full interface for coding, developer tools, and managing agents.": "コーディング、開発者ツール、エージェント管理向けのフルインターフェースです。",
+      "Simplified interface for research, writing, and everyday tasks.": "リサーチ、執筆、日常タスク向けのシンプルなインターフェースです。",
+      "Starting terminal…": "ターミナルを起動中…",
+      "Terminal header": "ターミナルヘッダー",
+      "Terminal input": "ターミナル入力",
+      "Resolving link…": "リンクを解決中…",
+      "New Side Question": "新しいサイド質問",
+      "Create with Prompt": "プロンプトで作成",
+      "Add automation": "オートメーションを追加",
+      "New": "新規",
+      "Scheduled": "スケジュール済み",
+      "Next run": "次回実行",
+      "Last run": "前回実行",
+      "No runs yet": "実行履歴はまだありません",
+      "Instructions": "指示",
+      "Runs": "実行履歴",
+      "Loading runs…": "実行履歴を読み込み中…",
+      "No custom agents yet.": "カスタムエージェントはまだありません。",
+      "Loading available plugins...": "利用可能なプラグインを読み込み中...",
+      "Featured": "注目",
+      "See more": "もっと見る",
+      "Create": "作成",
+      "All": "すべて",
+      "Loading customizations...": "カスタマイズを読み込み中...",
+      "Design, Creative & Media": "デザイン・クリエイティブ・メディア",
+      "Design, creative, and media tools.": "デザイン、クリエイティブ、メディア向けツールです。",
+      "Productivity & Project Management": "生産性・プロジェクト管理",
+      "Cloud Hosting & Deployment": "クラウドホスティング・デプロイ",
+      "Developer Tools": "開発者ツール",
+      "Business": "ビジネス",
+      "Read, draft, and edit docs.": "ドキュメントの閲覧、下書き、編集を行います。",
+      "Read, write, and format spreadsheets.": "スプレッドシートの読み書きや書式設定を行います。",
+      "Read, edit, and export presentations.": "プレゼンテーションの閲覧、編集、エクスポートを行います。",
+      "Search, upload, download, and share files.": "ファイルの検索、アップロード、ダウンロード、共有を行います。",
+      "Check availability, schedule events, and RSVP.": "空き状況の確認、予定の作成、出欠回答を行います。"
     },
     "zh-CN": {
       "Pinned Conversations": "置顶对话",
@@ -10103,7 +10191,51 @@
       "High": "高",
       "Chat Layout": "聊天布局",
       "Zoom 100%, reset to fit": "缩放到 100%，重置以适应窗口",
-      "Download image": "下载图片"
+      "Download image": "下载图片",
+      "SSH Host…": "SSH 主机…",
+      "Open SSH Host": "打开 SSH 主机",
+      "Then create the project in its window.": "然后在其窗口中创建项目。",
+      "SSH host": "SSH 主机",
+      "Loading hosts…": "正在加载主机…",
+      "No hosts in": "没有主机:",
+      "Choose which key sends a message in the chat composer.": "选择在聊天输入框中发送消息的按键。",
+      "Configure built-in browser, link opening, and browser subagent preferences.": "配置内置浏览器、链接打开方式和浏览器子代理首选项。",
+      "Enter always submits. This adds a second shortcut.": "Enter 始终提交。此项用于添加第二个快捷键。",
+      "Full interface for coding, developer tools, and managing agents.": "用于编程、开发工具和代理管理的完整界面。",
+      "Simplified interface for research, writing, and everyday tasks.": "用于研究、写作和日常任务的简化界面。",
+      "Starting terminal…": "正在启动终端…",
+      "Terminal header": "终端标题栏",
+      "Terminal input": "终端输入",
+      "Resolving link…": "正在解析链接…",
+      "New Side Question": "新建侧边提问",
+      "Create with Prompt": "使用提示词创建",
+      "Add automation": "添加自动化",
+      "New": "新建",
+      "Scheduled": "已计划",
+      "Next run": "下次运行",
+      "Last run": "上次运行",
+      "No runs yet": "暂无运行记录",
+      "Instructions": "指令",
+      "Runs": "运行记录",
+      "Loading runs…": "正在加载运行记录…",
+      "No custom agents yet.": "暂无自定义代理。",
+      "Loading available plugins...": "正在加载可用插件...",
+      "Featured": "精选",
+      "See more": "查看更多",
+      "Create": "创建",
+      "All": "全部",
+      "Loading customizations...": "正在加载自定义项...",
+      "Design, Creative & Media": "设计、创意与媒体",
+      "Design, creative, and media tools.": "设计、创意与媒体工具。",
+      "Productivity & Project Management": "效率与项目管理",
+      "Cloud Hosting & Deployment": "云托管与部署",
+      "Developer Tools": "开发者工具",
+      "Business": "商业",
+      "Read, draft, and edit docs.": "阅读、起草和编辑文档。",
+      "Read, write, and format spreadsheets.": "读取、编写和格式化电子表格。",
+      "Read, edit, and export presentations.": "阅读、编辑和导出演示文稿。",
+      "Search, upload, download, and share files.": "搜索、上传、下载和共享文件。",
+      "Check availability, schedule events, and RSVP.": "查看空闲时间、安排日程并回复邀请。"
     },
     "zh-TW": {
       "Send feedback as ": "發送回饋為",
@@ -13362,7 +13494,51 @@
       "High": "高",
       "Chat Layout": "聊天版面配置",
       "Zoom 100%, reset to fit": "縮放至 100%，重設以符合視窗",
-      "Download image": "下載圖片"
+      "Download image": "下載圖片",
+      "SSH Host…": "SSH 主機…",
+      "Open SSH Host": "開啟 SSH 主機",
+      "Then create the project in its window.": "然後在該視窗中建立專案。",
+      "SSH host": "SSH 主機",
+      "Loading hosts…": "正在載入主機…",
+      "No hosts in": "沒有主機:",
+      "Choose which key sends a message in the chat composer.": "選擇在聊天輸入框中傳送訊息的按鍵。",
+      "Configure built-in browser, link opening, and browser subagent preferences.": "設定內建瀏覽器、連結開啟方式與瀏覽器子代理偏好設定。",
+      "Enter always submits. This adds a second shortcut.": "Enter 一律送出。此項用於新增第二組快速鍵。",
+      "Full interface for coding, developer tools, and managing agents.": "用於程式設計、開發者工具與代理管理的完整介面。",
+      "Simplified interface for research, writing, and everyday tasks.": "用於研究、寫作與日常任務的簡化介面。",
+      "Starting terminal…": "正在啟動終端機…",
+      "Terminal header": "終端機標題列",
+      "Terminal input": "終端機輸入",
+      "Resolving link…": "正在解析連結…",
+      "New Side Question": "新增側邊提問",
+      "Create with Prompt": "使用提示詞建立",
+      "Add automation": "新增自動化",
+      "New": "新增",
+      "Scheduled": "已排程",
+      "Next run": "下次執行",
+      "Last run": "上次執行",
+      "No runs yet": "尚無執行紀錄",
+      "Instructions": "指示",
+      "Runs": "執行紀錄",
+      "Loading runs…": "正在載入執行紀錄…",
+      "No custom agents yet.": "尚無自訂代理。",
+      "Loading available plugins...": "正在載入可用外掛程式...",
+      "Featured": "精選",
+      "See more": "查看更多",
+      "Create": "建立",
+      "All": "全部",
+      "Loading customizations...": "正在載入自訂項目...",
+      "Design, Creative & Media": "設計、創意與媒體",
+      "Design, creative, and media tools.": "設計、創意與媒體工具。",
+      "Productivity & Project Management": "生產力與專案管理",
+      "Cloud Hosting & Deployment": "雲端託管與部署",
+      "Developer Tools": "開發者工具",
+      "Business": "商業",
+      "Read, draft, and edit docs.": "閱讀、草擬與編輯文件。",
+      "Read, write, and format spreadsheets.": "讀取、寫入與格式化試算表。",
+      "Read, edit, and export presentations.": "閱讀、編輯與匯出簡報。",
+      "Search, upload, download, and share files.": "搜尋、上傳、下載與分享檔案。",
+      "Check availability, schedule events, and RSVP.": "查看空檔、安排行程並回覆邀請。"
     },
     "es": {
       "Updater": "Actualizador",
@@ -16621,7 +16797,51 @@
       "High": "Alto",
       "Chat Layout": "Diseño del chat",
       "Zoom 100%, reset to fit": "Zoom 100%, restablecer para ajustar",
-      "Download image": "Descargar imagen"
+      "Download image": "Descargar imagen",
+      "SSH Host…": "Host SSH…",
+      "Open SSH Host": "Abrir host SSH",
+      "Then create the project in its window.": "Luego crea el proyecto en su ventana.",
+      "SSH host": "Host SSH",
+      "Loading hosts…": "Cargando hosts…",
+      "No hosts in": "No hay hosts en",
+      "Choose which key sends a message in the chat composer.": "Elige qué tecla envía un mensaje en el compositor de chat.",
+      "Configure built-in browser, link opening, and browser subagent preferences.": "Configura el navegador integrado, apertura de enlaces y subagente.",
+      "Enter always submits. This adds a second shortcut.": "Enter siempre envía. Esto añade un segundo atajo.",
+      "Full interface for coding, developer tools, and managing agents.": "Interfaz completa para programar, herramientas y agentes.",
+      "Simplified interface for research, writing, and everyday tasks.": "Interfaz simplificada para investigación, escritura y tareas diarias.",
+      "Starting terminal…": "Iniciando terminal…",
+      "Terminal header": "Encabezado de terminal",
+      "Terminal input": "Entrada de terminal",
+      "Resolving link…": "Resolviendo enlace…",
+      "New Side Question": "Nueva pregunta lateral",
+      "Create with Prompt": "Crear con prompt",
+      "Add automation": "Añadir automatización",
+      "New": "Nuevo",
+      "Scheduled": "Programado",
+      "Next run": "Próxima ejecución",
+      "Last run": "Última ejecución",
+      "No runs yet": "Sin ejecuciones aún",
+      "Instructions": "Instrucciones",
+      "Runs": "Ejecuciones",
+      "Loading runs…": "Cargando ejecuciones…",
+      "No custom agents yet.": "Aún no hay agentes personalizados.",
+      "Loading available plugins...": "Cargando complementos disponibles...",
+      "Featured": "Destacados",
+      "See more": "Ver más",
+      "Create": "Crear",
+      "All": "Todo",
+      "Loading customizations...": "Cargando personalizaciones...",
+      "Design, Creative & Media": "Diseño, creatividad y medios",
+      "Design, creative, and media tools.": "Herramientas de diseño, creatividad y medios.",
+      "Productivity & Project Management": "Productividad y gestión de proyectos",
+      "Cloud Hosting & Deployment": "Alojamiento en la nube y despliegue",
+      "Developer Tools": "Herramientas de desarrollo",
+      "Business": "Negocios",
+      "Read, draft, and edit docs.": "Lee, redacta y edita documentos.",
+      "Read, write, and format spreadsheets.": "Lee, escribe y da formato a hojas de cálculo.",
+      "Read, edit, and export presentations.": "Lee, edita y exporta presentaciones.",
+      "Search, upload, download, and share files.": "Busca, sube, descarga y comparte archivos.",
+      "Check availability, schedule events, and RSVP.": "Consulta disponibilidad, programa eventos y responde."
     },
     "fr": {
       "Send feedback as ": "Envoyez vos commentaires en tant que",
@@ -19880,7 +20100,51 @@
       "High": "Élevé",
       "Chat Layout": "Disposition du chat",
       "Zoom 100%, reset to fit": "Zoom 100 %, réinitialiser pour ajuster",
-      "Download image": "Télécharger l’image"
+      "Download image": "Télécharger l’image",
+      "SSH Host…": "Hôte SSH…",
+      "Open SSH Host": "Ouvrir l’hôte SSH",
+      "Then create the project in its window.": "Créez ensuite le projet dans sa fenêtre.",
+      "SSH host": "Hôte SSH",
+      "Loading hosts…": "Chargement des hôtes…",
+      "No hosts in": "Aucun hôte dans",
+      "Choose which key sends a message in the chat composer.": "Choisissez la touche d’envoi dans le compositeur de chat.",
+      "Configure built-in browser, link opening, and browser subagent preferences.": "Configurez le navigateur intégré, l’ouverture des liens et le sous-agent.",
+      "Enter always submits. This adds a second shortcut.": "Entrée envoie toujours. Cela ajoute un second raccourci.",
+      "Full interface for coding, developer tools, and managing agents.": "Interface complète pour le code, les outils et la gestion des agents.",
+      "Simplified interface for research, writing, and everyday tasks.": "Interface simplifiée pour la recherche, la rédaction et le quotidien.",
+      "Starting terminal…": "Démarrage du terminal…",
+      "Terminal header": "En-tête du terminal",
+      "Terminal input": "Entrée du terminal",
+      "Resolving link…": "Résolution du lien…",
+      "New Side Question": "Nouvelle question latérale",
+      "Create with Prompt": "Créer avec un prompt",
+      "Add automation": "Ajouter une automatisation",
+      "New": "Nouveau",
+      "Scheduled": "Planifié",
+      "Next run": "Prochaine exécution",
+      "Last run": "Dernière exécution",
+      "No runs yet": "Aucune exécution",
+      "Instructions": "Instructions",
+      "Runs": "Exécutions",
+      "Loading runs…": "Chargement des exécutions…",
+      "No custom agents yet.": "Aucun agent personnalisé pour l’instant.",
+      "Loading available plugins...": "Chargement des extensions disponibles...",
+      "Featured": "En vedette",
+      "See more": "Voir plus",
+      "Create": "Créer",
+      "All": "Tout",
+      "Loading customizations...": "Chargement des personnalisations...",
+      "Design, Creative & Media": "Design, création et médias",
+      "Design, creative, and media tools.": "Outils de design, de création et de médias.",
+      "Productivity & Project Management": "Productivité et gestion de projet",
+      "Cloud Hosting & Deployment": "Hébergement cloud et déploiement",
+      "Developer Tools": "Outils de développement",
+      "Business": "Entreprise",
+      "Read, draft, and edit docs.": "Lisez, rédigez et modifiez des documents.",
+      "Read, write, and format spreadsheets.": "Lisez, écrivez et mettez en forme des feuilles de calcul.",
+      "Read, edit, and export presentations.": "Lisez, modifiez et exportez des présentations.",
+      "Search, upload, download, and share files.": "Recherchez, importez, téléchargez et partagez des fichiers.",
+      "Check availability, schedule events, and RSVP.": "Vérifiez les disponibilités, planifiez et répondez."
     },
     "de": {
       "Remove individual uploaded files or connected resources in Project Settings, or delete a project or conversation to remove its stored files.": "Entfernen Sie einzelne hochgeladene Dateien oder verbundene Ressourcen in den Projekteinstellungen oder löschen Sie ein Projekt oder eine Konversation, um die darin gespeicherten Dateien zu entfernen.",
@@ -23139,7 +23403,51 @@
       "High": "Hoch",
       "Chat Layout": "Chat-Layout",
       "Zoom 100%, reset to fit": "Zoom 100 %, an Fenster anpassen",
-      "Download image": "Bild herunterladen"
+      "Download image": "Bild herunterladen",
+      "SSH Host…": "SSH-Host…",
+      "Open SSH Host": "SSH-Host öffnen",
+      "Then create the project in its window.": "Erstellen Sie dann das Projekt in dessen Fenster.",
+      "SSH host": "SSH-Host",
+      "Loading hosts…": "Hosts werden geladen…",
+      "No hosts in": "Keine Hosts in",
+      "Choose which key sends a message in the chat composer.": "Wählen Sie die Taste zum Senden von Nachrichten im Chat.",
+      "Configure built-in browser, link opening, and browser subagent preferences.": "Integrierten Browser, Link-Öffnung und Browser-Subagent konfigurieren.",
+      "Enter always submits. This adds a second shortcut.": "Enter sendet immer. Dies fügt ein zweites Kürzel hinzu.",
+      "Full interface for coding, developer tools, and managing agents.": "Vollständige Oberfläche für Code, Entwicklertools und Agenten.",
+      "Simplified interface for research, writing, and everyday tasks.": "Vereinfachte Oberfläche für Recherche, Schreiben und Alltagsaufgaben.",
+      "Starting terminal…": "Terminal wird gestartet…",
+      "Terminal header": "Terminal-Kopfzeile",
+      "Terminal input": "Terminal-Eingabe",
+      "Resolving link…": "Link wird aufgelöst…",
+      "New Side Question": "Neue Nebenfrage",
+      "Create with Prompt": "Mit Prompt erstellen",
+      "Add automation": "Automatisierung hinzufügen",
+      "New": "Neu",
+      "Scheduled": "Geplant",
+      "Next run": "Nächste Ausführung",
+      "Last run": "Letzte Ausführung",
+      "No runs yet": "Noch keine Ausführungen",
+      "Instructions": "Anweisungen",
+      "Runs": "Ausführungen",
+      "Loading runs…": "Ausführungen werden geladen…",
+      "No custom agents yet.": "Noch keine benutzerdefinierten Agenten.",
+      "Loading available plugins...": "Verfügbare Plugins werden geladen...",
+      "Featured": "Empfohlen",
+      "See more": "Mehr anzeigen",
+      "Create": "Erstellen",
+      "All": "Alle",
+      "Loading customizations...": "Anpassungen werden geladen...",
+      "Design, Creative & Media": "Design, Kreativität & Medien",
+      "Design, creative, and media tools.": "Design-, Kreativ- und Medien-Tools.",
+      "Productivity & Project Management": "Produktivität & Projektmanagement",
+      "Cloud Hosting & Deployment": "Cloud-Hosting & Deployment",
+      "Developer Tools": "Entwicklertools",
+      "Business": "Business",
+      "Read, draft, and edit docs.": "Dokumente lesen, entwerfen und bearbeiten.",
+      "Read, write, and format spreadsheets.": "Tabellen lesen, schreiben und formatieren.",
+      "Read, edit, and export presentations.": "Präsentationen lesen, bearbeiten und exportieren.",
+      "Search, upload, download, and share files.": "Dateien suchen, hochladen, herunterladen und teilen.",
+      "Check availability, schedule events, and RSVP.": "Verfügbarkeit prüfen, Termine planen und zusagen."
     },
     "ru": {
       "Failed to stop agent": "Не удалось остановить агента",
@@ -26398,7 +26706,51 @@
       "High": "Высокий",
       "Chat Layout": "Макет чата",
       "Zoom 100%, reset to fit": "Масштаб 100%, сбросить по размеру",
-      "Download image": "Скачать изображение"
+      "Download image": "Скачать изображение",
+      "SSH Host…": "SSH-хост…",
+      "Open SSH Host": "Открыть SSH-хост",
+      "Then create the project in its window.": "Затем создайте проект в этом окне.",
+      "SSH host": "SSH-хост",
+      "Loading hosts…": "Загрузка хостов…",
+      "No hosts in": "Нет хостов в",
+      "Choose which key sends a message in the chat composer.": "Выберите клавишу для отправки сообщения в чате.",
+      "Configure built-in browser, link opening, and browser subagent preferences.": "Настройте встроенный браузер, открытие ссылок и субагента браузера.",
+      "Enter always submits. This adds a second shortcut.": "Enter всегда отправляет. Это добавляет второе сочетание.",
+      "Full interface for coding, developer tools, and managing agents.": "Полный интерфейс для разработки, инструментов и управления агентами.",
+      "Simplified interface for research, writing, and everyday tasks.": "Упрощённый интерфейс для исследований, текстов и повседневных задач.",
+      "Starting terminal…": "Запуск терминала…",
+      "Terminal header": "Заголовок терминала",
+      "Terminal input": "Ввод терминала",
+      "Resolving link…": "Разрешение ссылки…",
+      "New Side Question": "Новый боковой вопрос",
+      "Create with Prompt": "Создать по запросу",
+      "Add automation": "Добавить автоматизацию",
+      "New": "Новый",
+      "Scheduled": "Запланировано",
+      "Next run": "Следующий запуск",
+      "Last run": "Последний запуск",
+      "No runs yet": "Запусков ещё не было",
+      "Instructions": "Инструкции",
+      "Runs": "Запуски",
+      "Loading runs…": "Загрузка запусков…",
+      "No custom agents yet.": "Пользовательских агентов пока нет.",
+      "Loading available plugins...": "Загрузка доступных плагинов...",
+      "Featured": "Рекомендуемые",
+      "See more": "Показать ещё",
+      "Create": "Создать",
+      "All": "Все",
+      "Loading customizations...": "Загрузка настроек...",
+      "Design, Creative & Media": "Дизайн, творчество и медиа",
+      "Design, creative, and media tools.": "Инструменты для дизайна, творчества и медиа.",
+      "Productivity & Project Management": "Продуктивность и управление проектами",
+      "Cloud Hosting & Deployment": "Облачный хостинг и деплой",
+      "Developer Tools": "Инструменты разработчика",
+      "Business": "Бизнес",
+      "Read, draft, and edit docs.": "Чтение, создание черновиков и редактирование документов.",
+      "Read, write, and format spreadsheets.": "Чтение, запись и форматирование таблиц.",
+      "Read, edit, and export presentations.": "Чтение, редактирование и экспорт презентаций.",
+      "Search, upload, download, and share files.": "Поиск, загрузка, скачивание и обмен файлами.",
+      "Check availability, schedule events, and RSVP.": "Проверка доступности, планирование событий и ответы."
     }
   },
   "fragmentRules": [
@@ -27244,6 +27596,76 @@
       "source": "^(\\d+)\\s+active conversations?\\s+and\\s+(\\d+)\\s+archived conversations?$",
       "flags": "i",
       "rep": "활성 대화 $1개 및 보관된 대화 $2개"
+    },
+    {
+      "source": "^Install\\s+(.+)$",
+      "flags": "",
+      "rep": "$1 설치"
+    },
+    {
+      "source": "^Add\\s+(Firebase|Notion|Context7|Linear|Dynatrace|Stripe)$",
+      "flags": "",
+      "rep": "$1 추가"
+    },
+    {
+      "source": "^Details for\\s+(.+)$",
+      "flags": "",
+      "rep": "$1 상세 정보"
+    },
+    {
+      "source": "^More actions for\\s+(.+)$",
+      "flags": "",
+      "rep": "$1 추가 작업"
+    },
+    {
+      "source": "^Plugins in\\s+(.+)$",
+      "flags": "",
+      "rep": "$1의 플러그인"
+    },
+    {
+      "source": "^See more in\\s+(.+)$",
+      "flags": "",
+      "rep": "$1에서 더 보기"
+    },
+    {
+      "source": "^See\\s+(\\d+)\\s+more\\s+plugins$",
+      "flags": "i",
+      "rep": "플러그인 $1개 더 보기"
+    },
+    {
+      "source": "^See\\s+(\\d+)\\s+more\\s+skills and rules$",
+      "flags": "i",
+      "rep": "스킬 및 규칙 $1개 더 보기"
+    },
+    {
+      "source": "^See\\s+(\\d+)\\s+more$",
+      "flags": "i",
+      "rep": "$1개 더 보기"
+    },
+    {
+      "source": "^(\\d+)\\s+tools?\\s+disabled$",
+      "flags": "i",
+      "rep": "도구 $1개 비활성화됨"
+    },
+    {
+      "source": "^Filter skills and rules:\\s*(.+)$",
+      "flags": "i",
+      "rep": "스킬 및 규칙 필터: $1"
+    },
+    {
+      "source": "^Next run today around\\s+(.+)$",
+      "flags": "i",
+      "rep": "다음 실행: 오늘 $1경"
+    },
+    {
+      "source": "^Today\\s+(\\d{1,2}:\\d{2}\\s*(?:AM|PM))$",
+      "flags": "i",
+      "rep": "오늘 $1"
+    },
+    {
+      "source": "^Daily at\\s+(.+?)\\s+and\\s+(.+)$",
+      "flags": "i",
+      "rep": "매일 $1 및 $2"
     }
   ],
   "multiLangFragments": {
@@ -27743,6 +28165,76 @@
         "source": "^(\\d+)\\s+active conversations?\\s+and\\s+(\\d+)\\s+archived conversations?$",
         "flags": "i",
         "rep": "アクティブな会話 $1件・アーカイブ済み $2件"
+      },
+      {
+        "source": "^Install\\s+(.+)$",
+        "flags": "",
+        "rep": "$1 をインストール"
+      },
+      {
+        "source": "^Add\\s+(Firebase|Notion|Context7|Linear|Dynatrace|Stripe)$",
+        "flags": "",
+        "rep": "$1 を追加"
+      },
+      {
+        "source": "^Details for\\s+(.+)$",
+        "flags": "",
+        "rep": "$1 の詳細"
+      },
+      {
+        "source": "^More actions for\\s+(.+)$",
+        "flags": "",
+        "rep": "$1 のその他の操作"
+      },
+      {
+        "source": "^Plugins in\\s+(.+)$",
+        "flags": "",
+        "rep": "$1 のプラグイン"
+      },
+      {
+        "source": "^See more in\\s+(.+)$",
+        "flags": "",
+        "rep": "$1 でさらに表示"
+      },
+      {
+        "source": "^See\\s+(\\d+)\\s+more\\s+plugins$",
+        "flags": "i",
+        "rep": "他 $1件のプラグインを表示"
+      },
+      {
+        "source": "^See\\s+(\\d+)\\s+more\\s+skills and rules$",
+        "flags": "i",
+        "rep": "他 $1件のスキル・ルールを表示"
+      },
+      {
+        "source": "^See\\s+(\\d+)\\s+more$",
+        "flags": "i",
+        "rep": "他 $1件を表示"
+      },
+      {
+        "source": "^(\\d+)\\s+tools?\\s+disabled$",
+        "flags": "i",
+        "rep": "$1個のツールが無効"
+      },
+      {
+        "source": "^Filter skills and rules:\\s*(.+)$",
+        "flags": "i",
+        "rep": "スキルとルールを絞り込み: $1"
+      },
+      {
+        "source": "^Next run today around\\s+(.+)$",
+        "flags": "i",
+        "rep": "次回実行: 本日 $1 頃"
+      },
+      {
+        "source": "^Today\\s+(\\d{1,2}:\\d{2}\\s*(?:AM|PM))$",
+        "flags": "i",
+        "rep": "今日 $1"
+      },
+      {
+        "source": "^Daily at\\s+(.+?)\\s+and\\s+(.+)$",
+        "flags": "i",
+        "rep": "毎日 $1・$2"
       }
     ],
     "zh-CN": [
@@ -27945,6 +28437,76 @@
         "source": "^(\\d+)\\s+active conversations?\\s+and\\s+(\\d+)\\s+archived conversations?$",
         "flags": "i",
         "rep": "$1 个活跃对话和 $2 个已归档对话"
+      },
+      {
+        "source": "^Install\\s+(.+)$",
+        "flags": "",
+        "rep": "安装 $1"
+      },
+      {
+        "source": "^Add\\s+(Firebase|Notion|Context7|Linear|Dynatrace|Stripe)$",
+        "flags": "",
+        "rep": "添加 $1"
+      },
+      {
+        "source": "^Details for\\s+(.+)$",
+        "flags": "",
+        "rep": "$1 详情"
+      },
+      {
+        "source": "^More actions for\\s+(.+)$",
+        "flags": "",
+        "rep": "$1 更多操作"
+      },
+      {
+        "source": "^Plugins in\\s+(.+)$",
+        "flags": "",
+        "rep": "$1 中的插件"
+      },
+      {
+        "source": "^See more in\\s+(.+)$",
+        "flags": "",
+        "rep": "在 $1 中查看更多"
+      },
+      {
+        "source": "^See\\s+(\\d+)\\s+more\\s+plugins$",
+        "flags": "i",
+        "rep": "查看其余 $1 个插件"
+      },
+      {
+        "source": "^See\\s+(\\d+)\\s+more\\s+skills and rules$",
+        "flags": "i",
+        "rep": "查看其余 $1 项技能和规则"
+      },
+      {
+        "source": "^See\\s+(\\d+)\\s+more$",
+        "flags": "i",
+        "rep": "查看其余 $1 项"
+      },
+      {
+        "source": "^(\\d+)\\s+tools?\\s+disabled$",
+        "flags": "i",
+        "rep": "已禁用 $1 个工具"
+      },
+      {
+        "source": "^Filter skills and rules:\\s*(.+)$",
+        "flags": "i",
+        "rep": "筛选技能和规则：$1"
+      },
+      {
+        "source": "^Next run today around\\s+(.+)$",
+        "flags": "i",
+        "rep": "下次运行：今天约 $1"
+      },
+      {
+        "source": "^Today\\s+(\\d{1,2}:\\d{2}\\s*(?:AM|PM))$",
+        "flags": "i",
+        "rep": "今天 $1"
+      },
+      {
+        "source": "^Daily at\\s+(.+?)\\s+and\\s+(.+)$",
+        "flags": "i",
+        "rep": "每天 $1 和 $2"
       }
     ],
     "zh-TW": [
@@ -28147,6 +28709,76 @@
         "source": "^(\\d+)\\s+active conversations?\\s+and\\s+(\\d+)\\s+archived conversations?$",
         "flags": "i",
         "rep": "$1 個進行中對話與 $2 個已封存對話"
+      },
+      {
+        "source": "^Install\\s+(.+)$",
+        "flags": "",
+        "rep": "安裝 $1"
+      },
+      {
+        "source": "^Add\\s+(Firebase|Notion|Context7|Linear|Dynatrace|Stripe)$",
+        "flags": "",
+        "rep": "新增 $1"
+      },
+      {
+        "source": "^Details for\\s+(.+)$",
+        "flags": "",
+        "rep": "$1 詳細資訊"
+      },
+      {
+        "source": "^More actions for\\s+(.+)$",
+        "flags": "",
+        "rep": "$1 更多動作"
+      },
+      {
+        "source": "^Plugins in\\s+(.+)$",
+        "flags": "",
+        "rep": "$1 中的外掛程式"
+      },
+      {
+        "source": "^See more in\\s+(.+)$",
+        "flags": "",
+        "rep": "在 $1 中查看更多"
+      },
+      {
+        "source": "^See\\s+(\\d+)\\s+more\\s+plugins$",
+        "flags": "i",
+        "rep": "查看其餘 $1 個外掛程式"
+      },
+      {
+        "source": "^See\\s+(\\d+)\\s+more\\s+skills and rules$",
+        "flags": "i",
+        "rep": "查看其餘 $1 項技能與規則"
+      },
+      {
+        "source": "^See\\s+(\\d+)\\s+more$",
+        "flags": "i",
+        "rep": "查看其餘 $1 項"
+      },
+      {
+        "source": "^(\\d+)\\s+tools?\\s+disabled$",
+        "flags": "i",
+        "rep": "已停用 $1 個工具"
+      },
+      {
+        "source": "^Filter skills and rules:\\s*(.+)$",
+        "flags": "i",
+        "rep": "篩選技能與規則：$1"
+      },
+      {
+        "source": "^Next run today around\\s+(.+)$",
+        "flags": "i",
+        "rep": "下次執行：今天約 $1"
+      },
+      {
+        "source": "^Today\\s+(\\d{1,2}:\\d{2}\\s*(?:AM|PM))$",
+        "flags": "i",
+        "rep": "今天 $1"
+      },
+      {
+        "source": "^Daily at\\s+(.+?)\\s+and\\s+(.+)$",
+        "flags": "i",
+        "rep": "每天 $1 與 $2"
       }
     ],
     "es": [
@@ -28344,6 +28976,76 @@
         "source": "^(\\d+)\\s+active conversations?\\s+and\\s+(\\d+)\\s+archived conversations?$",
         "flags": "i",
         "rep": "$1 conversaciones activas y $2 archivadas"
+      },
+      {
+        "source": "^Install\\s+(.+)$",
+        "flags": "",
+        "rep": "Instalar $1"
+      },
+      {
+        "source": "^Add\\s+(Firebase|Notion|Context7|Linear|Dynatrace|Stripe)$",
+        "flags": "",
+        "rep": "Añadir $1"
+      },
+      {
+        "source": "^Details for\\s+(.+)$",
+        "flags": "",
+        "rep": "Detalles de $1"
+      },
+      {
+        "source": "^More actions for\\s+(.+)$",
+        "flags": "",
+        "rep": "Más acciones para $1"
+      },
+      {
+        "source": "^Plugins in\\s+(.+)$",
+        "flags": "",
+        "rep": "Complementos en $1"
+      },
+      {
+        "source": "^See more in\\s+(.+)$",
+        "flags": "",
+        "rep": "Ver más en $1"
+      },
+      {
+        "source": "^See\\s+(\\d+)\\s+more\\s+plugins$",
+        "flags": "i",
+        "rep": "Ver $1 complementos más"
+      },
+      {
+        "source": "^See\\s+(\\d+)\\s+more\\s+skills and rules$",
+        "flags": "i",
+        "rep": "Ver $1 habilidades y reglas más"
+      },
+      {
+        "source": "^See\\s+(\\d+)\\s+more$",
+        "flags": "i",
+        "rep": "Ver $1 más"
+      },
+      {
+        "source": "^(\\d+)\\s+tools?\\s+disabled$",
+        "flags": "i",
+        "rep": "$1 herramientas deshabilitadas"
+      },
+      {
+        "source": "^Filter skills and rules:\\s*(.+)$",
+        "flags": "i",
+        "rep": "Filtrar habilidades y reglas: $1"
+      },
+      {
+        "source": "^Next run today around\\s+(.+)$",
+        "flags": "i",
+        "rep": "Próxima ejecución hoy alrededor de $1"
+      },
+      {
+        "source": "^Today\\s+(\\d{1,2}:\\d{2}\\s*(?:AM|PM))$",
+        "flags": "i",
+        "rep": "Hoy a las $1"
+      },
+      {
+        "source": "^Daily at\\s+(.+?)\\s+and\\s+(.+)$",
+        "flags": "i",
+        "rep": "Diariamente a las $1 y $2"
       }
     ],
     "fr": [
@@ -28541,6 +29243,76 @@
         "source": "^(\\d+)\\s+active conversations?\\s+and\\s+(\\d+)\\s+archived conversations?$",
         "flags": "i",
         "rep": "$1 conversations actives et $2 archivées"
+      },
+      {
+        "source": "^Install\\s+(.+)$",
+        "flags": "",
+        "rep": "Installer $1"
+      },
+      {
+        "source": "^Add\\s+(Firebase|Notion|Context7|Linear|Dynatrace|Stripe)$",
+        "flags": "",
+        "rep": "Ajouter $1"
+      },
+      {
+        "source": "^Details for\\s+(.+)$",
+        "flags": "",
+        "rep": "Détails pour $1"
+      },
+      {
+        "source": "^More actions for\\s+(.+)$",
+        "flags": "",
+        "rep": "Plus d’actions pour $1"
+      },
+      {
+        "source": "^Plugins in\\s+(.+)$",
+        "flags": "",
+        "rep": "Extensions dans $1"
+      },
+      {
+        "source": "^See more in\\s+(.+)$",
+        "flags": "",
+        "rep": "Voir plus dans $1"
+      },
+      {
+        "source": "^See\\s+(\\d+)\\s+more\\s+plugins$",
+        "flags": "i",
+        "rep": "Voir $1 extensions de plus"
+      },
+      {
+        "source": "^See\\s+(\\d+)\\s+more\\s+skills and rules$",
+        "flags": "i",
+        "rep": "Voir $1 compétences et règles de plus"
+      },
+      {
+        "source": "^See\\s+(\\d+)\\s+more$",
+        "flags": "i",
+        "rep": "Voir $1 de plus"
+      },
+      {
+        "source": "^(\\d+)\\s+tools?\\s+disabled$",
+        "flags": "i",
+        "rep": "$1 outils désactivés"
+      },
+      {
+        "source": "^Filter skills and rules:\\s*(.+)$",
+        "flags": "i",
+        "rep": "Filtrer compétences et règles : $1"
+      },
+      {
+        "source": "^Next run today around\\s+(.+)$",
+        "flags": "i",
+        "rep": "Prochaine exécution aujourd’hui vers $1"
+      },
+      {
+        "source": "^Today\\s+(\\d{1,2}:\\d{2}\\s*(?:AM|PM))$",
+        "flags": "i",
+        "rep": "Aujourd’hui à $1"
+      },
+      {
+        "source": "^Daily at\\s+(.+?)\\s+and\\s+(.+)$",
+        "flags": "i",
+        "rep": "Tous les jours à $1 et $2"
       }
     ],
     "de": [
@@ -28738,6 +29510,76 @@
         "source": "^(\\d+)\\s+active conversations?\\s+and\\s+(\\d+)\\s+archived conversations?$",
         "flags": "i",
         "rep": "$1 aktive und $2 archivierte Unterhaltungen"
+      },
+      {
+        "source": "^Install\\s+(.+)$",
+        "flags": "",
+        "rep": "$1 installieren"
+      },
+      {
+        "source": "^Add\\s+(Firebase|Notion|Context7|Linear|Dynatrace|Stripe)$",
+        "flags": "",
+        "rep": "$1 hinzufügen"
+      },
+      {
+        "source": "^Details for\\s+(.+)$",
+        "flags": "",
+        "rep": "Details zu $1"
+      },
+      {
+        "source": "^More actions for\\s+(.+)$",
+        "flags": "",
+        "rep": "Weitere Aktionen für $1"
+      },
+      {
+        "source": "^Plugins in\\s+(.+)$",
+        "flags": "",
+        "rep": "Plugins in $1"
+      },
+      {
+        "source": "^See more in\\s+(.+)$",
+        "flags": "",
+        "rep": "Mehr in $1 anzeigen"
+      },
+      {
+        "source": "^See\\s+(\\d+)\\s+more\\s+plugins$",
+        "flags": "i",
+        "rep": "$1 weitere Plugins anzeigen"
+      },
+      {
+        "source": "^See\\s+(\\d+)\\s+more\\s+skills and rules$",
+        "flags": "i",
+        "rep": "$1 weitere Skills und Regeln anzeigen"
+      },
+      {
+        "source": "^See\\s+(\\d+)\\s+more$",
+        "flags": "i",
+        "rep": "$1 weitere anzeigen"
+      },
+      {
+        "source": "^(\\d+)\\s+tools?\\s+disabled$",
+        "flags": "i",
+        "rep": "$1 Tools deaktiviert"
+      },
+      {
+        "source": "^Filter skills and rules:\\s*(.+)$",
+        "flags": "i",
+        "rep": "Skills und Regeln filtern: $1"
+      },
+      {
+        "source": "^Next run today around\\s+(.+)$",
+        "flags": "i",
+        "rep": "Nächste Ausführung heute um ca. $1"
+      },
+      {
+        "source": "^Today\\s+(\\d{1,2}:\\d{2}\\s*(?:AM|PM))$",
+        "flags": "i",
+        "rep": "Heute $1"
+      },
+      {
+        "source": "^Daily at\\s+(.+?)\\s+and\\s+(.+)$",
+        "flags": "i",
+        "rep": "Täglich um $1 und $2"
       }
     ],
     "ru": [
@@ -28935,6 +29777,76 @@
         "source": "^(\\d+)\\s+active conversations?\\s+and\\s+(\\d+)\\s+archived conversations?$",
         "flags": "i",
         "rep": "Активных бесед: $1, в архиве: $2"
+      },
+      {
+        "source": "^Install\\s+(.+)$",
+        "flags": "",
+        "rep": "Установить $1"
+      },
+      {
+        "source": "^Add\\s+(Firebase|Notion|Context7|Linear|Dynatrace|Stripe)$",
+        "flags": "",
+        "rep": "Добавить $1"
+      },
+      {
+        "source": "^Details for\\s+(.+)$",
+        "flags": "",
+        "rep": "Подробнее о $1"
+      },
+      {
+        "source": "^More actions for\\s+(.+)$",
+        "flags": "",
+        "rep": "Ещё действия для $1"
+      },
+      {
+        "source": "^Plugins in\\s+(.+)$",
+        "flags": "",
+        "rep": "Плагины в «$1»"
+      },
+      {
+        "source": "^See more in\\s+(.+)$",
+        "flags": "",
+        "rep": "Показать ещё в «$1»"
+      },
+      {
+        "source": "^See\\s+(\\d+)\\s+more\\s+plugins$",
+        "flags": "i",
+        "rep": "Показать ещё плагинов: $1"
+      },
+      {
+        "source": "^See\\s+(\\d+)\\s+more\\s+skills and rules$",
+        "flags": "i",
+        "rep": "Показать ещё навыков и правил: $1"
+      },
+      {
+        "source": "^See\\s+(\\d+)\\s+more$",
+        "flags": "i",
+        "rep": "Показать ещё: $1"
+      },
+      {
+        "source": "^(\\d+)\\s+tools?\\s+disabled$",
+        "flags": "i",
+        "rep": "Отключено инструментов: $1"
+      },
+      {
+        "source": "^Filter skills and rules:\\s*(.+)$",
+        "flags": "i",
+        "rep": "Фильтр навыков и правил: $1"
+      },
+      {
+        "source": "^Next run today around\\s+(.+)$",
+        "flags": "i",
+        "rep": "Следующий запуск сегодня около $1"
+      },
+      {
+        "source": "^Today\\s+(\\d{1,2}:\\d{2}\\s*(?:AM|PM))$",
+        "flags": "i",
+        "rep": "Сегодня в $1"
+      },
+      {
+        "source": "^Daily at\\s+(.+?)\\s+and\\s+(.+)$",
+        "flags": "i",
+        "rep": "Ежедневно в $1 и $2"
       }
     ]
   }

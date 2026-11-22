@@ -1,26 +1,26 @@
 {
-  "version": "4.0.3",
+  "version": "4.0.4",
   "channel": "stable",
   "minAppVersion": "2.30.0",
   "testedAppVersion": "2.34.0",
   "repo": "x2tora/antigravity-enhancer",
-  "updatedAt": "2026-11-22T22:41:24.690Z",
-  "releaseNotes": "- **Centered Patch Settings & Glossary Layout Fix**: Removed external `.agy-overlay` class interference so the Patch Settings modal stays horizontally centered, switched the Custom Glossary input row to CSS Grid to prevent the `Add` button from wrapping or overflowing, and unified the Settings page card into a single **Patch Settings** button.\n- **Expanded UI & Dynamic Counter Translations**: Added 18 static UI strings (including Image/File/Diff viewer controls, Subagent Conversation headers, and `Zoom 100%, reset to fit` / `Download image`) and 24 dynamic rules (`lines added/removed`, `excluded`, `active and archived conversations`) across 8 languages.\n- **Stronger Collector Filtering**: Excluded quoted code literals, MCP tool IDs, leading-ellipsis fragments, code comments, and Claude model names.",
+  "updatedAt": "2026-11-22T22:52:53.922Z",
+  "releaseNotes": "- **SSH Host, Automations & Marketplace Localization**: Added 44 static UI translations (352 entries across 8 languages) for SSH Host dialogs, Automations/Scheduled runs, Terminal UI, and Marketplace categories, plus 112 dynamic regex rules (`Install ...`, `Add ...`, `Details for ...`, `More actions for ...`, `See N more ...`, `N tools disabled`, `Filter skills and rules: ...`, schedule timestamps).\n- **Stronger Noise Filtering**: Filtered out repeated-character strings, `user@host:port`, runtime version tags, marketplace brand names, CI run IDs, and dynamic marketplace/automation labels from the untranslated collector.",
   "releaseNotesI18n": {
-    "en": "- **Centered Patch Settings & Glossary Layout Fix**: Removed external `.agy-overlay` class interference so the Patch Settings modal stays horizontally centered, switched the Custom Glossary input row to CSS Grid to prevent the `Add` button from wrapping or overflowing, and unified the Settings page card into a single **Patch Settings** button.\n- **Expanded UI & Dynamic Counter Translations**: Added 18 static UI strings (including Image/File/Diff viewer controls, Subagent Conversation headers, and `Zoom 100%, reset to fit` / `Download image`) and 24 dynamic rules (`lines added/removed`, `excluded`, `active and archived conversations`) across 8 languages.\n- **Stronger Collector Filtering**: Excluded quoted code literals, MCP tool IDs, leading-ellipsis fragments, code comments, and Claude model names.",
-    "ko": "- **패치 설정 정중앙 배치 및 용어집 레이아웃 수정**: 외부 `.agy-overlay` 클래스 간섭을 제거해 패치 설정 창이 항상 화면 가로 정중앙에 오도록 수정했고, 커스텀 용어집 입력 행을 CSS Grid로 바꿔 `추가` 버튼 줄바꿈·삐져나옴을 해결했습니다. 설정 페이지 하단 카드도 `패치 설정` 버튼 하나로 통합했습니다.\n- **신규 UI 및 동적 카운터 번역 추가**: 파일/Diff/이미지 뷰어(`Download image`, `Zoom 100%, reset to fit`), 서브에이전트 대화, `Fold code block` 등 정적 UI 18종과 `lines added/removed`, `excluded`, 활성+보관 대화 수 동적 규칙 24건을 추가했습니다.\n- **미번역 수집 필터 강화**: 따옴표 코드 리터럴, MCP 툴 식별자, 말줄임표 조각, 코드 주석, Claude 모델명 등을 수집 대상에서 제외했습니다.",
-    "ja": "- **パッチ設定の中央配置と用語集レイアウト修正**: 外部クラスの干渉をなくしモーダルを画面中央に固定しました。カスタム用語集の入力行を CSS Grid 化し、ボタンの折り返し・はみ出しを解消しました。\n- **新規 UI・動的カウンター翻訳とフィルター強化**: 画像/ファイルビューアーやサブエージェント会話などの UI 18種と動的ルール 24件を追加し、コード断片や MCP 識別子の除外を強化しました。",
-    "zh-CN": "- **修复补丁设置居中与术语表布局**：移除外部类干扰确保弹窗水平居中，将自定义术语表输入行改为 CSS Grid 防止按钮换行或溢出，并统一设置页入口按钮。\n- **扩展界面与动态计数翻译**：新增 18 项静态界面（含图片查看器与子代理对话）及 24 条动态规则，并进一步过滤代码字面量与 MCP 工具名。",
-    "zh-TW": "- **修正修補設定置中與詞彙表版面**：移除外部類別干擾確保視窗水平置中，將自訂詞彙表輸入列改為 CSS Grid 防止按鈕換行或溢出，並統一設定頁入口按鈕。\n- **擴充介面與動態計數翻譯**：新增 18 項靜態介面（含圖片檢視器與子代理對話）及 24 條動態規則，並過濾程式碼字面量與 MCP 工具名稱。",
-    "es": "- **Centrado del modal y corrección del glosario**: Se eliminó la interferencia de clases externas para centrar el modal, se usó CSS Grid en la fila del glosario y se unificó el botón de ajustes.\n- **Más traducciones y mejor filtrado**: 18 textos estáticos nuevos, 24 reglas dinámicas y filtrado de literales de código e IDs MCP.",
-    "fr": "- **Centrage du panneau et mise en page du glossaire** : Suppression de l’interférence CSS externe pour centrer le panneau, passage en CSS Grid pour le glossaire et bouton unifié.\n- **Traductions et filtrage renforcés** : 18 libellés statiques, 24 règles dynamiques et exclusion des littéraux de code et identifiants MCP.",
-    "de": "- **Zentriertes Modal & Glossar-Layout**: Externe CSS-Interferenz entfernt, Glossar-Eingabezeile auf CSS Grid umgestellt und Einstellungs-Button vereinheitlicht.\n- **Erweiterte Übersetzungen & Filter**: 18 neue statische UI-Texte, 24 dynamische Regeln sowie Filterung von Code-Literalen und MCP-IDs.",
-    "ru": "- **Центрирование окна и исправление глоссария**: Устранено влияние внешних классов для центрирования окна, строка глоссария переведена на CSS Grid, кнопка настроек унифицирована.\n- **Новые переводы и фильтрация**: Добавлено 18 статических строк UI, 24 динамических правила и фильтрация литералов кода и MCP-идентификаторов."
+    "en": "- **SSH Host, Automations & Marketplace Localization**: Added 44 static UI translations (352 entries across 8 languages) for SSH Host dialogs, Automations/Scheduled runs, Terminal UI, and Marketplace categories, plus 112 dynamic regex rules (`Install ...`, `Add ...`, `Details for ...`, `More actions for ...`, `See N more ...`, `N tools disabled`, `Filter skills and rules: ...`, schedule timestamps).\n- **Stronger Noise Filtering**: Filtered out repeated-character strings, `user@host:port`, runtime version tags, marketplace brand names, CI run IDs, and dynamic marketplace/automation labels from the untranslated collector.",
+    "ko": "- **SSH 호스트 · 자동화 · 마켓플레이스 번역 추가**: SSH 호스트 연결, 자동화/예약 실행, 터미널·보조 질문, 마켓플레이스 카테고리/설명 등 정적 UI 44종(8개국어 352개 항목)과 플러그인 설치·추가·상세·더 보기·도구 비활성화 수·예약 시간 등 동적 규칙 14종(112개 규칙)을 추가했습니다.\n- **미번역 수집 필터 강화**: 반복 문자(`WWWW...`), `user@host:port`, 런타임 버전, 플러그인 고유명사, 긴 CI 실행 ID 및 동적 마켓플레이스 라벨을 수집 대상에서 제외했습니다.",
+    "ja": "- **SSH ホスト・オートメーション・マーケットプレイス翻訳を追加**: SSH 接続、スケジュール実行、ターミナル UI、マーケットプレイスカテゴリなどの静的 UI 44種と動的ルール 112件を追加しました。\n- **未翻訳収集フィルター強化**: 反復文字、ホストテンプレート、プラグイン固有名詞、CI 実行 ID を除外しました。",
+    "zh-CN": "- **新增 SSH 主机、自动化与插件市场翻译**：新增 44 项静态界面（352 条多语言词条）及 112 条安装/详情/更多操作/禁用工具数等动态规则。\n- **强化噪声过滤**：排除重复字符、`user@host:port`、插件品牌名及 CI 运行 ID。",
+    "zh-TW": "- **新增 SSH 主機、自動化與外掛市場翻譯**：新增 44 項靜態介面（352 筆多語言詞條）及 112 條安裝/詳情/更多動作/停用工具數等動態規則。\n- **強化雜訊過濾**：排除重複字元、`user@host:port`、外掛品牌名稱及 CI 執行 ID。",
+    "es": "- **Traducciones de SSH, Automatizaciones y Marketplace**: 44 cadenas estáticas nuevas (352 entradas) y 112 reglas dinámicas para acciones de plugins, herramientas deshabilitadas y horarios.\n- **Filtro mejorado**: Se excluyen caracteres repetidos, `user@host:port`, nombres de marca e IDs de ejecución.",
+    "fr": "- **Traductions SSH, Automatisations et Marketplace** : 44 libellés statiques (352 entrées) et 112 règles dynamiques pour les actions d’extensions, outils désactivés et planifications.\n- **Filtrage renforcé** : Exclusion des caractères répétés, `user@host:port`, noms de marque et IDs CI.",
+    "de": "- **Übersetzungen für SSH, Automatisierungen & Marketplace**: 44 statische UI-Texte (352 Einträge) und 112 dynamische Regeln für Plugin-Aktionen, deaktivierte Tools und Zeitpläne.\n- **Verbesserter Filter**: Filtert wiederholte Zeichen, `user@host:port`, Markennamen und CI-Run-IDs.",
+    "ru": "- **Переводы для SSH, автоматизаций и маркетплейса**: 44 статических строки (352 записи) и 112 динамических правил для действий плагинов, счётчиков и расписания.\n- **Улучшенная фильтрация**: Исключены повторяющиеся символы, `user@host:port`, бренды и ID запусков CI."
   },
   "files": {
     "main-enhancer.js": {
       "size": 36510,
-      "sha256": "1e999ec3586d1b1cf9eb8d19f71d85de7fa9546934fee929d95c1390630c8abc",
+      "sha256": "9d6db4ea4dad64d5c94f107f66b31accae1c8b64bec67cc4c16195dabd027472",
       "restartRequired": true
     },
     "asar-patcher.js": {
@@ -29,8 +29,8 @@
       "restartRequired": true
     },
     "renderer-enhancer.js": {
-      "size": 193202,
-      "sha256": "55d35fdc93b59661e18179c705540315bb0a6b11e531ab3f24b060684f4b52b0",
+      "size": 194429,
+      "sha256": "10fd748b65bacdd20450799e4f2688e76092c3a8b4945f085c7941690ce56365",
       "restartRequired": false
     },
     "gsap-core.js": {
@@ -39,8 +39,8 @@
       "restartRequired": false
     },
     "dictionaries.json": {
-      "size": 3802430,
-      "sha256": "64c8def8c508ee00d0492b95f286d2437787b66da66113f90cc5157b11c373eb",
+      "size": 3841479,
+      "sha256": "68a007a7ac4db5f3ee8a23efe57dd3bc1da0b704f83905680b4a913dad4c1ca0",
       "restartRequired": false
     },
     "auto-repatch.js": {
@@ -49,8 +49,8 @@
       "restartRequired": false
     },
     "CHANGELOG.md": {
-      "size": 6620,
-      "sha256": "4f6ef2cac7181488da47fdee68126e230145bb1265ab6a0490e433c13912ce54",
+      "size": 7421,
+      "sha256": "ebf168eecaaf84c653ba0b39f21a681090db70d3e4e9b31130e2c54f2ade9c48",
       "restartRequired": false
     }
   }

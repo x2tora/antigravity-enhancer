@@ -1,5 +1,5 @@
 /**
- * Antigravity Enhancer v4.0.3 - Modular Renderer Enhancer Engine
+ * Antigravity Enhancer v4.0.4 - Modular Renderer Enhancer Engine
  * Features: 9-Language Zero-Restart i18n, Translation Engine 2.0 (Slice + Glossary),
  *           Quota Intelligence (Sparklines, Burn-Rate ETA & Alerts),
  *           Enhancer Control Center & Custom Shortcuts (x2tora/antigravity-enhancer)
@@ -11,7 +11,7 @@
   const ipc = electron_1 ? electron_1.ipcRenderer : null;
   const payload = (typeof __ENHANCER_PAYLOAD__ !== 'undefined' && __ENHANCER_PAYLOAD__) ? __ENHANCER_PAYLOAD__ : {};
   const ENHANCER_REPO = payload.repo || 'x2tora/antigravity-enhancer';
-  const ENHANCER_CURRENT_VERSION = payload.version || '4.0.3';
+  const ENHANCER_CURRENT_VERSION = payload.version || '4.0.4';
 
   const DEFAULT_PREFS = {
     shortcutCycleLang: 'Alt+Shift+L',
@@ -238,18 +238,22 @@
     if (/^\d+\s*[smhd](?:\s+\d+\s*[smhd])*$/i.test(trimmed)) return true;
     if (/^(?:Thinking for \d+|Still thinking,\s*\d+\s*seconds?|Turn \d+ of \d+|Load older messages)/i.test(trimmed)) return true;
     // Brand / model / codename standalone labels & dynamic multi-word Close <Title>
+    if (/(.)\1{5,}/.test(trimmed)) return true;
     if (/^(?:Antigravity|Antigravity Enhancer|Argon|Gemini|Migratify|Gero|Supabase|Gmail|Inter|Google Sans|Object|Users|Desktop|e2e|_ns)$/i.test(trimmed)) return true;
-    if (/^(?:Gemini\s+\d+|Google AI\b|Gemini API$|Claude\s+(?:Opus|Sonnet|Haiku)\s+[\d.]+$)/i.test(trimmed)) return true;
+    if (/^(?:Notion|Context7|Linear|Dynatrace|Stripe|Canva|Figma|Mobbin|Dropbox|Granola|Cloudflare|Netlify|Railway|Spacefast|Wix|Arize AX|Auth0|Base44|Better Stack|Browserbase|Clerk|Bigin|Intercom|Levels\.fyi|Semrush|Looker|n8n|Google Workspace|Google Docs|Google Sheets|Google Slides|Google Calendar|Data Agent Kit|Robotics|Genomics|Chemistry|Descrybe Legal Engine|Midpage Legal Research|Science Overview|Structural Biology|Scientific Literature)$/i.test(trimmed)) return true;
+    if (/^(?:Gemini\s+\d+|Google AI\b|Gemini API$|Claude\s+(?:Opus|Sonnet|Haiku)\s+[\d.]+$|(?:PowerShell|Node\.js|Python|Electron|Chrome)\s+[\d.]+$)/i.test(trimmed)) return true;
     if (/^(?:Ctrl|Alt|Shift|Meta|Cmd|Opt|Enter|Esc|Tab|Space|Backspace|Delete)$/i.test(trimmed)) return true;
     if (/^\d+(?:\.\d+)?(?:px|rem|em|pt|%|ms|s)$/i.test(trimmed)) return true;
-    if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) return true;
-    if (/^[A-Za-z0-9_.\-]+\/$/.test(trimmed)) return true;
+    if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed) || /^[a-z0-9_.-]+@[a-z0-9_.-]+(?::[a-z0-9]+)?$/i.test(trimmed)) return true;
+    if (/^[A-Za-z0-9_.\-]+\/$/.test(trimmed) || /\b\d{6,}\b/.test(trimmed)) return true;
     if (/^['"][^'"]+['"]$/.test(trimmed) || /^mcp:[a-z0-9_:-]+$/i.test(trimmed) || /^…/.test(trimmed) || /^\/\//.test(trimmed)) return true;
     if (/^(?:Close\s+\S+\s+\S+|Side Question:\s+|Delete side question:\s+)/i.test(trimmed)) return true;
     if (/^(?:Shortcut\s+.+\s+for\s+|Remove shortcut\s+.+\s+for\s+|Add shortcut for\s+|Send feedback as\s+)/i.test(trimmed)) return true;
+    if (/^(?:Install|Details for|More actions for|Plugins in|See more in)\s+.+$/i.test(trimmed) || /^Add\s+(?:Firebase|Notion|Context7|Linear|Dynatrace|Stripe)$/i.test(trimmed)) return true;
+    if (/^(?:See\s+\d+\s+more(?:\s+(?:plugins|skills and rules))?|\d+\s+tools?\s+disabled|Filter skills and rules:\s*.+|Next run today around\s+.+|Today\s+\d{1,2}:\d{2}\s*(?:AM|PM)|Daily at\s+.+)$/i.test(trimmed)) return true;
     if (/^(?:\d+\s+active conversations?(?:\s+and\s+\d+\s+archived conversations?)?|(?:Rules|Skills|Subagents|Mcp Tools):\s*[\d,]+\s*tokens|\d+\s+lines?\s+added,\s+\d+\s+lines?\s+removed|\d+\s+excluded)$/i.test(trimmed)) return true;
-    // Agent tool/step summaries & comma-separated action logs (e.g., "Explored files, ran commands, edited files")
-    if (/^(?:Ran commands|Killing subagent|Model Selector & Theme UI Engineer|Check current git status and diff summary)$/i.test(trimmed)) return true;
+    // Agent tool/step summaries & comma-separated action logs
+    if (/^(?:Ran commands|Killing subagent|Model Selector & Theme UI Engineer|Check current git status and diff summary|Run full E2E.*|Run v3 architecture.*|Check CSP headers.*|Check installed Antigravity.*|Pack asar.*|Test bidirectional.*|Execute mock test.*|Check app\.asar\.original|Find large files.*)$/i.test(trimmed)) return true;
     if (/^(?:Explored|Searched|Read|Edited|Wrote|Ran|Checked|Listed|Commit)\b.*,\s*(?:ran|edited|read|wrote|explored|searched|checked|listed|tag|and push)\b/i.test(trimmed)) return true;
     // Paths, dotfiles, ALL-CAPS files, URLs, markdown links, CLI flags, mentions, slash commands
     if (/^(?:@|#|\/|--?)[A-Za-z0-9_.\-]+/.test(trimmed) || /(?:https?|file):\/\//i.test(trimmed)) return true;

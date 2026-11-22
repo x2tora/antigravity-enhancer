@@ -3,6 +3,16 @@
 All notable changes to **Antigravity Enhancer** are documented in this file.
 Older pre-v3 legacy patch logs have been consolidated into milestone summaries below.
 
+## [4.0.4] - 2026-11-23
+
+### Added
+- **SSH Host, Automations & Marketplace Translations**: Added 44 static UI strings (352 entries across 8 languages) covering SSH Host connection dialogs, Automations/Scheduled runs, Terminal header/input, Side Question prompts, and Marketplace categories/descriptions, plus 14 dynamic regex rules × 8 languages (`Install ...`, `Add ...`, `Details for ...`, `More actions for ...`, `Plugins in ...`, `See more in ...`, `See N more ...`, `N tools disabled`, `Filter skills and rules: ...`, `Today ...`, `Daily at ...`).
+
+### Improved
+- **Collector Filtering**: Excluded repeated-character terminal measurements (`WWWW...`), `user@host:port`, `PowerShell 7.6.10`, marketplace plugin brand names, 6+ digit CI run IDs, and dynamic marketplace/automation patterns.
+
+---
+
 ## [4.0.3] - 2026-11-23
 
 ### Added
