@@ -1,5 +1,5 @@
 ﻿param(
-    [string]$Version = "3.5.2",
+    [string]$Version = "3.5.3",
     [string]$OutputExe = "",
     [string]$SignCertThumbprint = ""
 )
@@ -1350,6 +1350,7 @@ namespace AntigravityEnhancer
                 string exePath = Path.Combine(appDir, "Antigravity.exe");
                 string scriptPath = Path.Combine(enhancerDir, "auto-repatch.js");
                 string psWrapperPath = Path.Combine(enhancerDir, "auto-repatch.ps1");
+                string vbsWrapperPath = Path.Combine(enhancerDir, "auto-repatch.vbs");
                 string psBody =
                     "$ErrorActionPreference = 'SilentlyContinue'\r\n" +
                     "if (-not (Get-Process Antigravity -ErrorAction SilentlyContinue)) {\r\n" +
@@ -1358,7 +1359,12 @@ namespace AntigravityEnhancer
                     "}\r\n";
                 File.WriteAllText(psWrapperPath, psBody, new UTF8Encoding(false));
 
-                string tr = "powershell.exe -NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -File \"" + psWrapperPath + "\"";
+                string vbsBody =
+                    "Set sh = CreateObject(\"WScript.Shell\")\r\n" +
+                    "sh.Run \"powershell.exe -NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -File \"\"" + psWrapperPath + "\"\"\", 0, False\r\n";
+                File.WriteAllText(vbsWrapperPath, vbsBody, Encoding.ASCII);
+
+                string tr = "wscript.exe //B //Nologo \"" + vbsWrapperPath + "\"";
                 var psi = new ProcessStartInfo("schtasks.exe", "/Create /F /TN \"AntigravityEnhancerAutoRepatch\" /SC MINUTE /MO 5 /RL LIMITED /TR \"" + tr.Replace("\"", "\\\"") + "\"")
                 {
                     CreateNoWindow = true,
@@ -1378,7 +1384,9 @@ namespace AntigravityEnhancer
             {
                 string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
                 string psWrapperPath = Path.Combine(appData, @"Antigravity\enhancer\auto-repatch.ps1");
+                string vbsWrapperPath = Path.Combine(appData, @"Antigravity\enhancer\auto-repatch.vbs");
                 if (File.Exists(psWrapperPath)) { try { File.Delete(psWrapperPath); } catch { } }
+                if (File.Exists(vbsWrapperPath)) { try { File.Delete(vbsWrapperPath); } catch { } }
                 var psi = new ProcessStartInfo("schtasks.exe", "/Delete /TN \"AntigravityEnhancerAutoRepatch\" /F")
                 {
                     CreateNoWindow = true,

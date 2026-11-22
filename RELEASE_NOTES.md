@@ -1,10 +1,8 @@
-# Antigravity Enhancer v3.5.2
+# Antigravity Enhancer v3.5.3
 
 ## Changes
 
-- **Auto-Repatch Scheduler Fix**: Replaced the >261-char inline `schtasks.exe /TR` command with a lightweight `auto-repatch.ps1` wrapper (<160 chars) scheduled every 5 minutes so Antigravity updates are reliably re-patched in the background.
-- **Control Center Shortcuts Tab Fix**: Made `Shortcuts` tab switching synchronous before async diagnostics loading and added `ev.code` fallback + `Escape` cancel for key recording.
-- **Native UI Visual Alignment**: Aligned `#ag-enhancer-control-center` backdrop, border-radius (`12px`), `#0B0B0E` / `#111217` / `#181A22` / `#CAD3F5` / `#A0A3F6` surfaces, close button, and `-webkit-app-region: no-drag` rules 100% with the native Antigravity & Hub UI.
+- **Zero-Flash Auto-Repatch Launcher**: Switched `AntigravityEnhancerAutoRepatch` scheduled task to invoke `wscript.exe //B //Nologo auto-repatch.vbs` (`SW_HIDE` GUI host), eliminating the brief PowerShell console window flash every 5 minutes.
 
 ---
 
@@ -13,71 +11,55 @@
 <details>
 <summary>한국어</summary>
 
-- **자동 재패치 스케줄러 수정**: Windows `schtasks.exe /TR` 261자 길이 제한으로 등록이 누락되던 문제를 `auto-repatch.ps1` 래퍼(5분 주기) 방식으로 해결해 Antigravity 업데이트 후 백그라운드 자동 재패치가 안정적으로 동작하도록 수정했습니다.
-- **Control Center 단축키 탭 수정**: `단축키 · 진단` 탭 전환이 비동기 상태 조회를 기다리지 않고 즉시 전환되도록 수정하고, 키 입력 녹화에 `ev.code` 폴백 및 `ESC` 취소 처리를 추가했습니다.
-- **네이티브 UI 색상/디자인 통일**: Control Center 모달의 배경·카드(`#0B0B0E` / `#111217` / `#181A22`), 포인트(`#A0A3F6`), 닫기 버튼 및 `no-drag` 속성을 네이티브/허브 UI와 100% 일치시켰습니다.
+- **자동 재패치 콘솔 창 깜빡임 제거**: `AntigravityEnhancerAutoRepatch` 작업 스케줄러가 콘솔 창을 생성하지 않는 GUI 호스트(`wscript.exe //B //Nologo auto-repatch.vbs`, `SW_HIDE`)를 통해 실행되도록 개선해 5분마다 창이 잠깐 뜨는 현상을 완전히 제거했습니다.
 
 </details>
 
 <details>
 <summary>日本語</summary>
 
-- **自動再パッチスケジューラ修正**: `schtasks.exe /TR` の 261 文字制限を回避する `auto-repatch.ps1` ラッパー（5分間隔）へ変更し、アップデート後の自動再パッチを確実に動作させました。
-- **Control Center ショートカットタブ修正**: タブ切替を同期化し、キー記録に `ev.code` フォールバックと `ESC` キャンセルを追加しました。
-- **ネイティブ UI デザイン統一**: Control Center の配色（`#0B0B0E` / `#111217` / `#181A22` / `#A0A3F6`）・角丸・`no-drag` をネイティブ UI と完全一致させました。
+- **自動再パッチのウィンドウ点滅を解消**: `AntigravityEnhancerAutoRepatch` を `wscript.exe //B //Nologo auto-repatch.vbs`（`SW_HIDE`）経由で起動するように変更し、コンソールウィンドウの一瞬の表示を完全に無くしました。
 
 </details>
 
 <details>
 <summary>简体中文</summary>
 
-- **修复自动重打补丁计划任务**：改用 `auto-repatch.ps1` 包装脚本（每 5 分钟检查）绕过 `schtasks.exe /TR` 261 字符限制，确保 Antigravity 更新后可自动重新应用补丁。
-- **修复 Control Center 快捷键标签页**：切换标签页改为立即同步渲染，并为按键录制增加 `ev.code` 回退与 `ESC` 取消。
-- **统一原生 UI 视觉风格**：将 Control Center 的背景、卡片色值（`#0B0B0E` / `#111217` / `#181A22` / `#A0A3F6`）、圆角与 `no-drag` 与原生界面完全对齐。
+- **消除自动重打补丁弹窗闪烁**：将 `AntigravityEnhancerAutoRepatch` 计划任务改为通过 `wscript.exe //B //Nologo auto-repatch.vbs`（`SW_HIDE`）静默启动，彻底消除控制台窗口短暂闪现。
 
 </details>
 
 <details>
 <summary>繁體中文</summary>
 
-- **修正自動重打修補排程**：改用 `auto-repatch.ps1` 包裝腳本（每 5 分鐘檢查）避開 `schtasks.exe /TR` 261 字元限制，確保 Antigravity 更新後可自動重新套用修補。
-- **修正 Control Center 快捷鍵分頁**：切換分頁改為立即同步渲染，並為按鍵錄製新增 `ev.code` 回退與 `ESC` 取消。
-- **統一原生 UI 視覺風格**：將 Control Center 的背景、卡片色票（`#0B0B0E` / `#111217` / `#181A22` / `#A0A3F6`）、圓角與 `no-drag` 與原生介面完全對齊。
+- **消除自動重打修補視窗閃爍**：將 `AntigravityEnhancerAutoRepatch` 排程改為透過 `wscript.exe //B //Nologo auto-repatch.vbs`（`SW_HIDE`）靜默啟動，徹底消除主控台視窗短暫閃現。
 
 </details>
 
 <details>
 <summary>Español</summary>
 
-- **Corrección de re-parcheo automático**: Se reemplazó el comando `schtasks.exe /TR` (>261 caracteres) por `auto-repatch.ps1` cada 5 minutos.
-- **Corrección de pestaña Atajos**: Cambio síncrono de pestaña, respaldo `ev.code` y cancelación con `ESC`.
-- **Alineación visual nativa 100%**: Paleta `#0B0B0E` / `#111217` / `#181A22` / `#A0A3F6` y `no-drag` unificados con la UI nativa.
+- **Ejecución silenciosa sin parpadeo**: Se cambió la tarea `AntigravityEnhancerAutoRepatch` a `wscript.exe //B //Nologo auto-repatch.vbs` (`SW_HIDE`) para eliminar el destello de la ventana de consola.
 
 </details>
 
 <details>
 <summary>Français</summary>
 
-- **Correctif d'auto-repatch** : Passage à un script `auto-repatch.ps1` (toutes les 5 min) sous la limite des 261 caractères de `schtasks.exe /TR`.
-- **Correctif onglet Raccourcis** : Bascule synchrone de l'onglet, repli `ev.code` et annulation `Échap`.
-- **Alignement visuel natif 100 %** : Palette `#0B0B0E` / `#111217` / `#181A22` / `#A0A3F6` et `no-drag` alignés sur l'interface native.
+- **Lancement silencieux sans flash** : Passage de la tâche `AntigravityEnhancerAutoRepatch` à `wscript.exe //B //Nologo auto-repatch.vbs` (`SW_HIDE`) pour supprimer l'apparition éclair de la console.
 
 </details>
 
 <details>
 <summary>Deutsch</summary>
 
-- **Auto-Repatch-Fix**: Wechsel auf ein `auto-repatch.ps1`-Skript (alle 5 Min.) unterhalb des 261-Zeichen-Limits von `schtasks.exe /TR`.
-- **Shortcuts-Tab-Fix**: Synchroner Tab-Wechsel, `ev.code`-Fallback und `ESC`-Abbruch.
-- **100 % Natives UI-Design**: Einheitliche `#0B0B0E` / `#111217` / `#181A22` / `#A0A3F6`-Palette und `no-drag`-Regeln.
+- **Flackerfreier Auto-Repatch**: `AntigravityEnhancerAutoRepatch` startet nun über `wscript.exe //B //Nologo auto-repatch.vbs` (`SW_HIDE`) ohne kurzes Aufblitzen eines Konsolenfensters.
 
 </details>
 
 <details>
 <summary>Русский</summary>
 
-- **Исправление авто-перепатча**: Переход на обёртку `auto-repatch.ps1` (каждые 5 мин) в пределах лимита 261 символа `schtasks.exe /TR`.
-- **Исправление вкладки горячих клавиш**: Синхронное переключение вкладки, резервный `ev.code` и отмена по `ESC`.
-- **100% соответствие нативному UI**: Палитра `#0B0B0E` / `#111217` / `#181A22` / `#A0A3F6` и `no-drag` приведены к нативному виду.
+- **Тихий запуск без мерцания окна**: Задача `AntigravityEnhancerAutoRepatch` теперь запускается через `wscript.exe //B //Nologo auto-repatch.vbs` (`SW_HIDE`), полностью устраняя кратковременное появление окна консоли.
 
 </details>
