@@ -1,5 +1,5 @@
 /**
- * Antigravity Enhancer v4.0.1 - Main Process Bridge, Persistence & Secure In-App Updater
+ * Antigravity Enhancer v4.0.2 - Main Process Bridge, Persistence & Secure In-App Updater
  * Source Repo: https://github.com/x2tora/antigravity-enhancer
  */
 'use strict';
@@ -480,7 +480,7 @@ function loadBootstrapPayload(forceRefresh = false, langId = null) {
 
       cachedBootstrapPayload = {
         disabled: false,
-        version: manifest.version || '4.0.1',
+        version: manifest.version || '4.0.2',
         repo: ENHANCER_REPO,
         code: rendererCode,
         gsapCode,
@@ -526,7 +526,7 @@ function getFullStatus() {
   } catch (_) {}
 
   return {
-    enhancerVersion: manifest.version || '4.0.1',
+    enhancerVersion: manifest.version || '4.0.2',
     appVersion: (el && el.app && el.app.getVersion) ? el.app.getVersion() : 'unknown',
     repo: ENHANCER_REPO,
     enhancerDir,
@@ -683,7 +683,7 @@ async function checkRemoteUpdate() {
 
 async function applyInAppUpdate(refBranch = 'main') {
   const local = getLocalManifest();
-  const prevVersion = local.version || '4.0.1';
+  const prevVersion = local.version || '4.0.2';
 
   broadcastEvent('enhancer:update-progress', { phase: 'manifest', percent: 8, message: 'Fetching signed manifest...' });
   const manifestUrl = `https://raw.githubusercontent.com/${ENHANCER_REPO}/${encodeURIComponent(refBranch)}/enhancer/manifest.json?t=${Date.now()}`;

@@ -1,26 +1,26 @@
 {
-  "version": "4.0.1",
+  "version": "4.0.2",
   "channel": "stable",
   "minAppVersion": "2.30.0",
   "testedAppVersion": "2.34.0",
   "repo": "x2tora/antigravity-enhancer",
-  "updatedAt": "2026-11-22T19:37:59.382Z",
-  "releaseNotes": "- **Full 9-Language Font Support**: Added per-language typography stacks and webfont stylesheets (`Pretendard Variable`, `Pretendard JP Variable`, `Noto Sans SC`, `Noto Sans TC`, `Noto Sans`) with native OS fallbacks across all 9 supported languages.\n- **Centered Modal Positioning**: Centered the Patch Settings modal vertically relative to its max height (`min(86vh, 680px)`) while keeping the top edge anchored.\n- **Installer Logo & Discord Webhook Refresh**: Updated installer icons (`icon.png` / `icon.ico`) to match `antigravity.xitora.cc`, and updated Discord release notifications with `AntigravityEnhancer` profile branding and a release download button.",
+  "updatedAt": "2026-11-22T21:05:11.366Z",
+  "releaseNotes": "- **Expanded Static UI & Dynamic Pattern Translations**: Added 34 static UI translations (251 entries across 8 languages) for Orchestrator Settings, Interface Layout, Feedback, Viewer headers, and color pickers, plus 72 dynamic regex rules for shortcut `aria-label`s, active conversation counts, token counters, and feedback account prompts.\n- **Stronger Untranslated Collector Filtering**: Filtered out emails, trailing-slash folder names, CSS size units, standalone key names, `Side Question:` titles, model names, split markdown/changelog fragments, and versioned agent logs.",
   "releaseNotesI18n": {
-    "en": "- **Full 9-Language Font Support**: Added per-language typography stacks and webfont stylesheets (`Pretendard Variable`, `Pretendard JP Variable`, `Noto Sans SC`, `Noto Sans TC`, `Noto Sans`) with native OS fallbacks across all 9 supported languages.\n- **Centered Modal Positioning**: Centered the Patch Settings modal vertically relative to its max height (`min(86vh, 680px)`) while keeping the top edge anchored.\n- **Installer Logo & Discord Webhook Refresh**: Updated installer icons (`icon.png` / `icon.ico`) to match `antigravity.xitora.cc`, and updated Discord release notifications with `AntigravityEnhancer` profile branding and a release download button.",
-    "ko": "- **모든 지원 언어(9개국어) 전용 폰트 추가**: 한국어(`Pretendard Variable`), 일본어(`Pretendard JP Variable`), 중국어 간체/번체(`Noto Sans SC` / `TC`), 러시아어·유럽어(`Noto Sans` / `Pretendard`) 웹폰트 및 OS 기본 폴백 스택을 언어별로 최적화해 한·중·일 글꼴 혼용 없이 깔끔하게 표시됩니다.\n- **패치 설정 화면 정중앙 배치 (상단 고정 유지)**: 최대 크기(`min(86vh, 680px)`) 기준으로 화면 정중앙에 오도록 상단 여백을 조정하면서, 높이 변화 시 상단 위치는 흔들리지 않도록 유지했습니다.\n- **인스톨러 로고 교체 및 디스코드 알림 개선**: 인스톨러 아이콘을 웹페이지(`antigravity.xitora.cc`) 로고로 교체하고, 디스코드 릴리스 알림에 `AntigravityEnhancer` 프로필·로고·다운로드 버튼을 적용했습니다.",
-    "ja": "- **全9言語対応フォントを追加**: 日本語（`Pretendard JP Variable`）、韓国語（`Pretendard Variable`）、簡体字/繁体字中国語（`Noto Sans SC/TC`）、ロシア語・欧州言語（`Noto Sans`）の Web フォントと OS フォールバックを言語別に最適化しました。\n- **設定モーダルの中央配置とロゴ刷新**: 最大高さ基準で画面中央に配置（上端固定を維持）し、インストーラーアイコンを `antigravity.xitora.cc` ロゴへ更新しました。",
-    "zh-CN": "- **新增全9种语言专属字体**：为简体中文（`Noto Sans SC`）、繁体中文（`Noto Sans TC`）、日语（`Pretendard JP Variable`）、韩语（`Pretendard Variable`）及俄语/欧洲语言（`Noto Sans`）提供对应网页字体与系统回退字体。\n- **居中弹窗布局与图标更新**：按最大高度居中显示设置弹窗（保持顶部固定），并更换为网页版新图标。",
-    "zh-TW": "- **新增全9種語言專屬字體**：為繁體中文（`Noto Sans TC`）、簡體中文（`Noto Sans SC`）、日語（`Pretendard JP Variable`）、韓語（`Pretendard Variable`）及俄語/歐洲語言（`Noto Sans`）提供專屬網頁字體與系統備援字體。\n- **置中視窗版面與圖示更新**：依最大高度置中顯示設定視窗（維持頂部固定），並更換為網頁版新圖示。",
-    "es": "- **Fuentes para los 9 idiomas**: Se añadieron pilas tipográficas y fuentes web (`Pretendard Variable`, `Pretendard JP Variable`, `Noto Sans SC/TC`, `Noto Sans`) para todos los idiomas.\n- **Modal centrado y nuevo logotipo**: Se centró el modal según su altura máxima manteniendo fija la parte superior, y se actualizó el icono del instalador.",
-    "fr": "- **Polices pour les 9 langues** : Ajout de polices web (`Pretendard Variable`, `Pretendard JP Variable`, `Noto Sans SC/TC`, `Noto Sans`) et de polices système adaptées à chaque langue.\n- **Centrage du panneau et nouveau logo** : Centrage vertical basé sur la hauteur maximale tout en gardant le haut fixe, et mise à jour de l’icône de l’installeur.",
-    "de": "- **Schriftarten für alle 9 Sprachen**: Sprachspezifische Webfonts (`Pretendard Variable`, `Pretendard JP Variable`, `Noto Sans SC/TC`, `Noto Sans`) und System-Fallbacks ergänzt.\n- **Zentriertes Modal & neues Logo**: Vertikale Zentrierung bei maximaler Höhe mit fester Oberkante sowie aktualisiertes Installer-Symbol.",
-    "ru": "- **Шрифты для всех 9 языков**: Добавлены веб-шрифты (`Pretendard Variable`, `Pretendard JP Variable`, `Noto Sans SC/TC`, `Noto Sans`) и системные фолбэки, включая полную поддержку кириллицы.\n- **Центрирование окна и новый логотип**: Вертикальное центрирование по максимальной высоте с фиксацией верхнего края и обновлённая иконка установщика."
+    "en": "- **Expanded Static UI & Dynamic Pattern Translations**: Added 34 static UI translations (251 entries across 8 languages) for Orchestrator Settings, Interface Layout, Feedback, Viewer headers, and color pickers, plus 72 dynamic regex rules for shortcut `aria-label`s, active conversation counts, token counters, and feedback account prompts.\n- **Stronger Untranslated Collector Filtering**: Filtered out emails, trailing-slash folder names, CSS size units, standalone key names, `Side Question:` titles, model names, split markdown/changelog fragments, and versioned agent logs.",
+    "ko": "- **신규 UI 및 동적 패턴 번역 대폭 추가**: 오케스트레이터 설정, 인터페이스 레이아웃, 피드백 보내기, 뷰어 헤더, 색상 선택기 등 정적 UI 34종(8개국어 251개 항목)과 단축키 안내·활성 대화 수·토큰 카운터 등 동적 규칙 9종(72개 규칙)을 추가했습니다.\n- **미번역 수집 필터 고도화**: 이메일, 폴더 경로(`project_11/`), 크기 단위(`14px`), 단독 키 이름, `Side Question:` 제목, 모델명, 깨진 마크다운/변경 로그 조각을 자동으로 걸러냅니다.",
+    "ja": "- **新規 UI・動的パターン翻訳を追加**: オーケストレーター設定、インターフェースレイアウト、フィードバック、ビューアーヘッダー等の静的 UI 34種と、ショートカット説明・会話数・トークン表示の動的ルール 72件を追加しました。\n- **未翻訳収集フィルター強化**: メールアドレス、フォルダ名、サイズ単位、モデル名、分割された Markdown 断片を除外します。",
+    "zh-CN": "- **新增界面与动态规则翻译**：新增 34 项静态界面翻译（251 条多语言词条）及 72 条快捷键描述、活跃对话数与令牌计数动态规则。\n- **强化未翻译收集过滤**：自动过滤邮箱、文件夹路径、尺寸单位、模型名与残缺 Markdown 片段。",
+    "zh-TW": "- **新增介面與動態規則翻譯**：新增 34 項靜態介面翻譯（251 筆多語言詞條）及 72 條快速鍵說明、進行中對話數與權杖計數動態規則。\n- **強化未翻譯收集過濾**：自動過濾電子郵件、資料夾路徑、尺寸單位、模型名稱與殘缺 Markdown 片段。",
+    "es": "- **Más traducciones de interfaz y reglas dinámicas**: 34 cadenas estáticas nuevas (251 entradas en 8 idiomas) y 72 reglas dinámicas para atajos, conversaciones activas y contadores de tokens.\n- **Filtrado mejorado**: Se excluyen correos, rutas de carpetas, unidades CSS, nombres de modelo y fragmentos Markdown.",
+    "fr": "- **Traductions UI et règles dynamiques étendues** : 34 libellés statiques (251 entrées sur 8 langues) et 72 règles dynamiques pour raccourcis, conversations actives et compteurs de jetons.\n- **Filtrage renforcé** : Exclusion des e-mails, dossiers, unités CSS, noms de modèle et fragments Markdown.",
+    "de": "- **Erweiterte UI- & Dynamik-Übersetzungen**: 34 statische UI-Texte (251 Einträge in 8 Sprachen) sowie 72 dynamische Regeln für Kürzel, aktive Unterhaltungen und Token-Zähler.\n- **Verbesserter Filter**: Filtert E-Mails, Ordnernamen, CSS-Einheiten, Modellnamen und Markdown-Fragmente heraus.",
+    "ru": "- **Расширенные переводы UI и динамические правила**: Добавлено 34 статических строки (251 запись на 8 языках) и 72 динамических правила для сочетаний клавиш, счётчиков бесед и токенов.\n- **Улучшенная фильтрация**: Исключены email-адреса, папки, единицы CSS, названия моделей и обрывки Markdown."
   },
   "files": {
     "main-enhancer.js": {
       "size": 36510,
-      "sha256": "b3a1250c355341125b44536a6cd27cf622bf096d005eb79fea507cd1881d4601",
+      "sha256": "1b22704dc82d72a75c90f01c5694936c30f0c445c3a74c6ed86c485b509e13a2",
       "restartRequired": true
     },
     "asar-patcher.js": {
@@ -29,8 +29,8 @@
       "restartRequired": true
     },
     "renderer-enhancer.js": {
-      "size": 192001,
-      "sha256": "d1f8f58b3d8bd8835b014677869494df9248e5494dccc3e94fcb6ad90c4a2b1e",
+      "size": 192973,
+      "sha256": "f232c5e5e0bd85acd48fbac5ece01bbc58295b492a76a1fb36c1e72b0f6356e7",
       "restartRequired": false
     },
     "gsap-core.js": {
@@ -39,8 +39,8 @@
       "restartRequired": false
     },
     "dictionaries.json": {
-      "size": 3766072,
-      "sha256": "da667259a796df1295f1fc26e6c0f3de3b7c4f4223275717f28dd2a8d828d13e",
+      "size": 3790004,
+      "sha256": "7087b452ca08118a800781da5935796280e498f1b084f93c5104f335c4ff87d9",
       "restartRequired": false
     },
     "auto-repatch.js": {
@@ -49,8 +49,8 @@
       "restartRequired": false
     },
     "CHANGELOG.md": {
-      "size": 4503,
-      "sha256": "e03577cb0c1b64c9fe89c640db6fda6a37db76ac4ceefc012cd3ef2c975ad441",
+      "size": 5372,
+      "sha256": "629263ca66bacb8e611e26cf031b8942c71641b24c2d4eb23308fb0dc3a6612a",
       "restartRequired": false
     }
   }

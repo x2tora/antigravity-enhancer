@@ -3532,7 +3532,41 @@
     "Move Up": "위로 이동",
     "Move Down": "아래로 이동",
     "Delete Group": "그룹 삭제",
-    "Reveal in File Explorer": "파일 탐색기에서 보기"
+    "Reveal in File Explorer": "파일 탐색기에서 보기",
+    "Side Question header": "보조 질문 헤더",
+    "File Viewer header": "파일 뷰어 헤더",
+    "Raw": "원본",
+    "Give Feedback": "피드백 보내기",
+    "Edit project name": "프로젝트 이름 편집",
+    "Interface Layout": "인터페이스 레이아웃",
+    "Knowledge Work": "지식 작업",
+    "Software Engineering": "소프트웨어 엔지니어링",
+    "Input Box": "입력 상자",
+    "System": "시스템",
+    "Light": "라이트",
+    "Dark": "다크",
+    "Strong": "강하게",
+    "System UI": "시스템 UI",
+    "Background color picker": "배경 색상 선택기",
+    "Foreground color picker": "전경 색상 선택기",
+    "Accent color picker": "강조 색상 선택기",
+    "Reset to preset": "프리셋으로 초기화",
+    "No token data available.": "사용 가능한 토큰 데이터가 없습니다.",
+    "Loading workspace customizations...": "워크스페이스 사용자 지정 항목 불러오는 중...",
+    "Change…": "변경…",
+    "Attach a screenshot (optional)": "스크린샷 첨부 (선택 사항)",
+    "Visit": "방문",
+    "Legal Help": "법적 도움말",
+    "Submit Prompt (Alternate to Enter)": "프롬프트 전송 (Enter 대체)",
+    "Side Question Selection": "선택 영역 보조 질문",
+    "Terminal: Select All": "터미널: 모두 선택",
+    "Orchestrator Settings": "오케스트레이터 설정",
+    "Orchestrator Model": "오케스트레이터 모델",
+    "Extra High": "매우 높음",
+    "Executor Model": "실행기 모델",
+    "Loading token usage...": "토큰 사용량 불러오는 중...",
+    "Other Customizations": "기타 사용자 지정",
+    "Settings for conversations outside of projects.": "프로젝트 외부 대화에 대한 설정입니다."
   },
   "translations": {
     "ja": {
@@ -6743,7 +6777,38 @@
       "Move Up": "上へ移動",
       "Move Down": "下へ移動",
       "Delete Group": "グループを削除",
-      "Reveal in File Explorer": "エクスプローラーで表示"
+      "Reveal in File Explorer": "エクスプローラーで表示",
+      "Side Question header": "サイド質問ヘッダー",
+      "File Viewer header": "ファイルビューアーヘッダー",
+      "Raw": "Raw",
+      "Give Feedback": "フィードバックを送信",
+      "Edit project name": "プロジェクト名を編集",
+      "Interface Layout": "インターフェースレイアウト",
+      "Knowledge Work": "ナレッジワーク",
+      "Software Engineering": "ソフトウェアエンジニアリング",
+      "Input Box": "入力ボックス",
+      "Strong": "強調",
+      "System UI": "システム UI",
+      "Background color picker": "背景色ピッカー",
+      "Foreground color picker": "前景色ピッカー",
+      "Accent color picker": "アクセントカラーピッカー",
+      "Reset to preset": "プリセットにリセット",
+      "No token data available.": "利用可能なトークンデータがありません。",
+      "Loading workspace customizations...": "ワークスペースのカスタマイズを読み込み中...",
+      "Change…": "変更…",
+      "Attach a screenshot (optional)": "スクリーンショットを添付（任意）",
+      "Visit": "アクセス",
+      "Legal Help": "法的ヘルプ",
+      "Submit Prompt (Alternate to Enter)": "プロンプトを送信（Enter の代替）",
+      "Side Question Selection": "選択範囲のサイド質問",
+      "Terminal: Select All": "ターミナル: すべて選択",
+      "Orchestrator Settings": "オーケストレーター設定",
+      "Orchestrator Model": "オーケストレーターモデル",
+      "Extra High": "最高",
+      "Executor Model": "エグゼキューターモデル",
+      "Loading token usage...": "トークン使用量を読み込み中...",
+      "Other Customizations": "その他のカスタマイズ",
+      "Settings for conversations outside of projects.": "プロジェクト外の会話に関する設定です。"
     },
     "zh-CN": {
       "Pinned Conversations": "置顶对话",
@@ -9953,7 +10018,38 @@
       "Move Up": "上移",
       "Move Down": "下移",
       "Delete Group": "删除分组",
-      "Reveal in File Explorer": "在文件资源管理器中显示"
+      "Reveal in File Explorer": "在文件资源管理器中显示",
+      "Side Question header": "侧边提问标题栏",
+      "File Viewer header": "文件查看器标题栏",
+      "Raw": "原始",
+      "Give Feedback": "提供反馈",
+      "Edit project name": "编辑项目名称",
+      "Interface Layout": "界面布局",
+      "Knowledge Work": "知识工作",
+      "Software Engineering": "软件工程",
+      "Input Box": "输入框",
+      "Strong": "强烈",
+      "System UI": "系统 UI",
+      "Background color picker": "背景颜色选择器",
+      "Foreground color picker": "前景色选择器",
+      "Accent color picker": "强调色选择器",
+      "Reset to preset": "重置为预设",
+      "No token data available.": "没有可用的令牌数据。",
+      "Loading workspace customizations...": "正在加载工作区自定义项...",
+      "Change…": "更改…",
+      "Attach a screenshot (optional)": "附加截图（可选）",
+      "Visit": "访问",
+      "Legal Help": "法律帮助",
+      "Submit Prompt (Alternate to Enter)": "提交提示词（替代 Enter）",
+      "Side Question Selection": "选区侧边提问",
+      "Terminal: Select All": "终端：全选",
+      "Orchestrator Settings": "编排器设置",
+      "Orchestrator Model": "编排器模型",
+      "Extra High": "超高",
+      "Executor Model": "执行器模型",
+      "Loading token usage...": "正在加载令牌用量...",
+      "Other Customizations": "其他自定义",
+      "Settings for conversations outside of projects.": "项目外对话的设置。"
     },
     "zh-TW": {
       "Send feedback as ": "發送回饋為",
@@ -13163,7 +13259,38 @@
       "Move Up": "上移",
       "Move Down": "下移",
       "Delete Group": "刪除群組",
-      "Reveal in File Explorer": "在檔案總管中顯示"
+      "Reveal in File Explorer": "在檔案總管中顯示",
+      "Side Question header": "側邊提問標題列",
+      "File Viewer header": "檔案檢視器標題列",
+      "Raw": "原始",
+      "Give Feedback": "提供意見",
+      "Edit project name": "編輯專案名稱",
+      "Interface Layout": "介面版面配置",
+      "Knowledge Work": "知識工作",
+      "Software Engineering": "軟體工程",
+      "Input Box": "輸入框",
+      "Strong": "強烈",
+      "System UI": "系統 UI",
+      "Background color picker": "背景色彩選擇器",
+      "Foreground color picker": "前景色選擇器",
+      "Accent color picker": "強調色選擇器",
+      "Reset to preset": "重設為預設",
+      "No token data available.": "沒有可用的權杖資料。",
+      "Loading workspace customizations...": "正在載入工作區自訂項目...",
+      "Change…": "變更…",
+      "Attach a screenshot (optional)": "附加螢幕截圖（選填）",
+      "Visit": "造訪",
+      "Legal Help": "法律協助",
+      "Submit Prompt (Alternate to Enter)": "提交提示詞（替代 Enter）",
+      "Side Question Selection": "選取範圍側邊提問",
+      "Terminal: Select All": "終端機：全選",
+      "Orchestrator Settings": "編排器設定",
+      "Orchestrator Model": "編排器模型",
+      "Extra High": "極高",
+      "Executor Model": "執行器模型",
+      "Loading token usage...": "正在載入權杖用量...",
+      "Other Customizations": "其他自訂項目",
+      "Settings for conversations outside of projects.": "專案外對話的設定。"
     },
     "es": {
       "Updater": "Actualizador",
@@ -16373,7 +16500,38 @@
       "Move Up": "Subir",
       "Move Down": "Bajar",
       "Delete Group": "Eliminar grupo",
-      "Reveal in File Explorer": "Mostrar en el Explorador de archivos"
+      "Reveal in File Explorer": "Mostrar en el Explorador de archivos",
+      "Side Question header": "Encabezado de pregunta lateral",
+      "File Viewer header": "Encabezado del visor de archivos",
+      "Raw": "Sin formato",
+      "Give Feedback": "Enviar comentarios",
+      "Edit project name": "Editar nombre del proyecto",
+      "Interface Layout": "Diseño de interfaz",
+      "Knowledge Work": "Trabajo de conocimiento",
+      "Software Engineering": "Ingeniería de software",
+      "Input Box": "Cuadro de entrada",
+      "Strong": "Fuerte",
+      "System UI": "IU del sistema",
+      "Background color picker": "Selector de color de fondo",
+      "Foreground color picker": "Selector de color de primer plano",
+      "Accent color picker": "Selector de color de acento",
+      "Reset to preset": "Restablecer al preajuste",
+      "No token data available.": "No hay datos de tokens disponibles.",
+      "Loading workspace customizations...": "Cargando personalizaciones del espacio de trabajo...",
+      "Change…": "Cambiar…",
+      "Attach a screenshot (optional)": "Adjuntar una captura de pantalla (opcional)",
+      "Visit": "Visitar",
+      "Legal Help": "Ayuda legal",
+      "Submit Prompt (Alternate to Enter)": "Enviar prompt (alternativa a Enter)",
+      "Side Question Selection": "Pregunta lateral de selección",
+      "Terminal: Select All": "Terminal: Seleccionar todo",
+      "Orchestrator Settings": "Ajustes del orquestador",
+      "Orchestrator Model": "Modelo del orquestador",
+      "Extra High": "Extra alto",
+      "Executor Model": "Modelo ejecutor",
+      "Loading token usage...": "Cargando uso de tokens...",
+      "Other Customizations": "Otras personalizaciones",
+      "Settings for conversations outside of projects.": "Ajustes para conversaciones fuera de proyectos."
     },
     "fr": {
       "Send feedback as ": "Envoyez vos commentaires en tant que",
@@ -19583,7 +19741,38 @@
       "Move Up": "Monter",
       "Move Down": "Descendre",
       "Delete Group": "Supprimer le groupe",
-      "Reveal in File Explorer": "Afficher dans l’Explorateur de fichiers"
+      "Reveal in File Explorer": "Afficher dans l’Explorateur de fichiers",
+      "Side Question header": "En-tête de question latérale",
+      "File Viewer header": "En-tête du visualiseur de fichiers",
+      "Raw": "Brut",
+      "Give Feedback": "Donner un avis",
+      "Edit project name": "Modifier le nom du projet",
+      "Interface Layout": "Disposition de l’interface",
+      "Knowledge Work": "Travail intellectuel",
+      "Software Engineering": "Génie logiciel",
+      "Input Box": "Zone de saisie",
+      "Strong": "Fort",
+      "System UI": "Interface système",
+      "Background color picker": "Sélecteur de couleur d’arrière-plan",
+      "Foreground color picker": "Sélecteur de couleur de premier plan",
+      "Accent color picker": "Sélecteur de couleur d’accent",
+      "Reset to preset": "Réinitialiser au préréglage",
+      "No token data available.": "Aucune donnée de jeton disponible.",
+      "Loading workspace customizations...": "Chargement des personnalisations de l’espace de travail...",
+      "Change…": "Modifier…",
+      "Attach a screenshot (optional)": "Joindre une capture d’écran (facultatif)",
+      "Visit": "Visiter",
+      "Legal Help": "Aide juridique",
+      "Submit Prompt (Alternate to Enter)": "Envoyer l’invite (alternative à Entrée)",
+      "Side Question Selection": "Question latérale sur la sélection",
+      "Terminal: Select All": "Terminal : Tout sélectionner",
+      "Orchestrator Settings": "Paramètres de l’orchestrateur",
+      "Orchestrator Model": "Modèle de l’orchestrateur",
+      "Extra High": "Très élevé",
+      "Executor Model": "Modèle exécuteur",
+      "Loading token usage...": "Chargement de la consommation de jetons...",
+      "Other Customizations": "Autres personnalisations",
+      "Settings for conversations outside of projects.": "Paramètres pour les conversations hors projets."
     },
     "de": {
       "Remove individual uploaded files or connected resources in Project Settings, or delete a project or conversation to remove its stored files.": "Entfernen Sie einzelne hochgeladene Dateien oder verbundene Ressourcen in den Projekteinstellungen oder löschen Sie ein Projekt oder eine Konversation, um die darin gespeicherten Dateien zu entfernen.",
@@ -22793,7 +22982,38 @@
       "Move Up": "Nach oben",
       "Move Down": "Nach unten",
       "Delete Group": "Gruppe löschen",
-      "Reveal in File Explorer": "Im Datei-Explorer anzeigen"
+      "Reveal in File Explorer": "Im Datei-Explorer anzeigen",
+      "Side Question header": "Kopfzeile der Nebenfrage",
+      "File Viewer header": "Kopfzeile des Dateiviewers",
+      "Raw": "Roh",
+      "Give Feedback": "Feedback geben",
+      "Edit project name": "Projektnamen bearbeiten",
+      "Interface Layout": "Oberflächenlayout",
+      "Knowledge Work": "Wissensarbeit",
+      "Software Engineering": "Softwareentwicklung",
+      "Input Box": "Eingabefeld",
+      "Strong": "Stark",
+      "System UI": "System-UI",
+      "Background color picker": "Hintergrundfarbwähler",
+      "Foreground color picker": "Vordergrundfarbwähler",
+      "Accent color picker": "Akzentfarbwähler",
+      "Reset to preset": "Auf Voreinstellung zurücksetzen",
+      "No token data available.": "Keine Token-Daten verfügbar.",
+      "Loading workspace customizations...": "Arbeitsbereichsanpassungen werden geladen...",
+      "Change…": "Ändern…",
+      "Attach a screenshot (optional)": "Screenshot anhängen (optional)",
+      "Visit": "Besuchen",
+      "Legal Help": "Rechtliche Hilfe",
+      "Submit Prompt (Alternate to Enter)": "Prompt senden (Alternative zu Enter)",
+      "Side Question Selection": "Nebenfrage zur Auswahl",
+      "Terminal: Select All": "Terminal: Alles auswählen",
+      "Orchestrator Settings": "Orchestrator-Einstellungen",
+      "Orchestrator Model": "Orchestrator-Modell",
+      "Extra High": "Sehr hoch",
+      "Executor Model": "Executor-Modell",
+      "Loading token usage...": "Token-Nutzung wird geladen...",
+      "Other Customizations": "Weitere Anpassungen",
+      "Settings for conversations outside of projects.": "Einstellungen für Unterhaltungen außerhalb von Projekten."
     },
     "ru": {
       "Failed to stop agent": "Не удалось остановить агента",
@@ -26003,7 +26223,38 @@
       "Move Up": "Вверх",
       "Move Down": "Вниз",
       "Delete Group": "Удалить группу",
-      "Reveal in File Explorer": "Показать в проводнике"
+      "Reveal in File Explorer": "Показать в проводнике",
+      "Side Question header": "Заголовок бокового вопроса",
+      "File Viewer header": "Заголовок просмотрщика файлов",
+      "Raw": "Исходный",
+      "Give Feedback": "Оставить отзыв",
+      "Edit project name": "Изменить название проекта",
+      "Interface Layout": "Макет интерфейса",
+      "Knowledge Work": "Работа со знаниями",
+      "Software Engineering": "Разработка ПО",
+      "Input Box": "Поле ввода",
+      "Strong": "Сильный",
+      "System UI": "Системный UI",
+      "Background color picker": "Выбор цвета фона",
+      "Foreground color picker": "Выбор основного цвета",
+      "Accent color picker": "Выбор акцентного цвета",
+      "Reset to preset": "Сбросить к пресету",
+      "No token data available.": "Нет данных о токенах.",
+      "Loading workspace customizations...": "Загрузка настроек рабочей области...",
+      "Change…": "Изменить…",
+      "Attach a screenshot (optional)": "Прикрепить скриншот (необязательно)",
+      "Visit": "Перейти",
+      "Legal Help": "Юридическая справка",
+      "Submit Prompt (Alternate to Enter)": "Отправить запрос (вместо Enter)",
+      "Side Question Selection": "Боковой вопрос по выделению",
+      "Terminal: Select All": "Терминал: Выбрать всё",
+      "Orchestrator Settings": "Настройки оркестратора",
+      "Orchestrator Model": "Модель оркестратора",
+      "Extra High": "Очень высокий",
+      "Executor Model": "Модель исполнителя",
+      "Loading token usage...": "Загрузка расхода токенов...",
+      "Other Customizations": "Прочие настройки",
+      "Settings for conversations outside of projects.": "Настройки для бесед вне проектов."
     }
   },
   "fragmentRules": [
@@ -26789,6 +27040,51 @@
       "source": "^Turn (\\d+) of (\\d+)$",
       "flags": "i",
       "rep": "턴 $1 / $2"
+    },
+    {
+      "source": "^(\\d+)\\s+active conversations?$",
+      "flags": "i",
+      "rep": "활성 대화 $1개"
+    },
+    {
+      "source": "^Rules:\\s*([\\d,]+)\\s*tokens$",
+      "flags": "i",
+      "rep": "규칙: $1 토큰"
+    },
+    {
+      "source": "^Skills:\\s*([\\d,]+)\\s*tokens$",
+      "flags": "i",
+      "rep": "스킬: $1 토큰"
+    },
+    {
+      "source": "^Subagents:\\s*([\\d,]+)\\s*tokens$",
+      "flags": "i",
+      "rep": "서브에이전트: $1 토큰"
+    },
+    {
+      "source": "^Mcp Tools:\\s*([\\d,]+)\\s*tokens$",
+      "flags": "i",
+      "rep": "MCP 도구: $1 토큰"
+    },
+    {
+      "source": "^Send feedback as\\s+(.+)$",
+      "flags": "i",
+      "rep": "$1 계정으로 피드백 보내기"
+    },
+    {
+      "source": "^Shortcut\\s+(.+?)\\s+for\\s+(.+)$",
+      "flags": "i",
+      "rep": "$2 단축키: $1"
+    },
+    {
+      "source": "^Remove shortcut\\s+(.+?)\\s+for\\s+(.+)$",
+      "flags": "i",
+      "rep": "$2 단축키($1) 제거"
+    },
+    {
+      "source": "^Add shortcut for\\s+(.+)$",
+      "flags": "i",
+      "rep": "$1 단축키 추가"
     }
   ],
   "multiLangFragments": {
@@ -27228,6 +27524,51 @@
         "source": "^Turn (\\d+) of (\\d+)$",
         "flags": "i",
         "rep": "ターン $1 / $2"
+      },
+      {
+        "source": "^(\\d+)\\s+active conversations?$",
+        "flags": "i",
+        "rep": "アクティブな会話 $1件"
+      },
+      {
+        "source": "^Rules:\\s*([\\d,]+)\\s*tokens$",
+        "flags": "i",
+        "rep": "ルール: $1 トークン"
+      },
+      {
+        "source": "^Skills:\\s*([\\d,]+)\\s*tokens$",
+        "flags": "i",
+        "rep": "スキル: $1 トークン"
+      },
+      {
+        "source": "^Subagents:\\s*([\\d,]+)\\s*tokens$",
+        "flags": "i",
+        "rep": "サブエージェント: $1 トークン"
+      },
+      {
+        "source": "^Mcp Tools:\\s*([\\d,]+)\\s*tokens$",
+        "flags": "i",
+        "rep": "MCP ツール: $1 トークン"
+      },
+      {
+        "source": "^Send feedback as\\s+(.+)$",
+        "flags": "i",
+        "rep": "$1 としてフィードバックを送信"
+      },
+      {
+        "source": "^Shortcut\\s+(.+?)\\s+for\\s+(.+)$",
+        "flags": "i",
+        "rep": "$2 のショートカット: $1"
+      },
+      {
+        "source": "^Remove shortcut\\s+(.+?)\\s+for\\s+(.+)$",
+        "flags": "i",
+        "rep": "$2 のショートカット（$1）を削除"
+      },
+      {
+        "source": "^Add shortcut for\\s+(.+)$",
+        "flags": "i",
+        "rep": "$1 のショートカットを追加"
       }
     ],
     "zh-CN": [
@@ -27370,6 +27711,51 @@
         "source": "^Turn (\\d+) of (\\d+)$",
         "flags": "i",
         "rep": "第 $1 / $2 轮"
+      },
+      {
+        "source": "^(\\d+)\\s+active conversations?$",
+        "flags": "i",
+        "rep": "$1 个活跃对话"
+      },
+      {
+        "source": "^Rules:\\s*([\\d,]+)\\s*tokens$",
+        "flags": "i",
+        "rep": "规则：$1 tokens"
+      },
+      {
+        "source": "^Skills:\\s*([\\d,]+)\\s*tokens$",
+        "flags": "i",
+        "rep": "技能：$1 tokens"
+      },
+      {
+        "source": "^Subagents:\\s*([\\d,]+)\\s*tokens$",
+        "flags": "i",
+        "rep": "子代理：$1 tokens"
+      },
+      {
+        "source": "^Mcp Tools:\\s*([\\d,]+)\\s*tokens$",
+        "flags": "i",
+        "rep": "MCP 工具：$1 tokens"
+      },
+      {
+        "source": "^Send feedback as\\s+(.+)$",
+        "flags": "i",
+        "rep": "以 $1 身份发送反馈"
+      },
+      {
+        "source": "^Shortcut\\s+(.+?)\\s+for\\s+(.+)$",
+        "flags": "i",
+        "rep": "$2 快捷键：$1"
+      },
+      {
+        "source": "^Remove shortcut\\s+(.+?)\\s+for\\s+(.+)$",
+        "flags": "i",
+        "rep": "移除 $2 的快捷键（$1）"
+      },
+      {
+        "source": "^Add shortcut for\\s+(.+)$",
+        "flags": "i",
+        "rep": "为 $1 添加快捷键"
       }
     ],
     "zh-TW": [
@@ -27512,6 +27898,51 @@
         "source": "^Turn (\\d+) of (\\d+)$",
         "flags": "i",
         "rep": "第 $1 / $2 輪"
+      },
+      {
+        "source": "^(\\d+)\\s+active conversations?$",
+        "flags": "i",
+        "rep": "$1 個進行中對話"
+      },
+      {
+        "source": "^Rules:\\s*([\\d,]+)\\s*tokens$",
+        "flags": "i",
+        "rep": "規則：$1 tokens"
+      },
+      {
+        "source": "^Skills:\\s*([\\d,]+)\\s*tokens$",
+        "flags": "i",
+        "rep": "技能：$1 tokens"
+      },
+      {
+        "source": "^Subagents:\\s*([\\d,]+)\\s*tokens$",
+        "flags": "i",
+        "rep": "子代理：$1 tokens"
+      },
+      {
+        "source": "^Mcp Tools:\\s*([\\d,]+)\\s*tokens$",
+        "flags": "i",
+        "rep": "MCP 工具：$1 tokens"
+      },
+      {
+        "source": "^Send feedback as\\s+(.+)$",
+        "flags": "i",
+        "rep": "以 $1 身分傳送意見"
+      },
+      {
+        "source": "^Shortcut\\s+(.+?)\\s+for\\s+(.+)$",
+        "flags": "i",
+        "rep": "$2 快速鍵：$1"
+      },
+      {
+        "source": "^Remove shortcut\\s+(.+?)\\s+for\\s+(.+)$",
+        "flags": "i",
+        "rep": "移除 $2 的快速鍵（$1）"
+      },
+      {
+        "source": "^Add shortcut for\\s+(.+)$",
+        "flags": "i",
+        "rep": "為 $1 新增快速鍵"
       }
     ],
     "es": [
@@ -27649,6 +28080,51 @@
         "source": "^Turn (\\d+) of (\\d+)$",
         "flags": "i",
         "rep": "Turno $1 de $2"
+      },
+      {
+        "source": "^(\\d+)\\s+active conversations?$",
+        "flags": "i",
+        "rep": "$1 conversaciones activas"
+      },
+      {
+        "source": "^Rules:\\s*([\\d,]+)\\s*tokens$",
+        "flags": "i",
+        "rep": "Reglas: $1 tokens"
+      },
+      {
+        "source": "^Skills:\\s*([\\d,]+)\\s*tokens$",
+        "flags": "i",
+        "rep": "Habilidades: $1 tokens"
+      },
+      {
+        "source": "^Subagents:\\s*([\\d,]+)\\s*tokens$",
+        "flags": "i",
+        "rep": "Subagentes: $1 tokens"
+      },
+      {
+        "source": "^Mcp Tools:\\s*([\\d,]+)\\s*tokens$",
+        "flags": "i",
+        "rep": "Herramientas MCP: $1 tokens"
+      },
+      {
+        "source": "^Send feedback as\\s+(.+)$",
+        "flags": "i",
+        "rep": "Enviar comentarios como $1"
+      },
+      {
+        "source": "^Shortcut\\s+(.+?)\\s+for\\s+(.+)$",
+        "flags": "i",
+        "rep": "Atajo $1 para $2"
+      },
+      {
+        "source": "^Remove shortcut\\s+(.+?)\\s+for\\s+(.+)$",
+        "flags": "i",
+        "rep": "Quitar atajo $1 de $2"
+      },
+      {
+        "source": "^Add shortcut for\\s+(.+)$",
+        "flags": "i",
+        "rep": "Añadir atajo para $1"
       }
     ],
     "fr": [
@@ -27786,6 +28262,51 @@
         "source": "^Turn (\\d+) of (\\d+)$",
         "flags": "i",
         "rep": "Tour $1 sur $2"
+      },
+      {
+        "source": "^(\\d+)\\s+active conversations?$",
+        "flags": "i",
+        "rep": "$1 conversations actives"
+      },
+      {
+        "source": "^Rules:\\s*([\\d,]+)\\s*tokens$",
+        "flags": "i",
+        "rep": "Règles : $1 jetons"
+      },
+      {
+        "source": "^Skills:\\s*([\\d,]+)\\s*tokens$",
+        "flags": "i",
+        "rep": "Compétences : $1 jetons"
+      },
+      {
+        "source": "^Subagents:\\s*([\\d,]+)\\s*tokens$",
+        "flags": "i",
+        "rep": "Sous-agents : $1 jetons"
+      },
+      {
+        "source": "^Mcp Tools:\\s*([\\d,]+)\\s*tokens$",
+        "flags": "i",
+        "rep": "Outils MCP : $1 jetons"
+      },
+      {
+        "source": "^Send feedback as\\s+(.+)$",
+        "flags": "i",
+        "rep": "Envoyer un avis en tant que $1"
+      },
+      {
+        "source": "^Shortcut\\s+(.+?)\\s+for\\s+(.+)$",
+        "flags": "i",
+        "rep": "Raccourci $1 pour $2"
+      },
+      {
+        "source": "^Remove shortcut\\s+(.+?)\\s+for\\s+(.+)$",
+        "flags": "i",
+        "rep": "Supprimer le raccourci $1 pour $2"
+      },
+      {
+        "source": "^Add shortcut for\\s+(.+)$",
+        "flags": "i",
+        "rep": "Ajouter un raccourci pour $1"
       }
     ],
     "de": [
@@ -27923,6 +28444,51 @@
         "source": "^Turn (\\d+) of (\\d+)$",
         "flags": "i",
         "rep": "Zug $1 von $2"
+      },
+      {
+        "source": "^(\\d+)\\s+active conversations?$",
+        "flags": "i",
+        "rep": "$1 aktive Unterhaltungen"
+      },
+      {
+        "source": "^Rules:\\s*([\\d,]+)\\s*tokens$",
+        "flags": "i",
+        "rep": "Regeln: $1 Tokens"
+      },
+      {
+        "source": "^Skills:\\s*([\\d,]+)\\s*tokens$",
+        "flags": "i",
+        "rep": "Skills: $1 Tokens"
+      },
+      {
+        "source": "^Subagents:\\s*([\\d,]+)\\s*tokens$",
+        "flags": "i",
+        "rep": "Subagenten: $1 Tokens"
+      },
+      {
+        "source": "^Mcp Tools:\\s*([\\d,]+)\\s*tokens$",
+        "flags": "i",
+        "rep": "MCP-Tools: $1 Tokens"
+      },
+      {
+        "source": "^Send feedback as\\s+(.+)$",
+        "flags": "i",
+        "rep": "Feedback senden als $1"
+      },
+      {
+        "source": "^Shortcut\\s+(.+?)\\s+for\\s+(.+)$",
+        "flags": "i",
+        "rep": "Kürzel $1 für $2"
+      },
+      {
+        "source": "^Remove shortcut\\s+(.+?)\\s+for\\s+(.+)$",
+        "flags": "i",
+        "rep": "Kürzel $1 für $2 entfernen"
+      },
+      {
+        "source": "^Add shortcut for\\s+(.+)$",
+        "flags": "i",
+        "rep": "Kürzel für $1 hinzufügen"
       }
     ],
     "ru": [
@@ -28060,6 +28626,51 @@
         "source": "^Turn (\\d+) of (\\d+)$",
         "flags": "i",
         "rep": "Ход $1 из $2"
+      },
+      {
+        "source": "^(\\d+)\\s+active conversations?$",
+        "flags": "i",
+        "rep": "Активных бесед: $1"
+      },
+      {
+        "source": "^Rules:\\s*([\\d,]+)\\s*tokens$",
+        "flags": "i",
+        "rep": "Правила: $1 токенов"
+      },
+      {
+        "source": "^Skills:\\s*([\\d,]+)\\s*tokens$",
+        "flags": "i",
+        "rep": "Навыки: $1 токенов"
+      },
+      {
+        "source": "^Subagents:\\s*([\\d,]+)\\s*tokens$",
+        "flags": "i",
+        "rep": "Субагенты: $1 токенов"
+      },
+      {
+        "source": "^Mcp Tools:\\s*([\\d,]+)\\s*tokens$",
+        "flags": "i",
+        "rep": "Инструменты MCP: $1 токенов"
+      },
+      {
+        "source": "^Send feedback as\\s+(.+)$",
+        "flags": "i",
+        "rep": "Отправить отзыв от имени $1"
+      },
+      {
+        "source": "^Shortcut\\s+(.+?)\\s+for\\s+(.+)$",
+        "flags": "i",
+        "rep": "Сочетание $1 для «$2»"
+      },
+      {
+        "source": "^Remove shortcut\\s+(.+?)\\s+for\\s+(.+)$",
+        "flags": "i",
+        "rep": "Удалить сочетание $1 для «$2»"
+      },
+      {
+        "source": "^Add shortcut for\\s+(.+)$",
+        "flags": "i",
+        "rep": "Добавить сочетание для «$1»"
       }
     ]
   }

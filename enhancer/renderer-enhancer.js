@@ -1,5 +1,5 @@
 /**
- * Antigravity Enhancer v4.0.1 - Modular Renderer Enhancer Engine
+ * Antigravity Enhancer v4.0.2 - Modular Renderer Enhancer Engine
  * Features: 9-Language Zero-Restart i18n, Translation Engine 2.0 (Slice + Glossary),
  *           Quota Intelligence (Sparklines, Burn-Rate ETA & Alerts),
  *           Enhancer Control Center & Custom Shortcuts (x2tora/antigravity-enhancer)
@@ -11,7 +11,7 @@
   const ipc = electron_1 ? electron_1.ipcRenderer : null;
   const payload = (typeof __ENHANCER_PAYLOAD__ !== 'undefined' && __ENHANCER_PAYLOAD__) ? __ENHANCER_PAYLOAD__ : {};
   const ENHANCER_REPO = payload.repo || 'x2tora/antigravity-enhancer';
-  const ENHANCER_CURRENT_VERSION = payload.version || '4.0.1';
+  const ENHANCER_CURRENT_VERSION = payload.version || '4.0.2';
 
   const DEFAULT_PREFS = {
     shortcutCycleLang: 'Alt+Shift+L',
@@ -238,10 +238,17 @@
     if (/^\d+\s*[smhd](?:\s+\d+\s*[smhd])*$/i.test(trimmed)) return true;
     if (/^(?:Thinking for \d+|Still thinking,\s*\d+\s*seconds?|Turn \d+ of \d+|Load older messages)/i.test(trimmed)) return true;
     // Brand / model / codename standalone labels & dynamic multi-word Close <Title>
-    if (/^(?:Antigravity|Argon|Gemini)$/i.test(trimmed)) return true;
-    if (/^Close\s+\S+\s+\S+/i.test(trimmed)) return true;
+    if (/^(?:Antigravity|Antigravity Enhancer|Argon|Gemini|Migratify|Gero)$/i.test(trimmed)) return true;
+    if (/^(?:Gemini\s+\d+|Google AI\b)/i.test(trimmed)) return true;
+    if (/^(?:Ctrl|Alt|Shift|Meta|Cmd|Opt|Enter|Esc|Tab|Space|Backspace|Delete)$/i.test(trimmed)) return true;
+    if (/^\d+(?:\.\d+)?(?:px|rem|em|pt|%|ms|s)$/i.test(trimmed)) return true;
+    if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) return true;
+    if (/^[A-Za-z0-9_.\-]+\/$/.test(trimmed)) return true;
+    if (/^Close\s+\S+\s+\S+/i.test(trimmed) || /^Side Question:\s+/i.test(trimmed)) return true;
+    if (/^(?:Shortcut\s+.+\s+for\s+|Remove shortcut\s+.+\s+for\s+|Add shortcut for\s+|Send feedback as\s+)/i.test(trimmed)) return true;
+    if (/^(?:\d+\s+active conversations?|(?:Rules|Skills|Subagents|Mcp Tools):\s*[\d,]+\s*tokens)$/i.test(trimmed)) return true;
     // Agent tool/step summaries & comma-separated action logs (e.g., "Explored files, ran commands, edited files")
-    if (/^(?:Explored|Searched|Read|Edited|Wrote|Ran|Checked|Listed)\b.*,\s*(?:ran|edited|read|wrote|explored|searched|checked|listed)\b/i.test(trimmed)) return true;
+    if (/^(?:Explored|Searched|Read|Edited|Wrote|Ran|Checked|Listed|Commit)\b.*,\s*(?:ran|edited|read|wrote|explored|searched|checked|listed|tag|and push)\b/i.test(trimmed)) return true;
     // Paths, dotfiles, ALL-CAPS files, URLs, markdown links, CLI flags, mentions, slash commands
     if (/^(?:@|#|\/|--?)[A-Za-z0-9_.\-]+/.test(trimmed) || /(?:https?|file):\/\//i.test(trimmed)) return true;
     if (/^\.[A-Za-z0-9_.-]+$/.test(trimmed) || /^(?:LICENSE|README|CHANGELOG|MAKEFILE|DOCKERFILE)$/i.test(trimmed)) return true;
@@ -261,11 +268,13 @@
       if (!tok) continue;
       if (/\.(?:js|ts|tsx|jsx|mjs|cjs|json|md|ps1|vbs|exe|zip|txt|css|scss|html|yml|yaml|asar|py|go|rs)$/i.test(tok)) return true;
       if (/^F\d{1,3}(?:-F?\d{1,3})?$/.test(tok)) return true;
+      if (/^v\d+\.\d+(?:\.\d+)*$/i.test(tok) && tokens.length > 2) return true;
       if (/^[A-Za-z0-9]+(?:[_-][A-Za-z0-9]+)+$/.test(tok) && !/^(?:in-memory|in-app|e2e|top-bar|auto-detect|auto-repatch|real-time|one-click|non-empty|built-in|up-to-date)$/i.test(tok)) return true;
       if (/^(?:[a-z]+[A-Z][A-Za-z0-9]*|[A-Z][a-z]+[A-Z][A-Za-z0-9]*)$/.test(tok) && !/^(?:GitHub|JavaScript|TypeScript|PowerShell|DevTools|YouTube|OpenAI|ChatGPT|OneDrive|macOS|iOS)$/i.test(tok)) return true;
     }
-    // Code snippets / split prose fragments
-    if (/[`{};=<>]/.test(trimmed) || /[,;:(\[]$/.test(trimmed) || /^[a-z].*\.$/.test(trimmed)) return true;
+    // Code snippets / split prose or markdown fragments
+    if (/[`{};=<>]/.test(trimmed) || /^[:),.;\]]|[,:(\[]$/.test(trimmed) || /^[a-z].*\.$/.test(trimmed)) return true;
+    if (/^[a-z]+(?:\s+[a-z0-9,().\-/]+)+$/.test(trimmed) || (/^[^()]*\)/.test(trimmed) && !trimmed.includes('('))) return true;
     return false;
   }
 

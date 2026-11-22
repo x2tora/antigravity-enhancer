@@ -3,6 +3,16 @@
 All notable changes to **Antigravity Enhancer** are documented in this file.
 Older pre-v3 legacy patch logs have been consolidated into milestone summaries below.
 
+## [4.0.2] - 2026-11-23
+
+### Added
+- **Expanded UI & Dynamic Pattern Translations**: Added 34 static UI strings (251 entries across 8 languages) including `Orchestrator Settings`, `Interface Layout`, `Give Feedback`, `Side Question header`, `File Viewer header`, `Raw`, `System`/`Light`/`Dark`, color pickers, and customization loading states, plus 9 dynamic pattern rules × 8 languages (`Shortcut ... for ...`, `Remove shortcut ... for ...`, `Add shortcut for ...`, `Send feedback as ...`, `N active conversations`, `Rules/Skills/Subagents/Mcp Tools: N tokens`).
+
+### Improved
+- **Untranslated Collector Noise Filtering**: Excluded email addresses, trailing-slash folder names, CSS size units (`14px`), standalone key names, `Side Question:` titles, model names (`Gemini 4 Neon`/`Hydrogen`), split markdown/changelog fragments, and versioned commit/agent logs.
+
+---
+
 ## [4.0.1] - 2026-11-23
 
 ### Added

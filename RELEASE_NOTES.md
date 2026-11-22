@@ -1,10 +1,9 @@
-# Antigravity Enhancer v4.0.1
+# Antigravity Enhancer v4.0.2
 
 ## Changes
 
-- **Full 9-Language Font Support**: Added per-language typography stacks and webfont stylesheets (`Pretendard Variable`, `Pretendard JP Variable`, `Noto Sans SC`, `Noto Sans TC`, `Noto Sans`) with native OS fallbacks across all 9 supported languages.
-- **Centered Modal Positioning**: Centered the Patch Settings modal vertically relative to its max height (`min(86vh, 680px)`) while keeping the top edge anchored.
-- **Installer Logo & Discord Webhook Refresh**: Updated installer icons (`icon.png` / `icon.ico`) to match `antigravity.xitora.cc`, and updated Discord release notifications with `AntigravityEnhancer` profile branding and a release download button.
+- **Expanded Static UI & Dynamic Pattern Translations**: Added 34 static UI translations (251 entries across 8 languages) for Orchestrator Settings, Interface Layout, Feedback, Viewer headers, and color pickers, plus 72 dynamic regex rules for shortcut `aria-label`s, active conversation counts, token counters, and feedback account prompts.
+- **Stronger Untranslated Collector Filtering**: Filtered out emails, trailing-slash folder names, CSS size units, standalone key names, `Side Question:` titles, model names, split markdown/changelog fragments, and versioned agent logs.
 
 ---
 
@@ -13,64 +12,63 @@
 <details>
 <summary>한국어</summary>
 
-- **모든 지원 언어(9개국어) 전용 폰트 추가**: 한국어(`Pretendard Variable`), 일본어(`Pretendard JP Variable`), 중국어 간체/번체(`Noto Sans SC` / `TC`), 러시아어·유럽어(`Noto Sans` / `Pretendard`) 웹폰트 및 OS 기본 폴백 스택을 언어별로 최적화해 한·중·일 글꼴 혼용 없이 깔끔하게 표시됩니다.
-- **패치 설정 화면 정중앙 배치 (상단 고정 유지)**: 최대 크기(`min(86vh, 680px)`) 기준으로 화면 정중앙에 오도록 상단 여백을 조정하면서, 높이 변화 시 상단 위치는 흔들리지 않도록 유지했습니다.
-- **인스톨러 로고 교체 및 디스코드 알림 개선**: 인스톨러 아이콘을 웹페이지(`antigravity.xitora.cc`) 로고로 교체하고, 디스코드 릴리스 알림에 `AntigravityEnhancer` 프로필·로고·다운로드 버튼을 적용했습니다.
+- **신규 UI 및 동적 패턴 번역 대폭 추가**: 오케스트레이터 설정, 인터페이스 레이아웃, 피드백 보내기, 뷰어 헤더, 색상 선택기 등 정적 UI 34종(8개국어 251개 항목)과 단축키 안내·활성 대화 수·토큰 카운터 등 동적 규칙 9종(72개 규칙)을 추가했습니다.
+- **미번역 수집 필터 고도화**: 이메일, 폴더 경로(`project_11/`), 크기 단위(`14px`), 단독 키 이름, `Side Question:` 제목, 모델명, 깨진 마크다운/변경 로그 조각을 자동으로 걸러냅니다.
 
 </details>
 
 <details>
 <summary>日本語</summary>
 
-- **全9言語対応フォントを追加**: 日本語（`Pretendard JP Variable`）、韓国語（`Pretendard Variable`）、簡体字/繁体字中国語（`Noto Sans SC/TC`）、ロシア語・欧州言語（`Noto Sans`）の Web フォントと OS フォールバックを言語別に最適化しました。
-- **設定モーダルの中央配置とロゴ刷新**: 最大高さ基準で画面中央に配置（上端固定を維持）し、インストーラーアイコンを `antigravity.xitora.cc` ロゴへ更新しました。
+- **新規 UI・動的パターン翻訳を追加**: オーケストレーター設定、インターフェースレイアウト、フィードバック、ビューアーヘッダー等の静的 UI 34種と、ショートカット説明・会話数・トークン表示の動的ルール 72件を追加しました。
+- **未翻訳収集フィルター強化**: メールアドレス、フォルダ名、サイズ単位、モデル名、分割された Markdown 断片を除外します。
 
 </details>
 
 <details>
 <summary>简体中文</summary>
 
-- **新增全9种语言专属字体**：为简体中文（`Noto Sans SC`）、繁体中文（`Noto Sans TC`）、日语（`Pretendard JP Variable`）、韩语（`Pretendard Variable`）及俄语/欧洲语言（`Noto Sans`）提供对应网页字体与系统回退字体。
-- **居中弹窗布局与图标更新**：按最大高度居中显示设置弹窗（保持顶部固定），并更换为网页版新图标。
+- **新增界面与动态规则翻译**：新增 34 项静态界面翻译（251 条多语言词条）及 72 条快捷键描述、活跃对话数与令牌计数动态规则。
+- **强化未翻译收集过滤**：自动过滤邮箱、文件夹路径、尺寸单位、模型名与残缺 Markdown 片段。
 
 </details>
 
 <details>
 <summary>繁體中文</summary>
 
-- **新增全9種語言專屬字體**：為繁體中文（`Noto Sans TC`）、簡體中文（`Noto Sans SC`）、日語（`Pretendard JP Variable`）、韓語（`Pretendard Variable`）及俄語/歐洲語言（`Noto Sans`）提供專屬網頁字體與系統備援字體。
-- **置中視窗版面與圖示更新**：依最大高度置中顯示設定視窗（維持頂部固定），並更換為網頁版新圖示。
+- **新增介面與動態規則翻譯**：新增 34 項靜態介面翻譯（251 筆多語言詞條）及 72 條快速鍵說明、進行中對話數與權杖計數動態規則。
+- **強化未翻譯收集過濾**：自動過濾電子郵件、資料夾路徑、尺寸單位、模型名稱與殘缺 Markdown 片段。
 
 </details>
 
 <details>
 <summary>Español</summary>
 
-- **Fuentes para los 9 idiomas**: Se añadieron pilas tipográficas y fuentes web (`Pretendard Variable`, `Pretendard JP Variable`, `Noto Sans SC/TC`, `Noto Sans`) para todos los idiomas.
-- **Modal centrado y nuevo logotipo**: Se centró el modal según su altura máxima manteniendo fija la parte superior, y se actualizó el icono del instalador.
+- **Más traducciones de interfaz y reglas dinámicas**: 34 cadenas estáticas nuevas (251 entradas en 8 idiomas) y 72 reglas dinámicas para atajos, conversaciones activas y contadores de tokens.
+- **Filtrado mejorado**: Se excluyen correos, rutas de carpetas, unidades CSS, nombres de modelo y fragmentos Markdown.
 
 </details>
 
 <details>
 <summary>Français</summary>
 
-- **Polices pour les 9 langues** : Ajout de polices web (`Pretendard Variable`, `Pretendard JP Variable`, `Noto Sans SC/TC`, `Noto Sans`) et de polices système adaptées à chaque langue.
-- **Centrage du panneau et nouveau logo** : Centrage vertical basé sur la hauteur maximale tout en gardant le haut fixe, et mise à jour de l’icône de l’installeur.
+- **Traductions UI et règles dynamiques étendues** : 34 libellés statiques (251 entrées sur 8 langues) et 72 règles dynamiques pour raccourcis, conversations actives et compteurs de jetons.
+- **Filtrage renforcé** : Exclusion des e-mails, dossiers, unités CSS, noms de modèle et fragments Markdown.
 
 </details>
 
 <details>
 <summary>Deutsch</summary>
 
-- **Schriftarten für alle 9 Sprachen**: Sprachspezifische Webfonts (`Pretendard Variable`, `Pretendard JP Variable`, `Noto Sans SC/TC`, `Noto Sans`) und System-Fallbacks ergänzt.
-- **Zentriertes Modal & neues Logo**: Vertikale Zentrierung bei maximaler Höhe mit fester Oberkante sowie aktualisiertes Installer-Symbol.
+- **Erweiterte UI- & Dynamik-Übersetzungen**: 34 statische UI-Texte (251 Einträge in 8 Sprachen) sowie 72 dynamische Regeln für Kürzel, aktive Unterhaltungen und Token-Zähler.
+- **Verbesserter Filter**: Filtert E-Mails, Ordnernamen, CSS-Einheiten, Modellnamen und Markdown-Fragmente heraus.
 
 </details>
 
 <details>
 <summary>Русский</summary>
 
-- **Шрифты для всех 9 языков**: Добавлены веб-шрифты (`Pretendard Variable`, `Pretendard JP Variable`, `Noto Sans SC/TC`, `Noto Sans`) и системные фолбэки, включая полную поддержку кириллицы.
-- **Центрирование окна и новый логотип**: Вертикальное центрирование по максимальной высоте с фиксацией верхнего края и обновлённая иконка установщика.
+- **Расширенные переводы UI и динамические правила**: Добавлено 34 статических строки (251 запись на 8 языках) и 72 динамических правила для сочетаний клавиш, счётчиков бесед и токенов.
+- **Улучшенная фильтрация**: Исключены email-адреса, папки, единицы CSS, названия моделей и обрывки Markdown.
 
 </details>
