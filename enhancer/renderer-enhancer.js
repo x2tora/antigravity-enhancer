@@ -1,5 +1,5 @@
 /**
- * Antigravity Enhancer v4.0.0 - Modular Renderer Enhancer Engine
+ * Antigravity Enhancer v4.0.0.1 - Modular Renderer Enhancer Engine
  * Features: 9-Language Zero-Restart i18n, Translation Engine 2.0 (Slice + Glossary),
  *           Quota Intelligence (Sparklines, Burn-Rate ETA & Alerts),
  *           Enhancer Control Center & Custom Shortcuts (x2tora/antigravity-enhancer)
@@ -11,7 +11,7 @@
   const ipc = electron_1 ? electron_1.ipcRenderer : null;
   const payload = (typeof __ENHANCER_PAYLOAD__ !== 'undefined' && __ENHANCER_PAYLOAD__) ? __ENHANCER_PAYLOAD__ : {};
   const ENHANCER_REPO = payload.repo || 'x2tora/antigravity-enhancer';
-  const ENHANCER_CURRENT_VERSION = payload.version || '4.0.0';
+  const ENHANCER_CURRENT_VERSION = payload.version || '4.0.0.1';
 
   const DEFAULT_PREFS = {
     shortcutCycleLang: 'Alt+Shift+L',
@@ -1228,13 +1228,13 @@
     bd.id = 'ag-enhancer-control-center-backdrop';
     bd.className = 'notranslate';
     bd.setAttribute('translate', 'no');
-    bd.style.cssText = 'position:fixed;inset:0;z-index:100001;background:rgba(11,11,14,0.72);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:20px;app-region:no-drag;-webkit-app-region:no-drag;';
+    bd.style.cssText = 'position:fixed;inset:0;z-index:100001;background:rgba(11,11,14,0.72);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;align-items:flex-start;justify-content:center;padding:min(10vh, 72px) 20px 20px;app-region:no-drag;-webkit-app-region:no-drag;';
 
     const modal = document.createElement('div');
     modal.id = 'ag-enhancer-control-center';
     modal.className = 'agy-overlay border rounded-xl text-foreground shadow-lg notranslate';
     modal.setAttribute('translate', 'no');
-    modal.style.cssText = 'width:540px;max-width:94vw;max-height:86vh;display:flex;flex-direction:column;background:#0B0B0E;border:1px solid rgba(202,211,245,0.1);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,0.48);color:#CAD3F5;font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable",Pretendard,"Segoe UI",sans-serif;font-size:13px;overflow:hidden;app-region:no-drag;-webkit-app-region:no-drag;';
+    modal.style.cssText = 'width:660px;max-width:94vw;max-height:86vh;display:flex;flex-direction:column;background:#0B0B0E;border:1px solid rgba(202,211,245,0.1);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,0.48);color:#CAD3F5;font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable",Pretendard,"Segoe UI",sans-serif;font-size:13px;overflow:hidden;app-region:no-drag;-webkit-app-region:no-drag;';
 
     const sInit = getControlCenterStrings(activeLanguage);
     const tabs = [
@@ -1257,7 +1257,7 @@
         <span id="ag-cc-tab-pill" style="display:block;position:absolute;top:8px;bottom:8px;left:14px;width:0;border-radius:6px;background:rgba(160,163,246,0.14);border:1px solid rgba(160,163,246,0.22);pointer-events:none;z-index:0;"></span>
         ${tabs.map(t => `<button type="button" data-tab="${t.id}" class="ag-cc-tab" style="position:relative;z-index:1;padding:6px 12px;border-radius:6px;border:none;background:transparent;cursor:pointer;font-size:12px;font-weight:500;transition:color 140ms ease;">${t.label}</button>`).join('')}
       </div>
-      <div id="ag-cc-body" style="padding:14px 16px;height:360px;max-height:62vh;overflow-y:auto;overflow-x:hidden;scrollbar-gutter:stable;display:flex;flex-direction:column;gap:10px;background:#0B0B0E;"></div>
+      <div id="ag-cc-body" style="padding:14px 16px;height:auto;max-height:min(68vh, 560px);overflow-y:auto;overflow-x:hidden;scrollbar-gutter:stable;display:flex;flex-direction:column;gap:10px;background:#0B0B0E;"></div>
     `;
 
     bd.appendChild(modal);
@@ -1329,6 +1329,15 @@
       return sections.map(sec => ({ ...sec, body: sec.lines.join('\n').trim() }));
     };
 
+    const animateBodyHeight = (prevHeight) => {
+      if (!bodyEl || !canGsapAnimate(bodyEl) || !prevHeight || prevHeight <= 0) return;
+      bodyEl.style.height = 'auto';
+      const nextHeight = bodyEl.offsetHeight || 0;
+      if (nextHeight > 0 && Math.abs(prevHeight - nextHeight) > 2) {
+        window.gsap.fromTo(bodyEl, { height: prevHeight }, { height: nextHeight, duration: 0.22, ease: 'power2.out', clearProps: 'height' });
+      }
+    };
+
     function moveTabPill(targetBtn, animate = true) {
       if (!tabPill || !targetBtn) return;
       const left = targetBtn.offsetLeft || 14;
@@ -1343,6 +1352,7 @@
 
     function renderTab(tabId, animateSlide = false) {
       cleanupRecorder();
+      const prevBodyHeight = bodyEl ? (bodyEl.offsetHeight || 0) : 0;
       const prevIdx = tabs.findIndex(t => t.id === currentTab);
       const nextIdx = tabs.findIndex(t => t.id === tabId);
       if (tabId !== 'quota') clearHistConfirmOpen = false;
@@ -1379,12 +1389,12 @@
               const badgeHtml = isLatest ? `<span style="font-size:10px;font-weight:600;padding:1px 6px;border-radius:9999px;background:rgba(160,163,246,0.18);color:#A0A3F6;margin-left:6px;">LATEST</span>` : '';
               const dateHtml = sec.date ? `<span style="font-size:11px;color:#818BA8;font-variant-numeric:tabular-nums;">${escapeHtml(sec.date)}</span>` : '';
               return `
-                <article class="agy-changelog-card" style="background:#0B0B0E;border:1px solid rgba(202,211,245,0.09);border-radius:8px;overflow:hidden;">
+                <article class="agy-changelog-card" style="flex-shrink:0;background:#0B0B0E;border:1px solid rgba(202,211,245,0.09);border-radius:8px;overflow:hidden;">
                   <button type="button" class="agy-changelog-toggle" data-idx="${idx}" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:transparent;border:none;color:#CAD3F5;cursor:pointer;text-align:left;">
                     <span style="font-size:12.5px;font-weight:600;font-variant-numeric:tabular-nums;">v${escapeHtml(sec.version)}${badgeHtml}</span>
                     ${dateHtml}
                   </button>
-                  <div class="agy-changelog-body" style="display:${isLatest ? 'block' : 'none'};padding:0 10px 8px;border-top:1px solid rgba(202,211,245,0.06);font-size:11px;line-height:1.48;">
+                  <div class="agy-changelog-body" style="display:${isLatest ? 'block' : 'none'};padding:6px 10px 8px;border-top:1px solid rgba(202,211,245,0.06);font-size:11.5px;line-height:1.52;">
                     ${formatReleaseNotesHtml(sec.body)}
                   </div>
                 </article>
@@ -1392,20 +1402,24 @@
             }).join('');
             listEl.querySelectorAll('.agy-changelog-toggle').forEach((btn) => {
               btn.onclick = () => {
+                const prevH = bodyEl ? (bodyEl.offsetHeight || 0) : 0;
                 const card = btn.parentElement;
                 const body = card && card.querySelector('.agy-changelog-body');
-                if (body) body.style.display = body.style.display === 'none' ? 'block' : 'none';
+                if (body) {
+                  body.style.display = body.style.display === 'none' ? 'block' : 'none';
+                  animateBodyHeight(prevH);
+                }
               };
             });
           };
 
           bodyEl.innerHTML = `
-            <section id="agy-hub-changelog-view" style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;height:100%;box-sizing:border-box;">
+            <section id="agy-hub-changelog-view" style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;flex-shrink:0;">
               <header style="display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:1px solid rgba(202,211,245,0.08);padding-bottom:8px;">
                 <strong style="font-size:13px;font-weight:600;color:#CAD3F5;">${escapeHtml(s.changelogTitle)}</strong>
                 <button type="button" id="agy-hub-changelog-back" class="agy-enh-btn" style="height:24px;padding:0 10px;border-radius:6px;background:#181A22;border:1px solid rgba(202,211,245,0.1);color:#CAD3F5;font-size:11px;cursor:pointer;">← ${escapeHtml(s.changelogBack)}</button>
               </header>
-              <main id="agy-hub-changelog-list" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding-right:2px;">
+              <main id="agy-hub-changelog-list" style="display:flex;flex-direction:column;gap:8px;">
                 <p style="margin:12px 0;font-size:12px;color:#818BA8;text-align:center;">${escapeHtml(h.checking)}</p>
               </main>
             </section>
@@ -1417,7 +1431,11 @@
           } else if (ipc && ipc.invoke) {
             ipc.invoke('enhancer:get-changelog').then((res) => {
               cachedChangelogText = (res && res.ok && typeof res.content === 'string') ? res.content : '';
-              if (changelogViewOpen) renderChangelogCards(cachedChangelogText);
+              if (changelogViewOpen) {
+                const prevH = bodyEl ? (bodyEl.offsetHeight || 0) : 0;
+                renderChangelogCards(cachedChangelogText);
+                animateBodyHeight(prevH);
+              }
             }).catch(() => {
               cachedChangelogText = '';
               if (changelogViewOpen) renderChangelogCards('');
@@ -1425,6 +1443,7 @@
           } else {
             renderChangelogCards('');
           }
+          animateBodyHeight(prevBodyHeight);
           return;
         }
 
@@ -1887,6 +1906,7 @@
         }
       }
 
+      animateBodyHeight(prevBodyHeight);
       if (animateSlide && prevIdx !== -1 && nextIdx !== -1 && prevIdx !== nextIdx && canGsapAnimate(bodyEl)) {
         const dir = nextIdx > prevIdx ? 1 : -1;
         window.gsap.fromTo(bodyEl, { opacity: 0, x: dir * 18 }, { opacity: 1, x: 0, duration: 0.18, ease: 'power2.out' });

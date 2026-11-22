@@ -3,6 +3,14 @@
 All notable changes to **Antigravity Enhancer** are documented in this file.
 Older pre-v3 legacy patch logs have been consolidated into milestone summaries below.
 
+## [4.0.0.1] - 2026-11-23
+
+### Improved
+- **Dynamic Patch Settings Sizing & Top-Anchored Modal**: Replaced fixed modal body height (`360px`) with dynamic `auto` height + smooth GSAP vertical height transitions, widened the modal (`540px` → `660px`), and anchored the modal to the top (`align-items: flex-start`) so tab positions never shift while switching tabs or expanding changelog cards.
+- **Unclipped Changelog Cards & 4-Part Semver**: Added `flex-shrink: 0` to changelog cards so release notes never clip inside the flex container, and updated `compareSemver` and installer assembly versioning to support 4-segment versions (`4.0.0.1`).
+
+---
+
 ## [4.0.0] - 2026-11-23
 
 ### Added

@@ -1,5 +1,5 @@
 /**
- * Antigravity Enhancer v4.0.0 - Main Process Bridge, Persistence & Secure In-App Updater
+ * Antigravity Enhancer v4.0.0.1 - Main Process Bridge, Persistence & Secure In-App Updater
  * Source Repo: https://github.com/x2tora/antigravity-enhancer
  */
 'use strict';
@@ -246,7 +246,8 @@ function compareSemver(v1, v2) {
   const parse = (v) => String(v || '').replace(/^v/i, '').split('-')[0].split('.').map(n => parseInt(n, 10) || 0);
   const a = parse(v1);
   const b = parse(v2);
-  for (let i = 0; i < 3; i++) {
+  const len = Math.max(3, a.length, b.length);
+  for (let i = 0; i < len; i++) {
     const ai = a[i] || 0;
     const bi = b[i] || 0;
     if (ai > bi) return 1;
@@ -479,7 +480,7 @@ function loadBootstrapPayload(forceRefresh = false, langId = null) {
 
       cachedBootstrapPayload = {
         disabled: false,
-        version: manifest.version || '4.0.0',
+        version: manifest.version || '4.0.0.1',
         repo: ENHANCER_REPO,
         code: rendererCode,
         gsapCode,
@@ -525,7 +526,7 @@ function getFullStatus() {
   } catch (_) {}
 
   return {
-    enhancerVersion: manifest.version || '4.0.0',
+    enhancerVersion: manifest.version || '4.0.0.1',
     appVersion: (el && el.app && el.app.getVersion) ? el.app.getVersion() : 'unknown',
     repo: ENHANCER_REPO,
     enhancerDir,
@@ -682,7 +683,7 @@ async function checkRemoteUpdate() {
 
 async function applyInAppUpdate(refBranch = 'main') {
   const local = getLocalManifest();
-  const prevVersion = local.version || '4.0.0';
+  const prevVersion = local.version || '4.0.0.1';
 
   broadcastEvent('enhancer:update-progress', { phase: 'manifest', percent: 8, message: 'Fetching signed manifest...' });
   const manifestUrl = `https://raw.githubusercontent.com/${ENHANCER_REPO}/${encodeURIComponent(refBranch)}/enhancer/manifest.json?t=${Date.now()}`;

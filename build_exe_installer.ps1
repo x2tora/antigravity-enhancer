@@ -1,5 +1,5 @@
 ﻿param(
-    [string]$Version = "4.0.0",
+    [string]$Version = "4.0.0.1",
     [string]$OutputExe = "",
     [string]$SignCertThumbprint = ""
 )
@@ -77,8 +77,8 @@ using Microsoft.Win32;
 [assembly: AssemblyCompany("x2tora")]
 [assembly: AssemblyProduct("Antigravity Enhancer")]
 [assembly: AssemblyCopyright("Copyright (C) 2026 x2tora")]
-[assembly: AssemblyVersion("__ENHANCER_VERSION__.0")]
-[assembly: AssemblyFileVersion("__ENHANCER_VERSION__.0")]
+[assembly: AssemblyVersion("__ASM_VERSION__")]
+[assembly: AssemblyFileVersion("__ASM_VERSION__")]
 
 namespace AntigravityEnhancer
 {
@@ -1535,7 +1535,8 @@ try {
 
     $csFile = Join-Path $buildTmp "InstallerWPF.cs"
     $utf8WithBom = New-Object System.Text.UTF8Encoding($true)
-    $csCompiledSource = $csSource.Replace('__ENHANCER_VERSION__', $Version)
+    $asmVer = if (($Version -split '\.').Count -ge 4) { $Version } else { "$Version.0" }
+    $csCompiledSource = $csSource.Replace('__ASM_VERSION__', $asmVer).Replace('__ENHANCER_VERSION__', $Version)
     [System.IO.File]::WriteAllText($csFile, $csCompiledSource, $utf8WithBom)
 
     Write-Host "[3/4] Compiling Antigravity-Enhancer-Setup.exe v$Version..." -ForegroundColor Cyan
