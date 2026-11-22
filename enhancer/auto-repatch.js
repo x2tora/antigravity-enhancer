@@ -1,5 +1,5 @@
 /**
- * Antigravity Enhancer v3.5.3 - Secure Auto-Re-Patch Guardian
+ * Antigravity Enhancer v3.5.4 - Secure Auto-Re-Patch Guardian
  * Detects when an Antigravity IDE update overwrites app.asar, verifies if a matching
  * patch exists in the remote manifest, downloads SHA-256 verified modules, and
  * atomically re-bootstraps app.asar when Antigravity is not running.
@@ -92,15 +92,30 @@ async function runAutoRepatch(options = {}) {
   const httpsMod = options.httpsMod || https;
   const asarPatcher = options.asarPatcher || require(path.join(enhancerDir, 'asar-patcher.js'));
 
+  function writeRepatchStatus(dir, statusObj) {
+    try {
+      const ud = path.join(dir, 'user-data');
+      fs.mkdirSync(ud, { recursive: true });
+      fs.writeFileSync(
+        path.join(ud, 'auto-repatch-status.json'),
+        JSON.stringify({ ts: Date.now(), ...statusObj }, null, 2),
+        'utf8'
+      );
+    } catch (_) {}
+  }
+
   if (fs.existsSync(path.join(enhancerDir, 'disabled.flag'))) {
+    writeRepatchStatus(enhancerDir, { status: 'disabled' });
     return { ok: true, skipped: true, reason: 'disabled' };
   }
   if (!fs.existsSync(asarPath)) {
+    writeRepatchStatus(enhancerDir, { status: 'asar-missing' });
     return { ok: true, skipped: true, reason: 'asar-missing' };
   }
 
   const status = asarPatcher.inspectAsarStatus(asarPath);
   if (status.bootstrapped) {
+    writeRepatchStatus(enhancerDir, { status: 'already-bootstrapped' });
     return { ok: true, skipped: true, reason: 'already-bootstrapped' };
   }
 
@@ -115,6 +130,7 @@ async function runAutoRepatch(options = {}) {
   const testedApp = remote.testedAppVersion || '0.0.0';
   if (compareSemver(installedAppVersion, minApp) < 0 || compareSemver(testedApp, installedAppVersion) < 0) {
     appendLog(enhancerDir, `Waiting for matching patch: installed=${installedAppVersion}, tested=${testedApp}`);
+    writeRepatchStatus(enhancerDir, { status: 'waiting-for-matching-patch', installedAppVersion, testedAppVersion: testedApp, remoteVersion: remote.version });
     return { ok: true, skipped: true, reason: 'waiting-for-matching-patch', installedAppVersion, testedAppVersion: testedApp };
   }
 
@@ -156,6 +172,7 @@ async function runAutoRepatch(options = {}) {
 
     const patchRes = asarPatcher.patchAsar(asarPath);
     appendLog(enhancerDir, `Auto-repatched Antigravity ${installedAppVersion} with Enhancer v${remote.version} (updated ${updatedFiles.length} modules)`);
+    writeRepatchStatus(enhancerDir, { status: 'repatched', installedAppVersion, enhancerVersion: remote.version, updatedFiles });
     return {
       ok: true,
       repatched: true,
@@ -173,6 +190,7 @@ async function runAutoRepatch(options = {}) {
       }
     }
     appendLog(enhancerDir, `Auto-repatch failed: ${err.message || err}`);
+    writeRepatchStatus(enhancerDir, { status: 'error', installedAppVersion, error: err.message || String(err) });
     throw err;
   } finally {
     fs.rmSync(stageDir, { recursive: true, force: true });

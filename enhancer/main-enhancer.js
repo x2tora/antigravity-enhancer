@@ -1,5 +1,5 @@
 /**
- * Antigravity Enhancer v3.5.3 - Main Process Bridge, Persistence & Secure In-App Updater
+ * Antigravity Enhancer v3.5.4 - Main Process Bridge, Persistence & Secure In-App Updater
  * Source Repo: https://github.com/x2tora/antigravity-enhancer
  */
 'use strict';
@@ -477,7 +477,7 @@ function loadBootstrapPayload(forceRefresh = false, langId = null) {
 
       cachedBootstrapPayload = {
         disabled: false,
-        version: manifest.version || '3.5.3',
+        version: manifest.version || '3.5.4',
         repo: ENHANCER_REPO,
         code: rendererCode,
         gsapCode,
@@ -509,7 +509,7 @@ function getFullStatus() {
   } catch (_) {}
 
   return {
-    enhancerVersion: manifest.version || '3.5.3',
+    enhancerVersion: manifest.version || '3.5.4',
     appVersion: (el && el.app && el.app.getVersion) ? el.app.getVersion() : 'unknown',
     repo: ENHANCER_REPO,
     enhancerDir,
@@ -518,8 +518,38 @@ function getFullStatus() {
     safeMode: runtimeState.safeMode,
     disabled: runtimeState.disabled,
     lastError: runtimeState.lastError,
-    lastRemoteInfo: runtimeState.lastRemoteInfo
+    lastRemoteInfo: runtimeState.lastRemoteInfo,
+    autoRepatchStatus: readJsonSafe(getUserDataPath('auto-repatch-status.json'), null)
   };
+}
+
+function ensureAutoRepatchWrappers(targetDir = enhancerDir, appExePath = null) {
+  if (process.platform !== 'win32' || runtimeState.disabled) return false;
+  try {
+    const exe = appExePath || (process.execPath && /Antigravity\.exe$/i.test(process.execPath) ? process.execPath : path.join(process.env.LOCALAPPDATA || '', 'Programs', 'Antigravity', 'Antigravity.exe'));
+    if (!exe || !fs.existsSync(targetDir)) return false;
+    const scriptPath = path.join(targetDir, 'auto-repatch.js');
+    const psPath = path.join(targetDir, 'auto-repatch.ps1');
+    const vbsPath = path.join(targetDir, 'auto-repatch.vbs');
+    const psBody =
+      "$ErrorActionPreference = 'SilentlyContinue'\r\n" +
+      "if (-not (Get-Process Antigravity -ErrorAction SilentlyContinue)) {\r\n" +
+      "  $env:ELECTRON_RUN_AS_NODE = '1'\r\n" +
+      `  & '${exe.replace(/'/g, "''")}' '${scriptPath.replace(/'/g, "''")}'\r\n` +
+      "}\r\n";
+    const vbsBody =
+      'Set sh = CreateObject("WScript.Shell")\r\n' +
+      `sh.Run "powershell.exe -NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -File ""${psPath}""", 0, False\r\n`;
+    if (!fs.existsSync(psPath) || fs.readFileSync(psPath, 'utf8') !== psBody) {
+      fs.writeFileSync(psPath, psBody, 'utf8');
+    }
+    if (!fs.existsSync(vbsPath) || fs.readFileSync(vbsPath, 'ascii') !== vbsBody) {
+      fs.writeFileSync(vbsPath, vbsBody, 'ascii');
+    }
+    return true;
+  } catch (_) {
+    return false;
+  }
 }
 
 function parseReleaseNotesMarkdown(md) {
@@ -636,7 +666,7 @@ async function checkRemoteUpdate() {
 
 async function applyInAppUpdate(refBranch = 'main') {
   const local = getLocalManifest();
-  const prevVersion = local.version || '3.5.3';
+  const prevVersion = local.version || '3.5.4';
 
   broadcastEvent('enhancer:update-progress', { phase: 'manifest', percent: 8, message: 'Fetching signed manifest...' });
   const manifestUrl = `https://raw.githubusercontent.com/${ENHANCER_REPO}/${encodeURIComponent(refBranch)}/enhancer/manifest.json?t=${Date.now()}`;
@@ -902,6 +932,7 @@ function init(options = {}) {
   if (options.appRoot) appRootDir = options.appRoot;
 
   handleCrashFailsafe();
+  ensureAutoRepatchWrappers();
   loadBootstrapPayload(true);
   registerIpcHandlers();
 }
@@ -918,6 +949,7 @@ module.exports = {
   checkRemoteUpdate,
   applyInAppUpdate,
   getFullStatus,
+  ensureAutoRepatchWrappers,
   buildLanguageSlice,
   DEFAULT_PREFERENCES,
   getPreferences,

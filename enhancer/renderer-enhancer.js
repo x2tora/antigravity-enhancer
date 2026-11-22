@@ -1,5 +1,5 @@
 /**
- * Antigravity Enhancer v3.5.3 - Modular Renderer Enhancer Engine
+ * Antigravity Enhancer v3.5.4 - Modular Renderer Enhancer Engine
  * Features: 9-Language Zero-Restart i18n, Translation Engine 2.0 (Slice + Glossary),
  *           Quota Intelligence (Sparklines, Burn-Rate ETA & Alerts),
  *           Enhancer Control Center & Custom Shortcuts (x2tora/antigravity-enhancer)
@@ -11,7 +11,7 @@
   const ipc = electron_1 ? electron_1.ipcRenderer : null;
   const payload = (typeof __ENHANCER_PAYLOAD__ !== 'undefined' && __ENHANCER_PAYLOAD__) ? __ENHANCER_PAYLOAD__ : {};
   const ENHANCER_REPO = payload.repo || 'x2tora/antigravity-enhancer';
-  const ENHANCER_CURRENT_VERSION = payload.version || '3.5.3';
+  const ENHANCER_CURRENT_VERSION = payload.version || '3.5.4';
 
   const DEFAULT_PREFS = {
     shortcutCycleLang: 'Alt+Shift+L',
@@ -1031,6 +1031,56 @@
     }
   }
 
+  const CONTROL_CENTER_I18N = {
+    en: {
+      tabs: { general: 'General', translation: 'Translation', quota: 'Quota', shortcuts: 'Shortcuts' },
+      ifaceLang: 'Interface Language', ifaceDesc: 'Zero-restart live localization.',
+      hubTitle: 'Update & Restore Hub', checkUpd: 'Check Updates',
+      glossaryTitle: 'Custom Glossary', srcPh: 'Source text', dstPh: 'Target text', add: 'Add',
+      exportJson: 'Export JSON', importJson: 'Import JSON', apply: 'Apply',
+      noGlossary: 'No custom glossary entries yet.',
+      collectUt: 'Collect Untranslated Strings (Opt-in)', collectUtDesc: 'Logs unmatched UI text locally for review.',
+      utList: 'Collected Strings', copy: 'Copy', clear: 'Clear', emptyUt: 'No collected strings.',
+      sparklines: 'Quota Popover Sparklines', sparkDesc: 'Shows 72h local usage trend sparkline.',
+      compactCard: 'Compact Quota Cards', compactDesc: 'Tightens popover card spacing and hides model list.',
+      lowAlert: 'Low-Quota Desktop Alerts', lowDesc: 'Alerts once per model below threshold (30m cooldown).',
+      threshold: 'Threshold', resetAlert: 'Quota Reset Alerts', resetDesc: 'Notifies when quota recovers above 80%.',
+      clearHist: 'Clear 72h History', cleared: 'Cleared', copied: 'Copied',
+      cycleKey: 'Cycle Language Shortcut', centerKey: 'Open Control Center',
+      pressKeys: 'Press keys (ESC cancel)...', diagnostics: 'Diagnostics', autoRepatch: 'Auto-Repatch'
+    },
+    ko: {
+      tabs: { general: '일반', translation: '번역 · 용어집', quota: '할당량 · 알림', shortcuts: '단축키 · 진단' },
+      ifaceLang: '인터페이스 언어', ifaceDesc: '재시작 없이 즉시 언어를 전환합니다.',
+      hubTitle: '업데이트 및 복구 허브', checkUpd: '업데이트 확인',
+      glossaryTitle: '커스텀 용어집', srcPh: '원문 (예: Agent)', dstPh: '번역 (예: 에이전트)', add: '추가',
+      exportJson: 'JSON 내보내기', importJson: 'JSON 가져오기', apply: '적용',
+      noGlossary: '등록된 사용자 용어집 항목이 없습니다.',
+      collectUt: '미번역 문자열 자동 수집 (Opt-in)', collectUtDesc: '사전에 없는 UI 문구를 로컬 JSON에 기록합니다.',
+      utList: '수집된 미번역 목록', copy: '복사', clear: '비우기', emptyUt: '수집된 문자열이 없습니다.',
+      sparklines: '할당량 팝오버 스파크라인', sparkDesc: '72시간 로컬 사용 추이 그래프를 표시합니다.',
+      compactCard: '컴팩트 할당량 카드', compactDesc: '팝오버 여백을 줄이고 모델 목록을 간소화합니다.',
+      lowAlert: '저잔량 데스크톱 알림', lowDesc: '임계치 미만 도달 시 모델별 1회 알림 (30분 쿨다운)',
+      threshold: '임계치', resetAlert: '할당량 리셋 완료 알림', resetDesc: '고갈 후 80% 이상 회복 시 알림을 보냅니다.',
+      clearHist: '72시간 기록 초기화', cleared: '초기화됨', copied: '복사됨',
+      cycleKey: '언어 순환 단축키', centerKey: 'Control Center 열기',
+      pressKeys: '키 조합 입력 (ESC 취소)...', diagnostics: '시스템 진단', autoRepatch: '자동 재패치'
+    },
+    ja: { tabs: { general: '一般', translation: '翻訳・用語集', quota: 'クォータ・通知', shortcuts: 'ショートカット' }, ifaceLang: 'インターフェース言語', ifaceDesc: '再起動なしで即時に言語を切り替えます。', hubTitle: 'アップデート・復元ハブ', checkUpd: 'アップデート確認', glossaryTitle: 'カスタム用語集', add: '追加', exportJson: 'JSON出力', importJson: 'JSON読込', collectUt: '未翻訳テキスト収集 (Opt-in)', utList: '収集済みリスト', copy: 'コピー', clear: 'クリア', sparklines: 'スパークライン表示', compactCard: 'コンパクトカード', lowAlert: '残量低下通知', threshold: 'しきい値', resetAlert: 'リセット通知', clearHist: '72時間履歴を消去', cycleKey: '言語切替キー', centerKey: 'Control Centerを開く', diagnostics: 'システム診断', autoRepatch: '自動再パッチ' },
+    'zh-CN': { tabs: { general: '常规', translation: '翻译・术语表', quota: '配额・通知', shortcuts: '快捷键・诊断' }, ifaceLang: '界面语言', ifaceDesc: '无需重启即可实时切换语言。', hubTitle: '更新与恢复中心', checkUpd: '检查更新', glossaryTitle: '自定义术语表', add: '添加', exportJson: '导出 JSON', importJson: '导入 JSON', collectUt: '收集未翻译文本 (可选)', utList: '已收集列表', copy: '复制', clear: '清空', sparklines: '显示趋势线', compactCard: '紧凑配额卡片', lowAlert: '低配额桌面通知', threshold: '阈值', resetAlert: '配额重置通知', clearHist: '清除72小时历史', cycleKey: '切换语言快捷键', centerKey: '打开 Control Center', diagnostics: '系统诊断', autoRepatch: '自动重打补丁' },
+    'zh-TW': { tabs: { general: '一般', translation: '翻譯・詞彙表', quota: '配額・通知', shortcuts: '快捷鍵・診斷' }, ifaceLang: '介面語言', ifaceDesc: '無需重新啟動即可即時切換語言。', hubTitle: '更新與還原中心', checkUpd: '檢查更新', glossaryTitle: '自訂詞彙表', add: '新增', exportJson: '匯出 JSON', importJson: '匯入 JSON', collectUt: '收集未翻譯文字 (選用)', utList: '已收集清單', copy: '複製', clear: '清空', sparklines: '顯示趨勢線', compactCard: '精簡配額卡片', lowAlert: '低配額桌面通知', threshold: '閾值', resetAlert: '配額重設通知', clearHist: '清除72小時歷史', cycleKey: '切換語言快捷鍵', centerKey: '開啟 Control Center', diagnostics: '系統診斷', autoRepatch: '自動重打修補' },
+    es: { tabs: { general: 'General', translation: 'Traducción', quota: 'Cuota', shortcuts: 'Atajos' }, ifaceLang: 'Idioma de interfaz', checkUpd: 'Buscar actualizaciones', add: 'Añadir', copy: 'Copiar', clear: 'Limpiar', diagnostics: 'Diagnóstico' },
+    fr: { tabs: { general: 'Général', translation: 'Traduction', quota: 'Quota', shortcuts: 'Raccourcis' }, ifaceLang: 'Langue de l’interface', checkUpd: 'Vérifier les mises à jour', add: 'Ajouter', copy: 'Copier', clear: 'Effacer', diagnostics: 'Diagnostic' },
+    de: { tabs: { general: 'Allgemein', translation: 'Übersetzung', quota: 'Kontingent', shortcuts: 'Tastenkürzel' }, ifaceLang: 'Oberflächensprache', checkUpd: 'Nach Updates suchen', add: 'Hinzufügen', copy: 'Kopieren', clear: 'Leeren', diagnostics: 'Diagnose' },
+    ru: { tabs: { general: 'Общие', translation: 'Перевод', quota: 'Квота', shortcuts: 'Сочетания' }, ifaceLang: 'Язык интерфейса', checkUpd: 'Проверить обновления', add: 'Добавить', copy: 'Копировать', clear: 'Очистить', diagnostics: 'Диагностика' }
+  };
+
+  function getControlCenterStrings(lang) {
+    const base = CONTROL_CENTER_I18N.en;
+    const loc = CONTROL_CENTER_I18N[lang] || {};
+    return { ...base, ...loc, tabs: { ...base.tabs, ...(loc.tabs || {}) } };
+  }
+
   async function openControlCenterModal(initialTab = 'general') {
     if (typeof document === 'undefined') return;
     if (document.getElementById('ag-enhancer-control-center-backdrop')) {
@@ -1039,7 +1089,6 @@
     }
     closeEnhancerHubModal(true);
 
-    const isKo = activeLanguage === 'ko';
     const bd = document.createElement('div');
     bd.id = 'ag-enhancer-control-center-backdrop';
     bd.className = 'notranslate';
@@ -1052,11 +1101,12 @@
     modal.setAttribute('translate', 'no');
     modal.style.cssText = 'width:540px;max-width:94vw;max-height:86vh;display:flex;flex-direction:column;background:#0B0B0E;border:1px solid rgba(202,211,245,0.1);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,0.48);color:#CAD3F5;font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable",Pretendard,"Segoe UI",sans-serif;font-size:13px;overflow:hidden;app-region:no-drag;-webkit-app-region:no-drag;';
 
+    const sInit = getControlCenterStrings(activeLanguage);
     const tabs = [
-      { id: 'general', label: isKo ? '일반' : 'General' },
-      { id: 'translation', label: isKo ? '번역 · 용어집' : 'Translation' },
-      { id: 'quota', label: isKo ? '할당량 · 알림' : 'Quota' },
-      { id: 'shortcuts', label: isKo ? '단축키 · 진단' : 'Shortcuts' }
+      { id: 'general', label: sInit.tabs.general },
+      { id: 'translation', label: sInit.tabs.translation },
+      { id: 'quota', label: sInit.tabs.quota },
+      { id: 'shortcuts', label: sInit.tabs.shortcuts }
     ];
     let currentTab = tabs.some(t => t.id === initialTab) ? initialTab : 'general';
 
@@ -1095,8 +1145,11 @@
     function renderTab(tabId) {
       cleanupRecorder();
       currentTab = tabId;
+      const s = getControlCenterStrings(activeLanguage);
       tabBtns.forEach(b => {
-        const active = b.getAttribute('data-tab') === currentTab;
+        const tKey = b.getAttribute('data-tab');
+        if (s.tabs[tKey]) b.textContent = s.tabs[tKey];
+        const active = tKey === currentTab;
         b.style.background = active ? 'rgba(160,163,246,0.14)' : 'transparent';
         b.style.color = active ? '#A0A3F6' : '#9DA7C7';
       });
@@ -1110,17 +1163,17 @@
         bodyEl.innerHTML = `
           <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:12px;">
             <div>
-              <div style="font-size:13px;font-weight:500;color:#CAD3F5;">${isKo ? '인터페이스 언어' : 'Interface Language'}</div>
-              <div style="font-size:11px;color:#818BA8;margin-top:2px;">${isKo ? '재시작 없이 즉시 언어를 전환합니다.' : 'Zero-restart live localization.'}</div>
+              <div style="font-size:13px;font-weight:500;color:#CAD3F5;">${escapeHtml(s.ifaceLang)}</div>
+              <div style="font-size:11px;color:#818BA8;margin-top:2px;">${escapeHtml(s.ifaceDesc)}</div>
             </div>
             <select id="ag-cc-lang-select" style="background:#181A22;color:#CAD3F5;border:1px solid rgba(202,211,245,0.1);border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;">${langOpts}</select>
           </div>
           <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:12px;">
             <div>
-              <div style="font-size:13px;font-weight:500;color:#CAD3F5;">${isKo ? '업데이트 및 복구 허브' : 'Update & Restore Hub'}</div>
+              <div style="font-size:13px;font-weight:500;color:#CAD3F5;">${escapeHtml(s.hubTitle)}</div>
               <div style="font-size:11px;color:#818BA8;margin-top:2px;">v${ENHANCER_CURRENT_VERSION} · ${ENHANCER_REPO}</div>
             </div>
-            <button type="button" id="ag-cc-open-update" class="agy-enh-primary" style="background:#A0A3F6;color:#0B0B0E;border:none;border-radius:6px;height:28px;padding:0 12px;font-size:12px;font-weight:600;cursor:pointer;">${isKo ? '업데이트 확인' : 'Check Updates'}</button>
+            <button type="button" id="ag-cc-open-update" class="agy-enh-primary" style="background:#A0A3F6;color:#0B0B0E;border:none;border-radius:6px;height:28px;padding:0 12px;font-size:12px;font-weight:600;cursor:pointer;">${escapeHtml(s.checkUpd)}</button>
           </div>
         `;
         const sel = bodyEl.querySelector('#ag-cc-lang-select');
@@ -1132,36 +1185,83 @@
         const entries = Object.entries(langMap);
         const rowsHtml = entries.length > 0
           ? entries.map(([src, dst]) => `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px;background:#181A22;border:1px solid rgba(202,211,245,0.06);border-radius:6px;font-size:12px;"><span style="color:#9DA7C7;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(src)}</span><span style="color:#818BA8;">→</span><span style="color:#CAD3F5;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(dst)}</span><button type="button" data-del="${escapeHtml(src)}" class="ag-cc-del-glossary" style="background:none;border:none;color:#E56B6F;cursor:pointer;font-size:12px;">✕</button></div>`).join('')
-          : `<div style="font-size:12px;color:#818BA8;">${isKo ? '등록된 사용자 용어집 항목이 없습니다.' : 'No custom glossary entries yet.'}</div>`;
+          : `<div style="font-size:12px;color:#818BA8;">${escapeHtml(s.noGlossary)}</div>`;
         bodyEl.innerHTML = `
           <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;">
-            <div style="font-size:13px;font-weight:500;color:#CAD3F5;">${isKo ? `커스텀 용어집 (${activeLanguage.toUpperCase()})` : `Custom Glossary (${activeLanguage.toUpperCase()})`}</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+              <div style="font-size:13px;font-weight:500;color:#CAD3F5;">${escapeHtml(s.glossaryTitle)} (${activeLanguage.toUpperCase()})</div>
+              <div style="display:flex;gap:6px;">
+                <button type="button" id="ag-cc-gl-export" class="agy-enh-btn" style="background:#181A22;color:#CAD3F5;border:1px solid rgba(202,211,245,0.1);border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;">${escapeHtml(s.exportJson)}</button>
+                <button type="button" id="ag-cc-gl-import" class="agy-enh-btn" style="background:#181A22;color:#CAD3F5;border:1px solid rgba(202,211,245,0.1);border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;">${escapeHtml(s.importJson)}</button>
+              </div>
+            </div>
+            <div id="ag-cc-gl-import-box" style="display:none;flex-direction:column;gap:6px;">
+              <textarea id="ag-cc-gl-import-txt" rows="3" placeholder='{"Settings":"설정"}' style="background:#181A22;color:#CAD3F5;border:1px solid rgba(202,211,245,0.1);border-radius:6px;padding:6px 8px;font-size:11px;font-family:monospace;"></textarea>
+              <button type="button" id="ag-cc-gl-import-apply" class="agy-enh-primary" style="align-self:flex-end;background:#A0A3F6;color:#0B0B0E;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;">${escapeHtml(s.apply)}</button>
+            </div>
             <div style="display:flex;gap:6px;">
-              <input id="ag-cc-gl-src" placeholder="${isKo ? '원문 (예: Agent)' : 'Source text'}" style="flex:1;background:#181A22;color:#CAD3F5;border:1px solid rgba(202,211,245,0.1);border-radius:6px;padding:5px 8px;font-size:12px;" />
-              <input id="ag-cc-gl-dst" placeholder="${isKo ? '번역 (예: 에이전트)' : 'Target text'}" style="flex:1;background:#181A22;color:#CAD3F5;border:1px solid rgba(202,211,245,0.1);border-radius:6px;padding:5px 8px;font-size:12px;" />
-              <button type="button" id="ag-cc-gl-add" class="agy-enh-primary" style="background:#A0A3F6;color:#0B0B0E;border:none;border-radius:6px;padding:0 12px;height:28px;font-size:12px;font-weight:600;cursor:pointer;">${isKo ? '추가' : 'Add'}</button>
+              <input id="ag-cc-gl-src" placeholder="${escapeHtml(s.srcPh)}" style="flex:1;background:#181A22;color:#CAD3F5;border:1px solid rgba(202,211,245,0.1);border-radius:6px;padding:5px 8px;font-size:12px;" />
+              <input id="ag-cc-gl-dst" placeholder="${escapeHtml(s.dstPh)}" style="flex:1;background:#181A22;color:#CAD3F5;border:1px solid rgba(202,211,245,0.1);border-radius:6px;padding:5px 8px;font-size:12px;" />
+              <button type="button" id="ag-cc-gl-add" class="agy-enh-primary" style="background:#A0A3F6;color:#0B0B0E;border:none;border-radius:6px;padding:0 12px;height:28px;font-size:12px;font-weight:600;cursor:pointer;">${escapeHtml(s.add)}</button>
             </div>
-            <div style="display:flex;flex-direction:column;gap:4px;max-height:150px;overflow-y:auto;">${rowsHtml}</div>
+            <div style="display:flex;flex-direction:column;gap:4px;max-height:110px;overflow-y:auto;">${rowsHtml}</div>
           </div>
-          <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">
-            <div>
-              <div style="font-size:13px;font-weight:500;color:#CAD3F5;">${isKo ? '미번역 문자열 자동 수집 (Opt-in)' : 'Collect Untranslated Strings (Opt-in)'}</div>
-              <div style="font-size:11px;color:#818BA8;margin-top:2px;">${isKo ? '사전에 없는 UI 문구를 로컬 JSON에 기록합니다.' : 'Logs unmatched UI text locally for review.'}</div>
+          <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <div style="font-size:13px;font-weight:500;color:#CAD3F5;">${escapeHtml(s.collectUt)}</div>
+                <div style="font-size:11px;color:#818BA8;margin-top:2px;">${escapeHtml(s.collectUtDesc)}</div>
+              </div>
+              <input type="checkbox" id="ag-cc-ut-toggle" ${userPreferences.collectUntranslated ? 'checked' : ''} style="width:16px;height:16px;accent-color:#A0A3F6;cursor:pointer;" />
             </div>
-            <input type="checkbox" id="ag-cc-ut-toggle" ${userPreferences.collectUntranslated ? 'checked' : ''} style="width:16px;height:16px;accent-color:#A0A3F6;cursor:pointer;" />
+            <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(202,211,245,0.06);padding-top:8px;">
+              <span style="font-size:12px;color:#9DA7C7;">${escapeHtml(s.utList)} (<b id="ag-cc-ut-count" style="color:#CAD3F5;">0</b>)</span>
+              <div style="display:flex;gap:6px;">
+                <button type="button" id="ag-cc-ut-copy" class="agy-enh-btn" style="background:#181A22;color:#CAD3F5;border:1px solid rgba(202,211,245,0.1);border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;">${escapeHtml(s.copy)}</button>
+                <button type="button" id="ag-cc-ut-clear" class="agy-enh-btn" style="background:#181A22;color:#E56B6F;border:1px solid rgba(229,107,111,0.28);border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;">${escapeHtml(s.clear)}</button>
+              </div>
+            </div>
+            <div id="ag-cc-ut-list" style="max-height:76px;overflow-y:auto;font-size:11px;color:#818BA8;">${escapeHtml(s.emptyUt)}</div>
           </div>
         `;
         const addBtn = bodyEl.querySelector('#ag-cc-gl-add');
         if (addBtn) {
           addBtn.onclick = async () => {
-            const s = (bodyEl.querySelector('#ag-cc-gl-src').value || '').trim();
-            const d = (bodyEl.querySelector('#ag-cc-gl-dst').value || '').trim();
-            if (!s || !d) return;
+            const srcVal = (bodyEl.querySelector('#ag-cc-gl-src').value || '').trim();
+            const dstVal = (bodyEl.querySelector('#ag-cc-gl-dst').value || '').trim();
+            if (!srcVal || !dstVal) return;
             if (!userGlossary[activeLanguage]) userGlossary[activeLanguage] = {};
-            userGlossary[activeLanguage][s] = d;
+            userGlossary[activeLanguage][srcVal] = dstVal;
             if (ipc && ipc.invoke) await ipc.invoke('enhancer:save-glossary', userGlossary).catch(() => {});
             if (document.body && activeLanguage !== 'en') { revertToOriginal(document.body); translateNode(document.body); }
             renderTab('translation');
+          };
+        }
+        const expBtn = bodyEl.querySelector('#ag-cc-gl-export');
+        if (expBtn) {
+          expBtn.onclick = () => {
+            const json = JSON.stringify(userGlossary[activeLanguage] || {}, null, 2);
+            try { if (navigator && navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(json); } catch (_) {}
+            showToast(s.copied);
+          };
+        }
+        const impBtn = bodyEl.querySelector('#ag-cc-gl-import');
+        const impBox = bodyEl.querySelector('#ag-cc-gl-import-box');
+        if (impBtn && impBox) {
+          impBtn.onclick = () => { impBox.style.display = impBox.style.display === 'none' ? 'flex' : 'none'; };
+        }
+        const impApply = bodyEl.querySelector('#ag-cc-gl-import-apply');
+        if (impApply) {
+          impApply.onclick = async () => {
+            try {
+              const parsed = JSON.parse(bodyEl.querySelector('#ag-cc-gl-import-txt').value || '{}');
+              if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+                userGlossary[activeLanguage] = { ...(userGlossary[activeLanguage] || {}), ...parsed };
+                if (ipc && ipc.invoke) await ipc.invoke('enhancer:save-glossary', userGlossary).catch(() => {});
+                if (document.body && activeLanguage !== 'en') { revertToOriginal(document.body); translateNode(document.body); }
+                renderTab('translation');
+              }
+            } catch (_) {}
           };
         }
         bodyEl.querySelectorAll('.ag-cc-del-glossary').forEach(btn => {
@@ -1175,38 +1275,85 @@
         });
         const utToggle = bodyEl.querySelector('#ag-cc-ut-toggle');
         if (utToggle) utToggle.onchange = () => persistPreferences({ collectUntranslated: Boolean(utToggle.checked) });
+
+        let latestUtItems = [];
+        if (ipc && ipc.invoke) {
+          ipc.invoke('enhancer:get-untranslated').then((res) => {
+            if (!res || !Array.isArray(res.items)) return;
+            latestUtItems = res.items;
+            const cntEl = bodyEl.querySelector('#ag-cc-ut-count');
+            const listEl = bodyEl.querySelector('#ag-cc-ut-list');
+            if (cntEl) cntEl.textContent = String(latestUtItems.length);
+            if (listEl) {
+              listEl.innerHTML = latestUtItems.length > 0
+                ? latestUtItems.slice(-25).reverse().map(x => `<div style="padding:2px 0;color:#9DA7C7;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">• ${escapeHtml(typeof x === 'string' ? x : x.text)}</div>`).join('')
+                : escapeHtml(s.emptyUt);
+            }
+          }).catch(() => {});
+        }
+        const utCopy = bodyEl.querySelector('#ag-cc-ut-copy');
+        if (utCopy) {
+          utCopy.onclick = () => {
+            const txt = JSON.stringify(latestUtItems.map(x => (typeof x === 'string' ? x : x.text)), null, 2);
+            try { if (navigator && navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt); } catch (_) {}
+            showToast(s.copied);
+          };
+        }
+        const utClear = bodyEl.querySelector('#ag-cc-ut-clear');
+        if (utClear) {
+          utClear.onclick = async () => {
+            if (ipc && ipc.invoke) await ipc.invoke('enhancer:clear-untranslated').catch(() => {});
+            latestUtItems = [];
+            const cntEl = bodyEl.querySelector('#ag-cc-ut-count');
+            const listEl = bodyEl.querySelector('#ag-cc-ut-list');
+            if (cntEl) cntEl.textContent = '0';
+            if (listEl) listEl.textContent = s.emptyUt;
+          };
+        }
       } else if (currentTab === 'quota') {
         bodyEl.innerHTML = `
           <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">
             <div>
-              <div style="font-size:13px;font-weight:500;color:#CAD3F5;">${isKo ? '할당량 팝오버 스파크라인' : 'Quota Popover Sparklines'}</div>
-              <div style="font-size:11px;color:#818BA8;margin-top:2px;">${isKo ? '72시간 로컬 사용 추이 그래프를 표시합니다.' : 'Shows 72h local usage trend sparkline.'}</div>
+              <div style="font-size:13px;font-weight:500;color:#CAD3F5;">${escapeHtml(s.sparklines)}</div>
+              <div style="font-size:11px;color:#818BA8;margin-top:2px;">${escapeHtml(s.sparkDesc)}</div>
             </div>
             <input type="checkbox" id="ag-cc-spark-toggle" ${userPreferences.showSparklines !== false ? 'checked' : ''} style="width:16px;height:16px;accent-color:#A0A3F6;cursor:pointer;" />
+          </div>
+          <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <div style="font-size:13px;font-weight:500;color:#CAD3F5;">${escapeHtml(s.compactCard)}</div>
+              <div style="font-size:11px;color:#818BA8;margin-top:2px;">${escapeHtml(s.compactDesc)}</div>
+            </div>
+            <input type="checkbox" id="ag-cc-compact-toggle" ${userPreferences.compactQuotaCard ? 'checked' : ''} style="width:16px;height:16px;accent-color:#A0A3F6;cursor:pointer;" />
           </div>
           <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;">
             <div style="display:flex;justify-content:space-between;align-items:center;">
               <div>
-                <div style="font-size:13px;font-weight:500;color:#CAD3F5;">${isKo ? '저잔량 데스크톱 알림' : 'Low-Quota Desktop Alerts'}</div>
-                <div style="font-size:11px;color:#818BA8;margin-top:2px;">${isKo ? '임계치 미만 도달 시 모델별 1회 알림 (30분 쿨다운)' : 'Alerts once per model below threshold (30m cooldown).'}</div>
+                <div style="font-size:13px;font-weight:500;color:#CAD3F5;">${escapeHtml(s.lowAlert)}</div>
+                <div style="font-size:11px;color:#818BA8;margin-top:2px;">${escapeHtml(s.lowDesc)}</div>
               </div>
               <input type="checkbox" id="ag-cc-low-alert" ${userPreferences.quotaAlertsEnabled ? 'checked' : ''} style="width:16px;height:16px;accent-color:#A0A3F6;cursor:pointer;" />
             </div>
             <div style="display:flex;align-items:center;gap:10px;font-size:12px;color:#9DA7C7;">
-              <span>${isKo ? '임계치' : 'Threshold'}: <b id="ag-cc-thresh-val" style="color:#CAD3F5;font-variant-numeric:tabular-nums;">${userPreferences.quotaLowThreshold || 20}%</b></span>
+              <span>${escapeHtml(s.threshold)}: <b id="ag-cc-thresh-val" style="color:#CAD3F5;font-variant-numeric:tabular-nums;">${userPreferences.quotaLowThreshold || 20}%</b></span>
               <input type="range" id="ag-cc-thresh-range" min="5" max="50" step="5" value="${userPreferences.quotaLowThreshold || 20}" style="flex:1;accent-color:#A0A3F6;" />
             </div>
           </div>
           <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">
             <div>
-              <div style="font-size:13px;font-weight:500;color:#CAD3F5;">${isKo ? '할당량 리셋 완료 알림' : 'Quota Reset Alerts'}</div>
-              <div style="font-size:11px;color:#818BA8;margin-top:2px;">${isKo ? '고갈 후 80% 이상 회복 시 알림을 보냅니다.' : 'Notifies when quota recovers above 80% after depletion.'}</div>
+              <div style="font-size:13px;font-weight:500;color:#CAD3F5;">${escapeHtml(s.resetAlert)}</div>
+              <div style="font-size:11px;color:#818BA8;margin-top:2px;">${escapeHtml(s.resetDesc)}</div>
             </div>
             <input type="checkbox" id="ag-cc-reset-alert" ${userPreferences.quotaResetAlertsEnabled ? 'checked' : ''} style="width:16px;height:16px;accent-color:#A0A3F6;cursor:pointer;" />
+          </div>
+          <div style="display:flex;justify-content:flex-end;">
+            <button type="button" id="ag-cc-clear-hist" class="agy-enh-btn" style="background:#181A22;color:#E56B6F;border:1px solid rgba(229,107,111,0.28);border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;">${escapeHtml(s.clearHist)}</button>
           </div>
         `;
         const spark = bodyEl.querySelector('#ag-cc-spark-toggle');
         if (spark) spark.onchange = () => persistPreferences({ showSparklines: Boolean(spark.checked) });
+        const cmp = bodyEl.querySelector('#ag-cc-compact-toggle');
+        if (cmp) cmp.onchange = () => persistPreferences({ compactQuotaCard: Boolean(cmp.checked) });
         const lowA = bodyEl.querySelector('#ag-cc-low-alert');
         if (lowA) lowA.onchange = () => persistPreferences({ quotaAlertsEnabled: Boolean(lowA.checked) });
         const rstA = bodyEl.querySelector('#ag-cc-reset-alert');
@@ -1217,18 +1364,29 @@
           rng.oninput = () => { if (rngVal) rngVal.textContent = `${rng.value}%`; };
           rng.onchange = () => persistPreferences({ quotaLowThreshold: Number(rng.value) || 20 });
         }
+        const clrHist = bodyEl.querySelector('#ag-cc-clear-hist');
+        if (clrHist) {
+          clrHist.onclick = async () => {
+            if (ipc && ipc.invoke) await ipc.invoke('enhancer:clear-quota-history').catch(() => {});
+            quotaHistoryState = {};
+            if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
+              window.dispatchEvent(new CustomEvent('antigravity-quota-history-updated', { detail: { history: {}, preferences: userPreferences } }));
+            }
+            showToast(s.cleared);
+          };
+        }
       } else if (currentTab === 'shortcuts') {
         bodyEl.innerHTML = `
           <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">
-            <span style="font-size:13px;color:#CAD3F5;">${isKo ? '언어 순환 단축키' : 'Cycle Language Shortcut'}</span>
+            <span style="font-size:13px;color:#CAD3F5;">${escapeHtml(s.cycleKey)}</span>
             <button type="button" id="ag-cc-rec-lang" class="agy-enh-btn" style="background:#181A22;color:#A0A3F6;border:1px solid rgba(160,163,246,0.32);border-radius:6px;padding:5px 10px;font-size:12px;font-weight:500;cursor:pointer;font-variant-numeric:tabular-nums;">${escapeHtml(userPreferences.shortcutCycleLang)}</button>
           </div>
           <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">
-            <span style="font-size:13px;color:#CAD3F5;">${isKo ? 'Control Center 열기' : 'Open Control Center'}</span>
+            <span style="font-size:13px;color:#CAD3F5;">${escapeHtml(s.centerKey)}</span>
             <button type="button" id="ag-cc-rec-center" class="agy-enh-btn" style="background:#181A22;color:#A0A3F6;border:1px solid rgba(160,163,246,0.32);border-radius:6px;padding:5px 10px;font-size:12px;font-weight:500;cursor:pointer;font-variant-numeric:tabular-nums;">${escapeHtml(userPreferences.shortcutOpenCenter)}</button>
           </div>
           <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;">
-            <div style="font-size:13px;font-weight:500;color:#CAD3F5;margin-bottom:4px;">${isKo ? '시스템 진단' : 'Diagnostics'}</div>
+            <div style="font-size:13px;font-weight:500;color:#CAD3F5;margin-bottom:4px;">${escapeHtml(s.diagnostics)}</div>
             <div id="ag-cc-diag-box" style="font-size:11px;color:#818BA8;line-height:1.6;">Enhancer v${ENHANCER_CURRENT_VERSION}</div>
           </div>
         `;
@@ -1239,7 +1397,7 @@
             if (e) e.stopPropagation();
             cleanupRecorder();
             const prevSpec = userPreferences[prefKey];
-            btn.textContent = isKo ? '키 조합 입력 (ESC 취소)...' : 'Press keys (ESC cancel)...';
+            btn.textContent = s.pressKeys;
             const onKey = (ev) => {
               ev.preventDefault();
               ev.stopPropagation();
@@ -1265,7 +1423,9 @@
           ipc.invoke('enhancer:get-status').then((st) => {
             const box = bodyEl.querySelector('#ag-cc-diag-box');
             if (st && box) {
-              box.innerHTML = `App: <b style="color:#CAD3F5;">${escapeHtml(st.appVersion || '')}</b> · ASAR Bootstrap: <b style="color:#4CC38A;">${st.asarBootstrapped ? 'Active' : 'Inactive'}</b><br/>Dir: ${escapeHtml(st.enhancerDir || '')}`;
+              const ar = st.autoRepatchStatus;
+              const arTxt = ar ? `${escapeHtml(ar.status || '')}${ar.ts ? ` (${new Date(ar.ts).toLocaleString()})` : ''}` : 'N/A';
+              box.innerHTML = `App: <b style="color:#CAD3F5;">${escapeHtml(st.appVersion || '')}</b> · ASAR Bootstrap: <b style="color:#4CC38A;">${st.asarBootstrapped ? 'Active' : 'Inactive'}</b><br/>${escapeHtml(s.autoRepatch)}: <b style="color:#CAD3F5;">${arTxt}</b><br/>Dir: ${escapeHtml(st.enhancerDir || '')}`;
             }
           }).catch(() => {});
         }
@@ -2413,11 +2573,13 @@
 
       let quotaHistoryCache = {};
       let quotaShowSparklines = true;
+      let quotaCompactCard = false;
       window.addEventListener('antigravity-quota-history-updated', (ev) => {
         if (ev && ev.detail) {
           if (ev.detail.history) quotaHistoryCache = ev.detail.history;
-          if (ev.detail.preferences && typeof ev.detail.preferences.showSparklines === 'boolean') {
-            quotaShowSparklines = ev.detail.preferences.showSparklines;
+          if (ev.detail.preferences) {
+            if (typeof ev.detail.preferences.showSparklines === 'boolean') quotaShowSparklines = ev.detail.preferences.showSparklines;
+            if (typeof ev.detail.preferences.compactQuotaCard === 'boolean') quotaCompactCard = ev.detail.preferences.compactQuotaCard;
           }
         }
       });
@@ -2524,7 +2686,9 @@
           const spark = renderSparklineSvg(hist, isLow);
           const etaTxt = calcBurnRateAndEta(hist, g.h5);
           const borderStyle = isLow ? 'background:rgba(229,107,111,0.08);border:1px solid rgba(229,107,111,0.32);' : 'background:#161820;border:1px solid rgba(202,211,245,0.08);';
-          return `<section class="group-card rounded-lg p-2 mb-2" style="${borderStyle}border-radius:8px;padding:8px 12px;margin-bottom:8px;"><header style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><div style="display:inline-flex;align-items:center;gap:6px;flex-shrink:0;white-space:nowrap;"><strong style="font-weight:600;font-size:12px;white-space:nowrap;color:${isLow ? '#E56B6F' : g.color};">${g.label}</strong>${g.id === currentActiveGroup ? `<em style="font-style:normal;font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;white-space:nowrap;flex-shrink:0;line-height:1.2;background:rgba(160,163,246,0.14);color:#A0A3F6;border:1px solid rgba(160,163,246,0.32);">${qs.activeTag}</em>` : ''}</div>${spark}<span style="font-size:11px;color:#818BA8;flex:1;min-width:0;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${etaTxt || (g.models || []).join(', ')}</span></header><main>${rows || '<p style="margin:4px 0 0;font-size:11px;color:#818BA8;">--</p>'}</main></section>`;
+          const cardPad = quotaCompactCard ? 'padding:6px 10px;margin-bottom:6px;' : 'padding:8px 12px;margin-bottom:8px;';
+          const rightMeta = etaTxt || (quotaCompactCard ? '' : (g.models || []).join(', '));
+          return `<section class="group-card rounded-lg p-2 mb-2" style="${borderStyle}border-radius:8px;${cardPad}"><header style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><div style="display:inline-flex;align-items:center;gap:6px;flex-shrink:0;white-space:nowrap;"><strong style="font-weight:600;font-size:12px;white-space:nowrap;color:${isLow ? '#E56B6F' : g.color};">${g.label}</strong>${g.id === currentActiveGroup ? `<em style="font-style:normal;font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;white-space:nowrap;flex-shrink:0;line-height:1.2;background:rgba(160,163,246,0.14);color:#A0A3F6;border:1px solid rgba(160,163,246,0.32);">${qs.activeTag}</em>` : ''}</div>${spark}<span style="font-size:11px;color:#818BA8;flex:1;min-width:0;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${rightMeta}</span></header><main>${rows || '<p style="margin:4px 0 0;font-size:11px;color:#818BA8;">--</p>'}</main></section>`;
         }).join('');
 
         pop.innerHTML = `<header style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid rgba(202,211,245,0.08);"><span style="font-weight:600;font-size:13px;color:#CAD3F5;">${qs.title}</span><button id="antigravity-popover-refresh" title="${qs.refresh}" style="background:none;border:none;color:#9DA7C7;cursor:pointer;padding:0;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg></button></header><main>${cardsHtml}</main><footer style="margin-top:4px;padding-top:8px;text-align:right;border-top:1px solid rgba(202,211,245,0.08);"><button id="antigravity-open-models-settings" style="background:none;border:none;color:#A0A3F6;font-size:12px;font-weight:500;cursor:pointer;">${qs.openSettings}</button></footer>`;
@@ -2867,6 +3031,14 @@
         scheduleInjectTitleMenuIntegration();
       }
     }, 2000);
+  }
+
+  if (typeof window !== 'undefined') {
+    window.__agEnhancerTestHooks = {
+      formatShortcutFromEvent,
+      matchesShortcut,
+      getControlCenterStrings
+    };
   }
 
   if (typeof document !== 'undefined') {
