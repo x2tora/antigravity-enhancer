@@ -1,5 +1,5 @@
 /**
- * Antigravity Enhancer v4.0.4 - Main Process Bridge, Persistence & Secure In-App Updater
+ * Antigravity Enhancer v4.0.4.1 - Main Process Bridge, Persistence & Secure In-App Updater
  * Source Repo: https://github.com/x2tora/antigravity-enhancer
  */
 'use strict';
@@ -480,7 +480,7 @@ function loadBootstrapPayload(forceRefresh = false, langId = null) {
 
       cachedBootstrapPayload = {
         disabled: false,
-        version: manifest.version || '4.0.4',
+        version: manifest.version || '4.0.4.1',
         repo: ENHANCER_REPO,
         code: rendererCode,
         gsapCode,
@@ -526,7 +526,7 @@ function getFullStatus() {
   } catch (_) {}
 
   return {
-    enhancerVersion: manifest.version || '4.0.4',
+    enhancerVersion: manifest.version || '4.0.4.1',
     appVersion: (el && el.app && el.app.getVersion) ? el.app.getVersion() : 'unknown',
     repo: ENHANCER_REPO,
     enhancerDir,
@@ -555,8 +555,14 @@ function ensureAutoRepatchWrappers(targetDir = enhancerDir, appExePath = null) {
       `  & '${exe.replace(/'/g, "''")}' '${scriptPath.replace(/'/g, "''")}'\r\n` +
       "}\r\n";
     const vbsBody =
-      'Set sh = CreateObject("WScript.Shell")\r\n' +
-      `sh.Run "powershell.exe -NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -File ""${psPath}""", 0, False\r\n`;
+      'On Error Resume Next\r\n' +
+      'Set wmi = GetObject("winmgmts:\\\\.\\root\\cimv2")\r\n' +
+      'Set procs = wmi.ExecQuery("Select ProcessId from Win32_Process where Name=\'Antigravity.exe\'")\r\n' +
+      'If procs.Count = 0 Then\r\n' +
+      '  Set sh = CreateObject("WScript.Shell")\r\n' +
+      '  sh.Environment("PROCESS")("ELECTRON_RUN_AS_NODE") = "1"\r\n' +
+      `  sh.Run """${exe}"" ""${scriptPath}""", 0, False\r\n` +
+      'End If\r\n';
     if (!fs.existsSync(psPath) || fs.readFileSync(psPath, 'utf8') !== psBody) {
       fs.writeFileSync(psPath, psBody, 'utf8');
     }
@@ -683,7 +689,7 @@ async function checkRemoteUpdate() {
 
 async function applyInAppUpdate(refBranch = 'main') {
   const local = getLocalManifest();
-  const prevVersion = local.version || '4.0.4';
+  const prevVersion = local.version || '4.0.4.1';
 
   broadcastEvent('enhancer:update-progress', { phase: 'manifest', percent: 8, message: 'Fetching signed manifest...' });
   const manifestUrl = `https://raw.githubusercontent.com/${ENHANCER_REPO}/${encodeURIComponent(refBranch)}/enhancer/manifest.json?t=${Date.now()}`;

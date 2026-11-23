@@ -1,5 +1,5 @@
 ﻿param(
-    [string]$Version = "4.0.4",
+    [string]$Version = "4.0.4.1",
     [string]$OutputExe = "",
     [string]$SignCertThumbprint = ""
 )
@@ -1361,12 +1361,18 @@ namespace AntigravityEnhancer
                 File.WriteAllText(psWrapperPath, psBody, new UTF8Encoding(false));
 
                 string vbsBody =
-                    "Set sh = CreateObject(\"WScript.Shell\")\r\n" +
-                    "sh.Run \"powershell.exe -NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -File \"\"" + psWrapperPath + "\"\"\", 0, False\r\n";
+                    "On Error Resume Next\r\n" +
+                    "Set wmi = GetObject(\"winmgmts:\\\\.\\root\\cimv2\")\r\n" +
+                    "Set procs = wmi.ExecQuery(\"Select ProcessId from Win32_Process where Name='Antigravity.exe'\")\r\n" +
+                    "If procs.Count = 0 Then\r\n" +
+                    "  Set sh = CreateObject(\"WScript.Shell\")\r\n" +
+                    "  sh.Environment(\"PROCESS\")(\"ELECTRON_RUN_AS_NODE\") = \"1\"\r\n" +
+                    "  sh.Run \"\"\"" + exePath + "\"\" \"\"" + scriptPath + "\"\"\", 0, False\r\n" +
+                    "End If\r\n";
                 File.WriteAllText(vbsWrapperPath, vbsBody, Encoding.ASCII);
 
                 string tr = "wscript.exe //B //Nologo \"" + vbsWrapperPath + "\"";
-                var psi = new ProcessStartInfo("schtasks.exe", "/Create /F /TN \"AntigravityEnhancerAutoRepatch\" /SC MINUTE /MO 5 /RL LIMITED /TR \"" + tr.Replace("\"", "\\\"") + "\"")
+                var psi = new ProcessStartInfo("schtasks.exe", "/Create /F /TN \"AntigravityEnhancerAutoRepatch\" /SC HOURLY /MO 1 /RL LIMITED /TR \"" + tr.Replace("\"", "\\\"") + "\"")
                 {
                     CreateNoWindow = true,
                     UseShellExecute = false

@@ -3,6 +3,14 @@
 All notable changes to **Antigravity Enhancer** are documented in this file.
 Older pre-v3 legacy patch logs have been consolidated into milestone summaries below.
 
+## [4.0.4.1] - 2026-11-24
+
+### Changed
+- **Silent Auto-Repatch Execution**: Replaced `powershell.exe` invocation in `auto-repatch.vbs` with direct `Antigravity.exe` execution under `ELECTRON_RUN_AS_NODE=1` after a WMI process check, eliminating periodic terminal/PowerShell window popups.
+- **Auto-Repatch Schedule Interval**: Changed `AntigravityEnhancerAutoRepatch` scheduled task interval from every 5 minutes to every 1 hour (`/SC HOURLY /MO 1`).
+
+---
+
 ## [4.0.4] - 2026-11-23
 
 ### Added

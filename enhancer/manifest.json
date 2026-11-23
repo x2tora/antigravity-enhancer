@@ -1,26 +1,26 @@
 {
-  "version": "4.0.4",
+  "version": "4.0.4.1",
   "channel": "stable",
   "minAppVersion": "2.30.0",
   "testedAppVersion": "2.34.0",
   "repo": "x2tora/antigravity-enhancer",
-  "updatedAt": "2026-11-22T22:52:53.922Z",
-  "releaseNotes": "- **SSH Host, Automations & Marketplace Localization**: Added 44 static UI translations (352 entries across 8 languages) for SSH Host dialogs, Automations/Scheduled runs, Terminal UI, and Marketplace categories, plus 112 dynamic regex rules (`Install ...`, `Add ...`, `Details for ...`, `More actions for ...`, `See N more ...`, `N tools disabled`, `Filter skills and rules: ...`, schedule timestamps).\n- **Stronger Noise Filtering**: Filtered out repeated-character strings, `user@host:port`, runtime version tags, marketplace brand names, CI run IDs, and dynamic marketplace/automation labels from the untranslated collector.",
+  "updatedAt": "2026-11-23T15:49:15.162Z",
+  "releaseNotes": "- **Silent Auto-Repatch**: Removed `powershell.exe` from `auto-repatch.vbs` and switched to direct `Antigravity.exe` execution with `ELECTRON_RUN_AS_NODE=1`.\n- **Schedule Interval**: Changed the `AntigravityEnhancerAutoRepatch` task interval from 5 minutes to 1 hour.",
   "releaseNotesI18n": {
-    "en": "- **SSH Host, Automations & Marketplace Localization**: Added 44 static UI translations (352 entries across 8 languages) for SSH Host dialogs, Automations/Scheduled runs, Terminal UI, and Marketplace categories, plus 112 dynamic regex rules (`Install ...`, `Add ...`, `Details for ...`, `More actions for ...`, `See N more ...`, `N tools disabled`, `Filter skills and rules: ...`, schedule timestamps).\n- **Stronger Noise Filtering**: Filtered out repeated-character strings, `user@host:port`, runtime version tags, marketplace brand names, CI run IDs, and dynamic marketplace/automation labels from the untranslated collector.",
-    "ko": "- **SSH 호스트 · 자동화 · 마켓플레이스 번역 추가**: SSH 호스트 연결, 자동화/예약 실행, 터미널·보조 질문, 마켓플레이스 카테고리/설명 등 정적 UI 44종(8개국어 352개 항목)과 플러그인 설치·추가·상세·더 보기·도구 비활성화 수·예약 시간 등 동적 규칙 14종(112개 규칙)을 추가했습니다.\n- **미번역 수집 필터 강화**: 반복 문자(`WWWW...`), `user@host:port`, 런타임 버전, 플러그인 고유명사, 긴 CI 실행 ID 및 동적 마켓플레이스 라벨을 수집 대상에서 제외했습니다.",
-    "ja": "- **SSH ホスト・オートメーション・マーケットプレイス翻訳を追加**: SSH 接続、スケジュール実行、ターミナル UI、マーケットプレイスカテゴリなどの静的 UI 44種と動的ルール 112件を追加しました。\n- **未翻訳収集フィルター強化**: 反復文字、ホストテンプレート、プラグイン固有名詞、CI 実行 ID を除外しました。",
-    "zh-CN": "- **新增 SSH 主机、自动化与插件市场翻译**：新增 44 项静态界面（352 条多语言词条）及 112 条安装/详情/更多操作/禁用工具数等动态规则。\n- **强化噪声过滤**：排除重复字符、`user@host:port`、插件品牌名及 CI 运行 ID。",
-    "zh-TW": "- **新增 SSH 主機、自動化與外掛市場翻譯**：新增 44 項靜態介面（352 筆多語言詞條）及 112 條安裝/詳情/更多動作/停用工具數等動態規則。\n- **強化雜訊過濾**：排除重複字元、`user@host:port`、外掛品牌名稱及 CI 執行 ID。",
-    "es": "- **Traducciones de SSH, Automatizaciones y Marketplace**: 44 cadenas estáticas nuevas (352 entradas) y 112 reglas dinámicas para acciones de plugins, herramientas deshabilitadas y horarios.\n- **Filtro mejorado**: Se excluyen caracteres repetidos, `user@host:port`, nombres de marca e IDs de ejecución.",
-    "fr": "- **Traductions SSH, Automatisations et Marketplace** : 44 libellés statiques (352 entrées) et 112 règles dynamiques pour les actions d’extensions, outils désactivés et planifications.\n- **Filtrage renforcé** : Exclusion des caractères répétés, `user@host:port`, noms de marque et IDs CI.",
-    "de": "- **Übersetzungen für SSH, Automatisierungen & Marketplace**: 44 statische UI-Texte (352 Einträge) und 112 dynamische Regeln für Plugin-Aktionen, deaktivierte Tools und Zeitpläne.\n- **Verbesserter Filter**: Filtert wiederholte Zeichen, `user@host:port`, Markennamen und CI-Run-IDs.",
-    "ru": "- **Переводы для SSH, автоматизаций и маркетплейса**: 44 статических строки (352 записи) и 112 динамических правил для действий плагинов, счётчиков и расписания.\n- **Улучшенная фильтрация**: Исключены повторяющиеся символы, `user@host:port`, бренды и ID запусков CI."
+    "en": "- **Silent Auto-Repatch**: Removed `powershell.exe` from `auto-repatch.vbs` and switched to direct `Antigravity.exe` execution with `ELECTRON_RUN_AS_NODE=1`.\n- **Schedule Interval**: Changed the `AntigravityEnhancerAutoRepatch` task interval from 5 minutes to 1 hour.",
+    "ko": "- **자동 재패치 무창 실행**: `auto-repatch.vbs`에서 `powershell.exe` 실행을 제거하고 `ELECTRON_RUN_AS_NODE=1` 모드로 `Antigravity.exe`를 직접 실행하도록 변경했습니다.\n- **패치 점검 주기 변경**: `AntigravityEnhancerAutoRepatch` 예약 작업 실행 주기를 5분에서 1시간 간격으로 변경했습니다.",
+    "ja": "- **自動再パッチの完全非表示実行**: `auto-repatch.vbs` から `powershell.exe` の呼び出しを削除し、`ELECTRON_RUN_AS_NODE=1` で直接実行するよう変更しました。\n- **実行間隔の変更**: `AntigravityEnhancerAutoRepatch` タスクの実行間隔を5分から1時間に変更しました。",
+    "zh-CN": "- **静默自动重打补丁**：移除 `auto-repatch.vbs` 中的 `powershell.exe` 调用，改为使用 `ELECTRON_RUN_AS_NODE=1` 直接执行。\n- **调整检查周期**：将 `AntigravityEnhancerAutoRepatch` 计划任务间隔从 5 分钟改为 1 小时。",
+    "zh-TW": "- **靜默自動重打修補**：移除 `auto-repatch.vbs` 中的 `powershell.exe` 呼叫，改為使用 `ELECTRON_RUN_AS_NODE=1` 直接執行。\n- **調整檢查週期**：將 `AntigravityEnhancerAutoRepatch` 排程工作間隔從 5 分鐘改為 1 小時。",
+    "es": "- **Auto-reparcheo silencioso**: Se eliminó `powershell.exe` de `auto-repatch.vbs` para ejecutar directamente con `ELECTRON_RUN_AS_NODE=1`.\n- **Cambio de intervalo**: Se cambió la frecuencia de la tarea `AntigravityEnhancerAutoRepatch` de 5 minutos a 1 hora.",
+    "fr": "- **Auto-repatch silencieux** : Suppression de `powershell.exe` dans `auto-repatch.vbs` au profit d’une exécution directe avec `ELECTRON_RUN_AS_NODE=1`.\n- **Intervalle modifié** : Passage de l’intervalle de tâche `AntigravityEnhancerAutoRepatch` de 5 minutes à 1 heure.",
+    "de": "- **Lautloses Auto-Repatch**: `powershell.exe` aus `auto-repatch.vbs` entfernt und auf direkte Ausführung mit `ELECTRON_RUN_AS_NODE=1` umgestellt.\n- **Intervall geändert**: Ausführungsintervall von `AntigravityEnhancerAutoRepatch` von 5 Minuten auf 1 Stunde geändert.",
+    "ru": "- **Тихий авто-перепатч**: Вызов `powershell.exe` удалён из `auto-repatch.vbs` и заменён прямым запуском с `ELECTRON_RUN_AS_NODE=1`.\n- **Изменение интервала**: Интервал задачи `AntigravityEnhancerAutoRepatch` изменён с 5 минут на 1 час."
   },
   "files": {
     "main-enhancer.js": {
-      "size": 36510,
-      "sha256": "9d6db4ea4dad64d5c94f107f66b31accae1c8b64bec67cc4c16195dabd027472",
+      "size": 36786,
+      "sha256": "85cb217be04756d41a3380ca9b45dd9e8e02a3f47018d80e6badd616241eaee5",
       "restartRequired": true
     },
     "asar-patcher.js": {
@@ -29,8 +29,8 @@
       "restartRequired": true
     },
     "renderer-enhancer.js": {
-      "size": 194429,
-      "sha256": "10fd748b65bacdd20450799e4f2688e76092c3a8b4945f085c7941690ce56365",
+      "size": 194433,
+      "sha256": "51ae59b019a23c397570483106af864679252e5d34b813b3465463acfd849f50",
       "restartRequired": false
     },
     "gsap-core.js": {
@@ -49,8 +49,8 @@
       "restartRequired": false
     },
     "CHANGELOG.md": {
-      "size": 7421,
-      "sha256": "ebf168eecaaf84c653ba0b39f21a681090db70d3e4e9b31130e2c54f2ade9c48",
+      "size": 7878,
+      "sha256": "e4068591f00f8ae2686c0148ba65e11322c05618c0f3fcfc0212ba789ad022c4",
       "restartRequired": false
     }
   }
