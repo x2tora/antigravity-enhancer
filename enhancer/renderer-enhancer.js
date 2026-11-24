@@ -1,5 +1,5 @@
 /**
- * Antigravity Enhancer v4.0.6 - Modular Renderer Enhancer Engine
+ * Antigravity Enhancer v4.0.7 - Modular Renderer Enhancer Engine
  * Features: 9-Language Zero-Restart i18n, Translation Engine 2.0 (Slice + Glossary),
  *           Quota Intelligence (Sparklines, Burn-Rate ETA & Alerts),
  *           Enhancer Control Center & Custom Shortcuts (x2tora/antigravity-enhancer)
@@ -11,7 +11,7 @@
   const ipc = electron_1 ? electron_1.ipcRenderer : null;
   const payload = (typeof __ENHANCER_PAYLOAD__ !== 'undefined' && __ENHANCER_PAYLOAD__) ? __ENHANCER_PAYLOAD__ : {};
   const ENHANCER_REPO = payload.repo || 'x2tora/antigravity-enhancer';
-  const ENHANCER_CURRENT_VERSION = payload.version || '4.0.6';
+  const ENHANCER_CURRENT_VERSION = payload.version || '4.0.7';
 
   const DEFAULT_PREFS = {
     shortcutCycleLang: 'Alt+Shift+L',
@@ -240,7 +240,7 @@
     // Brand / model / codename standalone labels & dynamic multi-word Close <Title>
     if (/(.)\1{5,}/.test(trimmed)) return true;
     if (/^(?:Antigravity|Antigravity Enhancer|Argon|Gemini|Migratify|Gero|Supabase|Gmail|Inter|Google Sans|Object|Users|Desktop|e2e|_ns)$/i.test(trimmed)) return true;
-    if (/^(?:Notion|Context7|Linear|Dynatrace|Stripe|Canva|Figma|Mobbin|Dropbox|Granola|Cloudflare|Netlify|Railway|Spacefast|Wix|Arize AX|Auth0|Base44|Better Stack|Browserbase|Clerk|Bigin|Intercom|Levels\.fyi|Semrush|Looker|n8n|Google Workspace|Google Docs|Google Sheets|Google Slides|Google Calendar|Data Agent Kit|Robotics|Genomics|Chemistry|Descrybe Legal Engine|Midpage Legal Research|Science Overview|Structural Biology|Scientific Literature)$/i.test(trimmed)) return true;
+    if (/^(?:Notion|Context7|Linear|Dynatrace|Stripe|Canva|Figma|Mobbin|Dropbox|Granola|Cloudflare|Netlify|Railway|Spacefast|Wix|Arize AX|Auth0|Base44|Better Stack|Browserbase|Clerk|Bigin|Intercom|Levels\.fyi|Semrush|Looker|n8n|Kling AI|Atlassian Teamwork Graph CLI|Google Workspace|Google Docs|Google Sheets|Google Slides|Google Calendar|Data Agent Kit|Robotics|Genomics|Chemistry|Descrybe Legal Engine|Midpage Legal Research|Science Overview|Structural Biology|Scientific Literature)$/i.test(trimmed)) return true;
     if (/^(?:Gemini\s+\d+|Google AI\b|Gemini API$|Claude\s+(?:Opus|Sonnet|Haiku)\s+[\d.]+$|(?:PowerShell|Node\.js|Python|Electron|Chrome)\s+[\d.]+$)/i.test(trimmed)) return true;
     if (/^(?:Ctrl|Alt|Shift|Meta|Cmd|Opt|Enter|Esc|Tab|Space|Backspace|Delete)$/i.test(trimmed)) return true;
     if (/^\d+(?:\.\d+)?(?:px|rem|em|pt|%|ms|s)$/i.test(trimmed)) return true;
@@ -489,7 +489,21 @@
 
       try {
         const sourceText = node._originalText !== undefined ? node._originalText : raw;
-        const translated = translateText(sourceText, activeLanguage, !isUserContentElement(parent));
+        let translated = null;
+        if (activeLanguage === 'ko') {
+          const stTrim = sourceText.trim();
+          if (stTrim === 'Visit') {
+            const pTxt = (parent.textContent || '').toLowerCase();
+            if (pTxt.includes('legal reasons') || pTxt.includes('법적 도움말')) {
+              translated = '법적인 이유로 콘텐츠 변경을 요청하려면 ';
+            }
+          } else if (stTrim === 'to ask for content changes for legal reasons.') {
+            translated = ' 페이지를 방문하세요.';
+          }
+        }
+        if (translated === null) {
+          translated = translateText(sourceText, activeLanguage, !isUserContentElement(parent));
+        }
         if (typeof translated === 'string' && translated !== raw) {
           node._isTranslating = true;
           node._lastTranslatedValue = translated;
