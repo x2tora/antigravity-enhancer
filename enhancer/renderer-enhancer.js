@@ -1,6 +1,6 @@
 /**
- * Antigravity Enhancer v4.0.7 - Modular Renderer Enhancer Engine
- * Features: 9-Language Zero-Restart i18n, Translation Engine 2.0 (Slice + Glossary),
+ * Antigravity Enhancer v4.1.0 - Modular Renderer Enhancer Engine
+ * Features: 15-Language Zero-Restart i18n, Translation Engine 3.0 (Slice + Composite DOM + Glossary),
  *           Quota Intelligence (Sparklines, Burn-Rate ETA & Alerts),
  *           Enhancer Control Center & Custom Shortcuts (x2tora/antigravity-enhancer)
  */
@@ -11,7 +11,7 @@
   const ipc = electron_1 ? electron_1.ipcRenderer : null;
   const payload = (typeof __ENHANCER_PAYLOAD__ !== 'undefined' && __ENHANCER_PAYLOAD__) ? __ENHANCER_PAYLOAD__ : {};
   const ENHANCER_REPO = payload.repo || 'x2tora/antigravity-enhancer';
-  const ENHANCER_CURRENT_VERSION = payload.version || '4.0.7';
+  const ENHANCER_CURRENT_VERSION = payload.version || '4.1.0';
 
   const DEFAULT_PREFS = {
     shortcutCycleLang: 'Alt+Shift+L',
@@ -40,9 +40,41 @@
   } catch (_) {}
 
   // ---------------------------------------------------------------------------
-  // 2. Dictionaries & Translation Engine
+  // 2. Dictionaries & Translation Engine 3.0
   // ---------------------------------------------------------------------------
-  const dicts = payload.dictionaries || {};
+  function hydrateCompactDicts(raw) {
+    if (!raw || typeof raw !== 'object') return {};
+    if (raw.__hydrated || (raw.exactDict && Object.keys(raw.exactDict).length > 0 && raw.translations && !raw.keyTable)) {
+      return raw;
+    }
+    const out = { ...raw, __hydrated: true };
+    if (Array.isArray(raw.keyTable) && Array.isArray(raw.keyToConcept) && raw.conceptPools && typeof raw.conceptPools === 'object') {
+      const keys = raw.keyTable;
+      const k2c = raw.keyToConcept;
+      const pools = raw.conceptPools;
+      const koPool = Array.isArray(pools.ko) ? pools.ko : [];
+      const ed = { ...(raw.koOnlyExact || {}) };
+      for (let i = 0; i < keys.length; i++) {
+        const val = koPool[k2c[i]];
+        if (typeof val === 'string') ed[keys[i]] = val;
+      }
+      const tr = { ...(raw.translations || {}) };
+      for (const [lang, pool] of Object.entries(pools)) {
+        if (lang === 'ko' || !Array.isArray(pool)) continue;
+        const map = { ...(tr[lang] || {}) };
+        for (let i = 0; i < keys.length; i++) {
+          const val = pool[k2c[i]];
+          if (typeof val === 'string') map[keys[i]] = val;
+        }
+        tr[lang] = map;
+      }
+      out.exactDict = ed;
+      out.translations = tr;
+    }
+    return out;
+  }
+
+  const dicts = hydrateCompactDicts(payload.dictionaries || {});
   const SUPPORTED_LANGUAGES = dicts.SUPPORTED_LANGUAGES || [
     { id: 'en', native: 'English', enName: 'English' },
     { id: 'ko', native: '한국어', enName: 'Korean' },
@@ -52,13 +84,22 @@
     { id: 'es', native: 'Español', enName: 'Spanish' },
     { id: 'fr', native: 'Français', enName: 'French' },
     { id: 'de', native: 'Deutsch', enName: 'German' },
-    { id: 'ru', native: 'Русский', enName: 'Russian' }
+    { id: 'ru', native: 'Русский', enName: 'Russian' },
+    { id: 'pt-BR', native: 'Português (Brasil)', enName: 'Portuguese (Brazil)' },
+    { id: 'vi', native: 'Tiếng Việt', enName: 'Vietnamese' },
+    { id: 'it', native: 'Italiano', enName: 'Italian' },
+    { id: 'id', native: 'Bahasa Indonesia', enName: 'Indonesian' },
+    { id: 'tr', native: 'Türkçe', enName: 'Turkish' },
+    { id: 'pl', native: 'Polski', enName: 'Polish' }
   ];
   const LANG_ORDER = dicts.LANG_ORDER || SUPPORTED_LANGUAGES.map(l => l.id);
+  const NON_KO_TARGET_LANGS = ['ja', 'zh-CN', 'zh-TW', 'es', 'fr', 'de', 'ru', 'pt-BR', 'vi', 'it', 'id', 'tr', 'pl'];
   const exactDict = dicts.exactDict || {};
   const translations = dicts.translations || {};
   const fragmentRules = dicts.fragmentRules || [];
   const placeholders = dicts.placeholders || {};
+  const placeholdersByLang = dicts.placeholdersByLang || {};
+  const compositeTemplates = dicts.compositeTemplates || {};
   const multiLangFragments = dicts.multiLangFragments || {};
 
   function compileDynamicRules(list) {
@@ -173,7 +214,7 @@
 
   buildLangIndices('ko', exactDict);
   if (Object.keys(exactDict).length > 0) loadedLanguages.add('ko');
-  for (const l of ['ja', 'zh-CN', 'zh-TW', 'es', 'fr', 'de', 'ru']) {
+  for (const l of NON_KO_TARGET_LANGS) {
     buildLangIndices(l, translations[l]);
     if (translations[l] && Object.keys(translations[l]).length > 0) loadedLanguages.add(l);
   }
@@ -185,6 +226,9 @@
       const res = await ipc.invoke('enhancer:get-language-dict', lang);
       if (res && res.ok && res.slice) {
         const s = res.slice;
+        if (s.compositeTemplates && s.compositeTemplates[lang]) {
+          compositeTemplates[lang] = s.compositeTemplates[lang];
+        }
         if (lang === 'ko') {
           if (s.exactDict) Object.assign(exactDict, s.exactDict);
           if (s.placeholders) Object.assign(placeholders, s.placeholders);
@@ -195,6 +239,9 @@
           if (s.translations && s.translations[lang]) {
             translations[lang] = s.translations[lang];
             buildLangIndices(lang, translations[lang]);
+          }
+          if (s.placeholdersByLang && s.placeholdersByLang[lang]) {
+            placeholdersByLang[lang] = s.placeholdersByLang[lang];
           }
           if (s.multiLangFragments && s.multiLangFragments[lang]) {
             multiLangFragments[lang] = s.multiLangFragments[lang];
@@ -313,7 +360,13 @@
     es: { native: 'Español', en: 'Spanish' },
     fr: { native: 'Français', en: 'French' },
     de: { native: 'Deutsch', en: 'German' },
-    ru: { native: 'Русский', en: 'Russian' }
+    ru: { native: 'Русский', en: 'Russian' },
+    'pt-BR': { native: 'Português (Brasil)', en: 'Portuguese' },
+    vi: { native: 'Tiếng Việt', en: 'Vietnamese' },
+    it: { native: 'Italiano', en: 'Italian' },
+    id: { native: 'Bahasa Indonesia', en: 'Indonesian' },
+    tr: { native: 'Türkçe', en: 'Turkish' },
+    pl: { native: 'Polski', en: 'Polish' }
   };
 
   function detectOsLanguage() {
@@ -335,6 +388,12 @@
             ? 'zh-TW'
             : 'zh-CN';
         }
+        if (norm.startsWith('pt')) return 'pt-BR';
+        if (norm.startsWith('vi')) return 'vi';
+        if (norm.startsWith('it')) return 'it';
+        if (norm.startsWith('id') || norm.startsWith('in')) return 'id';
+        if (norm.startsWith('tr')) return 'tr';
+        if (norm.startsWith('pl')) return 'pl';
         if (norm.startsWith('es')) return 'es';
         if (norm.startsWith('fr')) return 'fr';
         if (norm.startsWith('de')) return 'de';
@@ -433,23 +492,165 @@
     const frags = (lang === 'ko') ? fragmentRules : (multiLangFragments[lang] || []);
     let result = raw;
     let matched = false;
-    for (const frag of frags) {
-      if (result.includes(frag.target)) {
-        result = result.replace(frag.target, frag.replace);
-        matched = true;
-      }
-    }
-    if (matched) return result;
-
+    // No partial fragment substitution on unmatched sentences (prevents mixed-language output)
     if (allowCollect) queueUntranslated(trimmed);
     return raw;
   }
 
   const TRANSLATE_ATTRS = ['placeholder', 'data-placeholder', 'aria-placeholder', 'title', 'aria-label', 'data-tooltip', 'data-tip'];
   const originalTextMap = new WeakMap();
+  const COMPOSITE_CONTAINER_TAGS = new Set(['P', 'SPAN', 'DIV', 'LI', 'LABEL']);
+  const COMPOSITE_INLINE_TAGS = new Set(['A', 'CODE', 'KBD', 'STRONG', 'B', 'EM', 'SPAN', 'BUTTON']);
+  const DEFAULT_KO_COMPOSITES = {
+    'Visit <0>Legal Help</0> to ask for content changes for legal reasons.': '법적인 이유로 콘텐츠 변경을 요청하려면 <0>법적 도움말</0> 페이지를 방문하세요.',
+    'No hosts in <0>': '호스트가 없습니다: <0>',
+    'Configure the browser subagent. It requires <0> to be installed.': '브라우저 하위 에이전트를 구성합니다. 실행하려면 <0> 설치가 필요합니다.',
+    'It requires <0> to be installed.': '실행하려면 <0> 설치가 필요합니다.',
+    'The browser subagent can be invoked by typing <0> in the conversation input box.': '대화 입력창에 <0>을(를) 입력하여 브라우저 하위 에이전트를 호출할 수 있습니다.',
+    'Learn more about <0>': '자세히 알아보기: <0>',
+    'Learn more about <0>.': '<0> 자세히 알아보기.',
+    'Inherits your <0> when working in this project.': '이 프로젝트에서 작업할 때 <0> 설정을 상속합니다.',
+    'Also includes <0> when working in this project.': '이 프로젝트에서 작업할 때 <0> 항목도 포함합니다.',
+    '<0> of the customization budget is available.': '맞춤 설정 예산 중 <0> 사용 가능합니다.',
+    'Scan the code to open this device in Remote Control, or <0>.': 'QR 코드를 스캔하여 원격 제어에서 이 기기를 열거나 <0>하세요.',
+    'By using this app, you agree to its <0> and <1>.': '이 앱을 사용하면 <0> 및 <1>에 동의하는 것으로 간주됩니다.',
+    'Type <0> and select <1> to have the agent generate a plan.': '<0>을(를) 입력하고 <1>을(를) 선택하면 에이전트가 계획을 생성합니다.',
+    'All notable changes to <0> are documented in this file.': '<0>의 주요 변경 사항이 이 파일에 기록됩니다.'
+  };
+
+  function setTextNodeTranslated(tNode, newVal) {
+    if (!tNode || tNode.nodeType !== 3) return;
+    const raw = tNode.nodeValue || '';
+    if (tNode._originalText === undefined || (raw !== tNode._originalText && raw !== tNode._lastTranslatedValue)) {
+      tNode._originalText = raw;
+    }
+    if (!originalTextMap.has(tNode) || (raw !== originalTextMap.get(tNode) && raw !== tNode._lastTranslatedValue)) {
+      originalTextMap.set(tNode, raw);
+    }
+    if (raw !== newVal) {
+      tNode._isTranslating = true;
+      tNode._lastTranslatedValue = newVal;
+      tNode.nodeValue = newVal;
+      tNode._isTranslating = false;
+    }
+  }
+
+  function getTextNodeOriginal(tNode) {
+    const raw = tNode.nodeValue || '';
+    if (tNode._originalText === undefined || (raw !== tNode._originalText && raw !== tNode._lastTranslatedValue)) {
+      tNode._originalText = raw;
+      originalTextMap.set(tNode, raw);
+    }
+    return tNode._originalText !== undefined ? tNode._originalText : raw;
+  }
+
+  function translateCompositeElement(el) {
+    if (!el || !COMPOSITE_CONTAINER_TAGS.has(el.tagName)) return false;
+    const cNodes = el.childNodes;
+    if (!cNodes || cNodes.length < 2 || cNodes.length > 9) return false;
+
+    const inlineEls = [];
+    const slotTextNodes = [];
+    let currentTextNode = null;
+    let hasNonEmptyText = false;
+
+    for (let i = 0; i < cNodes.length; i++) {
+      const ch = cNodes[i];
+      if (ch.nodeType === 3) {
+        if (currentTextNode !== null) return false;
+        currentTextNode = ch;
+        if ((ch.nodeValue || '').trim().length > 0) hasNonEmptyText = true;
+      } else if (ch.nodeType === 1) {
+        if (!COMPOSITE_INLINE_TAGS.has(ch.tagName) || inlineEls.length >= 3) return false;
+        if (ch.childNodes && ch.childNodes.length > 1) return false;
+        if (ch.childNodes && ch.childNodes.length === 1 && ch.childNodes[0].nodeType !== 3) return false;
+        slotTextNodes.push(currentTextNode);
+        currentTextNode = null;
+        inlineEls.push(ch);
+      } else {
+        return false;
+      }
+    }
+    slotTextNodes.push(currentTextNode);
+    if (!hasNonEmptyText || inlineEls.length === 0) return false;
+
+    const slotOrigs = slotTextNodes.map(tn => (tn ? getTextNodeOriginal(tn) : ''));
+    const innerNodes = inlineEls.map(ie => (ie.childNodes && ie.childNodes[0] && ie.childNodes[0].nodeType === 3 ? ie.childNodes[0] : null));
+    const innerOrigs = innerNodes.map(tn => (tn ? getTextNodeOriginal(tn).trim() : ''));
+
+    let taggedParts = slotOrigs[0];
+    let bareParts = slotOrigs[0];
+    for (let k = 0; k < inlineEls.length; k++) {
+      taggedParts += `<${k}>${innerOrigs[k]}</${k}>` + slotOrigs[k + 1];
+      bareParts += `<${k}>` + slotOrigs[k + 1];
+    }
+    const taggedKey = taggedParts.replace(/\s+/g, ' ').trim();
+    const bareKey = bareParts.replace(/\s+/g, ' ').trim();
+
+    const compMap = (activeLanguage === 'ko')
+      ? { ...DEFAULT_KO_COMPOSITES, ...(compositeTemplates.ko || {}) }
+      : (compositeTemplates[activeLanguage] || null);
+    if (!compMap) return false;
+
+    const taggedTpl = safeDictGet(compMap, taggedKey);
+    const bareTpl = !taggedTpl ? safeDictGet(compMap, bareKey) : undefined;
+    const tpl = taggedTpl || bareTpl;
+    if (typeof tpl !== 'string' || !tpl) return false;
+
+    const segs = [];
+    const innerReplacements = {};
+    if (taggedTpl) {
+      let lastIdx = 0;
+      const re = /<(\d+)>([\s\S]*?)<\/\1>/g;
+      let m;
+      let count = 0;
+      while ((m = re.exec(tpl)) !== null) {
+        if (Number(m[1]) !== count) return false;
+        segs.push(tpl.slice(lastIdx, m.index));
+        innerReplacements[count] = m[2];
+        lastIdx = re.lastIndex;
+        count++;
+      }
+      if (count !== inlineEls.length) return false;
+      segs.push(tpl.slice(lastIdx));
+    } else {
+      let lastIdx = 0;
+      const re = /<(\d+)>/g;
+      let m;
+      let count = 0;
+      while ((m = re.exec(tpl)) !== null) {
+        if (Number(m[1]) !== count) return false;
+        segs.push(tpl.slice(lastIdx, m.index));
+        lastIdx = re.lastIndex;
+        count++;
+      }
+      if (count !== inlineEls.length) return false;
+      segs.push(tpl.slice(lastIdx));
+    }
+
+    // Ensure every non-empty text segment has an existing TextNode slot (zero DOM structural mutation)
+    for (let s = 0; s < segs.length; s++) {
+      if (segs[s] && segs[s].trim().length > 0 && !slotTextNodes[s]) return false;
+    }
+
+    for (let s = 0; s < segs.length; s++) {
+      if (slotTextNodes[s]) setTextNodeTranslated(slotTextNodes[s], segs[s]);
+    }
+    for (let k = 0; k < inlineEls.length; k++) {
+      translateElementAttrs(inlineEls[k]);
+      if (hasOwn.call(innerReplacements, k) && innerNodes[k]) {
+        setTextNodeTranslated(innerNodes[k], innerReplacements[k]);
+      } else if (!IGNORE_TAGS.has(inlineEls[k].tagName) && innerNodes[k]) {
+        const trInner = translateText(innerOrigs[k], activeLanguage, false);
+        if (typeof trInner === 'string') setTextNodeTranslated(innerNodes[k], trInner);
+      }
+    }
+    return true;
+  }
 
   function translateElementAttrs(el) {
     const allowCollect = !isUserContentElement(el);
+    const phMap = (activeLanguage === 'ko') ? placeholders : (placeholdersByLang[activeLanguage] || null);
     for (const attr of TRANSLATE_ATTRS) {
       const val = el.getAttribute ? el.getAttribute(attr) : el[attr];
       if (!val) continue;
@@ -459,9 +660,12 @@
         el[origKey] = val;
       }
       const baseAttrVal = el[origKey] || val;
-      const trans = (activeLanguage === 'ko')
-        ? (safeDictGet(placeholders, baseAttrVal) || safeDictGet(exactDict, baseAttrVal) || (typeof baseAttrVal === 'string' ? safeDictGet(exactDict, baseAttrVal.toLowerCase()) : undefined) || translateText(baseAttrVal, 'ko', allowCollect))
-        : translateText(baseAttrVal, activeLanguage, allowCollect);
+      const phHit = phMap ? safeDictGet(phMap, baseAttrVal) : undefined;
+      const trans = (typeof phHit === 'string')
+        ? phHit
+        : ((activeLanguage === 'ko')
+          ? (safeDictGet(exactDict, baseAttrVal) || (typeof baseAttrVal === 'string' ? safeDictGet(exactDict, baseAttrVal.toLowerCase()) : undefined) || translateText(baseAttrVal, 'ko', allowCollect))
+          : translateText(baseAttrVal, activeLanguage, allowCollect));
       if (trans && trans !== val) {
         el[lastTransKey] = trans;
         if (el.setAttribute) el.setAttribute(attr, trans);
@@ -476,6 +680,7 @@
     if (node.nodeType === 3) {
       const parent = node.parentElement;
       if (!parent || shouldIgnore(parent) || isInputOrEditable(parent) || node._isTranslating) return;
+      if (translateCompositeElement(parent)) return;
       const raw = node.nodeValue;
       if (!raw || !raw.trim()) return;
       if (node._lastTranslatedValue && raw === node._lastTranslatedValue) return;
@@ -489,21 +694,7 @@
 
       try {
         const sourceText = node._originalText !== undefined ? node._originalText : raw;
-        let translated = null;
-        if (activeLanguage === 'ko') {
-          const stTrim = sourceText.trim();
-          if (stTrim === 'Visit') {
-            const pTxt = (parent.textContent || '').toLowerCase();
-            if (pTxt.includes('legal reasons') || pTxt.includes('법적 도움말')) {
-              translated = '법적인 이유로 콘텐츠 변경을 요청하려면 ';
-            }
-          } else if (stTrim === 'to ask for content changes for legal reasons.') {
-            translated = ' 페이지를 방문하세요.';
-          }
-        }
-        if (translated === null) {
-          translated = translateText(sourceText, activeLanguage, !isUserContentElement(parent));
-        }
+        const translated = translateText(sourceText, activeLanguage, !isUserContentElement(parent));
         if (typeof translated === 'string' && translated !== raw) {
           node._isTranslating = true;
           node._lastTranslatedValue = translated;
@@ -531,6 +722,7 @@
       if (isInputOrEditable(node) || shouldIgnore(node)) return;
       translateElementAttrs(node);
       if (node.shadowRoot) translateNode(node.shadowRoot);
+      if (translateCompositeElement(node)) return;
       const children = node.childNodes;
       for (let i = 0; i < children.length; i++) translateNode(children[i]);
     } else if (node.nodeType === 11) {
@@ -582,7 +774,7 @@
   const UI_FONT_LINKS = [
     { id: 'ag-font-pretendard', href: 'https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css' },
     { id: 'ag-font-pretendard-jp', href: 'https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-jp-dynamic-subset.min.css' },
-    { id: 'ag-font-noto-multilang', href: 'https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap' }
+    { id: 'ag-font-noto-multilang', href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap' }
   ];
 
   function getUiFontFamily(lang) {
@@ -595,8 +787,12 @@
         return '-apple-system, BlinkMacSystemFont, "Noto Sans SC", "PingFang SC", "Microsoft YaHei UI", "Microsoft YaHei", "Pretendard Variable", "Segoe UI", sans-serif';
       case 'zh-TW':
         return '-apple-system, BlinkMacSystemFont, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei UI", "Microsoft JhengHei", "Pretendard Variable", "Segoe UI", sans-serif';
+      case 'vi':
+      case 'pl':
+      case 'tr':
+        return 'Inter, "Noto Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
       default:
-        return '-apple-system, BlinkMacSystemFont, "Pretendard Variable", "Noto Sans", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+        return '-apple-system, BlinkMacSystemFont, Inter, "Pretendard Variable", "Noto Sans", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
     }
   }
 
@@ -649,6 +845,17 @@
         }
         .antigravity-copy-success svg, .antigravity-copy-pulse svg {
           stroke: #4CC38A !important;
+        }
+        #antigravity-quick-lang-menu::-webkit-scrollbar,
+        #antigravity-lang-dropdown-menu::-webkit-scrollbar,
+        #ag-cc-lang-menu::-webkit-scrollbar {
+          width: 5px;
+        }
+        #antigravity-quick-lang-menu::-webkit-scrollbar-thumb,
+        #antigravity-lang-dropdown-menu::-webkit-scrollbar-thumb,
+        #ag-cc-lang-menu::-webkit-scrollbar-thumb {
+          background: rgba(202, 211, 245, 0.2);
+          border-radius: 9999px;
         }
         #antigravity-quick-lang-menu .agy-overlay-item:hover,
         #antigravity-lang-dropdown-menu .agy-overlay-item:hover {
@@ -735,7 +942,13 @@
     es: 'Código copiado al portapapeles',
     fr: 'Code copié dans le presse-papiers',
     de: 'Code in die Zwischenablage kopiert',
-    ru: 'Код скопирован в буфер обмена'
+    ru: 'Код скопирован в буфер обмена',
+    'pt-BR': 'Código copiado para a área de transferência',
+    vi: 'Đã sao chép mã vào bộ nhớ tạm',
+    it: 'Codice copiato negli appunti',
+    id: 'Kode disalin ke papan klip',
+    tr: 'Kod panoya kopyalandı',
+    pl: 'Kod skopiowany do schowka'
   };
 
   let copyToastTimer = null;
@@ -1024,6 +1237,60 @@
       restoreConfirmDesc: 'Удалить патчи Antigravity Enhanced, восстановить исходные файлы и перезапустить приложение?',
       restoring: 'Восстановление...',
       safeModeWarn: 'Включён безопасный режим'
+    },
+    'pt-BR': {
+      title: 'Antigravity Enhanced', patchVersionPrefix: 'Versão do Patch', checkUpdates: 'Verificar atualizações', restoreVanilla: 'Restaurar original',
+      curVer: 'Versão do Patch', appVer: 'Versão do App', updateSection: 'Atualizações', checkBtn: 'Verificar', checking: 'Verificando...',
+      upToDate: 'Atualizado', availPrefix: 'Nova versão: ', updateNow: 'Atualizar', updating: 'Atualizando...', updateDoneSuffix: ' instalado',
+      openRelease: 'Abrir versão', reloadNow: 'Recarregar janela', restartNow: 'Reiniciar', relaunchNow: 'Reiniciar agora', retryBtn: 'Tentar novamente',
+      closeBtn: 'Fechar', cancelBtn: 'Cancelar', restoreConfirmTitle: 'Restaurar original',
+      restoreConfirmDesc: 'Remover os patches do Antigravity Enhanced, restaurar os arquivos originais e reiniciar o aplicativo?',
+      restoring: 'Restaurando...', safeModeWarn: 'Modo de segurança ativo'
+    },
+    vi: {
+      title: 'Antigravity Enhanced', patchVersionPrefix: 'Phiên bản bản vá', checkUpdates: 'Kiểm tra cập nhật', restoreVanilla: 'Khôi phục bản gốc',
+      curVer: 'Phiên bản bản vá', appVer: 'Phiên bản ứng dụng', updateSection: 'Cập nhật', checkBtn: 'Kiểm tra', checking: 'Đang kiểm tra...',
+      upToDate: 'Đã mới nhất', availPrefix: 'Bản mới: ', updateNow: 'Cập nhật', updating: 'Đang cập nhật...', updateDoneSuffix: ' đã cài đặt',
+      openRelease: 'Mở bản phát hành', reloadNow: 'Tải lại cửa sổ', restartNow: 'Khởi động lại', relaunchNow: 'Khởi động lại ngay', retryBtn: 'Thử lại',
+      closeBtn: 'Đóng', cancelBtn: 'Hủy', restoreConfirmTitle: 'Khôi phục bản gốc',
+      restoreConfirmDesc: 'Gỡ bỏ bản vá Antigravity Enhanced, khôi phục tệp gốc và khởi động lại ứng dụng?',
+      restoring: 'Đang khôi phục...', safeModeWarn: 'Đang ở chế độ an toàn'
+    },
+    it: {
+      title: 'Antigravity Enhanced', patchVersionPrefix: 'Versione patch', checkUpdates: 'Controlla aggiornamenti', restoreVanilla: 'Ripristina originale',
+      curVer: 'Versione patch', appVer: 'Versione app', updateSection: 'Aggiornamenti', checkBtn: 'Controlla', checking: 'Controllo...',
+      upToDate: 'Aggiornato', availPrefix: 'Nuova versione: ', updateNow: 'Aggiorna', updating: 'Aggiornamento...', updateDoneSuffix: ' installato',
+      openRelease: 'Apri release', reloadNow: 'Ricarica finestra', restartNow: 'Riavvia', relaunchNow: 'Riavvia ora', retryBtn: 'Riprova',
+      closeBtn: 'Chiudi', cancelBtn: 'Annulla', restoreConfirmTitle: 'Ripristina originale',
+      restoreConfirmDesc: 'Rimuovere le patch di Antigravity Enhanced, ripristinare i file originali e riavviare l’applicazione?',
+      restoring: 'Ripristino...', safeModeWarn: 'Modalità provvisoria attiva'
+    },
+    id: {
+      title: 'Antigravity Enhanced', patchVersionPrefix: 'Versi Patch', checkUpdates: 'Periksa pembaruan', restoreVanilla: 'Pulihkan asli',
+      curVer: 'Versi Patch', appVer: 'Versi Aplikasi', updateSection: 'Pembaruan', checkBtn: 'Periksa', checking: 'Memeriksa...',
+      upToDate: 'Sudah terbaru', availPrefix: 'Versi baru: ', updateNow: 'Perbarui', updating: 'Memperbarui...', updateDoneSuffix: ' terpasang',
+      openRelease: 'Buka rilis', reloadNow: 'Muat ulang jendela', restartNow: 'Mulai ulang', relaunchNow: 'Mulai ulang sekarang', retryBtn: 'Coba lagi',
+      closeBtn: 'Tutup', cancelBtn: 'Batal', restoreConfirmTitle: 'Pulihkan versi asli',
+      restoreConfirmDesc: 'Hapus patch Antigravity Enhanced, pulihkan file asli, dan mulai ulang aplikasi?',
+      restoring: 'Memulihkan...', safeModeWarn: 'Mode aman aktif'
+    },
+    tr: {
+      title: 'Antigravity Enhanced', patchVersionPrefix: 'Yama Sürümü', checkUpdates: 'Güncellemeleri denetle', restoreVanilla: 'Orijinale dön',
+      curVer: 'Yama Sürümü', appVer: 'Uygulama Sürümü', updateSection: 'Güncellemeler', checkBtn: 'Denetle', checking: 'Denetleniyor...',
+      upToDate: 'Güncel', availPrefix: 'Yeni sürüm: ', updateNow: 'Güncelle', updating: 'Güncelleniyor...', updateDoneSuffix: ' kuruldu',
+      openRelease: 'Sürümü aç', reloadNow: 'Pencereyi yenile', restartNow: 'Yeniden başlat', relaunchNow: 'Şimdi yeniden başlat', retryBtn: 'Tekrar dene',
+      closeBtn: 'Kapat', cancelBtn: 'İptal', restoreConfirmTitle: 'Orijinal dosyaları geri yükle',
+      restoreConfirmDesc: 'Antigravity Enhanced yamaları kaldırılıp orijinal dosyalar geri yüklensin ve uygulama yeniden başlatılsın mı?',
+      restoring: 'Geri yükleniyor...', safeModeWarn: 'Güvenli mod etkin'
+    },
+    pl: {
+      title: 'Antigravity Enhanced', patchVersionPrefix: 'Wersja łatki', checkUpdates: 'Sprawdź aktualizacje', restoreVanilla: 'Przywróć oryginał',
+      curVer: 'Wersja łatki', appVer: 'Wersja aplikacji', updateSection: 'Aktualizacje', checkBtn: 'Sprawdź', checking: 'Sprawdzanie...',
+      upToDate: 'Aktualna wersja', availPrefix: 'Nowa wersja: ', updateNow: 'Aktualizuj', updating: 'Aktualizowanie...', updateDoneSuffix: ' zainstalowano',
+      openRelease: 'Otwórz wydanie', reloadNow: 'Przeładuj okno', restartNow: 'Uruchom ponownie', relaunchNow: 'Uruchom ponownie teraz', retryBtn: 'Ponów',
+      closeBtn: 'Zamknij', cancelBtn: 'Anuluj', restoreConfirmTitle: 'Przywróć oryginał',
+      restoreConfirmDesc: 'Usunąć łatki Antigravity Enhanced, przywrócić oryginalne pliki i ponownie uruchomić aplikację?',
+      restoring: 'Przywracanie...', safeModeWarn: 'Tryb awaryjny aktywny'
     }
   };
 
@@ -1036,7 +1303,13 @@
     es: 'Actualización disponible',
     fr: 'Mise à jour disponible',
     de: 'Update verfügbar',
-    ru: 'Доступно обновление'
+    ru: 'Доступно обновление',
+    'pt-BR': 'Atualização disponível',
+    vi: 'Có bản cập nhật',
+    it: 'Aggiornamento disponibile',
+    id: 'Pembaruan tersedia',
+    tr: 'Güncelleme mevcut',
+    pl: 'Dostępna aktualizacja'
   };
 
   function getHubStrings() {
@@ -1283,7 +1556,13 @@
     es: { modalTitle: 'Ajustes del parche', menuItem: 'Ajustes del parche...', tabs: { general: 'General', translation: 'Traducción', quota: 'Cuota', shortcuts: 'Atajos' }, ifaceLang: 'Idioma de interfaz', checkUpd: 'Buscar actualizaciones', changelogBtn: 'Historial', changelogTitle: 'Historial de cambios', changelogBack: 'Volver', add: 'Añadir', copy: 'Copiar', clear: 'Limpiar', diagnostics: 'Diagnóstico' },
     fr: { modalTitle: 'Paramètres du patch', menuItem: 'Paramètres du patch...', tabs: { general: 'Général', translation: 'Traduction', quota: 'Quota', shortcuts: 'Raccourcis' }, ifaceLang: 'Langue de l’interface', checkUpd: 'Vérifier les mises à jour', changelogBtn: 'Historique', changelogTitle: 'Journal des modifications', changelogBack: 'Retour', add: 'Ajouter', copy: 'Copier', clear: 'Effacer', diagnostics: 'Diagnostic' },
     de: { modalTitle: 'Patch-Einstellungen', menuItem: 'Patch-Einstellungen...', tabs: { general: 'Allgemein', translation: 'Übersetzung', quota: 'Kontingent', shortcuts: 'Tastenkürzel' }, ifaceLang: 'Oberflächensprache', checkUpd: 'Nach Updates suchen', changelogBtn: 'Änderungen', changelogTitle: 'Änderungsprotokoll', changelogBack: 'Zurück', add: 'Hinzufügen', copy: 'Kopieren', clear: 'Leeren', diagnostics: 'Diagnose' },
-    ru: { modalTitle: 'Настройки патча', menuItem: 'Настройки патча...', tabs: { general: 'Общие', translation: 'Перевод', quota: 'Квота', shortcuts: 'Сочетания' }, ifaceLang: 'Язык интерфейса', checkUpd: 'Проверить обновления', changelogBtn: 'История', changelogTitle: 'История изменений', changelogBack: 'Назад', add: 'Добавить', copy: 'Копировать', clear: 'Очистить', diagnostics: 'Диагностика' }
+    ru: { modalTitle: 'Настройки патча', menuItem: 'Настройки патча...', tabs: { general: 'Общие', translation: 'Перевод', quota: 'Квота', shortcuts: 'Сочетания' }, ifaceLang: 'Язык интерфейса', checkUpd: 'Проверить обновления', changelogBtn: 'История', changelogTitle: 'История изменений', changelogBack: 'Назад', add: 'Добавить', copy: 'Копировать', clear: 'Очистить', diagnostics: 'Диагностика' },
+    'pt-BR': { modalTitle: 'Configurações do Patch', menuItem: 'Configurações do Patch...', tabs: { general: 'Geral', translation: 'Tradução', quota: 'Cota', shortcuts: 'Atalhos' }, ifaceLang: 'Idioma da interface', ifaceDesc: 'Troca de idioma instantânea sem reiniciar.', checkUpd: 'Verificar atualizações', changelogBtn: 'Alterações', changelogTitle: 'Histórico de alterações', changelogBack: 'Voltar', glossaryTitle: 'Glossário personalizado', add: 'Adicionar', copy: 'Copiar', clear: 'Limpar', diagnostics: 'Diagnóstico' },
+    vi: { modalTitle: 'Cài đặt bản vá', menuItem: 'Cài đặt bản vá...', tabs: { general: 'Chung', translation: 'Dịch thuật', quota: 'Hạn mức', shortcuts: 'Phím tắt' }, ifaceLang: 'Ngôn ngữ giao diện', ifaceDesc: 'Chuyển đổi ngôn ngữ tức thì không cần khởi động lại.', checkUpd: 'Kiểm tra cập nhật', changelogBtn: 'Nhật ký', changelogTitle: 'Nhật ký thay đổi', changelogBack: 'Quay lại', glossaryTitle: 'Từ điển tùy chỉnh', add: 'Thêm', copy: 'Sao chép', clear: 'Xóa', diagnostics: 'Chẩn đoán' },
+    it: { modalTitle: 'Impostazioni patch', menuItem: 'Impostazioni patch...', tabs: { general: 'Generale', translation: 'Traduzione', quota: 'Quota', shortcuts: 'Scorciatoie' }, ifaceLang: 'Lingua interfaccia', ifaceDesc: 'Cambio lingua istantaneo senza riavvio.', checkUpd: 'Controlla aggiornamenti', changelogBtn: 'Modifiche', changelogTitle: 'Registro delle modifiche', changelogBack: 'Indietro', glossaryTitle: 'Glossario personalizzato', add: 'Aggiungi', copy: 'Copia', clear: 'Svuota', diagnostics: 'Diagnostica' },
+    id: { modalTitle: 'Pengaturan Patch', menuItem: 'Pengaturan Patch...', tabs: { general: 'Umum', translation: 'Terjemahan', quota: 'Kuota', shortcuts: 'Pintasan' }, ifaceLang: 'Bahasa Antarmuka', ifaceDesc: 'Ganti bahasa seketika tanpa memulai ulang.', checkUpd: 'Periksa pembaruan', changelogBtn: 'Riwayat', changelogTitle: 'Catatan perubahan', changelogBack: 'Kembali', glossaryTitle: 'Glosarium Kustom', add: 'Tambah', copy: 'Salin', clear: 'Bersihkan', diagnostics: 'Diagnostik' },
+    tr: { modalTitle: 'Yama Ayarları', menuItem: 'Yama Ayarları...', tabs: { general: 'Genel', translation: 'Çeviri', quota: 'Kota', shortcuts: 'Kısayollar' }, ifaceLang: 'Arayüz Dili', ifaceDesc: 'Yeniden başlatmadan anında dil değiştirin.', checkUpd: 'Güncellemeleri denetle', changelogBtn: 'Değişiklikler', changelogTitle: 'Değişiklik Günlüğü', changelogBack: 'Geri', glossaryTitle: 'Özel Sözlük', add: 'Ekle', copy: 'Kopyala', clear: 'Temizle', diagnostics: 'Tanılama' },
+    pl: { modalTitle: 'Ustawienia łatki', menuItem: 'Ustawienia łatki...', tabs: { general: 'Ogólne', translation: 'Tłumaczenie', quota: 'Limit', shortcuts: 'Skróty' }, ifaceLang: 'Język interfejsu', ifaceDesc: 'Natychmiastowa zmiana języka bez restartu.', checkUpd: 'Sprawdź aktualizacje', changelogBtn: 'Historia', changelogTitle: 'Dziennik zmian', changelogBack: 'Wstecz', glossaryTitle: 'Własny słownik', add: 'Dodaj', copy: 'Kopiuj', clear: 'Wyczyść', diagnostics: 'Diagnostyka' }
   };
 
   function getControlCenterStrings(lang) {
@@ -1414,7 +1693,14 @@
         'Español': 'es',
         'Français': 'fr',
         'Deutsch': 'de',
-        'Русский': 'ru'
+        'Русский': 'ru',
+        'Português (Brasil)': 'pt-BR',
+        'Português': 'pt-BR',
+        'Tiếng Việt': 'vi',
+        'Italiano': 'it',
+        'Bahasa Indonesia': 'id',
+        'Türkçe': 'tr',
+        'Polski': 'pl'
       };
       return sections.map((sec) => {
         const rawBody = sec.lines.join('\n').trim();
@@ -1748,9 +2034,19 @@
       } else if (currentTab === 'translation') {
         const langMap = (userGlossary[activeLanguage] && typeof userGlossary[activeLanguage] === 'object') ? userGlossary[activeLanguage] : {};
         const entries = Object.entries(langMap);
-        const rowsHtml = entries.length > 0
-          ? entries.map(([src, dst]) => `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px;background:#181A22;border:1px solid rgba(202,211,245,0.06);border-radius:6px;font-size:12px;"><span style="color:#9DA7C7;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(src)}</span><span style="color:#818BA8;">→</span><span style="color:#CAD3F5;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(dst)}</span><button type="button" data-del="${escapeHtml(src)}" class="ag-cc-del-glossary" style="background:none;border:none;color:#E56B6F;cursor:pointer;font-size:12px;">✕</button></div>`).join('')
-          : `<div style="font-size:12px;color:#818BA8;">${escapeHtml(s.noGlossary)}</div>`;
+        const renderGlossaryRows = (filterTerm = '') => {
+          const normF = (filterTerm || '').trim().toLowerCase();
+          const filtered = normF
+            ? entries.filter(([src, dst]) => src.toLowerCase().includes(normF) || dst.toLowerCase().includes(normF))
+            : entries;
+          if (filtered.length === 0) {
+            return `<div style="font-size:12px;color:#818BA8;">${escapeHtml(s.noGlossary)}</div>`;
+          }
+          return filtered.map(([src, dst]) => `<div class="ag-cc-gl-row" data-gl-src="${escapeHtml(src)}" data-gl-dst="${escapeHtml(dst)}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px;background:#181A22;border:1px solid rgba(202,211,245,0.06);border-radius:6px;font-size:12px;cursor:pointer;" title="Click to edit"><span style="color:#9DA7C7;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(src)}</span><span style="color:#818BA8;">→</span><span style="color:#CAD3F5;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(dst)}</span><button type="button" data-del="${escapeHtml(src)}" class="ag-cc-del-glossary" style="background:none;border:none;color:#E56B6F;cursor:pointer;font-size:12px;">✕</button></div>`).join('');
+        };
+        const filterInputHtml = entries.length > 6
+          ? `<input id="ag-cc-gl-filter" placeholder="Filter..." style="width:100%;background:#181A22;color:#CAD3F5;border:1px solid rgba(202,211,245,0.08);border-radius:6px;padding:4px 8px;font-size:11px;box-sizing:border-box;" />`
+          : '';
         bodyEl.innerHTML = `
           <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;">
             <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
@@ -1765,11 +2061,12 @@
               <button type="button" id="ag-cc-gl-import-apply" class="agy-enh-primary" style="align-self:flex-end;background:#A0A3F6;color:#0B0B0E;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;">${escapeHtml(s.apply)}</button>
             </div>
             <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:6px;align-items:center;">
-              <input id="ag-cc-gl-src" placeholder="${escapeHtml(s.srcPh)}" style="width:100%;min-width:0;background:#181A22;color:#CAD3F5;border:1px solid rgba(202,211,245,0.1);border-radius:6px;padding:5px 8px;font-size:12px;box-sizing:border-box;" />
-              <input id="ag-cc-gl-dst" placeholder="${escapeHtml(s.dstPh)}" style="width:100%;min-width:0;background:#181A22;color:#CAD3F5;border:1px solid rgba(202,211,245,0.1);border-radius:6px;padding:5px 8px;font-size:12px;box-sizing:border-box;" />
+              <input id="ag-cc-gl-src" placeholder="${escapeHtml(s.srcPh)}" style="width:100%;min-width:0;background:#181A22;color:#CAD3F5;border:1px solid rgba(202,211,245,0.1);border-radius:6px;padding:5px 8px;font-size:12px;box-sizing:border-box;transition:border-color 140ms ease;" />
+              <input id="ag-cc-gl-dst" placeholder="${escapeHtml(s.dstPh)}" style="width:100%;min-width:0;background:#181A22;color:#CAD3F5;border:1px solid rgba(202,211,245,0.1);border-radius:6px;padding:5px 8px;font-size:12px;box-sizing:border-box;transition:border-color 140ms ease;" />
               <button type="button" id="ag-cc-gl-add" class="agy-enh-primary" style="flex-shrink:0;white-space:nowrap;background:#A0A3F6;color:#0B0B0E;border:none;border-radius:6px;padding:0 12px;height:28px;font-size:12px;font-weight:600;cursor:pointer;">${escapeHtml(s.add)}</button>
             </div>
-            <div style="display:flex;flex-direction:column;gap:4px;max-height:84px;overflow-y:auto;">${rowsHtml}</div>
+            ${filterInputHtml}
+            <div id="ag-cc-gl-rows" style="display:flex;flex-direction:column;gap:4px;max-height:84px;overflow-y:auto;">${renderGlossaryRows('')}</div>
           </div>
           <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;">
             <div style="display:flex;justify-content:space-between;align-items:center;">
@@ -1829,15 +2126,40 @@
             } catch (_) {}
           };
         }
-        bodyEl.querySelectorAll('.ag-cc-del-glossary').forEach(btn => {
-          btn.onclick = async () => {
-            const key = btn.getAttribute('data-del');
-            if (userGlossary[activeLanguage] && key) delete userGlossary[activeLanguage][key];
-            if (ipc && ipc.invoke) await ipc.invoke('enhancer:save-glossary', userGlossary).catch(() => {});
-            if (document.body && activeLanguage !== 'en') { revertToOriginal(document.body); translateNode(document.body); }
-            renderTab('translation', false);
+        const bindGlossaryRowEvents = () => {
+          bodyEl.querySelectorAll('.ag-cc-del-glossary').forEach((btn) => {
+            btn.onclick = async (ev) => {
+              if (ev && ev.stopPropagation) ev.stopPropagation();
+              const key = btn.getAttribute('data-del');
+              if (userGlossary[activeLanguage] && key) delete userGlossary[activeLanguage][key];
+              if (ipc && ipc.invoke) await ipc.invoke('enhancer:save-glossary', userGlossary).catch(() => {});
+              if (document.body && activeLanguage !== 'en') { revertToOriginal(document.body); translateNode(document.body); }
+              renderTab('translation', false);
+            };
+          });
+          bodyEl.querySelectorAll('.ag-cc-gl-row').forEach((row) => {
+            row.onclick = () => {
+              const srcInp = bodyEl.querySelector('#ag-cc-gl-src');
+              const dstInp = bodyEl.querySelector('#ag-cc-gl-dst');
+              if (srcInp && dstInp) {
+                srcInp.value = row.getAttribute('data-gl-src') || '';
+                dstInp.value = row.getAttribute('data-gl-dst') || '';
+                if (dstInp.focus) dstInp.focus();
+              }
+            };
+          });
+        };
+        bindGlossaryRowEvents();
+        const glFilterInp = bodyEl.querySelector('#ag-cc-gl-filter');
+        if (glFilterInp) {
+          glFilterInp.oninput = () => {
+            const rowsWrap = bodyEl.querySelector('#ag-cc-gl-rows');
+            if (rowsWrap) {
+              rowsWrap.innerHTML = renderGlossaryRows(glFilterInp.value);
+              bindGlossaryRowEvents();
+            }
           };
-        });
+        }
         wireNativeSwitch(bodyEl.querySelector('#ag-cc-ut-toggle'), (checked) => persistPreferences({ collectUntranslated: checked }));
 
         let latestUtItems = [];
@@ -1849,9 +2171,26 @@
             const listEl = bodyEl.querySelector('#ag-cc-ut-list');
             if (cntEl) cntEl.textContent = String(latestUtItems.length);
             if (listEl) {
-              listEl.innerHTML = latestUtItems.length > 0
-                ? latestUtItems.slice(-25).reverse().map(x => `<div style="padding:2px 0;color:#9DA7C7;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">• ${escapeHtml(typeof x === 'string' ? x : x.text)}</div>`).join('')
-                : escapeHtml(s.emptyUt);
+              if (latestUtItems.length > 0) {
+                listEl.innerHTML = latestUtItems.slice(-25).reverse().map((x) => {
+                  const rawTxt = typeof x === 'string' ? x : x.text;
+                  return `<div class="ag-cc-ut-item agy-overlay-item" data-ut-src="${escapeHtml(rawTxt)}" style="padding:3px 6px;border-radius:5px;color:#9DA7C7;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;">• ${escapeHtml(rawTxt)}</div>`;
+                }).join('');
+                listEl.querySelectorAll('.ag-cc-ut-item').forEach((utEl) => {
+                  utEl.onclick = () => {
+                    const srcInp = bodyEl.querySelector('#ag-cc-gl-src');
+                    const dstInp = bodyEl.querySelector('#ag-cc-gl-dst');
+                    if (srcInp) {
+                      srcInp.value = utEl.getAttribute('data-ut-src') || '';
+                      srcInp.style.borderColor = '#A0A3F6';
+                      setTimeout(() => { srcInp.style.borderColor = 'rgba(202,211,245,0.1)'; }, 450);
+                    }
+                    if (dstInp && dstInp.focus) dstInp.focus();
+                  };
+                });
+              } else {
+                listEl.textContent = s.emptyUt;
+              }
             }
           }).catch(() => {});
         }
@@ -2069,7 +2408,13 @@
     es: { title: 'Widget de cuota superior', desc: 'Mostrar la cuota de modelos y el uso de IA en la barra superior.' },
     fr: { title: 'Widget de quota supérieur', desc: 'Afficher le quota de modèles et l’utilisation de l’IA dans la barre supérieure.' },
     de: { title: 'Kontingent-Widget (Leiste)', desc: 'Modellkontingent und KI-Nutzung in Echtzeit in der oberen Leiste anzeigen.' },
-    ru: { title: 'Виджет квоты в панели', desc: 'Показывать квоту моделей и использование ИИ в верхней панели.' }
+    ru: { title: 'Виджет квоты в панели', desc: 'Показывать квоту моделей и использование ИИ в верхней панели.' },
+    'pt-BR': { title: 'Widget de cota superior', desc: 'Exibir cota de modelos e uso em tempo real na barra superior.' },
+    vi: { title: 'Tiện ích hạn mức thanh trên', desc: 'Hiển thị hạn mức mô hình và mức sử dụng theo thời gian thực trên thanh trên cùng.' },
+    it: { title: 'Widget quota superiore', desc: 'Mostra quota modelli e utilizzo in tempo reale nella barra superiore.' },
+    id: { title: 'Widget kuota bilah atas', desc: 'Tampilkan kuota model dan penggunaan waktu nyata di bilah atas.' },
+    tr: { title: 'Üst çubuk kota göstergesi', desc: 'Üst çubukta gerçek zamanlı model kotasını ve kullanımı göster.' },
+    pl: { title: 'Widżet limitów na pasku', desc: 'Pokazuj bieżący limit modeli i użycie na górnym pasku.' }
   };
 
   function getQuotaSettingStrings(lang) {
@@ -2254,7 +2599,7 @@
               <span class="truncate" id="antigravity-lang-current-label">${LANG_DISPLAY_NAMES[currentLang] ? `${LANG_DISPLAY_NAMES[currentLang].native} (${LANG_DISPLAY_NAMES[currentLang].en})` : currentLang}</span>
               <svg id="antigravity-lang-chevron" class="w-3.5 h-3.5 shrink-0 opacity-70 ml-auto pointer-events-none" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </button>
-            <div id="antigravity-lang-dropdown-menu" style="display:none;position:absolute;right:0;top:calc(100% + 4px);z-index:6000;background:#111217;border:1px solid rgba(202,211,245,0.1);box-shadow:0 8px 24px rgba(0,0,0,0.42);border-radius:10px;padding:4px;gap:2px;min-width:176px;" class="agy-overlay text-foreground no-focus-ring flex flex-col">${langItemsHtml}</div>
+            <div id="antigravity-lang-dropdown-menu" style="display:none;position:absolute;right:0;top:calc(100% + 4px);z-index:6000;background:#111217;border:1px solid rgba(202,211,245,0.1);box-shadow:0 8px 24px rgba(0,0,0,0.42);border-radius:10px;padding:4px;gap:2px;min-width:190px;max-height:280px;overflow-y:auto;" class="agy-overlay text-foreground no-focus-ring flex flex-col">${langItemsHtml}</div>
           </div>
         </div>
         <div id="antigravity-quota-setting-row" class="py-2 px-3 w-full bg-transparent flex justify-between gap-4 items-center" style="display:flex;align-items:center;justify-content:space-between;gap:16px;">
@@ -2344,7 +2689,7 @@
     menu.id = 'antigravity-quick-lang-menu';
     menu.className = 'agy-overlay border rounded-xl no-focus-ring flex flex-col shadow-lg min-w-[175px] p-1 gap-px notranslate';
     menu.setAttribute('translate', 'no');
-    menu.style.cssText = `position:fixed;top:${topPx}px;right:${rightPx}px;min-width:176px;padding:4px;gap:2px;display:flex;flex-direction:column;border-radius:10px;background:#111217;border:1px solid rgba(202,211,245,0.1);box-shadow:0 8px 24px rgba(0,0,0,0.42);color:#CAD3F5;font-family:${getUiFontFamily(activeLanguage)};z-index:99999;user-select:none;app-region:no-drag;-webkit-app-region:no-drag;`;
+    menu.style.cssText = `position:fixed;top:${topPx}px;right:${rightPx}px;min-width:190px;max-height:280px;overflow-y:auto;padding:4px;gap:2px;display:flex;flex-direction:column;border-radius:10px;background:#111217;border:1px solid rgba(202,211,245,0.1);box-shadow:0 8px 24px rgba(0,0,0,0.42);color:#CAD3F5;font-family:${getUiFontFamily(activeLanguage)};z-index:99999;user-select:none;app-region:no-drag;-webkit-app-region:no-drag;`;
 
     menu.innerHTML = LANG_ORDER.map(l => {
       const info = LANG_DISPLAY_NAMES[l] || { native: l, en: l };
@@ -2725,7 +3070,13 @@
         es: { title: 'Cuota', refresh: 'Actualizar', weekly: 'Sem:', weeklyFull: 'Semanal', h5Full: '5 horas', resetIn: 'Se restablece en ', checking: 'Comprobando...', openSettings: 'Ajustes de modelo', lowWarning: 'Baja (<20%)', activeTag: 'ACTIVO', otherLabel: 'Otros' },
         fr: { title: 'Quota', refresh: 'Actualiser', weekly: 'Heb:', weeklyFull: 'Hebdomadaire', h5Full: '5 heures', resetIn: 'Réinitialisation dans ', checking: 'Vérification...', openSettings: 'Paramètres modèles', lowWarning: 'Faible (<20%)', activeTag: 'ACTIF', otherLabel: 'Autres' },
         de: { title: 'Kontingent', refresh: 'Aktualisieren', weekly: 'Wo:', weeklyFull: 'Wöchentlich', h5Full: '5 Stunden', resetIn: 'Zurücksetzen in ', checking: 'Prüfe...', openSettings: 'Modelleinstellungen', lowWarning: 'Niedrig (<20%)', activeTag: 'AKTIV', otherLabel: 'Andere' },
-        ru: { title: 'Квота', refresh: 'Обновить', weekly: 'Нед:', weeklyFull: 'Недельная', h5Full: '5 часов', resetIn: 'Сброс через ', checking: 'Проверка...', openSettings: 'Настройки моделей', lowWarning: 'Низкая (<20%)', activeTag: 'АКТИВНА', otherLabel: 'Другие' }
+        ru: { title: 'Квота', refresh: 'Обновить', weekly: 'Нед:', weeklyFull: 'Недельная', h5Full: '5 часов', resetIn: 'Сброс через ', checking: 'Проверка...', openSettings: 'Настройки моделей', lowWarning: 'Низкая (<20%)', activeTag: 'АКТИВНА', otherLabel: 'Другие' },
+        'pt-BR': { title: 'Cota', refresh: 'Atualizar', weekly: 'Sem:', weeklyFull: 'Semanal', h5Full: '5 horas', resetIn: 'Redefine em ', checking: 'Verificando...', openSettings: 'Config. de modelos', lowWarning: 'Baixa (<20%)', activeTag: 'ATIVO', otherLabel: 'Outros' },
+        vi: { title: 'Hạn mức', refresh: 'Làm mới', weekly: 'Tuần:', weeklyFull: 'Hàng tuần', h5Full: '5 giờ', resetIn: 'Đặt lại sau ', checking: 'Đang kiểm tra...', openSettings: 'Cài đặt mô hình', lowWarning: 'Thấp (<20%)', activeTag: 'ĐANG DÙNG', otherLabel: 'Khác' },
+        it: { title: 'Quota', refresh: 'Aggiorna', weekly: 'Sett:', weeklyFull: 'Settimanale', h5Full: '5 ore', resetIn: 'Ripristino tra ', checking: 'Controllo...', openSettings: 'Impostazioni modelli', lowWarning: 'Bassa (<20%)', activeTag: 'ATTIVO', otherLabel: 'Altri' },
+        id: { title: 'Kuota', refresh: 'Segarkan', weekly: 'Mgg:', weeklyFull: 'Mingguan', h5Full: '5 Jam', resetIn: 'Reset dalam ', checking: 'Memeriksa...', openSettings: 'Pengaturan model', lowWarning: 'Rendah (<20%)', activeTag: 'AKTIF', otherLabel: 'Lainnya' },
+        tr: { title: 'Kota', refresh: 'Yenile', weekly: 'Haf:', weeklyFull: 'Haftalık', h5Full: '5 Saat', resetIn: 'Sıfırlama: ', checking: 'Denetleniyor...', openSettings: 'Model ayarları', lowWarning: 'Düşük (<20%)', activeTag: 'AKTİF', otherLabel: 'Diğer' },
+        pl: { title: 'Limit', refresh: 'Odśwież', weekly: 'Tydz:', weeklyFull: 'Tygodniowy', h5Full: '5 godzin', resetIn: 'Reset za ', checking: 'Sprawdzanie...', openSettings: 'Ustawienia modeli', lowWarning: 'Niski (<20%)', activeTag: 'AKTYWNY', otherLabel: 'Inne' }
       };
 
       function getActiveLang() {
@@ -2739,6 +3090,12 @@
           if (low.startsWith('ko')) return 'ko';
           if (low.startsWith('ja')) return 'ja';
           if (low.startsWith('zh')) return (low.includes('tw') || low.includes('hk') || low.includes('mo') || low.includes('hant')) ? 'zh-TW' : 'zh-CN';
+          if (low.startsWith('pt')) return 'pt-BR';
+          if (low.startsWith('vi')) return 'vi';
+          if (low.startsWith('it')) return 'it';
+          if (low.startsWith('id') || low.startsWith('in')) return 'id';
+          if (low.startsWith('tr')) return 'tr';
+          if (low.startsWith('pl')) return 'pl';
           if (low.startsWith('es')) return 'es';
           if (low.startsWith('fr')) return 'fr';
           if (low.startsWith('de')) return 'de';

@@ -1,5 +1,5 @@
 ﻿param(
-    [string]$Version = "4.0.7",
+    [string]$Version = "4.1.0",
     [string]$OutputExe = "",
     [string]$SignCertThumbprint = ""
 )
@@ -50,6 +50,7 @@ if ((Test-Path $pngPath) -and (-not (Test-Path $icoPath))) {
 }
 
 # 2. WPF Installer C# Source (.NET 4.0)
+# Palette tokens: #0B0B0E (base), #121319 (card), #181A23 (raised), #CAD3F5 (primary text), #A0A3F6 (accent)
 $csSource = @'
 using System;
 using System.Collections.Generic;
@@ -60,6 +61,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -69,6 +71,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
 using System.Windows.Threading;
 using Microsoft.Win32;
 
@@ -86,13 +89,36 @@ namespace AntigravityEnhancer
     {
         public static readonly string[] SupportedLanguages = new string[]
         {
-            "en", "ko", "ja", "zh-CN", "zh-TW", "es", "fr", "de", "ru"
+            "en", "ko", "ja", "zh-CN", "zh-TW", "es", "fr", "de", "ru",
+            "pt-BR", "vi", "it", "id", "tr", "pl"
         };
+
+        public static string GetLanguageNativeLabel(string lang)
+        {
+            switch (lang)
+            {
+                case "ko": return "한국어";
+                case "ja": return "日本語";
+                case "zh-CN": return "简体中文";
+                case "zh-TW": return "繁體中文";
+                case "es": return "Español";
+                case "fr": return "Français";
+                case "de": return "Deutsch";
+                case "ru": return "Русский";
+                case "pt-BR": return "Português (BR)";
+                case "vi": return "Tiếng Việt";
+                case "it": return "Italiano";
+                case "id": return "Bahasa Indonesia";
+                case "tr": return "Türkçe";
+                case "pl": return "Polski";
+                default: return "English";
+            }
+        }
 
         public static string ResolveCultureCode(string cultureName, string twoLetterIso)
         {
             string name = (cultureName ?? "").Trim();
-            string lowerName = name.ToLowerInvariant();
+            string lowerName = name.ToLowerInvariant().Replace('_', '-');
             string two = (twoLetterIso ?? "").Trim().ToLowerInvariant();
             if (string.IsNullOrEmpty(two) && !string.IsNullOrEmpty(lowerName))
             {
@@ -110,6 +136,12 @@ namespace AntigravityEnhancer
                 }
                 return "zh-CN";
             }
+            if (two == "pt") return "pt-BR";
+            if (two == "vi") return "vi";
+            if (two == "it") return "it";
+            if (two == "id" || two == "in") return "id";
+            if (two == "tr") return "tr";
+            if (two == "pl") return "pl";
             if (two == "es") return "es";
             if (two == "fr") return "fr";
             if (two == "de") return "de";
@@ -179,158 +211,190 @@ namespace AntigravityEnhancer
                 "Antigravity Sprach- & Kontingent-Patch",
                 "Патч локализации и квот Antigravity");
 
-            AddAll(t, "HeroSub",
-                "9 languages · In-app updates · Quota viewer",
-                "9개 언어 지원 · 인앱 업데이트 · 사용량 표시",
-                "9言語対応 · アプリ内更新 · 使用量表示",
-                "支持 9 种语言 · 应用内更新 · 用量显示",
-                "支援 9 種語言 · 應用程式內更新 · 用量顯示",
-                "9 idiomas · Actualización integrada · Visor de uso",
-                "9 langues · Mises à jour intégrées · Quotas",
-                "9 Sprachen · In-App-Updates · Kontingentanzeige",
-                "9 языков · Обновления в приложении · Индикатор квот");
+            AddAll(t, "Step1Label",
+                "Configure", "설정 확인", "設定確認", "确认设置", "確認設定", "Configurar", "Configurer", "Konfiguration", "Настройка");
+
+            AddAll(t, "Step2Label",
+                "Apply & Restart", "작업 진행", "適用と再起動", "执行与重启", "執行與重啟", "Aplicar y reiniciar", "Appliquer", "Ausführen", "Выполнение");
 
             AddAll(t, "BadgeVerified",
-                "Verified", "확인됨", "確認済み", "已验证", "已驗證", "Verificado", "Vérifié", "Bestätigt", "Проверено");
+                "Detected", "자동 인식됨", "自動検出", "已自动识别", "已自動識別", "Detectado", "Détecté", "Erkannt", "Обнаружено");
 
             AddAll(t, "BadgePatched",
-                "Patched", "패치 적용됨", "パッチ適用済み", "已应用补丁", "已套用修補", "Parcheado", "Patch appliqué", "Gepatcht", "Патч активен");
+                "Patch Active", "패치 적용됨", "適用済み", "补丁已生效", "修補已生效", "Parche activo", "Patch actif", "Patch aktiv", "Патч активен");
 
             AddAll(t, "BadgeNotFound",
-                "Path Not Found", "설치 경로 미감지", "パス未検出", "未检测到路径", "未偵測到路徑", "Ruta no detectada", "Chemin introuvable", "Pfad nicht gefunden", "Путь не найден");
+                "Not Found", "경로 미감지", "未検出", "未检测到", "未偵測到", "No detectado", "Introuvable", "Nicht gefunden", "Не найдено");
 
             AddAll(t, "BadgeCheckPath",
-                "Check Path", "경로 확인 필요", "パス要確認", "请检查路径", "請檢查路徑", "Verificar ruta", "Vérifier le chemin", "Pfad prüfen", "Проверьте путь");
+                "Invalid Path", "경로 확인 필요", "パス要確認", "路径无效", "路徑無效", "Ruta no válida", "Chemin invalide", "Ungültiger Pfad", "Неверный путь");
 
             AddAll(t, "PathLabel",
-                "Install Location", "설치 경로", "インストール先", "安装路径", "安裝路徑", "Ruta de instalación", "Dossier d’installation", "Installationspfad", "Путь установки");
+                "Installation Directory", "설치 경로", "インストール先", "安装路径", "安裝路徑", "Carpeta de instalación", "Dossier d’installation", "Installationspfad", "Папка установки");
 
             AddAll(t, "BtnBrowse",
-                "Browse", "찾아보기", "参照", "浏览", "瀏覽", "Examinar", "Parcourir", "Durchsuchen", "Обзор");
+                "Change", "변경", "変更", "更改", "變更", "Cambiar", "Modifier", "Ändern", "Изменить");
 
             AddAll(t, "BrowseDesc",
-                "Select the Antigravity installation folder.",
-                "Antigravity가 설치된 디렉터리를 선택하세요.",
-                "Antigravity がインストールされているフォルダを選択してください。",
-                "请选择 Antigravity 的安装目录。",
-                "請選擇 Antigravity 的安裝目錄。",
-                "Seleccione la carpeta donde está instalado Antigravity.",
-                "Sélectionnez le dossier d’installation d’Antigravity.",
-                "Wählen Sie den Installationsordner von Antigravity.",
-                "Выберите папку установки Antigravity.");
+                "Select the Antigravity installation folder",
+                "Antigravity가 설치된 폴더를 선택하세요",
+                "Antigravity のインストール先フォルダを選択してください",
+                "请选择 Antigravity 安装文件夹",
+                "請選擇 Antigravity 安裝資料夾",
+                "Seleccione la carpeta de instalación de Antigravity",
+                "Sélectionnez le dossier d’installation d’Antigravity",
+                "Wählen Sie den Installationsordner von Antigravity",
+                "Выберите папку установки Antigravity");
+
+            AddAll(t, "WhatsNewTitle",
+                "What's Changed", "변경 사항 요약", "主な変更点", "更新摘要", "變更摘要", "Novedades", "Nouveautés", "Änderungen", "Что нового");
+
+            AddAll(t, "DefaultNotes",
+                "Expanded UI, model, and Worktree translations across 9 languages\nRefined step-by-step setup with automatic restart\nImproved quota tracking and silent background maintenance",
+                "9개 언어 UI · 모델 설명 · 워크트리 번역 대폭 확충\n단계별 설치 화면 개편 및 완료 후 자동 재시작 지원\n실시간 사용량 표시 및 무음 백그라운드 유지 관리",
+                "9言語のUI・モデル説明・ワークツリー翻訳を拡充\nステップ形式のセットアップと完了後の自動再起動に対応\nクォータ表示の改善とサイレント自動保守",
+                "扩展 9 种语言的界面、模型说明与工作树翻译\n全新分步安装流程，完成后自动重启应用\n优化配额监控与静默后台维护",
+                "擴充 9 種語言的介面、模型說明與工作樹翻譯\n全新分步安裝流程，完成後自動重新啟動\n最佳化配額監控與靜默背景維護",
+                "Traducciones ampliadas para modelos, árboles de trabajo e interfaz en 9 idiomas\nInstalación paso a paso con reinicio automático al finalizar\nSeguimiento de cuota mejorado y mantenimiento silencioso",
+                "Traductions étendues pour les modèles, arbres de travail et l’interface en 9 langues\nInstallation étape par étape avec redémarrage automatique\nSuivi des quotas amélioré et maintenance silencieuse",
+                "Erweiterte Übersetzungen für Modelle, Worktrees und Oberfläche in 9 Sprachen\nSchrittweise Einrichtung mit automatischem Neustart\nVerbesserte Kontingentanzeige und lautlose Hintergrundwartung",
+                "Расширен перевод моделей, рабочих деревьев и интерфейса на 9 языках\nПошаговая установка с автоматическим перезапуском\nУлучшенный мониторинг квот и тихое фоновое обслуживание");
 
             AddAll(t, "BtnInstall",
-                "Install Patch", "패치 설치", "パッチ適用", "安装补丁", "安裝修補", "Instalar parche", "Installer le patch", "Patch installieren", "Установить патч");
+                "Install Patch", "패치 설치", "パッチをインストール", "安装补丁", "安裝修補", "Instalar parche", "Installer le patch", "Patch installieren", "Установить патч");
 
             AddAll(t, "BtnRestore",
-                "Restore Original", "원본 복구", "オリジナル復元", "恢复原版", "還原原版", "Restaurar original", "Restaurer l’original", "Original wiederherstellen", "Восстановить оригинал");
+                "Restore Original", "원본 복구", "オリジナルに戻す", "恢复原版", "還原原版", "Restaurar original", "Restaurer l’original", "Original wiederherstellen", "Восстановить оригинал");
 
-            AddAll(t, "BtnLaunch",
-                "Launch Antigravity", "Antigravity 실행", "Antigravity を起動", "启动 Antigravity", "啟動 Antigravity", "Iniciar Antigravity", "Lancer Antigravity", "Antigravity starten", "Запустить Antigravity");
+            AddAll(t, "BtnBack",
+                "Back", "돌아가기", "戻る", "返回", "返回", "Volver", "Retour", "Zurück", "Назад");
 
-            AddAll(t, "StatusReady",
-                "Ready", "준비됨", "準備完了", "就绪", "就緒", "Listo", "Prêt", "Bereit", "Готово");
+            AddAll(t, "RunInstallTitle",
+                "Installing Patch", "패치 설치 진행 중", "パッチを適用しています", "正在安装补丁", "正在安裝修補", "Instalando parche", "Installation du patch", "Patch wird installiert", "Установка патча");
+
+            AddAll(t, "RunRestoreTitle",
+                "Restoring Original", "원본 복구 진행 중", "オリジナルを復元しています", "正在恢复原版", "正在還原原版", "Restaurando original", "Restauration de l’original", "Original wird wiederhergestellt", "Восстановление оригинала");
 
             AddAll(t, "LogTitle",
-                "Activity Log", "작업 로그", "作業ログ", "操作日志", "作業日誌", "Registro", "Journal", "Protokoll", "Журнал");
-
-            AddAll(t, "CountdownFmt",
-                "Launching in {0}s", "{0}초 후 실행", "{0}秒後に起動", "{0}秒后启动", "{0}秒後啟動", "Iniciando en {0}s", "Lancement dans {0}s", "Start in {0}s", "Запуск через {0} с");
-
-            AddAll(t, "CountdownLaunching",
-                "Launching...", "실행 중", "起動中", "正在启动", "啟動中", "Iniciando", "Lancement", "Starte...", "Запуск...");
-
-            AddAll(t, "BtnLaunchNow",
-                "Launch Now", "바로 실행", "今すぐ起動", "立即启动", "立即啟動", "Iniciar ahora", "Lancer", "Jetzt starten", "Запустить");
-
-            AddAll(t, "BtnCancel",
-                "Cancel", "취소", "キャンセル", "取消", "取消", "Cancelar", "Annuler", "Abbrechen", "Отмена");
-
-            AddAll(t, "LogCancelled",
-                "Auto-launch cancelled.",
-                "자동 실행이 취소되었습니다.",
-                "自動起動をキャンセルしました。",
-                "已取消自动启动。",
-                "已取消自動啟動。",
-                "Inicio automático cancelado.",
-                "Lancement automatique annulé.",
-                "Automatischer Start abgebrochen.",
-                "Автозапуск отменён.");
-
-            AddAll(t, "LogReadyFmt",
-                "Ready (v{0})", "준비됨 (v{0})", "準備完了 (v{0})", "就绪 (v{0})", "就緒 (v{0})", "Listo (v{0})", "Prêt (v{0})", "Bereit (v{0})", "Готово (v{0})");
+                "Activity Log", "작업 로그", "作業ログ", "操作日志", "作業日誌", "Registro de actividad", "Journal d’activité", "Aktivitätsprotokoll", "Журнал операций");
 
             AddAll(t, "PrepInstall",
-                "Preparing install...", "설치 준비 중...", "インストールを準備中...", "正在准备安装...", "正在準備安裝...", "Preparando instalación...", "Préparation de l’installation...", "Installation wird vorbereitet...", "Подготовка установки...");
+                "Preparing installation", "패치 설치를 준비합니다", "インストールの準備中", "正在准备安装", "正在準備安裝", "Preparando instalación", "Préparation de l’installation", "Installation wird vorbereitet", "Подготовка установки");
 
             AddAll(t, "PrepRestore",
-                "Preparing restore...", "복구 준비 중...", "復元を準備中...", "正在准备恢复...", "正在準備還原...", "Preparando restauración...", "Préparation de la restauration...", "Wiederherstellung wird vorbereitet...", "Подготовка восстановления...");
+                "Preparing restore", "원본 복구를 준비합니다", "復元の準備中", "正在准备恢复", "正在準備還原", "Preparando restauración", "Préparation de la restauration", "Wiederherstellung wird vorbereitet", "Подготовка восстановления");
 
             AddAll(t, "ProgKill",
-                "Closing Antigravity...", "Antigravity 프로세스 종료 중...", "Antigravity を終了中...", "正在关闭 Antigravity 进程...", "正在關閉 Antigravity 處理程序...", "Cerrando Antigravity...", "Fermeture d’Antigravity...", "Antigravity wird beendet...", "Закрытие Antigravity...");
+                "Closing running Antigravity processes", "실행 중인 Antigravity 종료 중", "実行中の Antigravity を終了中", "正在关闭运行中的 Antigravity", "正在關閉執行中的 Antigravity", "Cerrando procesos de Antigravity", "Fermeture d’Antigravity", "Antigravity wird beendet", "Завершение процессов Antigravity");
 
             AddAll(t, "ProgDeploy",
-                "Copying patch files...", "패치 파일 배치 중...", "パッチファイルを配置中...", "正在部署补丁文件...", "正在部署修補檔案...", "Copiando archivos del parche...", "Copie des fichiers du patch...", "Patch-Dateien werden kopiert...", "Копирование файлов патча...");
+                "Deploying language and enhancer modules", "다국어 및 패치 모듈 배치 중", "翻訳・拡張モジュールを配置中", "正在部署多语言与增强模块", "正在部署多語言與增強模組", "Copiando módulos del parche", "Copie des modules du patch", "Patch-Module werden bereitgestellt", "Копирование модулей патча");
 
             AddAll(t, "ProgAsar",
-                "Updating app.asar...", "app.asar 적용 중...", "app.asar に適用中...", "正在应用 app.asar...", "正在套用 app.asar...", "Aplicando en app.asar...", "Application sur app.asar...", "app.asar wird angepasst...", "Применение к app.asar...");
+                "Applying lossless bootstrapper to app.asar", "app.asar 부트스트랩 적용 중", "app.asar にブートストラップを適用中", "正在向 app.asar 写入引导程序", "正在向 app.asar 寫入引導程式", "Aplicando arranque en app.asar", "Application sur app.asar", "Bootstrapper wird auf app.asar angewendet", "Применение загрузчика к app.asar");
 
             AddAll(t, "ProgClean",
-                "Clearing cache...", "캐시 정리 중...", "キャッシュを整理中...", "正在清理缓存...", "正在清理快取...", "Limpiando caché...", "Nettoyage du cache...", "Cache wird geleert...", "Очистка кэша...");
+                "Refreshing application cache", "캐시 정리 중", "キャッシュを整理中", "正在清理应用缓存", "正在清理應用快取", "Limpiando caché", "Nettoyage du cache", "Cache wird bereinigt", "Очистка кэша");
 
             AddAll(t, "ProgInstallDone",
-                "Installation complete.", "설치가 완료되었습니다.", "インストールが完了しました。", "安装完成。", "安裝完成。", "Instalación completada.", "Installation terminée.", "Installation abgeschlossen.", "Установка завершена.");
+                "Patch installed. Restarting Antigravity", "설치 완료 · Antigravity 자동 재시작 중", "完了しました。Antigravity を再起動します", "安装完成，正在自动重启 Antigravity", "安裝完成，正在自動重新啟動 Antigravity", "Parche instalado. Reiniciando Antigravity", "Patch installé. Redémarrage d’Antigravity", "Patch installiert. Antigravity startet neu", "Патч установлен. Перезапуск Antigravity");
 
             AddAll(t, "ProgRestoring",
-                "Restoring original files...", "원본 상태 복원 중...", "オリジナル状態を復元中...", "正在恢复原版状态...", "正在還原原版狀態...", "Restaurando archivos originales...", "Restauration des fichiers d’origine...", "Originalzustand wird wiederhergestellt...", "Восстановление оригинала...");
+                "Restoring original application files", "원본 애플리케이션 파일 복원 중", "オリジナルファイルを復元中", "正在恢复原始应用文件", "正在還原原始應用檔案", "Restaurando archivos originales", "Restauration des fichiers d’origine", "Originaldateien werden wiederhergestellt", "Восстановление оригинальных файлов");
 
             AddAll(t, "ProgRestoreDone",
-                "Restored to original state.", "원본 상태로 복구되었습니다.", "オリジナル状態に復元しました。", "已恢复为原版状态。", "已還原為原版狀態。", "Restaurado al estado original.", "État d’origine restauré.", "Originalzustand wiederhergestellt.", "Оригинал восстановлен.");
+                "Original restored. Restarting Antigravity", "복구 완료 · Antigravity 자동 재시작 중", "復元完了。Antigravity を再起動します", "已恢复原版，正在自动重启 Antigravity", "已還原原版，正在自動重新啟動 Antigravity", "Original restaurado. Reiniciando Antigravity", "Original restauré. Redémarrage d’Antigravity", "Original wiederhergestellt. Neustart läuft", "Оригинал восстановлен. Перезапуск Antigravity");
 
             AddAll(t, "ErrStatus",
-                "Action Failed", "작업 실패", "処理に失敗しました", "操作失败", "作業失敗", "Operación fallida", "Échec de l’opération", "Vorgang fehlgeschlagen", "Ошибка");
+                "Operation could not be completed", "작업을 완료하지 못했습니다", "処理を完了できませんでした", "操作未能完成", "作業未能完成", "No se pudo completar la operación", "L’opération a échoué", "Vorgang fehlgeschlagen", "Не удалось завершить операцию");
 
             AddAll(t, "ErrPrefix",
                 "Error: ", "오류: ", "エラー: ", "错误: ", "錯誤: ", "Error: ", "Erreur : ", "Fehler: ", "Ошибка: ");
 
-            AddAll(t, "ErrTitle",
-                "Error", "오류", "エラー", "错误", "錯誤", "Error", "Erreur", "Fehler", "Ошибка");
-
             AddAll(t, "ErrMissingResFmt",
                 "Embedded resource not found: {0}",
-                "임베디드 리소스를 찾을 수 없습니다: {0}",
+                "내장 리소스를 찾을 수 없습니다: {0}",
                 "埋め込みリソースが見つかりません: {0}",
-                "找不到嵌入式资源: {0}",
-                "找不到內嵌資源: {0}",
+                "找不到内置资源: {0}",
+                "找不到內建資源: {0}",
                 "Recurso incrustado no encontrado: {0}",
                 "Ressource intégrée introuvable : {0}",
-                "Eingebettete Ressource nicht gefunden: {0}",
+                "Eingebettete Ressource fehlt: {0}",
                 "Встроенный ресурс не найден: {0}");
 
-            AddAll(t, "LogAutoLaunch",
-                "Done. Launching Antigravity in 3s.",
-                "완료되었습니다. 3초 후 Antigravity를 실행합니다.",
-                "完了しました。3秒後に Antigravity を起動します。",
-                "已完成。将在 3 秒后启动 Antigravity。",
-                "已完成。將於 3 秒後啟動 Antigravity。",
-                "Completado. Iniciando Antigravity en 3s.",
-                "Terminé. Lancement d’Antigravity dans 3s.",
-                "Fertig. Antigravity startet in 3s.",
-                "Готово. Запуск Antigravity через 3 с.");
-
             AddAll(t, "LogLaunching",
-                "Launching Antigravity...", "Antigravity를 실행합니다.", "Antigravity を起動します。", "正在启动 Antigravity。", "正在啟動 Antigravity。", "Iniciando Antigravity...", "Lancement d’Antigravity...", "Antigravity wird gestartet...", "Запуск Antigravity...");
-
-            AddAll(t, "LogLaunched",
-                "Antigravity launched.", "Antigravity를 실행했습니다.", "Antigravity を起動しました。", "已启动 Antigravity。", "已啟動 Antigravity。", "Antigravity iniciado.", "Antigravity lancé.", "Antigravity gestartet.", "Antigravity запущен.");
+                "Launching Antigravity", "Antigravity 실행 중", "Antigravity を起動しています", "正在启动 Antigravity", "正在啟動 Antigravity", "Iniciando Antigravity", "Lancement d’Antigravity", "Antigravity wird gestartet", "Запуск Antigravity");
 
             AddAll(t, "LogLaunchFail",
-                "Launch failed: ", "실행 실패: ", "起動に失敗しました: ", "启动失败: ", "啟動失敗: ", "Error al iniciar: ", "Échec du lancement : ", "Start fehlgeschlagen: ", "Ошибка запуска: ");
+                "Launch failed: ", "실행 실패: ", "起動失敗: ", "启动失败: ", "啟動失敗: ", "Error al iniciar: ", "Échec du lancement : ", "Start fehlgeschlagen: ", "Ошибка запуска: ");
 
             AddAll(t, "LogExeMissing",
-                "Executable not found: ", "실행 파일을 찾을 수 없습니다: ", "実行ファイルが見つかりません: ", "找不到可执行文件: ", "找不到可執行檔: ", "Ejecutable no encontrado: ", "Exécutable introuvable : ", "Ausführbare Datei nicht gefunden: ", "Исполняемый файл не найден: ");
+                "Executable not found: ", "실행 파일 없음: ", "実行ファイルが見つかりません: ", "未找到可执行文件: ", "找不到可執行檔: ", "Ejecutable no encontrado: ", "Exécutable introuvable : ", "Datei nicht gefunden: ", "Файл не найден: ");
+
+            AddExt(t, "HeroTitle",
+                "Patch de idioma e cota do Antigravity",
+                "Bản vá đa ngôn ngữ & hạn mức Antigravity",
+                "Patch lingua e quota per Antigravity",
+                "Patch bahasa & kuota Antigravity",
+                "Antigravity Dil ve Kota Yaması",
+                "Łatka języka i limitów Antigravity");
+            AddExt(t, "Step1Label", "Configurar", "Cấu hình", "Configura", "Konfigurasi", "Yapılandır", "Konfiguracja");
+            AddExt(t, "Step2Label", "Aplicar e reiniciar", "Áp dụng & khởi động lại", "Applica e riavvia", "Terapkan & mulai ulang", "Uygula ve yeniden başlat", "Zastosuj i uruchom");
+            AddExt(t, "BadgeVerified", "Detectado", "Đã nhận diện", "Rilevato", "Terdeteksi", "Algılandı", "Wykryto");
+            AddExt(t, "BadgePatched", "Patch ativo", "Đã cài bản vá", "Patch attiva", "Patch aktif", "Yama etkin", "Łatka aktywna");
+            AddExt(t, "BadgeNotFound", "Não encontrado", "Không tìm thấy", "Non trovato", "Tidak ditemukan", "Bulunamadı", "Nie znaleziono");
+            AddExt(t, "BadgeCheckPath", "Caminho inválido", "Đường dẫn không hợp lệ", "Percorso non valido", "Jalur tidak valid", "Geçersiz yol", "Nieprawidłowa ścieżka");
+            AddExt(t, "PathLabel", "Pasta de instalação", "Thư mục cài đặt", "Cartella di installazione", "Direktori instalasi", "Kurulum dizini", "Katalog instalacji");
+            AddExt(t, "BtnBrowse", "Alterar", "Thay đổi", "Cambia", "Ubah", "Değiştir", "Zmień");
+            AddExt(t, "BrowseDesc",
+                "Selecione a pasta de instalação do Antigravity",
+                "Chọn thư mục cài đặt Antigravity",
+                "Seleziona la cartella di installazione di Antigravity",
+                "Pilih folder instalasi Antigravity",
+                "Antigravity kurulum klasörünü seçin",
+                "Wybierz folder instalacji Antigravity");
+            AddExt(t, "WhatsNewTitle", "Resumo das alterações", "Tóm tắt thay đổi", "Riepilogo novità", "Ringkasan perubahan", "Değişiklik özeti", "Podsumowanie zmian");
+            AddExt(t, "DefaultNotes",
+                "Tradução completa em 15 idiomas para modelos, Worktree e menus\nInstalação em etapas com reinício automático ao concluir\nMonitoramento de cota em tempo real e manutenção silenciosa",
+                "Hỗ trợ đầy đủ 15 ngôn ngữ cho mô hình, Worktree và menu\nCài đặt theo từng bước và tự động khởi động lại khi hoàn tất\nTheo dõi hạn mức thời gian thực và tự bảo trì ngầm",
+                "Traduzione completa in 15 lingue per modelli, Worktree e menu\nInstallazione guidata con riavvio automatico al termine\nMonitoraggio quota in tempo reale e manutenzione silenziosa",
+                "Terjemahan lengkap 15 bahasa untuk model, Worktree, dan menu\nPemasangan bertahap dengan mulai ulang otomatis saat selesai\nPemantauan kuota waktu nyata dan pemeliharaan senyap",
+                "Modeller, Worktree ve menüler için 15 dilde tam çeviri\nTamamlandığında otomatik yeniden başlatmalı adım adım kurulum\nGerçek zamanlı kota takibi ve sessiz arka plan bakımı",
+                "Pełne tłumaczenie na 15 języków dla modeli, Worktree i menu\nInstalacja krok po kroku z automatycznym restartem po zakończeniu\nMonitorowanie limitów na żywo i cicha konserwacja w tle");
+            AddExt(t, "BtnInstall", "Instalar patch", "Cài đặt bản vá", "Installa patch", "Pasang patch", "Yamayı kur", "Zainstaluj łatkę");
+            AddExt(t, "BtnRestore", "Restaurar original", "Khôi phục bản gốc", "Ripristina originale", "Pulihkan asli", "Orijinale dön", "Przywróć oryginał");
+            AddExt(t, "BtnBack", "Voltar", "Quay lại", "Indietro", "Kembali", "Geri", "Wstecz");
+            AddExt(t, "RunInstallTitle", "Instalando patch", "Đang cài đặt bản vá", "Installazione patch", "Memasang patch", "Yama kuruluyor", "Instalowanie łatki");
+            AddExt(t, "RunRestoreTitle", "Restaurando original", "Đang khôi phục bản gốc", "Ripristino originale", "Memulihkan versi asli", "Orijinal geri yükleniyor", "Przywracanie oryginału");
+            AddExt(t, "LogTitle", "Registro de atividade", "Nhật ký hoạt động", "Registro attività", "Log aktivitas", "İşlem günlüğü", "Dziennik działań");
+            AddExt(t, "PrepInstall", "Preparando instalação", "Đang chuẩn bị cài đặt", "Preparazione installazione", "Menyiapkan pemasangan", "Kurulum hazırlanıyor", "Przygotowywanie instalacji");
+            AddExt(t, "PrepRestore", "Preparando restauração", "Đang chuẩn bị khôi phục", "Preparazione ripristino", "Menyiapkan pemulihan", "Geri yükleme hazırlanıyor", "Przygotowywanie przywracania");
+            AddExt(t, "ProgKill", "Fechando processos do Antigravity", "Đang đóng tiến trình Antigravity", "Chiusura processi Antigravity", "Menutup proses Antigravity", "Antigravity işlemleri kapatılıyor", "Zamykanie procesów Antigravity");
+            AddExt(t, "ProgDeploy", "Copiando módulos de idioma e patch", "Đang triển khai mô-đun ngôn ngữ", "Copia moduli lingua e patch", "Menyalin modul bahasa dan patch", "Dil ve yama modülleri kopyalanıyor", "Kopiowanie modułów językowych");
+            AddExt(t, "ProgAsar", "Aplicando bootstrapper em app.asar", "Đang áp dụng vào app.asar", "Applicazione bootstrapper a app.asar", "Menerapkan bootstrapper ke app.asar", "app.asar önyükleyicisi uygulanıyor", "Aktualizowanie pliku app.asar");
+            AddExt(t, "ProgClean", "Limpando cache do aplicativo", "Đang làm mới bộ nhớ đệm", "Pulizia cache applicazione", "Membersihkan cache aplikasi", "Uygulama önbelleği temizleniyor", "Czyszczenie pamięci podręcznej");
+            AddExt(t, "ProgInstallDone", "Patch instalado. Reiniciando Antigravity", "Đã cài xong. Đang khởi động lại Antigravity", "Patch installata. Riavvio di Antigravity", "Patch terpasang. Memulai ulang Antigravity", "Yama kuruldu. Antigravity yeniden başlatılıyor", "Zainstalowano. Ponowne uruchamianie Antigravity");
+            AddExt(t, "ProgRestoring", "Restaurando arquivos originais", "Đang khôi phục tệp gốc", "Ripristino file originali", "Memulihkan file asli", "Orijinal dosyalar geri yükleniyor", "Przywracanie oryginalnych plików");
+            AddExt(t, "ProgRestoreDone", "Original restaurado. Reiniciando Antigravity", "Đã khôi phục. Đang khởi động lại Antigravity", "Originale ripristinato. Riavvio in corso", "Versi asli dipulihkan. Memulai ulang Antigravity", "Orijinale dönüldü. Yeniden başlatılıyor", "Przywrócono oryginał. Ponowne uruchamianie");
+            AddExt(t, "ErrStatus", "Não foi possível concluir a operação", "Không thể hoàn tất thao tác", "Impossibile completare l’operazione", "Operasi tidak dapat diselesaikan", "İşlem tamamlanamadı", "Nie udało się ukończyć operacji");
+            AddExt(t, "ErrPrefix", "Erro: ", "Lỗi: ", "Errore: ", "Kesalahan: ", "Hata: ", "Błąd: ");
+            AddExt(t, "ErrMissingResFmt", "Recurso interno não encontrado: {0}", "Không tìm thấy tài nguyên: {0}", "Risorsa interna mancante: {0}", "Sumber daya tidak ditemukan: {0}", "Gömülü kaynak bulunamadı: {0}", "Brak zasobu wewnętrznego: {0}");
+            AddExt(t, "LogLaunching", "Iniciando Antigravity", "Đang khởi chạy Antigravity", "Avvio di Antigravity", "Menjalankan Antigravity", "Antigravity başlatılıyor", "Uruchamianie Antigravity");
+            AddExt(t, "LogLaunchFail", "Falha ao iniciar: ", "Khởi chạy thất bại: ", "Avvio non riuscito: ", "Gagal menjalankan: ", "Başlatma hatası: ", "Błąd uruchamiania: ");
+            AddExt(t, "LogExeMissing", "Executável não encontrado: ", "Không tìm thấy tệp thực thi: ", "Eseguibile non trovato: ", "File eksekusi tidak ditemukan: ", "Çalıştırılabilir dosya yok: ", "Nie znaleziono pliku: ");
 
             return t;
+        }
+
+        private static void AddExt(Dictionary<string, Dictionary<string, string>> t, string key,
+            string ptBr, string vi, string it, string id, string tr, string pl)
+        {
+            t["pt-BR"][key] = ptBr;
+            t["vi"][key] = vi;
+            t["it"][key] = it;
+            t["id"][key] = id;
+            t["tr"][key] = tr;
+            t["pl"][key] = pl;
         }
 
         public static string Get(string lang, string key)
@@ -361,46 +425,94 @@ namespace AntigravityEnhancer
 
     public class MainWindow : Window
     {
-        private static readonly Color BgPrimary = Color.FromRgb(11, 11, 14);      // #0B0B0E
-        private static readonly Color BgSurface = Color.FromRgb(18, 19, 25);      // #121319
-        private static readonly Color BorderSubtle = Color.FromRgb(33, 35, 48);   // #212330
-        private static readonly Color TextPrimary = Color.FromRgb(202, 211, 245); // #CAD3F5
-        private static readonly Color TextMuted = Color.FromRgb(138, 147, 178);   // #8A93B2
-        private static readonly Color AccentColor = Color.FromRgb(160, 163, 246); // #A0A3F6
+        // Strict neutral ramp + single accent (#0B0B0E, #CAD3F5, #A0A3F6)
+        private static readonly Color BgPrimary = Color.FromRgb(11, 11, 14);         // #0B0B0E
+        private static readonly Color BgSurface = Color.FromRgb(18, 19, 25);         // #121319
+        private static readonly Color BgRaised = Color.FromRgb(24, 26, 35);          // #181A23
+        private static readonly Color BgRaisedHover = Color.FromRgb(32, 35, 47);     // #20232F
+        private static readonly Color BorderHairline = Color.FromArgb(22, 202, 211, 245);
+        private static readonly Color BorderFocus = Color.FromArgb(150, 160, 163, 246);
+        private static readonly Color TextPrimary = Color.FromRgb(202, 211, 245);    // #CAD3F5
+        private static readonly Color TextSecondary = Color.FromRgb(155, 164, 196);  // #9BA4C4
+        private static readonly Color TextMuted = Color.FromRgb(110, 118, 148);     // #6E7694
+        private static readonly Color AccentColor = Color.FromRgb(160, 163, 246);    // #A0A3F6
+        private static readonly Color AccentHover = Color.FromRgb(178, 181, 250);    // #B2B5FA
+        private static readonly Color SemanticOk = Color.FromRgb(76, 195, 138);      // #4CC38A
+        private static readonly Color SemanticErr = Color.FromRgb(229, 72, 77);      // #E5484D
 
-        // UI Elements
+        // Window frame radius (14) vs unified inner UI curvature (8)
+        private static readonly CornerRadius WindowRadius = new CornerRadius(14);
+        private static readonly CornerRadius UniformRadius = new CornerRadius(8);
+
         private Border outerBorder;
-        private Border titleBorder;
-        private Border heroCard;
+        private ScaleTransform windowScale;
+        private TranslateTransform windowTranslate;
+        private Grid clipHost;
+
+        // Top bar & language switcher
+        private Button btnLangTrigger;
+        private TextBlock lblLangCurrent;
+        private Popup langPopup;
+        private StackPanel langMenuStack;
+
+        // Step indicator
+        private Border step1Dot;
+        private TextBlock lblStep1;
+        private Border stepConnectorFill;
+        private Border step2Dot;
+        private TextBlock lblStep2;
+
+        // Views
+        private Grid stageHost;
+        private Grid step1View;
+        private Grid step2View;
+
+        // Step 1 controls
         private Border pathCard;
+        private TextBlock lblPathTitle;
+        private Border statusBadge;
+        private Ellipse statusBadgeDot;
+        private TextBlock lblPathStatus;
+        private Border pathInputBorder;
+        private TextBox txtPath;
+        private Button btnBrowse;
+        private TextBlock lblBrowseText;
+
+        private Border notesCard;
+        private TextBlock lblNotesTitle;
+        private StackPanel notesBulletsPanel;
+
         private Grid actionGrid;
         private Button btnInstall;
+        private TextBlock lblInstallBtn;
         private Button btnRestore;
-        private Button btnLaunch;
-        private StackPanel progressStack;
-        private Border termBorder;
+        private TextBlock lblRestoreBtn;
 
-        private TextBox txtPath;
-        private TextBlock lblPathStatus;
-        private Border statusBadgeDot;
-        private ProgressBar prgBar;
-        private TextBlock lblStatus;
-        private Border pnlCountdown;
-        private TextBlock lblCountdownText;
-        private Button btnImmediateLaunch;
-        private Button btnCancelLaunch;
-        private TextBox txtLog;
+        // Step 2 controls
+        private TextBlock lblRunTitle;
+        private TextBlock lblRunPercent;
+        private TextBlock lblRunStatus;
+        private Border prgTrack;
+        private Border prgFill;
+        private TextBlock lblLogHeader;
         private ScrollViewer logScrollViewer;
+        private StackPanel logItemsStack;
+        private Button btnBack;
+        private TextBlock lblBackBtn;
 
-        private DispatcherTimer autoLaunchTimer;
-        private int countdownSeconds = 3;
         private BackgroundWorker worker;
+        private double currentProgress = 0.0;
+        private bool isClosingAnimated = false;
+        private bool isMinimizingAnimated = false;
+        private bool isBusy = false;
+        private string currentStep = "Step1";
 
         private string detectedAppDir = "";
         private string appExePath = "";
         private string asarPath = "";
         private string backupAsarPath = "";
-        private readonly string uiLang = InstallerI18n.DetectLanguage();
+        private string uiLang = InstallerI18n.DetectLanguage();
+        private Dictionary<string, List<string>> embeddedChangelogNotes;
 
         private string T(string key)
         {
@@ -410,28 +522,36 @@ namespace AntigravityEnhancer
         public MainWindow()
         {
             this.Title = "Antigravity Enhancer";
-            this.Width = 680;
-            this.Height = 580;
+            this.Width = 640;
+            this.Height = 516;
             this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             this.WindowStyle = WindowStyle.None;
             this.AllowsTransparency = true;
             this.Background = Brushes.Transparent;
             this.ResizeMode = ResizeMode.NoResize;
+            this.FontFamily = new FontFamily("Segoe UI, Malgun Gothic, Yu Gothic UI, Microsoft YaHei UI");
+            TextOptions.SetTextFormattingMode(this, TextFormattingMode.Display);
+            UseLayoutRounding = true;
+            SnapsToDevicePixels = true;
+
             LoadWindowIcon();
+            embeddedChangelogNotes = LoadEmbeddedLatestChangelog();
 
             BuildUI();
+            ApplyLocalizedTexts(false);
             DetectAntigravity();
 
-            this.Loaded += (s, e) => { RunFadeEntrance(); };
+            this.Loaded += (s, e) => { RunWindowEntrance(); };
+            this.StateChanged += MainWindow_StateChanged;
         }
 
-        private void LoadWindowIcon()
+        private BitmapSource LoadWindowIconBitmap()
         {
             try
             {
                 using (Stream resStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("app_icon.ico.gz"))
                 {
-                    if (resStream == null) return;
+                    if (resStream == null) return null;
                     using (GZipStream gz = new GZipStream(resStream, CompressionMode.Decompress))
                     using (MemoryStream ms = new MemoryStream())
                     {
@@ -439,465 +559,1341 @@ namespace AntigravityEnhancer
                         int n;
                         while ((n = gz.Read(buf, 0, buf.Length)) > 0) ms.Write(buf, 0, n);
                         ms.Position = 0;
-                        this.Icon = BitmapFrame.Create(ms, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
+                        BitmapFrame frame = BitmapFrame.Create(ms, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
+                        this.Icon = frame;
+                        return frame;
+                    }
+                }
+            }
+            catch { return null; }
+        }
+
+        private void LoadWindowIcon()
+        {
+            LoadWindowIconBitmap();
+        }
+
+        private Dictionary<string, List<string>> LoadEmbeddedLatestChangelog()
+        {
+            var result = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+            try
+            {
+                using (Stream res = Assembly.GetExecutingAssembly().GetManifestResourceStream("enhancer_CHANGELOG.md.gz"))
+                {
+                    if (res == null) return result;
+                    using (GZipStream gz = new GZipStream(res, CompressionMode.Decompress))
+                    using (StreamReader sr = new StreamReader(gz, Encoding.UTF8))
+                    {
+                        string md = sr.ReadToEnd().Replace("\r\n", "\n");
+                        Match secMatch = Regex.Match(md, @"^##\s+\[[^\]]+\][^\n]*\n([\s\S]*?)(?:\n---\n|\n##\s+\[|$)", RegexOptions.Multiline);
+                        if (!secMatch.Success) return result;
+                        string rawSec = secMatch.Groups[1].Value;
+
+                        var map = new Dictionary<string, string>();
+                        map["한국어"] = "ko";
+                        map["日本語"] = "ja";
+                        map["简体中文"] = "zh-CN";
+                        map["繁體中文"] = "zh-TW";
+                        map["Español"] = "es";
+                        map["Français"] = "fr";
+                        map["Deutsch"] = "de";
+                        map["Русский"] = "ru";
+                        map["Português (Brasil)"] = "pt-BR";
+                        map["Português"] = "pt-BR";
+                        map["Tiếng Việt"] = "vi";
+                        map["Italiano"] = "it";
+                        map["Bahasa Indonesia"] = "id";
+                        map["Türkçe"] = "tr";
+                        map["Polski"] = "pl";
+
+                        foreach (Match dm in Regex.Matches(rawSec, @"<details>\s*<summary>([^<]+)</summary>([\s\S]*?)</details>", RegexOptions.IgnoreCase))
+                        {
+                            string label = dm.Groups[1].Value.Trim();
+                            string langCode;
+                            if (map.TryGetValue(label, out langCode))
+                            {
+                                List<string> items = ExtractBulletLines(dm.Groups[2].Value);
+                                if (items.Count > 0) result[langCode] = items;
+                            }
+                        }
+
+                        string enRaw = Regex.Replace(rawSec, @"<details>[\s\S]*?</details>", "", RegexOptions.IgnoreCase);
+                        List<string> enItems = ExtractBulletLines(enRaw);
+                        if (enItems.Count > 0) result["en"] = enItems;
                     }
                 }
             }
             catch { }
+            return result;
+        }
+
+        private List<string> ExtractBulletLines(string block)
+        {
+            var list = new List<string>();
+            if (string.IsNullOrEmpty(block)) return list;
+            foreach (string rawLine in block.Split('\n'))
+            {
+                string line = rawLine.Trim();
+                if (line.StartsWith("- ") || line.StartsWith("* "))
+                {
+                    string cleaned = line.Substring(2).Trim();
+                    cleaned = Regex.Replace(cleaned, @"\*\*([^*]+)\*\*", "$1");
+                    cleaned = Regex.Replace(cleaned, @"`([^`]+)`", "$1");
+                    if (cleaned.EndsWith(".")) cleaned = cleaned.Substring(0, cleaned.Length - 1);
+                    if (!string.IsNullOrEmpty(cleaned)) list.Add(cleaned);
+                    if (list.Count >= 3) break;
+                }
+            }
+            return list;
         }
 
         private void BuildUI()
         {
-            // Outer shadow container
-            Grid rootGrid = new Grid();
-            rootGrid.Margin = new Thickness(12);
+            Grid rootGrid = new Grid { Margin = new Thickness(16) };
 
-            outerBorder = new Border();
-            outerBorder.CornerRadius = new CornerRadius(12);
-            outerBorder.Background = new SolidColorBrush(BgPrimary);
-            outerBorder.BorderBrush = new SolidColorBrush(BorderSubtle);
-            outerBorder.BorderThickness = new Thickness(1);
-            outerBorder.Effect = new DropShadowEffect
+            windowScale = new ScaleTransform(1.0, 1.0);
+            windowTranslate = new TranslateTransform(0.0, 0.0);
+            TransformGroup winTg = new TransformGroup();
+            winTg.Children.Add(windowScale);
+            winTg.Children.Add(windowTranslate);
+
+            outerBorder = new Border
             {
-                BlurRadius = 16,
-                ShadowDepth = 1,
-                Opacity = 0.4,
-                Color = Colors.Black
+                CornerRadius = WindowRadius,
+                Background = new SolidColorBrush(BgPrimary),
+                BorderBrush = new SolidColorBrush(BorderHairline),
+                BorderThickness = new Thickness(1),
+                RenderTransformOrigin = new Point(0.5, 0.5),
+                RenderTransform = winTg,
+                Opacity = 0.0,
+                Effect = new DropShadowEffect
+                {
+                    BlurRadius = 24,
+                    ShadowDepth = 4,
+                    Direction = 270,
+                    Opacity = 0.52,
+                    Color = Colors.Black
+                }
             };
 
-            Grid contentGrid = new Grid();
-            contentGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(44) }); // Title Bar
-            contentGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });    // Header Card
-            contentGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });    // Path Card
-            contentGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });    // Action Buttons
-            contentGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });    // Progress & Countdown
-            contentGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) }); // Log Output
+            // Strict interior mask so title-bar hover/press effects never bleed past window corners
+            clipHost = new Grid();
+            clipHost.SizeChanged += (s, e) =>
+            {
+                double r = Math.Max(0.0, WindowRadius.TopLeft - 1.0);
+                clipHost.Clip = new RectangleGeometry(new Rect(0, 0, e.NewSize.Width, e.NewSize.Height), r, r);
+            };
 
-            // 1. Title Bar
-            titleBorder = new Border();
-            titleBorder.Background = new SolidColorBrush(BgSurface);
-            titleBorder.CornerRadius = new CornerRadius(11, 11, 0, 0);
-            titleBorder.BorderBrush = new SolidColorBrush(BorderSubtle);
-            titleBorder.BorderThickness = new Thickness(0, 0, 0, 1);
-            titleBorder.MouseLeftButtonDown += (s, e) => { this.DragMove(); };
+            clipHost.RowDefinitions.Add(new RowDefinition { Height = new GridLength(44) }); // 0: Title Bar
+            clipHost.RowDefinitions.Add(new RowDefinition { Height = new GridLength(40) }); // 1: Step Strip
+            clipHost.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) }); // 2: Stage Host
+
+            // ----------------------------------------------------------------
+            // Row 0: Quiet Title Bar (masked inside clipHost)
+            // ----------------------------------------------------------------
+            Border titleBar = new Border
+            {
+                Background = new SolidColorBrush(BgSurface),
+                BorderBrush = new SolidColorBrush(BorderHairline),
+                BorderThickness = new Thickness(0, 0, 0, 1)
+            };
+            titleBar.MouseLeftButtonDown += (s, e) =>
+            {
+                if (e.LeftButton == MouseButtonState.Pressed)
+                {
+                    try { this.DragMove(); } catch { }
+                }
+            };
 
             Grid titleGrid = new Grid();
             titleGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             titleGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
-            StackPanel titleLeft = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(16, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center };
-            TextBlock tbBrand1 = new TextBlock { Text = "Antigravity", Foreground = new SolidColorBrush(TextPrimary), FontWeight = FontWeights.SemiBold, FontSize = 12, VerticalAlignment = VerticalAlignment.Center };
-            TextBlock tbBrand2 = new TextBlock { Text = "Enhancer", Foreground = new SolidColorBrush(AccentColor), FontWeight = FontWeights.SemiBold, FontSize = 12, Margin = new Thickness(4, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center };
-
-            Border badge = new Border
+            StackPanel brandStack = new StackPanel
             {
-                Background = new SolidColorBrush(Color.FromArgb(30, 160, 163, 246)),
-                BorderBrush = new SolidColorBrush(Color.FromArgb(96, 160, 163, 246)),
-                BorderThickness = new Thickness(1),
-                CornerRadius = new CornerRadius(6),
-                Padding = new Thickness(6, 2, 6, 2),
-                Margin = new Thickness(8, 0, 0, 0),
+                Orientation = Orientation.Horizontal,
+                Margin = new Thickness(16, 0, 0, 0),
                 VerticalAlignment = VerticalAlignment.Center
             };
-            TextBlock tbVersion = new TextBlock { Text = "v__ENHANCER_VERSION__", Foreground = new SolidColorBrush(AccentColor), FontSize = 11, FontWeight = FontWeights.Medium };
-            badge.Child = tbVersion;
 
-            titleLeft.Children.Add(tbBrand1);
-            titleLeft.Children.Add(tbBrand2);
-            titleLeft.Children.Add(badge);
+            BitmapSource iconBmp = LoadWindowIconBitmap();
+            if (iconBmp != null)
+            {
+                Image imgIcon = new Image
+                {
+                    Source = iconBmp,
+                    Width = 16,
+                    Height = 16,
+                    Margin = new Thickness(0, 0, 8, 0),
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                RenderOptions.SetBitmapScalingMode(imgIcon, BitmapScalingMode.HighQuality);
+                brandStack.Children.Add(imgIcon);
+            }
 
-            StackPanel titleRight = new StackPanel { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Center };
+            TextBlock tbBrand1 = new TextBlock
+            {
+                Text = "Antigravity",
+                Foreground = new SolidColorBrush(TextPrimary),
+                FontWeight = FontWeights.Medium,
+                FontSize = 13,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            TextBlock tbBrand2 = new TextBlock
+            {
+                Text = "Enhancer",
+                Foreground = new SolidColorBrush(AccentColor),
+                FontWeight = FontWeights.SemiBold,
+                FontSize = 13,
+                Margin = new Thickness(4, 0, 0, 0),
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            TextBlock tbVerMeta = new TextBlock
+            {
+                Text = "v__ENHANCER_VERSION__",
+                Foreground = new SolidColorBrush(TextMuted),
+                FontFamily = new FontFamily("Consolas"),
+                FontSize = 11,
+                Margin = new Thickness(8, 1, 0, 0),
+                VerticalAlignment = VerticalAlignment.Center
+            };
 
-            Button btnMin = CreateTitleButton(false);
-            btnMin.Click += (s, e) => { this.WindowState = WindowState.Minimized; };
+            brandStack.Children.Add(tbBrand1);
+            brandStack.Children.Add(tbBrand2);
+            brandStack.Children.Add(tbVerMeta);
 
-            Button btnClose = CreateTitleButton(true);
-            btnClose.Click += (s, e) => { Application.Current.Shutdown(); };
+            StackPanel titleRight = new StackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(0, 0, 6, 0)
+            };
+
+            BuildLanguageSelector();
+            titleRight.Children.Add(btnLangTrigger);
+
+            Button btnMin = CreateMaskedCaptionButton(false);
+            btnMin.Margin = new Thickness(4, 0, 2, 0);
+            btnMin.Click += (s, e) => { MinimizeWithAnimation(); };
+
+            Button btnClose = CreateMaskedCaptionButton(true);
+            btnClose.Click += (s, e) => { CloseWithAnimation(null); };
 
             titleRight.Children.Add(btnMin);
             titleRight.Children.Add(btnClose);
 
-            Grid.SetColumn(titleLeft, 0);
+            Grid.SetColumn(brandStack, 0);
             Grid.SetColumn(titleRight, 1);
-            titleGrid.Children.Add(titleLeft);
+            titleGrid.Children.Add(brandStack);
             titleGrid.Children.Add(titleRight);
-            titleBorder.Child = titleGrid;
-            Grid.SetRow(titleBorder, 0);
-            contentGrid.Children.Add(titleBorder);
+            titleBar.Child = titleGrid;
+            Grid.SetRow(titleBar, 0);
+            clipHost.Children.Add(titleBar);
 
-            // 2. Summary Card
-            heroCard = new Border
+            // ----------------------------------------------------------------
+            // Row 1: Two-Step Process Indicator
+            // ----------------------------------------------------------------
+            Border stepStrip = new Border
             {
-                Background = new SolidColorBrush(BgSurface),
-                BorderBrush = new SolidColorBrush(BorderSubtle),
-                BorderThickness = new Thickness(1),
-                CornerRadius = new CornerRadius(8),
-                Margin = new Thickness(16, 16, 16, 12),
-                Padding = new Thickness(16, 12, 16, 12)
+                Padding = new Thickness(20, 12, 20, 0)
             };
+            Grid stepGrid = new Grid { VerticalAlignment = VerticalAlignment.Center };
+            stepGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            stepGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(36) });
+            stepGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
-            Grid heroGrid = new Grid();
-            heroGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            heroGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-
-            StackPanel heroLeft = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
-            TextBlock tbHeroTitle = new TextBlock
+            StackPanel s1Stack = new StackPanel { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Center };
+            step1Dot = new Border
             {
-                Text = T("HeroTitle"),
+                Width = 20,
+                Height = 20,
+                CornerRadius = UniformRadius,
+                Background = new SolidColorBrush(AccentColor),
+                Margin = new Thickness(0, 0, 8, 0)
+            };
+            step1Dot.Child = new TextBlock
+            {
+                Text = "1",
+                FontFamily = new FontFamily("Consolas"),
+                FontSize = 11,
                 FontWeight = FontWeights.SemiBold,
-                FontSize = 14,
-                Foreground = new SolidColorBrush(TextPrimary)
+                Foreground = new SolidColorBrush(BgPrimary),
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
             };
-            TextBlock tbHeroSub = new TextBlock
+            lblStep1 = new TextBlock
             {
-                Text = T("HeroSub"),
                 FontSize = 12,
-                Foreground = new SolidColorBrush(TextMuted),
-                Margin = new Thickness(0, 4, 0, 0)
+                FontWeight = FontWeights.Medium,
+                Foreground = new SolidColorBrush(TextPrimary),
+                VerticalAlignment = VerticalAlignment.Center
             };
-            heroLeft.Children.Add(tbHeroTitle);
-            heroLeft.Children.Add(tbHeroSub);
+            s1Stack.Children.Add(step1Dot);
+            s1Stack.Children.Add(lblStep1);
 
-            Border statusBadge = new Border
+            Border stepConnTrack = new Border
             {
-                Background = new SolidColorBrush(Color.FromArgb(24, 160, 163, 246)),
-                BorderBrush = new SolidColorBrush(Color.FromArgb(96, 160, 163, 246)),
+                Height = 2,
+                Background = new SolidColorBrush(BgRaised),
+                Margin = new Thickness(10, 0, 10, 0),
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            stepConnectorFill = new Border
+            {
+                Height = 2,
+                Background = new SolidColorBrush(AccentColor),
+                HorizontalAlignment = HorizontalAlignment.Left,
+                Width = 0
+            };
+            stepConnTrack.Child = stepConnectorFill;
+
+            StackPanel s2Stack = new StackPanel { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Center };
+            step2Dot = new Border
+            {
+                Width = 20,
+                Height = 20,
+                CornerRadius = UniformRadius,
+                Background = new SolidColorBrush(BgRaised),
+                BorderBrush = new SolidColorBrush(BorderHairline),
                 BorderThickness = new Thickness(1),
-                CornerRadius = new CornerRadius(6),
-                Padding = new Thickness(8, 4, 8, 4),
+                Margin = new Thickness(0, 0, 8, 0)
+            };
+            TextBlock tbS2Num = new TextBlock
+            {
+                Text = "2",
+                FontFamily = new FontFamily("Consolas"),
+                FontSize = 11,
+                FontWeight = FontWeights.Medium,
+                Foreground = new SolidColorBrush(TextMuted),
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            step2Dot.Child = tbS2Num;
+            lblStep2 = new TextBlock
+            {
+                FontSize = 12,
+                FontWeight = FontWeights.Normal,
+                Foreground = new SolidColorBrush(TextMuted),
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            s2Stack.Children.Add(step2Dot);
+            s2Stack.Children.Add(lblStep2);
+
+            Grid.SetColumn(s1Stack, 0);
+            Grid.SetColumn(stepConnTrack, 1);
+            Grid.SetColumn(s2Stack, 2);
+            stepGrid.Children.Add(s1Stack);
+            stepGrid.Children.Add(stepConnTrack);
+            stepGrid.Children.Add(s2Stack);
+            stepStrip.Child = stepGrid;
+            Grid.SetRow(stepStrip, 1);
+            clipHost.Children.Add(stepStrip);
+
+            // ----------------------------------------------------------------
+            // Row 2: Stage Host (Step 1 Main View & Step 2 Activity Log View)
+            // ----------------------------------------------------------------
+            stageHost = new Grid { Margin = new Thickness(20, 12, 20, 20) };
+            BuildStep1View();
+            BuildStep2View();
+            stageHost.Children.Add(step1View);
+            stageHost.Children.Add(step2View);
+            Grid.SetRow(stageHost, 2);
+            clipHost.Children.Add(stageHost);
+
+            outerBorder.Child = clipHost;
+            rootGrid.Children.Add(outerBorder);
+            this.Content = rootGrid;
+
+            worker = new BackgroundWorker { WorkerReportsProgress = true };
+            worker.DoWork += Worker_DoWork;
+            worker.ProgressChanged += Worker_ProgressChanged;
+            worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
+        }
+
+        private void BuildLanguageSelector()
+        {
+            lblLangCurrent = new TextBlock
+            {
+                Text = InstallerI18n.GetLanguageNativeLabel(uiLang),
+                FontSize = 11.5,
+                FontWeight = FontWeights.Medium,
+                Foreground = new SolidColorBrush(TextSecondary),
                 VerticalAlignment = VerticalAlignment.Center
             };
 
-            StackPanel statusBadgeStack = new StackPanel { Orientation = Orientation.Horizontal };
-            statusBadgeDot = new Border
+            System.Windows.Shapes.Path chevron = new System.Windows.Shapes.Path
+            {
+                Data = Geometry.Parse("M 0 0 L 3.5 3.5 L 7 0"),
+                Stroke = new SolidColorBrush(TextMuted),
+                StrokeThickness = 1.3,
+                Margin = new Thickness(6, 1, 0, 0),
+                VerticalAlignment = VerticalAlignment.Center
+            };
+
+            StackPanel content = new StackPanel { Orientation = Orientation.Horizontal };
+            content.Children.Add(lblLangCurrent);
+            content.Children.Add(chevron);
+
+            btnLangTrigger = CreateSurfaceButton(content, BgRaised, BgRaisedHover, 28, new Thickness(10, 0, 10, 0), true);
+
+            langMenuStack = new StackPanel();
+            ScrollViewer langScroll = new ScrollViewer
+            {
+                MaxHeight = 252,
+                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
+                Content = langMenuStack
+            };
+            ApplyDarkScrollBarStyle(langScroll);
+
+            Border menuBorder = new Border
+            {
+                CornerRadius = UniformRadius,
+                Background = new SolidColorBrush(BgSurface),
+                BorderBrush = new SolidColorBrush(BorderHairline),
+                BorderThickness = new Thickness(1),
+                Padding = new Thickness(4),
+                Margin = new Thickness(8),
+                MinWidth = 156,
+                RenderTransform = new TranslateTransform(0, -6),
+                Effect = new DropShadowEffect
+                {
+                    BlurRadius = 16,
+                    ShadowDepth = 3,
+                    Direction = 270,
+                    Opacity = 0.45,
+                    Color = Colors.Black
+                }
+            };
+            menuBorder.Child = langScroll;
+
+            langPopup = new Popup
+            {
+                PlacementTarget = btnLangTrigger,
+                Placement = PlacementMode.Bottom,
+                HorizontalOffset = -12,
+                VerticalOffset = 2,
+                AllowsTransparency = true,
+                StaysOpen = false,
+                Child = menuBorder
+            };
+
+            PopulateLanguageMenu();
+
+            btnLangTrigger.Click += (s, e) =>
+            {
+                if (isBusy) return;
+                if (langPopup.IsOpen)
+                {
+                    langPopup.IsOpen = false;
+                }
+                else
+                {
+                    PopulateLanguageMenu();
+                    langPopup.IsOpen = true;
+                    menuBorder.Opacity = 0;
+                    TranslateTransform tt = (TranslateTransform)menuBorder.RenderTransform;
+                    tt.Y = -6;
+                    menuBorder.BeginAnimation(UIElement.OpacityProperty,
+                        new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(140)) { EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut } });
+                    tt.BeginAnimation(TranslateTransform.YProperty,
+                        new DoubleAnimation(-6, 0, TimeSpan.FromMilliseconds(160)) { EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut } });
+                }
+            };
+        }
+
+        private void PopulateLanguageMenu()
+        {
+            langMenuStack.Children.Clear();
+            foreach (string code in InstallerI18n.SupportedLanguages)
+            {
+                string captured = code;
+                bool active = string.Equals(code, uiLang, StringComparison.OrdinalIgnoreCase);
+
+                Grid rowGrid = new Grid { Width = 138 };
+                rowGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                rowGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+                TextBlock tb = new TextBlock
+                {
+                    Text = InstallerI18n.GetLanguageNativeLabel(code),
+                    FontSize = 12,
+                    FontWeight = active ? FontWeights.SemiBold : FontWeights.Normal,
+                    Foreground = new SolidColorBrush(active ? TextPrimary : TextSecondary),
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                rowGrid.Children.Add(tb);
+
+                if (active)
+                {
+                    Ellipse dot = new Ellipse
+                    {
+                        Width = 6,
+                        Height = 6,
+                        Fill = new SolidColorBrush(AccentColor),
+                        VerticalAlignment = VerticalAlignment.Center
+                    };
+                    Grid.SetColumn(dot, 1);
+                    rowGrid.Children.Add(dot);
+                }
+
+                Button itemBtn = CreateSurfaceButton(
+                    rowGrid,
+                    active ? BgRaised : BgSurface,
+                    BgRaisedHover,
+                    28,
+                    new Thickness(8, 0, 8, 0),
+                    false);
+                itemBtn.Click += (s, e) =>
+                {
+                    langPopup.IsOpen = false;
+                    if (!string.Equals(uiLang, captured, StringComparison.OrdinalIgnoreCase))
+                    {
+                        uiLang = captured;
+                        ApplyLocalizedTexts(true);
+                    }
+                };
+                langMenuStack.Children.Add(itemBtn);
+            }
+        }
+
+        private void BuildStep1View()
+        {
+            step1View = new Grid
+            {
+                RenderTransform = new TranslateTransform(0, 0)
+            };
+            step1View.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // 0: Path Card
+            step1View.RowDefinitions.Add(new RowDefinition { Height = new GridLength(12) });
+            step1View.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) }); // 2: Changelog Card
+            step1View.RowDefinitions.Add(new RowDefinition { Height = new GridLength(16) });
+            step1View.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // 4: Two Action Buttons
+
+            // 1. Path Card
+            pathCard = CreateCardContainer(new Thickness(16, 14, 16, 14));
+            StackPanel pathStack = new StackPanel();
+
+            Grid pathHeader = new Grid { Margin = new Thickness(0, 0, 0, 10) };
+            pathHeader.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            pathHeader.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+            lblPathTitle = new TextBlock
+            {
+                FontSize = 12,
+                FontWeight = FontWeights.Medium,
+                Foreground = new SolidColorBrush(TextSecondary),
+                VerticalAlignment = VerticalAlignment.Center
+            };
+
+            statusBadge = new Border
+            {
+                CornerRadius = UniformRadius,
+                Background = new SolidColorBrush(BgRaised),
+                BorderBrush = new SolidColorBrush(BorderHairline),
+                BorderThickness = new Thickness(1),
+                Padding = new Thickness(8, 3, 8, 3),
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            StackPanel badgeInner = new StackPanel { Orientation = Orientation.Horizontal };
+            statusBadgeDot = new Ellipse
             {
                 Width = 6,
                 Height = 6,
-                CornerRadius = new CornerRadius(3),
-                Background = new SolidColorBrush(AccentColor),
+                Fill = new SolidColorBrush(SemanticOk),
                 Margin = new Thickness(0, 0, 6, 0),
                 VerticalAlignment = VerticalAlignment.Center
             };
-
             lblPathStatus = new TextBlock
             {
-                Text = T("BadgeVerified"),
-                Foreground = new SolidColorBrush(AccentColor),
-                FontWeight = FontWeights.SemiBold,
                 FontSize = 11,
+                FontWeight = FontWeights.Medium,
+                Foreground = new SolidColorBrush(TextPrimary),
                 VerticalAlignment = VerticalAlignment.Center
             };
-            statusBadgeStack.Children.Add(statusBadgeDot);
-            statusBadgeStack.Children.Add(lblPathStatus);
-            statusBadge.Child = statusBadgeStack;
+            badgeInner.Children.Add(statusBadgeDot);
+            badgeInner.Children.Add(lblPathStatus);
+            statusBadge.Child = badgeInner;
 
-            Grid.SetColumn(heroLeft, 0);
+            Grid.SetColumn(lblPathTitle, 0);
             Grid.SetColumn(statusBadge, 1);
-            heroGrid.Children.Add(heroLeft);
-            heroGrid.Children.Add(statusBadge);
-            heroCard.Child = heroGrid;
-            Grid.SetRow(heroCard, 1);
-            contentGrid.Children.Add(heroCard);
+            pathHeader.Children.Add(lblPathTitle);
+            pathHeader.Children.Add(statusBadge);
 
-            // 3. Path Card
-            pathCard = new Border
+            Grid pathRow = new Grid();
+            pathRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            pathRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(8) });
+            pathRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+            SolidColorBrush inputBorderBrush = new SolidColorBrush(BorderHairline);
+            pathInputBorder = new Border
             {
-                Background = new SolidColorBrush(BgSurface),
-                BorderBrush = new SolidColorBrush(BorderSubtle),
+                CornerRadius = UniformRadius,
+                Background = new SolidColorBrush(BgPrimary),
+                BorderBrush = inputBorderBrush,
                 BorderThickness = new Thickness(1),
-                CornerRadius = new CornerRadius(8),
-                Margin = new Thickness(16, 0, 16, 12),
-                Padding = new Thickness(16, 12, 16, 12)
+                Height = 36,
+                Padding = new Thickness(10, 0, 10, 0)
             };
-
-            StackPanel pathStack = new StackPanel();
-            TextBlock tbPathLabel = new TextBlock
-            {
-                Text = T("PathLabel"),
-                Foreground = new SolidColorBrush(TextMuted),
-                FontSize = 11,
-                Margin = new Thickness(0, 0, 0, 8)
-            };
-
-            Grid pathInputGrid = new Grid();
-            pathInputGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            pathInputGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
             txtPath = new TextBox
             {
-                Background = new SolidColorBrush(BgPrimary),
+                Background = Brushes.Transparent,
                 Foreground = new SolidColorBrush(TextPrimary),
-                BorderBrush = new SolidColorBrush(BorderSubtle),
-                BorderThickness = new Thickness(1),
-                Padding = new Thickness(8, 4, 8, 4),
+                CaretBrush = new SolidColorBrush(AccentColor),
+                BorderThickness = new Thickness(0),
                 FontFamily = new FontFamily("Consolas"),
                 FontSize = 12,
+                VerticalContentAlignment = VerticalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center
             };
+            txtPath.GotKeyboardFocus += (s, e) =>
+            {
+                AnimateBrushColor(inputBorderBrush, BorderFocus, 150);
+            };
+            txtPath.LostKeyboardFocus += (s, e) =>
+            {
+                AnimateBrushColor(inputBorderBrush, BorderHairline, 150);
+            };
             txtPath.TextChanged += (s, e) => { OnPathChanged(); };
+            pathInputBorder.Child = txtPath;
 
-            Button btnBrowse = CreateActionButton(T("BtnBrowse"), BgSurface, Color.FromRgb(28, 30, 40), new SolidColorBrush(TextPrimary), 11, 28);
-            btnBrowse.Margin = new Thickness(8, 0, 0, 0);
-            btnBrowse.Padding = new Thickness(12, 0, 12, 0);
+            lblBrowseText = new TextBlock
+            {
+                FontSize = 12,
+                FontWeight = FontWeights.Medium,
+                Foreground = new SolidColorBrush(TextPrimary),
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            btnBrowse = CreateSurfaceButton(lblBrowseText, BgRaised, BgRaisedHover, 36, new Thickness(14, 0, 14, 0), true);
             btnBrowse.Click += (s, e) => { BrowseFolder(); };
 
-            Grid.SetColumn(txtPath, 0);
-            Grid.SetColumn(btnBrowse, 1);
-            pathInputGrid.Children.Add(txtPath);
-            pathInputGrid.Children.Add(btnBrowse);
+            Grid.SetColumn(pathInputBorder, 0);
+            Grid.SetColumn(btnBrowse, 2);
+            pathRow.Children.Add(pathInputBorder);
+            pathRow.Children.Add(btnBrowse);
 
-            pathStack.Children.Add(tbPathLabel);
-            pathStack.Children.Add(pathInputGrid);
+            pathStack.Children.Add(pathHeader);
+            pathStack.Children.Add(pathRow);
             pathCard.Child = pathStack;
-            Grid.SetRow(pathCard, 2);
-            contentGrid.Children.Add(pathCard);
+            Grid.SetRow(pathCard, 0);
+            step1View.Children.Add(pathCard);
 
-            // 4. Action Buttons
-            actionGrid = new Grid { Margin = new Thickness(16, 0, 16, 12) };
-            actionGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(2.0, GridUnitType.Star) });
-            actionGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(8) });
-            actionGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(2.0, GridUnitType.Star) });
-            actionGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(8) });
-            actionGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(2.0, GridUnitType.Star) });
+            // 2. Concise Localized Changelog Card
+            notesCard = CreateCardContainer(new Thickness(16, 14, 16, 14));
+            Grid notesGrid = new Grid();
+            notesGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            notesGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(10) });
+            notesGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
 
-            btnInstall = CreateAccentButton(T("BtnInstall"));
-            btnInstall.Click += (s, e) => { StartAction("Install"); };
+            Grid notesHeader = new Grid();
+            notesHeader.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            notesHeader.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
-            btnRestore = CreateActionButton(T("BtnRestore"), BgSurface, Color.FromRgb(28, 30, 40), new SolidColorBrush(TextPrimary), 12.0, 40);
-            btnRestore.Click += (s, e) => { StartAction("Restore"); };
+            lblNotesTitle = new TextBlock
+            {
+                FontSize = 12,
+                FontWeight = FontWeights.Medium,
+                Foreground = new SolidColorBrush(TextSecondary),
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            TextBlock tbNotesVer = new TextBlock
+            {
+                Text = "v__ENHANCER_VERSION__",
+                FontFamily = new FontFamily("Consolas"),
+                FontSize = 11,
+                Foreground = new SolidColorBrush(AccentColor),
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            Grid.SetColumn(lblNotesTitle, 0);
+            Grid.SetColumn(tbNotesVer, 1);
+            notesHeader.Children.Add(lblNotesTitle);
+            notesHeader.Children.Add(tbNotesVer);
 
-            btnLaunch = CreateActionButton(T("BtnLaunch"), BgSurface, Color.FromRgb(26, 28, 42), new SolidColorBrush(AccentColor), 12.0, 40, true, AccentColor);
-            btnLaunch.Click += (s, e) => { LaunchAntigravity(); };
+            notesBulletsPanel = new StackPanel { VerticalAlignment = VerticalAlignment.Top };
+
+            ScrollViewer notesScroll = new ScrollViewer
+            {
+                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
+                Content = notesBulletsPanel
+            };
+            ApplyDarkScrollBarStyle(notesScroll);
+
+            Grid.SetRow(notesHeader, 0);
+            Grid.SetRow(notesScroll, 2);
+            notesGrid.Children.Add(notesHeader);
+            notesGrid.Children.Add(notesScroll);
+            notesCard.Child = notesGrid;
+            Grid.SetRow(notesCard, 2);
+            step1View.Children.Add(notesCard);
+
+            // 3. Action Buttons (Strictly 2 buttons: Install Patch & Restore Original)
+            actionGrid = new Grid();
+            actionGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1.35, GridUnitType.Star) });
+            actionGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(10) });
+            actionGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1.0, GridUnitType.Star) });
+
+            lblInstallBtn = new TextBlock
+            {
+                FontSize = 13.5,
+                FontWeight = FontWeights.SemiBold,
+                Foreground = new SolidColorBrush(BgPrimary),
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center
+            };
+            btnInstall = CreatePrimaryButton(lblInstallBtn, 44);
+            btnInstall.Click += (s, e) => { StartStep2Action("Install"); };
+
+            lblRestoreBtn = new TextBlock
+            {
+                FontSize = 13,
+                FontWeight = FontWeights.Medium,
+                Foreground = new SolidColorBrush(TextPrimary),
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center
+            };
+            btnRestore = CreateSurfaceButton(lblRestoreBtn, BgSurface, BgRaisedHover, 44, new Thickness(16, 0, 16, 0), true);
+            btnRestore.Click += (s, e) => { StartStep2Action("Restore"); };
 
             Grid.SetColumn(btnInstall, 0);
             Grid.SetColumn(btnRestore, 2);
-            Grid.SetColumn(btnLaunch, 4);
             actionGrid.Children.Add(btnInstall);
             actionGrid.Children.Add(btnRestore);
-            actionGrid.Children.Add(btnLaunch);
-            Grid.SetRow(actionGrid, 3);
-            contentGrid.Children.Add(actionGrid);
+            Grid.SetRow(actionGrid, 4);
+            step1View.Children.Add(actionGrid);
+        }
 
-            // 5. Progress and Status / Auto-Launch
-            progressStack = new StackPanel { Margin = new Thickness(16, 0, 16, 8) };
-
-            prgBar = new ProgressBar
+        private void BuildStep2View()
+        {
+            step2View = new Grid
             {
-                Height = 4,
-                Background = new SolidColorBrush(BgSurface),
-                Foreground = new SolidColorBrush(AccentColor),
-                BorderThickness = new Thickness(0),
-                Value = 0
+                Visibility = Visibility.Collapsed,
+                Opacity = 0.0,
+                RenderTransform = new TranslateTransform(16, 0)
             };
+            step2View.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // 0: Progress Card
+            step2View.RowDefinitions.Add(new RowDefinition { Height = new GridLength(12) });
+            step2View.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) }); // 2: Activity Log Card
+            step2View.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // 3: Error Back Button (collapsed unless error)
 
-            Grid statusRow = new Grid { Margin = new Thickness(0, 8, 0, 0) };
-            statusRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            statusRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            Border progCard = CreateCardContainer(new Thickness(16, 14, 16, 14));
+            StackPanel progStack = new StackPanel();
 
-            lblStatus = new TextBlock
+            Grid progTop = new Grid { Margin = new Thickness(0, 0, 0, 10) };
+            progTop.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            progTop.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+            lblRunTitle = new TextBlock
             {
-                Text = T("StatusReady"),
+                FontSize = 13.5,
+                FontWeight = FontWeights.SemiBold,
                 Foreground = new SolidColorBrush(TextPrimary),
-                FontSize = 11,
-                VerticalAlignment = VerticalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            lblRunPercent = new TextBlock
+            {
+                Text = "0%",
+                FontFamily = new FontFamily("Consolas"),
+                FontSize = 12.5,
+                FontWeight = FontWeights.SemiBold,
+                Foreground = new SolidColorBrush(AccentColor),
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            Grid.SetColumn(lblRunTitle, 0);
+            Grid.SetColumn(lblRunPercent, 1);
+            progTop.Children.Add(lblRunTitle);
+            progTop.Children.Add(lblRunPercent);
+
+            prgTrack = new Border
+            {
+                Height = 8,
+                CornerRadius = UniformRadius,
+                Background = new SolidColorBrush(BgPrimary),
+                ClipToBounds = true
+            };
+            prgFill = new Border
+            {
+                Height = 8,
+                CornerRadius = UniformRadius,
+                Background = new SolidColorBrush(AccentColor),
+                HorizontalAlignment = HorizontalAlignment.Left,
+                Width = 0
+            };
+            prgTrack.Child = prgFill;
+            prgTrack.SizeChanged += (s, e) => { UpdateProgressFillWidth(false); };
+
+            lblRunStatus = new TextBlock
+            {
+                FontSize = 12,
+                Foreground = new SolidColorBrush(TextSecondary),
+                Margin = new Thickness(0, 10, 0, 0),
                 TextTrimming = TextTrimming.CharacterEllipsis
             };
 
-            pnlCountdown = new Border
+            progStack.Children.Add(progTop);
+            progStack.Children.Add(prgTrack);
+            progStack.Children.Add(lblRunStatus);
+            progCard.Child = progStack;
+            Grid.SetRow(progCard, 0);
+            step2View.Children.Add(progCard);
+
+            // Activity Log Card
+            Border logCard = CreateCardContainer(new Thickness(0));
+            Grid logGrid = new Grid();
+            logGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(32) });
+            logGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+
+            Border logHeader = new Border
             {
-                Background = new SolidColorBrush(Color.FromArgb(24, 160, 163, 246)),
-                BorderBrush = new SolidColorBrush(Color.FromArgb(110, 160, 163, 246)),
-                BorderThickness = new Thickness(1),
-                CornerRadius = new CornerRadius(6),
-                Padding = new Thickness(8, 3, 8, 3),
-                Visibility = Visibility.Collapsed
-            };
-
-            StackPanel countdownStack = new StackPanel { Orientation = Orientation.Horizontal };
-            lblCountdownText = new TextBlock
-            {
-                Text = string.Format(T("CountdownFmt"), 3),
-                Foreground = new SolidColorBrush(AccentColor),
-                FontWeight = FontWeights.SemiBold,
-                FontSize = 11,
-                VerticalAlignment = VerticalAlignment.Center,
-                Margin = new Thickness(0, 0, 8, 0)
-            };
-
-            btnImmediateLaunch = CreateSmallButton(T("BtnLaunchNow"), AccentColor, new SolidColorBrush(BgPrimary));
-            btnImmediateLaunch.Click += (s, e) => { StopAutoLaunchTimer(); LaunchAntigravity(); Application.Current.Shutdown(); };
-
-            btnCancelLaunch = CreateSmallButton(T("BtnCancel"), Color.FromRgb(38, 40, 56), new SolidColorBrush(TextPrimary));
-            btnCancelLaunch.Margin = new Thickness(4, 0, 0, 0);
-            btnCancelLaunch.Click += (s, e) => { StopAutoLaunchTimer(); pnlCountdown.Visibility = Visibility.Collapsed; Log(T("LogCancelled")); };
-
-            countdownStack.Children.Add(lblCountdownText);
-            countdownStack.Children.Add(btnImmediateLaunch);
-            countdownStack.Children.Add(btnCancelLaunch);
-            pnlCountdown.Child = countdownStack;
-
-            Grid.SetColumn(lblStatus, 0);
-            Grid.SetColumn(pnlCountdown, 1);
-            statusRow.Children.Add(lblStatus);
-            statusRow.Children.Add(pnlCountdown);
-
-            progressStack.Children.Add(prgBar);
-            progressStack.Children.Add(statusRow);
-            Grid.SetRow(progressStack, 4);
-            contentGrid.Children.Add(progressStack);
-
-            // 6. Log Panel
-            termBorder = new Border
-            {
-                Background = new SolidColorBrush(BgPrimary),
-                BorderBrush = new SolidColorBrush(BorderSubtle),
-                BorderThickness = new Thickness(1),
-                CornerRadius = new CornerRadius(8),
-                Margin = new Thickness(16, 0, 16, 16)
-            };
-
-            Grid termGrid = new Grid();
-            termGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(28) });
-            termGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
-
-            Border termHeader = new Border
-            {
-                Background = new SolidColorBrush(BgSurface),
-                BorderBrush = new SolidColorBrush(BorderSubtle),
+                BorderBrush = new SolidColorBrush(BorderHairline),
                 BorderThickness = new Thickness(0, 0, 0, 1),
-                CornerRadius = new CornerRadius(7, 7, 0, 0),
-                Padding = new Thickness(12, 0, 12, 0)
+                Padding = new Thickness(16, 0, 16, 0)
             };
-
-            TextBlock tbTermTitle = new TextBlock
+            lblLogHeader = new TextBlock
             {
-                Text = T("LogTitle"),
+                FontSize = 11.5,
+                FontWeight = FontWeights.Medium,
                 Foreground = new SolidColorBrush(TextMuted),
-                FontSize = 11,
-                FontWeight = FontWeights.SemiBold,
                 VerticalAlignment = VerticalAlignment.Center
             };
-            termHeader.Child = tbTermTitle;
-            Grid.SetRow(termHeader, 0);
-            termGrid.Children.Add(termHeader);
+            logHeader.Child = lblLogHeader;
 
+            logItemsStack = new StackPanel();
             logScrollViewer = new ScrollViewer
             {
                 VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
                 HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
-                Padding = new Thickness(12, 8, 12, 8)
+                Padding = new Thickness(16, 10, 16, 10),
+                Content = logItemsStack
             };
-
-            txtLog = new TextBox
-            {
-                Background = Brushes.Transparent,
-                Foreground = new SolidColorBrush(TextPrimary),
-                BorderThickness = new Thickness(0),
-                IsReadOnly = true,
-                TextWrapping = TextWrapping.Wrap,
-                FontFamily = new FontFamily("Consolas"),
-                FontSize = 11.0
-            };
-            logScrollViewer.Content = txtLog;
             ApplyDarkScrollBarStyle(logScrollViewer);
+
+            Grid.SetRow(logHeader, 0);
             Grid.SetRow(logScrollViewer, 1);
-            termGrid.Children.Add(logScrollViewer);
+            logGrid.Children.Add(logHeader);
+            logGrid.Children.Add(logScrollViewer);
+            logCard.Child = logGrid;
+            Grid.SetRow(logCard, 2);
+            step2View.Children.Add(logCard);
 
-            termBorder.Child = termGrid;
-            Grid.SetRow(termBorder, 5);
-            contentGrid.Children.Add(termBorder);
-
-            outerBorder.Child = contentGrid;
-            rootGrid.Children.Add(outerBorder);
-            this.Content = rootGrid;
-
-            // Timer & Worker
-            autoLaunchTimer = new DispatcherTimer();
-            autoLaunchTimer.Interval = TimeSpan.FromSeconds(1);
-            autoLaunchTimer.Tick += AutoLaunchTimer_Tick;
-
-            worker = new BackgroundWorker();
-            worker.WorkerReportsProgress = true;
-            worker.DoWork += Worker_DoWork;
-            worker.ProgressChanged += Worker_ProgressChanged;
-            worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
-
-            Log(string.Format(T("LogReadyFmt"), "__ENHANCER_VERSION__"));
-        }
-
-        private void RunFadeEntrance()
-        {
-            outerBorder.Opacity = 0.0;
-            DoubleAnimation fade = new DoubleAnimation
+            // Error recovery Back button (hidden during normal automatic restart flow)
+            lblBackBtn = new TextBlock
             {
-                From = 0.0,
-                To = 1.0,
-                Duration = TimeSpan.FromMilliseconds(120),
-                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                FontSize = 12.5,
+                FontWeight = FontWeights.Medium,
+                Foreground = new SolidColorBrush(TextPrimary),
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
             };
-            outerBorder.BeginAnimation(UIElement.OpacityProperty, fade);
+            btnBack = CreateSurfaceButton(lblBackBtn, BgRaised, BgRaisedHover, 38, new Thickness(20, 0, 20, 0), true);
+            btnBack.Margin = new Thickness(0, 12, 0, 0);
+            btnBack.HorizontalAlignment = HorizontalAlignment.Right;
+            btnBack.Visibility = Visibility.Collapsed;
+            btnBack.Click += (s, e) => { TransitionToStep1(); };
+            Grid.SetRow(btnBack, 3);
+            step2View.Children.Add(btnBack);
         }
 
-        private void AnimateProgressBar(double targetValue)
+        private Border CreateCardContainer(Thickness padding)
         {
-            DoubleAnimation da = new DoubleAnimation
+            return new Border
             {
-                To = targetValue,
-                Duration = TimeSpan.FromMilliseconds(120),
-                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                CornerRadius = UniformRadius,
+                Background = new SolidColorBrush(BgSurface),
+                BorderBrush = new SolidColorBrush(BorderHairline),
+                BorderThickness = new Thickness(1),
+                Padding = padding,
+                RenderTransform = new TranslateTransform(0, 0)
             };
-            prgBar.BeginAnimation(ProgressBar.ValueProperty, da);
         }
 
-        private Button CreateTitleButton(bool isClose)
+        private Button CreateMaskedCaptionButton(bool isClose)
         {
             Button btn = new Button
             {
-                Width = 44,
-                Height = 44,
+                Width = 30,
+                Height = 28,
                 Background = Brushes.Transparent,
                 BorderThickness = new Thickness(0),
-                Cursor = Cursors.Hand
+                Cursor = Cursors.Hand,
+                FocusVisualStyle = null
+            };
+
+            SolidColorBrush bgBrush = new SolidColorBrush(Color.FromArgb(0, 32, 35, 47));
+            SolidColorBrush strokeBrush = new SolidColorBrush(TextMuted);
+            ScaleTransform pressScale = new ScaleTransform(1.0, 1.0);
+
+            Border inner = new Border
+            {
+                CornerRadius = UniformRadius,
+                Background = bgBrush,
+                Width = 30,
+                Height = 28,
+                RenderTransformOrigin = new Point(0.5, 0.5),
+                RenderTransform = pressScale
             };
 
             System.Windows.Shapes.Path icon = new System.Windows.Shapes.Path
             {
-                Stroke = new SolidColorBrush(TextMuted),
+                Stroke = strokeBrush,
                 StrokeThickness = 1.4,
+                StrokeStartLineCap = PenLineCap.Round,
+                StrokeEndLineCap = PenLineCap.Round,
                 HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
+                VerticalAlignment = VerticalAlignment.Center,
+                Data = isClose
+                    ? Geometry.Parse("M 0 0 L 8 8 M 8 0 L 0 8")
+                    : Geometry.Parse("M 0 4 L 8.5 4")
             };
-            if (isClose)
+            inner.Child = icon;
+            btn.Content = inner;
+
+            ControlTemplate tpl = new ControlTemplate(typeof(Button));
+            FrameworkElementFactory cp = new FrameworkElementFactory(typeof(ContentPresenter));
+            tpl.VisualTree = cp;
+            Style st = new Style(typeof(Button));
+            st.Setters.Add(new Setter(Button.TemplateProperty, tpl));
+            btn.Style = st;
+
+            Color hoverColor = isClose ? SemanticErr : BgRaisedHover;
+            Color hoverIcon = isClose ? Colors.White : TextPrimary;
+
+            btn.MouseEnter += (s, e) =>
             {
-                icon.Data = Geometry.Parse("M 0 0 L 8.5 8.5 M 8.5 0 L 0 8.5");
+                AnimateBrushColor(bgBrush, hoverColor, 130);
+                AnimateBrushColor(strokeBrush, hoverIcon, 130);
+            };
+            btn.MouseLeave += (s, e) =>
+            {
+                AnimateBrushColor(bgBrush, Color.FromArgb(0, 32, 35, 47), 150);
+                AnimateBrushColor(strokeBrush, TextMuted, 150);
+                AnimateScale(pressScale, 1.0, 110);
+            };
+            btn.PreviewMouseLeftButtonDown += (s, e) => { AnimateScale(pressScale, 0.92, 90); };
+            btn.PreviewMouseLeftButtonUp += (s, e) => { AnimateScale(pressScale, 1.0, 120); };
+
+            return btn;
+        }
+
+        private Button CreatePrimaryButton(UIElement content, double height)
+        {
+            SolidColorBrush bgBrush = new SolidColorBrush(AccentColor);
+            ScaleTransform pressScale = new ScaleTransform(1.0, 1.0);
+
+            Border bdr = new Border
+            {
+                CornerRadius = UniformRadius,
+                Background = bgBrush,
+                Height = height,
+                Padding = new Thickness(18, 0, 18, 0),
+                RenderTransformOrigin = new Point(0.5, 0.5),
+                RenderTransform = pressScale,
+                Child = content
+            };
+
+            Button btn = new Button
+            {
+                Content = bdr,
+                Background = Brushes.Transparent,
+                BorderThickness = new Thickness(0),
+                Cursor = Cursors.Hand,
+                FocusVisualStyle = null
+            };
+
+            ControlTemplate tpl = new ControlTemplate(typeof(Button));
+            tpl.VisualTree = new FrameworkElementFactory(typeof(ContentPresenter));
+            Style st = new Style(typeof(Button));
+            st.Setters.Add(new Setter(Button.TemplateProperty, tpl));
+            btn.Style = st;
+
+            btn.MouseEnter += (s, e) =>
+            {
+                if (btn.IsEnabled) AnimateBrushColor(bgBrush, AccentHover, 140);
+            };
+            btn.MouseLeave += (s, e) =>
+            {
+                if (btn.IsEnabled) AnimateBrushColor(bgBrush, AccentColor, 160);
+                AnimateScale(pressScale, 1.0, 110);
+            };
+            btn.PreviewMouseLeftButtonDown += (s, e) =>
+            {
+                if (btn.IsEnabled) AnimateScale(pressScale, 0.978, 95);
+            };
+            btn.PreviewMouseLeftButtonUp += (s, e) =>
+            {
+                AnimateScale(pressScale, 1.0, 125);
+            };
+            btn.IsEnabledChanged += (s, e) =>
+            {
+                bdr.Opacity = btn.IsEnabled ? 1.0 : 0.42;
+                btn.Cursor = btn.IsEnabled ? Cursors.Hand : Cursors.Arrow;
+            };
+
+            return btn;
+        }
+
+        private Button CreateSurfaceButton(UIElement content, Color normalBg, Color hoverBg, double height, Thickness padding, bool showBorder)
+        {
+            SolidColorBrush bgBrush = new SolidColorBrush(normalBg);
+            SolidColorBrush borderBrush = new SolidColorBrush(showBorder ? BorderHairline : Color.FromArgb(0, 0, 0, 0));
+            ScaleTransform pressScale = new ScaleTransform(1.0, 1.0);
+
+            Border bdr = new Border
+            {
+                CornerRadius = UniformRadius,
+                Background = bgBrush,
+                BorderBrush = borderBrush,
+                BorderThickness = new Thickness(showBorder ? 1 : 0),
+                Height = height,
+                Padding = padding,
+                RenderTransformOrigin = new Point(0.5, 0.5),
+                RenderTransform = pressScale,
+                Child = content
+            };
+
+            Button btn = new Button
+            {
+                Content = bdr,
+                Background = Brushes.Transparent,
+                BorderThickness = new Thickness(0),
+                Cursor = Cursors.Hand,
+                FocusVisualStyle = null
+            };
+
+            ControlTemplate tpl = new ControlTemplate(typeof(Button));
+            tpl.VisualTree = new FrameworkElementFactory(typeof(ContentPresenter));
+            Style st = new Style(typeof(Button));
+            st.Setters.Add(new Setter(Button.TemplateProperty, tpl));
+            btn.Style = st;
+
+            btn.MouseEnter += (s, e) =>
+            {
+                if (btn.IsEnabled) AnimateBrushColor(bgBrush, hoverBg, 140);
+            };
+            btn.MouseLeave += (s, e) =>
+            {
+                if (btn.IsEnabled) AnimateBrushColor(bgBrush, normalBg, 160);
+                AnimateScale(pressScale, 1.0, 110);
+            };
+            btn.PreviewMouseLeftButtonDown += (s, e) =>
+            {
+                if (btn.IsEnabled) AnimateScale(pressScale, 0.978, 95);
+            };
+            btn.PreviewMouseLeftButtonUp += (s, e) =>
+            {
+                AnimateScale(pressScale, 1.0, 125);
+            };
+            btn.IsEnabledChanged += (s, e) =>
+            {
+                bdr.Opacity = btn.IsEnabled ? 1.0 : 0.42;
+                btn.Cursor = btn.IsEnabled ? Cursors.Hand : Cursors.Arrow;
+            };
+
+            return btn;
+        }
+
+        private void ApplyLocalizedTexts(bool animate)
+        {
+            lblLangCurrent.Text = InstallerI18n.GetLanguageNativeLabel(uiLang);
+            lblStep1.Text = T("Step1Label");
+            lblStep2.Text = T("Step2Label");
+            lblPathTitle.Text = T("PathLabel");
+            lblBrowseText.Text = T("BtnBrowse");
+            lblNotesTitle.Text = T("WhatsNewTitle");
+            lblInstallBtn.Text = T("BtnInstall");
+            lblRestoreBtn.Text = T("BtnRestore");
+            lblLogHeader.Text = T("LogTitle");
+            lblBackBtn.Text = T("BtnBack");
+
+            RenderLocalizedChangelogBullets();
+            OnPathChanged();
+
+            if (animate && currentStep == "Step1")
+            {
+                step1View.Opacity = 0.35;
+                TranslateTransform tt = (TranslateTransform)step1View.RenderTransform;
+                tt.Y = 4;
+                step1View.BeginAnimation(UIElement.OpacityProperty,
+                    new DoubleAnimation(0.35, 1.0, TimeSpan.FromMilliseconds(180)) { EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut } });
+                tt.BeginAnimation(TranslateTransform.YProperty,
+                    new DoubleAnimation(4, 0, TimeSpan.FromMilliseconds(200)) { EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut } });
+            }
+        }
+
+        private void RenderLocalizedChangelogBullets()
+        {
+            notesBulletsPanel.Children.Clear();
+            List<string> bullets = null;
+            if (embeddedChangelogNotes != null)
+            {
+                if (!embeddedChangelogNotes.TryGetValue(uiLang, out bullets))
+                {
+                    embeddedChangelogNotes.TryGetValue("en", out bullets);
+                }
+            }
+            if (bullets == null || bullets.Count == 0)
+            {
+                bullets = new List<string>(T("DefaultNotes").Split('\n'));
+            }
+
+            for (int i = 0; i < bullets.Count; i++)
+            {
+                string item = bullets[i].Trim();
+                if (string.IsNullOrEmpty(item)) continue;
+
+                Grid row = new Grid { Margin = new Thickness(0, i == 0 ? 2 : 8, 0, 0) };
+                row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(14) });
+                row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+                Ellipse dot = new Ellipse
+                {
+                    Width = 5,
+                    Height = 5,
+                    Fill = new SolidColorBrush(AccentColor),
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    VerticalAlignment = VerticalAlignment.Top,
+                    Margin = new Thickness(1, 6, 0, 0)
+                };
+
+                TextBlock tb = new TextBlock
+                {
+                    Text = item,
+                    FontSize = 12.5,
+                    LineHeight = 18,
+                    Foreground = new SolidColorBrush(TextPrimary),
+                    TextWrapping = TextWrapping.Wrap
+                };
+
+                Grid.SetColumn(dot, 0);
+                Grid.SetColumn(tb, 1);
+                row.Children.Add(dot);
+                row.Children.Add(tb);
+                notesBulletsPanel.Children.Add(row);
+            }
+        }
+
+        // --------------------------------------------------------------------
+        // Window & Step Motion
+        // --------------------------------------------------------------------
+        private void RunWindowEntrance()
+        {
+            var ease = new CubicEase { EasingMode = EasingMode.EaseOut };
+
+            outerBorder.Opacity = 0.0;
+            windowScale.ScaleX = 0.96;
+            windowScale.ScaleY = 0.96;
+            windowTranslate.Y = 10;
+
+            outerBorder.BeginAnimation(UIElement.OpacityProperty, new DoubleAnimation(0.0, 1.0, TimeSpan.FromMilliseconds(240)) { EasingFunction = ease });
+            windowScale.BeginAnimation(ScaleTransform.ScaleXProperty, new DoubleAnimation(0.96, 1.0, TimeSpan.FromMilliseconds(280)) { EasingFunction = ease });
+            windowScale.BeginAnimation(ScaleTransform.ScaleYProperty, new DoubleAnimation(0.96, 1.0, TimeSpan.FromMilliseconds(280)) { EasingFunction = ease });
+            windowTranslate.BeginAnimation(TranslateTransform.YProperty, new DoubleAnimation(10.0, 0.0, TimeSpan.FromMilliseconds(280)) { EasingFunction = ease });
+
+            // Staggered Step 1 card entrance
+            AnimateElementStagger(pathCard, 40);
+            AnimateElementStagger(notesCard, 90);
+            AnimateElementStagger(actionGrid, 140);
+        }
+
+        private void AnimateElementStagger(UIElement el, int delayMs)
+        {
+            if (el == null) return;
+            TranslateTransform tt = el.RenderTransform as TranslateTransform;
+            if (tt == null)
+            {
+                tt = new TranslateTransform(0, 8);
+                el.RenderTransform = tt;
             }
             else
             {
-                icon.Data = Geometry.Parse("M 0 5 L 9 5");
+                tt.Y = 8;
             }
-            btn.Content = icon;
+            el.Opacity = 0.0;
+            var ease = new CubicEase { EasingMode = EasingMode.EaseOut };
+            var fade = new DoubleAnimation(0.0, 1.0, TimeSpan.FromMilliseconds(240))
+            {
+                BeginTime = TimeSpan.FromMilliseconds(delayMs),
+                EasingFunction = ease
+            };
+            var rise = new DoubleAnimation(8.0, 0.0, TimeSpan.FromMilliseconds(260))
+            {
+                BeginTime = TimeSpan.FromMilliseconds(delayMs),
+                EasingFunction = ease
+            };
+            el.BeginAnimation(UIElement.OpacityProperty, fade);
+            tt.BeginAnimation(TranslateTransform.YProperty, rise);
+        }
 
-            Style style = new Style(typeof(Button));
-            ControlTemplate template = new ControlTemplate(typeof(Button));
-            FrameworkElementFactory border = new FrameworkElementFactory(typeof(Border));
-            border.Name = "bdr";
-            border.SetValue(Border.BackgroundProperty, Brushes.Transparent);
-            FrameworkElementFactory cp = new FrameworkElementFactory(typeof(ContentPresenter));
-            cp.SetValue(ContentPresenter.HorizontalAlignmentProperty, HorizontalAlignment.Center);
-            cp.SetValue(ContentPresenter.VerticalAlignmentProperty, VerticalAlignment.Center);
-            border.AppendChild(cp);
-            template.VisualTree = border;
+        private void CloseWithAnimation(Action beforeShutdown)
+        {
+            if (isClosingAnimated) return;
+            isClosingAnimated = true;
+            if (langPopup != null) langPopup.IsOpen = false;
 
-            Trigger trgHover = new Trigger { Property = Button.IsMouseOverProperty, Value = true };
-            trgHover.Setters.Add(new Setter(Border.BackgroundProperty, isClose ? new SolidColorBrush(Color.FromRgb(185, 55, 65)) : new SolidColorBrush(Color.FromRgb(30, 32, 44)), "bdr"));
-            template.Triggers.Add(trgHover);
+            var ease = new CubicEase { EasingMode = EasingMode.EaseIn };
+            var dur = TimeSpan.FromMilliseconds(190);
 
-            btn.MouseEnter += (s, e) => { icon.Stroke = new SolidColorBrush(TextPrimary); };
-            btn.MouseLeave += (s, e) => { icon.Stroke = new SolidColorBrush(TextMuted); };
+            DoubleAnimation fadeOut = new DoubleAnimation(outerBorder.Opacity, 0.0, dur) { EasingFunction = ease };
+            windowScale.BeginAnimation(ScaleTransform.ScaleXProperty, new DoubleAnimation(1.0, 0.965, dur) { EasingFunction = ease });
+            windowScale.BeginAnimation(ScaleTransform.ScaleYProperty, new DoubleAnimation(1.0, 0.965, dur) { EasingFunction = ease });
+            windowTranslate.BeginAnimation(TranslateTransform.YProperty, new DoubleAnimation(0.0, 8.0, dur) { EasingFunction = ease });
 
-            style.Setters.Add(new Setter(Button.TemplateProperty, template));
-            btn.Style = style;
-            return btn;
+            fadeOut.Completed += (s, e) =>
+            {
+                if (beforeShutdown != null)
+                {
+                    try { beforeShutdown(); } catch { }
+                }
+                Application.Current.Shutdown();
+            };
+            outerBorder.BeginAnimation(UIElement.OpacityProperty, fadeOut);
+        }
+
+        private void MinimizeWithAnimation()
+        {
+            if (isMinimizingAnimated || isClosingAnimated) return;
+            isMinimizingAnimated = true;
+            if (langPopup != null) langPopup.IsOpen = false;
+
+            var ease = new CubicEase { EasingMode = EasingMode.EaseIn };
+            var dur = TimeSpan.FromMilliseconds(130);
+            DoubleAnimation fade = new DoubleAnimation(1.0, 0.0, dur) { EasingFunction = ease };
+            windowScale.BeginAnimation(ScaleTransform.ScaleXProperty, new DoubleAnimation(1.0, 0.96, dur) { EasingFunction = ease });
+            windowScale.BeginAnimation(ScaleTransform.ScaleYProperty, new DoubleAnimation(1.0, 0.96, dur) { EasingFunction = ease });
+
+            fade.Completed += (s, e) =>
+            {
+                this.WindowState = WindowState.Minimized;
+                isMinimizingAnimated = false;
+            };
+            outerBorder.BeginAnimation(UIElement.OpacityProperty, fade);
+        }
+
+        private void MainWindow_StateChanged(object sender, EventArgs e)
+        {
+            if (this.WindowState == WindowState.Normal && !isClosingAnimated)
+            {
+                var ease = new CubicEase { EasingMode = EasingMode.EaseOut };
+                var dur = TimeSpan.FromMilliseconds(200);
+                outerBorder.BeginAnimation(UIElement.OpacityProperty, new DoubleAnimation(0.0, 1.0, dur) { EasingFunction = ease });
+                windowScale.BeginAnimation(ScaleTransform.ScaleXProperty, new DoubleAnimation(0.96, 1.0, dur) { EasingFunction = ease });
+                windowScale.BeginAnimation(ScaleTransform.ScaleYProperty, new DoubleAnimation(0.96, 1.0, dur) { EasingFunction = ease });
+            }
+        }
+
+        private void TransitionToStep2()
+        {
+            currentStep = "Step2";
+            var easeOut = new CubicEase { EasingMode = EasingMode.EaseOut };
+            var easeIn = new CubicEase { EasingMode = EasingMode.EaseIn };
+
+            // Animate step indicator connector & dot 2
+            stepConnectorFill.BeginAnimation(FrameworkElement.WidthProperty,
+                new DoubleAnimation(0, 36, TimeSpan.FromMilliseconds(240)) { EasingFunction = easeOut });
+            step2Dot.Background = new SolidColorBrush(AccentColor);
+            step2Dot.BorderThickness = new Thickness(0);
+            TextBlock tb2 = step2Dot.Child as TextBlock;
+            if (tb2 != null)
+            {
+                tb2.Foreground = new SolidColorBrush(BgPrimary);
+                tb2.FontWeight = FontWeights.SemiBold;
+            }
+            lblStep2.Foreground = new SolidColorBrush(TextPrimary);
+            lblStep2.FontWeight = FontWeights.Medium;
+
+            TranslateTransform t1 = (TranslateTransform)step1View.RenderTransform;
+            DoubleAnimation outFade = new DoubleAnimation(1.0, 0.0, TimeSpan.FromMilliseconds(150)) { EasingFunction = easeIn };
+            t1.BeginAnimation(TranslateTransform.XProperty, new DoubleAnimation(0, -16, TimeSpan.FromMilliseconds(150)) { EasingFunction = easeIn });
+            outFade.Completed += (s, e) =>
+            {
+                step1View.Visibility = Visibility.Collapsed;
+                step2View.Visibility = Visibility.Visible;
+                TranslateTransform t2 = (TranslateTransform)step2View.RenderTransform;
+                t2.X = 16;
+                step2View.BeginAnimation(UIElement.OpacityProperty, new DoubleAnimation(0.0, 1.0, TimeSpan.FromMilliseconds(230)) { EasingFunction = easeOut });
+                t2.BeginAnimation(TranslateTransform.XProperty, new DoubleAnimation(16, 0, TimeSpan.FromMilliseconds(250)) { EasingFunction = easeOut });
+            };
+            step1View.BeginAnimation(UIElement.OpacityProperty, outFade);
+        }
+
+        private void TransitionToStep1()
+        {
+            currentStep = "Step1";
+            var easeOut = new CubicEase { EasingMode = EasingMode.EaseOut };
+            var easeIn = new CubicEase { EasingMode = EasingMode.EaseIn };
+
+            stepConnectorFill.BeginAnimation(FrameworkElement.WidthProperty,
+                new DoubleAnimation(36, 0, TimeSpan.FromMilliseconds(200)) { EasingFunction = easeOut });
+            step2Dot.Background = new SolidColorBrush(BgRaised);
+            step2Dot.BorderThickness = new Thickness(1);
+            TextBlock tb2 = step2Dot.Child as TextBlock;
+            if (tb2 != null)
+            {
+                tb2.Foreground = new SolidColorBrush(TextMuted);
+                tb2.FontWeight = FontWeights.Medium;
+            }
+            lblStep2.Foreground = new SolidColorBrush(TextMuted);
+            lblStep2.FontWeight = FontWeights.Normal;
+
+            TranslateTransform t2 = (TranslateTransform)step2View.RenderTransform;
+            DoubleAnimation outFade = new DoubleAnimation(1.0, 0.0, TimeSpan.FromMilliseconds(140)) { EasingFunction = easeIn };
+            t2.BeginAnimation(TranslateTransform.XProperty, new DoubleAnimation(0, 16, TimeSpan.FromMilliseconds(140)) { EasingFunction = easeIn });
+            outFade.Completed += (s, e) =>
+            {
+                step2View.Visibility = Visibility.Collapsed;
+                step1View.Visibility = Visibility.Visible;
+                TranslateTransform t1 = (TranslateTransform)step1View.RenderTransform;
+                t1.X = -16;
+                step1View.BeginAnimation(UIElement.OpacityProperty, new DoubleAnimation(0.0, 1.0, TimeSpan.FromMilliseconds(220)) { EasingFunction = easeOut });
+                t1.BeginAnimation(TranslateTransform.XProperty, new DoubleAnimation(-16, 0, TimeSpan.FromMilliseconds(240)) { EasingFunction = easeOut });
+            };
+            step2View.BeginAnimation(UIElement.OpacityProperty, outFade);
+        }
+
+        private void AnimateBrushColor(SolidColorBrush brush, Color toColor, int ms)
+        {
+            if (brush == null) return;
+            brush.BeginAnimation(SolidColorBrush.ColorProperty,
+                new ColorAnimation(toColor, TimeSpan.FromMilliseconds(ms))
+                {
+                    EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+                });
+        }
+
+        private void AnimateScale(ScaleTransform st, double target, int ms)
+        {
+            if (st == null) return;
+            var ease = new CubicEase { EasingMode = EasingMode.EaseOut };
+            st.BeginAnimation(ScaleTransform.ScaleXProperty, new DoubleAnimation(target, TimeSpan.FromMilliseconds(ms)) { EasingFunction = ease });
+            st.BeginAnimation(ScaleTransform.ScaleYProperty, new DoubleAnimation(target, TimeSpan.FromMilliseconds(ms)) { EasingFunction = ease });
+        }
+
+        private void SetProgressAnimated(double percent)
+        {
+            currentProgress = Math.Max(0.0, Math.Min(100.0, percent));
+            lblRunPercent.Text = ((int)Math.Round(currentProgress)).ToString() + "%";
+            UpdateProgressFillWidth(true);
+        }
+
+        private void UpdateProgressFillWidth(bool animate)
+        {
+            if (prgTrack == null || prgFill == null) return;
+            double totalW = prgTrack.ActualWidth;
+            if (totalW <= 0) return;
+            double targetW = totalW * (currentProgress / 100.0);
+            if (animate)
+            {
+                prgFill.BeginAnimation(FrameworkElement.WidthProperty,
+                    new DoubleAnimation(targetW, TimeSpan.FromMilliseconds(220))
+                    {
+                        EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+                    });
+            }
+            else
+            {
+                prgFill.BeginAnimation(FrameworkElement.WidthProperty, null);
+                prgFill.Width = targetW;
+            }
         }
 
         private void ApplyDarkScrollBarStyle(ScrollViewer sv)
@@ -917,7 +1913,7 @@ namespace AntigravityEnhancer
                                                 <Thumb>
                                                     <Thumb.Template>
                                                         <ControlTemplate TargetType='Thumb'>
-                                                            <Border CornerRadius='3' Background='#2B2E40'/>
+                                                            <Border CornerRadius='8' Background='#262938'/>
                                                         </ControlTemplate>
                                                     </Thumb.Template>
                                                 </Thumb>
@@ -934,139 +1930,9 @@ namespace AntigravityEnhancer
             catch { }
         }
 
-        private Button CreateAccentButton(string text)
-        {
-            TextBlock tb = new TextBlock
-            {
-                Text = text,
-                FontWeight = FontWeights.Bold,
-                FontSize = 13,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
-            };
-
-            Button btn = new Button
-            {
-                Content = tb,
-                Height = 40,
-                Foreground = new SolidColorBrush(BgPrimary),
-                Cursor = Cursors.Hand
-            };
-
-            Style style = new Style(typeof(Button));
-            ControlTemplate template = new ControlTemplate(typeof(Button));
-            FrameworkElementFactory bdr = new FrameworkElementFactory(typeof(Border));
-            bdr.Name = "bdr";
-            bdr.SetValue(Border.CornerRadiusProperty, new CornerRadius(8));
-            bdr.SetValue(Border.BorderThicknessProperty, new Thickness(0));
-            bdr.SetValue(Border.BackgroundProperty, new SolidColorBrush(AccentColor));
-
-            FrameworkElementFactory cp = new FrameworkElementFactory(typeof(ContentPresenter));
-            cp.SetValue(ContentPresenter.HorizontalAlignmentProperty, HorizontalAlignment.Center);
-            cp.SetValue(ContentPresenter.VerticalAlignmentProperty, VerticalAlignment.Center);
-            bdr.AppendChild(cp);
-            template.VisualTree = bdr;
-
-            Trigger trgHover = new Trigger { Property = Button.IsMouseOverProperty, Value = true };
-            trgHover.Setters.Add(new Setter(Border.BackgroundProperty, new SolidColorBrush(Color.FromRgb(176, 179, 250)), "bdr"));
-            template.Triggers.Add(trgHover);
-
-            Trigger trgDisabled = new Trigger { Property = Button.IsEnabledProperty, Value = false };
-            trgDisabled.Setters.Add(new Setter(Border.BackgroundProperty, new SolidColorBrush(Color.FromRgb(28, 30, 42)), "bdr"));
-            trgDisabled.Setters.Add(new Setter(Button.ForegroundProperty, new SolidColorBrush(Color.FromRgb(95, 102, 128))));
-            template.Triggers.Add(trgDisabled);
-
-            style.Setters.Add(new Setter(Button.TemplateProperty, template));
-            btn.Style = style;
-            return btn;
-        }
-
-        private Button CreateActionButton(string text, Color bg, Color hoverBg, Brush fg, double fontSize, double height, bool bold = false, Color? borderColor = null)
-        {
-            TextBlock tb = new TextBlock
-            {
-                Text = text,
-                FontWeight = bold ? FontWeights.Bold : FontWeights.Normal,
-                FontSize = fontSize,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
-            };
-
-            Button btn = new Button
-            {
-                Content = tb,
-                Height = height,
-                Foreground = fg,
-                Cursor = Cursors.Hand
-            };
-
-            Style style = new Style(typeof(Button));
-            ControlTemplate template = new ControlTemplate(typeof(Button));
-            FrameworkElementFactory bdr = new FrameworkElementFactory(typeof(Border));
-            bdr.Name = "bdr";
-            bdr.SetValue(Border.CornerRadiusProperty, new CornerRadius(8));
-            bdr.SetValue(Border.BorderThicknessProperty, new Thickness(1));
-            bdr.SetValue(Border.BorderBrushProperty, new SolidColorBrush(borderColor ?? BorderSubtle));
-            bdr.SetValue(Border.BackgroundProperty, new SolidColorBrush(bg));
-
-            FrameworkElementFactory cp = new FrameworkElementFactory(typeof(ContentPresenter));
-            cp.SetValue(ContentPresenter.HorizontalAlignmentProperty, HorizontalAlignment.Center);
-            cp.SetValue(ContentPresenter.VerticalAlignmentProperty, VerticalAlignment.Center);
-            bdr.AppendChild(cp);
-            template.VisualTree = bdr;
-
-            Trigger trgHover = new Trigger { Property = Button.IsMouseOverProperty, Value = true };
-            trgHover.Setters.Add(new Setter(Border.BackgroundProperty, new SolidColorBrush(hoverBg), "bdr"));
-            template.Triggers.Add(trgHover);
-
-            Trigger trgDisabled = new Trigger { Property = Button.IsEnabledProperty, Value = false };
-            trgDisabled.Setters.Add(new Setter(Border.BackgroundProperty, new SolidColorBrush(Color.FromRgb(18, 19, 25)), "bdr"));
-            trgDisabled.Setters.Add(new Setter(Border.BorderBrushProperty, new SolidColorBrush(Color.FromRgb(28, 30, 42)), "bdr"));
-            trgDisabled.Setters.Add(new Setter(Button.ForegroundProperty, new SolidColorBrush(Color.FromRgb(85, 90, 110))));
-            template.Triggers.Add(trgDisabled);
-
-            style.Setters.Add(new Setter(Button.TemplateProperty, template));
-            btn.Style = style;
-            return btn;
-        }
-
-        private Button CreateSmallButton(string text, Color bg, Brush fg)
-        {
-            TextBlock tb = new TextBlock
-            {
-                Text = text,
-                FontSize = 10,
-                FontWeight = FontWeights.SemiBold,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
-            };
-
-            Button btn = new Button
-            {
-                Content = tb,
-                Padding = new Thickness(8, 2, 8, 2),
-                Foreground = fg,
-                Cursor = Cursors.Hand
-            };
-
-            Style style = new Style(typeof(Button));
-            ControlTemplate template = new ControlTemplate(typeof(Button));
-            FrameworkElementFactory bdr = new FrameworkElementFactory(typeof(Border));
-            bdr.Name = "bdr";
-            bdr.SetValue(Border.CornerRadiusProperty, new CornerRadius(4));
-            bdr.SetValue(Border.BackgroundProperty, new SolidColorBrush(bg));
-
-            FrameworkElementFactory cp = new FrameworkElementFactory(typeof(ContentPresenter));
-            cp.SetValue(ContentPresenter.HorizontalAlignmentProperty, HorizontalAlignment.Center);
-            cp.SetValue(ContentPresenter.VerticalAlignmentProperty, VerticalAlignment.Center);
-            bdr.AppendChild(cp);
-            template.VisualTree = bdr;
-
-            style.Setters.Add(new Setter(Button.TemplateProperty, template));
-            btn.Style = style;
-            return btn;
-        }
-
+        // --------------------------------------------------------------------
+        // Path Detection & Validation
+        // --------------------------------------------------------------------
         private void DetectAntigravity()
         {
             string candidate = "";
@@ -1076,17 +1942,33 @@ namespace AntigravityEnhancer
                 Process[] procs = Process.GetProcessesByName("Antigravity");
                 if (procs != null && procs.Length > 0)
                 {
-                    candidate = Path.GetDirectoryName(procs[0].MainModule.FileName);
+                    candidate = System.IO.Path.GetDirectoryName(procs[0].MainModule.FileName);
                 }
             }
             catch { }
 
             if (string.IsNullOrEmpty(candidate))
             {
+                try
+                {
+                    using (var key = Registry.CurrentUser.OpenSubKey(@"Software\AntigravityEnhancer"))
+                    {
+                        if (key != null)
+                        {
+                            string regDir = key.GetValue("AppDir") as string;
+                            if (!string.IsNullOrEmpty(regDir) && Directory.Exists(regDir)) candidate = regDir;
+                        }
+                    }
+                }
+                catch { }
+            }
+
+            if (string.IsNullOrEmpty(candidate))
+            {
                 string localApp = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-                string p1 = Path.Combine(localApp, @"Programs\Antigravity");
+                string p1 = System.IO.Path.Combine(localApp, @"Programs\Antigravity");
                 string progFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
-                string p2 = Path.Combine(progFiles, @"Antigravity");
+                string p2 = System.IO.Path.Combine(progFiles, @"Antigravity");
 
                 if (Directory.Exists(p1)) candidate = p1;
                 else if (Directory.Exists(p2)) candidate = p2;
@@ -1099,36 +1981,40 @@ namespace AntigravityEnhancer
             else
             {
                 lblPathStatus.Text = T("BadgeNotFound");
-                lblPathStatus.Foreground = new SolidColorBrush(Color.FromRgb(248, 113, 113));
-                statusBadgeDot.Background = new SolidColorBrush(Color.FromRgb(248, 113, 113));
+                lblPathStatus.Foreground = new SolidColorBrush(SemanticErr);
+                statusBadgeDot.Fill = new SolidColorBrush(SemanticErr);
+                btnInstall.IsEnabled = false;
+                btnRestore.IsEnabled = false;
             }
         }
 
         private void OnPathChanged()
         {
-            detectedAppDir = txtPath.Text.Trim();
-            appExePath = Path.Combine(detectedAppDir, "Antigravity.exe");
-            asarPath = Path.Combine(detectedAppDir, @"resources\app.asar");
-            backupAsarPath = Path.Combine(detectedAppDir, @"resources\app.asar.original");
+            detectedAppDir = (txtPath != null ? txtPath.Text : "").Trim();
+            appExePath = string.IsNullOrEmpty(detectedAppDir) ? "" : System.IO.Path.Combine(detectedAppDir, "Antigravity.exe");
+            asarPath = string.IsNullOrEmpty(detectedAppDir) ? "" : System.IO.Path.Combine(detectedAppDir, @"resources\app.asar");
+            backupAsarPath = string.IsNullOrEmpty(detectedAppDir) ? "" : System.IO.Path.Combine(detectedAppDir, @"resources\app.asar.original");
 
-            if (File.Exists(asarPath))
+            if (!string.IsNullOrEmpty(asarPath) && File.Exists(asarPath))
             {
                 bool patched = AsarMicroPatcher.IsBootstrapped(asarPath);
                 lblPathStatus.Text = patched ? T("BadgePatched") : T("BadgeVerified");
-                lblPathStatus.Foreground = new SolidColorBrush(AccentColor);
-                statusBadgeDot.Background = new SolidColorBrush(AccentColor);
-                btnInstall.IsEnabled = true;
-                btnRestore.IsEnabled = patched || File.Exists(backupAsarPath);
-                btnLaunch.IsEnabled = File.Exists(appExePath);
+                Color c = patched ? AccentColor : SemanticOk;
+                lblPathStatus.Foreground = new SolidColorBrush(TextPrimary);
+                statusBadgeDot.Fill = new SolidColorBrush(c);
+                if (!isBusy)
+                {
+                    btnInstall.IsEnabled = true;
+                    btnRestore.IsEnabled = patched || File.Exists(backupAsarPath);
+                }
             }
             else
             {
-                lblPathStatus.Text = T("BadgeCheckPath");
-                lblPathStatus.Foreground = new SolidColorBrush(Color.FromRgb(248, 113, 113));
-                statusBadgeDot.Background = new SolidColorBrush(Color.FromRgb(248, 113, 113));
+                lblPathStatus.Text = string.IsNullOrEmpty(detectedAppDir) ? T("BadgeNotFound") : T("BadgeCheckPath");
+                lblPathStatus.Foreground = new SolidColorBrush(SemanticErr);
+                statusBadgeDot.Fill = new SolidColorBrush(SemanticErr);
                 btnInstall.IsEnabled = false;
                 btnRestore.IsEnabled = false;
-                btnLaunch.IsEnabled = false;
             }
         }
 
@@ -1145,21 +2031,28 @@ namespace AntigravityEnhancer
             }
         }
 
-        private void SetUIBusy(bool busy)
+        // --------------------------------------------------------------------
+        // Step 2 Execution & Automatic Restart
+        // --------------------------------------------------------------------
+        private void StartStep2Action(string action)
         {
-            btnInstall.IsEnabled = !busy && File.Exists(asarPath);
-            btnRestore.IsEnabled = !busy && ((File.Exists(asarPath) && AsarMicroPatcher.IsBootstrapped(asarPath)) || File.Exists(backupAsarPath));
-            btnLaunch.IsEnabled = !busy && File.Exists(appExePath);
-            txtPath.IsEnabled = !busy;
-        }
+            if (isBusy) return;
+            isBusy = true;
+            btnLangTrigger.IsEnabled = false;
+            btnBack.Visibility = Visibility.Collapsed;
+            logItemsStack.Children.Clear();
 
-        private void StartAction(string action)
-        {
-            StopAutoLaunchTimer();
-            SetUIBusy(true);
-            AnimateProgressBar(0);
-            lblStatus.Foreground = new SolidColorBrush(TextPrimary);
-            lblStatus.Text = (action == "Install") ? T("PrepInstall") : T("PrepRestore");
+            lblRunTitle.Text = (action == "Install") ? T("RunInstallTitle") : T("RunRestoreTitle");
+            lblRunTitle.Foreground = new SolidColorBrush(TextPrimary);
+            lblRunStatus.Foreground = new SolidColorBrush(TextSecondary);
+            prgFill.Background = new SolidColorBrush(AccentColor);
+            SetProgressAnimated(0);
+
+            string prepMsg = (action == "Install") ? T("PrepInstall") : T("PrepRestore");
+            lblRunStatus.Text = prepMsg;
+            AppendLogRow(prepMsg, false);
+
+            TransitionToStep2();
             worker.RunWorkerAsync(action);
         }
 
@@ -1168,22 +2061,23 @@ namespace AntigravityEnhancer
             string action = e.Argument as string;
             string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            string enhancerDir = Path.Combine(appData, @"Antigravity\enhancer");
-            string legacyLauncherDir = Path.Combine(localAppData, "AntigravityEnhancer");
+            string enhancerDir = System.IO.Path.Combine(appData, @"Antigravity\enhancer");
+            string legacyLauncherDir = System.IO.Path.Combine(localAppData, "AntigravityEnhancer");
 
             try
             {
-                worker.ReportProgress(10, T("ProgKill"));
+                Thread.Sleep(180);
+                worker.ReportProgress(15, T("ProgKill"));
                 CloseAntigravityProcesses();
-                Thread.Sleep(400);
+                Thread.Sleep(350);
 
                 if (action == "Install")
                 {
-                    worker.ReportProgress(25, T("ProgDeploy"));
+                    worker.ReportProgress(38, T("ProgDeploy"));
                     Directory.CreateDirectory(enhancerDir);
-                    string disabledFlag = Path.Combine(enhancerDir, "disabled.flag");
+                    string disabledFlag = System.IO.Path.Combine(enhancerDir, "disabled.flag");
                     if (File.Exists(disabledFlag)) { try { File.Delete(disabledFlag); } catch { } }
-                    string stateFile = Path.Combine(enhancerDir, "state.json");
+                    string stateFile = System.IO.Path.Combine(enhancerDir, "state.json");
                     if (File.Exists(stateFile)) { try { File.Delete(stateFile); } catch { } }
 
                     string[] moduleFiles = new string[]
@@ -1199,10 +2093,10 @@ namespace AntigravityEnhancer
                     };
                     foreach (string mf in moduleFiles)
                     {
-                        ExtractEmbeddedGzip("enhancer_" + mf + ".gz", Path.Combine(enhancerDir, mf));
+                        ExtractEmbeddedGzip("enhancer_" + mf + ".gz", System.IO.Path.Combine(enhancerDir, mf));
                     }
 
-                    worker.ReportProgress(60, T("ProgAsar"));
+                    worker.ReportProgress(70, T("ProgAsar"));
                     AsarMicroPatcher.EnsureBootstrapped(asarPath, false);
 
                     RegisterAutoRepatchTask(detectedAppDir, enhancerDir);
@@ -1219,15 +2113,16 @@ namespace AntigravityEnhancer
 
                     worker.ReportProgress(90, T("ProgClean"));
                     PurgeCacheDirectories();
+                    Thread.Sleep(180);
 
                     worker.ReportProgress(100, T("ProgInstallDone"));
                     e.Result = "InstallSuccess";
                 }
                 else if (action == "Restore")
                 {
-                    worker.ReportProgress(35, T("ProgRestoring"));
+                    worker.ReportProgress(45, T("ProgRestoring"));
                     UnregisterAutoRepatchTask();
-                    try { if (Directory.Exists(enhancerDir)) File.WriteAllText(Path.Combine(enhancerDir, "disabled.flag"), "restored-vanilla\n"); } catch { }
+                    try { if (Directory.Exists(enhancerDir)) File.WriteAllText(System.IO.Path.Combine(enhancerDir, "disabled.flag"), "restored-vanilla\n"); } catch { }
                     AsarMicroPatcher.UnpatchVanilla(asarPath);
 
                     if (Directory.Exists(legacyLauncherDir))
@@ -1235,8 +2130,9 @@ namespace AntigravityEnhancer
                         try { Directory.Delete(legacyLauncherDir, true); } catch { }
                     }
 
-                    worker.ReportProgress(85, T("ProgClean"));
+                    worker.ReportProgress(88, T("ProgClean"));
                     PurgeCacheDirectories();
+                    Thread.Sleep(180);
 
                     worker.ReportProgress(100, T("ProgRestoreDone"));
                     e.Result = "RestoreSuccess";
@@ -1250,77 +2146,121 @@ namespace AntigravityEnhancer
 
         private void Worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            AnimateProgressBar(Math.Max(0, Math.Min(100, e.ProgressPercentage)));
+            SetProgressAnimated(e.ProgressPercentage);
             string msg = e.UserState as string;
             if (!string.IsNullOrEmpty(msg))
             {
-                lblStatus.Text = msg;
-                Log(msg);
+                lblRunStatus.Opacity = 0.4;
+                lblRunStatus.Text = msg;
+                lblRunStatus.BeginAnimation(UIElement.OpacityProperty,
+                    new DoubleAnimation(0.4, 1.0, TimeSpan.FromMilliseconds(150)));
+                AppendLogRow(msg, false);
             }
         }
 
         private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            SetUIBusy(false);
             string result = e.Result as string;
 
             if (result != null && result.StartsWith("Error: "))
             {
+                isBusy = false;
+                btnLangTrigger.IsEnabled = true;
+                OnPathChanged();
+
                 string detail = result.Substring(7);
-                lblStatus.Text = T("ErrStatus");
-                lblStatus.Foreground = new SolidColorBrush(Color.FromRgb(248, 113, 113));
-                Log(T("ErrPrefix") + detail);
-                MessageBox.Show(this, detail, T("ErrTitle"), MessageBoxButton.OK, MessageBoxImage.Error);
+                lblRunTitle.Text = T("ErrStatus");
+                lblRunTitle.Foreground = new SolidColorBrush(SemanticErr);
+                lblRunStatus.Text = detail;
+                lblRunStatus.Foreground = new SolidColorBrush(SemanticErr);
+                prgFill.Background = new SolidColorBrush(SemanticErr);
+                AppendLogRow(T("ErrPrefix") + detail, true);
+
+                btnBack.Visibility = Visibility.Visible;
+                AnimateElementStagger(btnBack, 0);
                 return;
             }
 
-            lblStatus.Foreground = new SolidColorBrush(AccentColor);
-            AnimateProgressBar(100);
+            SetProgressAnimated(100);
+            prgFill.Background = new SolidColorBrush(SemanticOk);
+            lblRunPercent.Foreground = new SolidColorBrush(SemanticOk);
             OnPathChanged();
 
-            StartAutoLaunchCountdown();
-        }
-
-        private void StartAutoLaunchCountdown()
-        {
-            countdownSeconds = 3;
-            lblCountdownText.Text = string.Format(T("CountdownFmt"), countdownSeconds);
-            pnlCountdown.Visibility = Visibility.Visible;
-            autoLaunchTimer.Start();
-            Log(T("LogAutoLaunch"));
-        }
-
-        private void StopAutoLaunchTimer()
-        {
-            autoLaunchTimer.Stop();
-            pnlCountdown.Visibility = Visibility.Collapsed;
-        }
-
-        private void AutoLaunchTimer_Tick(object sender, EventArgs e)
-        {
-            countdownSeconds--;
-            if (countdownSeconds > 0)
+            // Automatic restart without requiring any extra button press
+            AppendLogRow(T("LogLaunching"), false);
+            DispatcherTimer restartTimer = new DispatcherTimer
             {
-                lblCountdownText.Text = string.Format(T("CountdownFmt"), countdownSeconds);
-            }
-            else
+                Interval = TimeSpan.FromMilliseconds(650)
+            };
+            restartTimer.Tick += (s, ev) =>
             {
-                autoLaunchTimer.Stop();
-                lblCountdownText.Text = T("CountdownLaunching");
-                Log(T("LogLaunching"));
-                LaunchAntigravity();
-
-                DispatcherTimer exitTimer = new DispatcherTimer();
-                exitTimer.Interval = TimeSpan.FromMilliseconds(1200);
-                exitTimer.Tick += (s, ev) =>
-                {
-                    exitTimer.Stop();
-                    Application.Current.Shutdown();
-                };
-                exitTimer.Start();
-            }
+                restartTimer.Stop();
+                CloseWithAnimation(() => { LaunchAntigravity(); });
+            };
+            restartTimer.Start();
         }
 
+        private void AppendLogRow(string text, bool isError)
+        {
+            string ts = DateTime.Now.ToString("HH:mm:ss");
+            TranslateTransform tt = new TranslateTransform(0, 6);
+
+            Grid row = new Grid
+            {
+                Margin = new Thickness(0, 0, 0, 6),
+                Opacity = 0.0,
+                RenderTransform = tt
+            };
+            row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(64) });
+            row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(12) });
+            row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+            TextBlock tbTime = new TextBlock
+            {
+                Text = ts,
+                FontFamily = new FontFamily("Consolas"),
+                FontSize = 11,
+                Foreground = new SolidColorBrush(TextMuted),
+                VerticalAlignment = VerticalAlignment.Top,
+                Margin = new Thickness(0, 1, 0, 0)
+            };
+
+            Ellipse dot = new Ellipse
+            {
+                Width = 5,
+                Height = 5,
+                Fill = new SolidColorBrush(isError ? SemanticErr : AccentColor),
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Top,
+                Margin = new Thickness(0, 6, 0, 0)
+            };
+
+            TextBlock tbMsg = new TextBlock
+            {
+                Text = text,
+                FontSize = 12,
+                Foreground = new SolidColorBrush(isError ? SemanticErr : TextPrimary),
+                TextWrapping = TextWrapping.Wrap
+            };
+
+            Grid.SetColumn(tbTime, 0);
+            Grid.SetColumn(dot, 1);
+            Grid.SetColumn(tbMsg, 2);
+            row.Children.Add(tbTime);
+            row.Children.Add(dot);
+            row.Children.Add(tbMsg);
+
+            logItemsStack.Children.Add(row);
+            var ease = new CubicEase { EasingMode = EasingMode.EaseOut };
+            row.BeginAnimation(UIElement.OpacityProperty, new DoubleAnimation(0.0, 1.0, TimeSpan.FromMilliseconds(180)) { EasingFunction = ease });
+            tt.BeginAnimation(TranslateTransform.YProperty, new DoubleAnimation(6.0, 0.0, TimeSpan.FromMilliseconds(200)) { EasingFunction = ease });
+
+            logScrollViewer.ScrollToEnd();
+        }
+
+        // --------------------------------------------------------------------
+        // System Operations
+        // --------------------------------------------------------------------
         private void CloseAntigravityProcesses()
         {
             Process[] procs = Process.GetProcessesByName("Antigravity");
@@ -1348,10 +2288,10 @@ namespace AntigravityEnhancer
         {
             try
             {
-                string exePath = Path.Combine(appDir, "Antigravity.exe");
-                string scriptPath = Path.Combine(enhancerDir, "auto-repatch.js");
-                string psWrapperPath = Path.Combine(enhancerDir, "auto-repatch.ps1");
-                string vbsWrapperPath = Path.Combine(enhancerDir, "auto-repatch.vbs");
+                string exePath = System.IO.Path.Combine(appDir, "Antigravity.exe");
+                string scriptPath = System.IO.Path.Combine(enhancerDir, "auto-repatch.js");
+                string psWrapperPath = System.IO.Path.Combine(enhancerDir, "auto-repatch.ps1");
+                string vbsWrapperPath = System.IO.Path.Combine(enhancerDir, "auto-repatch.vbs");
                 string psBody =
                     "$ErrorActionPreference = 'SilentlyContinue'\r\n" +
                     "if (-not (Get-Process Antigravity -ErrorAction SilentlyContinue)) {\r\n" +
@@ -1390,8 +2330,8 @@ namespace AntigravityEnhancer
             try
             {
                 string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-                string psWrapperPath = Path.Combine(appData, @"Antigravity\enhancer\auto-repatch.ps1");
-                string vbsWrapperPath = Path.Combine(appData, @"Antigravity\enhancer\auto-repatch.vbs");
+                string psWrapperPath = System.IO.Path.Combine(appData, @"Antigravity\enhancer\auto-repatch.ps1");
+                string vbsWrapperPath = System.IO.Path.Combine(appData, @"Antigravity\enhancer\auto-repatch.vbs");
                 if (File.Exists(psWrapperPath)) { try { File.Delete(psWrapperPath); } catch { } }
                 if (File.Exists(vbsWrapperPath)) { try { File.Delete(vbsWrapperPath); } catch { } }
                 var psi = new ProcessStartInfo("schtasks.exe", "/Delete /TN \"AntigravityEnhancerAutoRepatch\" /F")
@@ -1431,13 +2371,13 @@ namespace AntigravityEnhancer
         private void PurgeCacheDirectories()
         {
             string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            string baseCache = Path.Combine(appData, "Antigravity");
+            string baseCache = System.IO.Path.Combine(appData, "Antigravity");
 
             string[] targets = new string[]
             {
-                Path.Combine(baseCache, "Cache"),
-                Path.Combine(baseCache, "Code Cache"),
-                Path.Combine(baseCache, "GPUCache")
+                System.IO.Path.Combine(baseCache, "Cache"),
+                System.IO.Path.Combine(baseCache, "Code Cache"),
+                System.IO.Path.Combine(baseCache, "GPUCache")
             };
 
             foreach (string t in targets)
@@ -1452,8 +2392,7 @@ namespace AntigravityEnhancer
         private void LaunchAntigravity()
         {
             string targetExe = appExePath;
-
-            if (File.Exists(targetExe))
+            if (!string.IsNullOrEmpty(targetExe) && File.Exists(targetExe))
             {
                 try
                 {
@@ -1464,24 +2403,9 @@ namespace AntigravityEnhancer
                         UseShellExecute = true
                     };
                     Process.Start(psi);
-                    Log(T("LogLaunched"));
                 }
-                catch (Exception ex)
-                {
-                    Log(T("LogLaunchFail") + ex.Message);
-                }
+                catch { }
             }
-            else
-            {
-                Log(T("LogExeMissing") + targetExe);
-            }
-        }
-
-        private void Log(string text)
-        {
-            string timestamp = DateTime.Now.ToString("HH:mm:ss");
-            txtLog.AppendText(string.Format("[{0}] {1}\r\n", timestamp, text));
-            logScrollViewer.ScrollToEnd();
         }
     }
 }
@@ -1546,6 +2470,8 @@ try {
     [System.IO.File]::WriteAllText($csFile, $csCompiledSource, $utf8WithBom)
 
     Write-Host "[3/4] Compiling Antigravity-Enhancer-Setup.exe v$Version..." -ForegroundColor Cyan
+    Get-Process -Name "Antigravity-Enhancer-Setup", "Antigravity-Enhancer-v*-Setup" -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+    Start-Sleep -Milliseconds 150
     $cscArgs = @(
         "/nologo",
         "/target:winexe",

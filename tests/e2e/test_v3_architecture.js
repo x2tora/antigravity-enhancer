@@ -219,15 +219,15 @@ function createRendererHarness(initialLang = 'ko', seedDomFn = null, payloadOver
 // ============================================================================
 // F22: Modular Enhancer & Manifest Integrity
 // ============================================================================
-registerTest(1, 'F22', 'manifest.json v4.0.7 points to x2tora/antigravity-enhancer & matches SHA-256 digests', () => {
+registerTest(1, 'F22', 'manifest.json v4.1.0 points to x2tora/antigravity-enhancer & matches SHA-256 digests', () => {
   const manifestPath = path.join(ENHANCER_DIR, 'manifest.json');
   assert.ok(fs.existsSync(manifestPath), 'enhancer/manifest.json missing');
   const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-  assert.strictEqual(manifest.version, '4.0.7');
+  assert.strictEqual(manifest.version, '4.1.0');
   assert.strictEqual(manifest.repo, 'x2tora/antigravity-enhancer');
   assert.strictEqual(manifest.testedAppVersion, '2.34.0');
   assert.ok(manifest.releaseNotesI18n && typeof manifest.releaseNotesI18n === 'object', 'manifest.json must include releaseNotesI18n');
-  for (const l of ['en', 'ko', 'ja', 'zh-CN', 'zh-TW', 'es', 'fr', 'de', 'ru']) {
+  for (const l of ['en', 'ko', 'ja', 'zh-CN', 'zh-TW', 'es', 'fr', 'de', 'ru', 'pt-BR', 'vi', 'it', 'id', 'tr', 'pl']) {
     assert.ok(typeof manifest.releaseNotesI18n[l] === 'string' && manifest.releaseNotesI18n[l].length > 10, `Missing manifest releaseNotesI18n for ${l}`);
   }
 
@@ -241,7 +241,7 @@ registerTest(1, 'F22', 'manifest.json v4.0.7 points to x2tora/antigravity-enhanc
   }
 });
 
-registerTest(1, 'F23', 'Renderer auto-detects OS language on first launch (9 languages + English fallback) and localizes quota setting labels', () => {
+registerTest(1, 'F23', 'Renderer auto-detects OS language on first launch (15 languages + English fallback) and localizes quota setting labels', () => {
   const src = fs.readFileSync(path.join(ENHANCER_DIR, 'renderer-enhancer.js'), 'utf8');
   const runDetect = (langs, lang) => {
     const { window, document, localStorage } = createMockEnvironment();
@@ -257,15 +257,21 @@ registerTest(1, 'F23', 'Renderer auto-detects OS language on first launch (9 lan
   const twRes = runDetect(['zh-Hant-TW'], 'zh-TW');
   assert.strictEqual(twRes.activeLanguage, 'zh-TW', 'First launch with zh-TW OS must resolve to zh-TW');
   const ptRes = runDetect(['pt-BR'], 'pt-BR');
-  assert.strictEqual(ptRes.activeLanguage, 'en', 'Unsupported OS language pt-BR must fall back to en');
-  for (const l of ['en', 'ko', 'ja', 'zh-CN', 'zh-TW', 'es', 'fr', 'de', 'ru']) {
+  assert.strictEqual(ptRes.activeLanguage, 'pt-BR', 'First launch with pt-BR OS must resolve to pt-BR');
+  const viRes = runDetect(['vi-VN'], 'vi-VN');
+  assert.strictEqual(viRes.activeLanguage, 'vi', 'First launch with vi-VN OS must resolve to vi');
+  const trRes = runDetect(['tr-TR'], 'tr-TR');
+  assert.strictEqual(trRes.activeLanguage, 'tr', 'First launch with tr-TR OS must resolve to tr');
+  const svRes = runDetect(['sv-SE'], 'sv-SE');
+  assert.strictEqual(svRes.activeLanguage, 'en', 'Unsupported OS language sv-SE must fall back to en');
+  for (const l of ['en', 'ko', 'ja', 'zh-CN', 'zh-TW', 'es', 'fr', 'de', 'ru', 'pt-BR', 'vi', 'it', 'id', 'tr', 'pl']) {
     assert.ok(jaRes.COPY_TOAST_I18N[l] && jaRes.COPY_TOAST_I18N[l].length > 3, `Missing COPY_TOAST_I18N for ${l}`);
     assert.ok(jaRes.QUOTA_SETTING_I18N[l] && jaRes.QUOTA_SETTING_I18N[l].title && jaRes.QUOTA_SETTING_I18N[l].desc, `Missing QUOTA_SETTING_I18N for ${l}`);
   }
 });
 
-registerTest(1, 'F22', 'Renderer translates all 2.34.0 & 2.30.0 New Conversation greetings/placeholders across all 9 languages and preserves editables', () => {
-  const langs = ['ko', 'ja', 'zh-CN', 'zh-TW', 'es', 'fr', 'de', 'ru'];
+registerTest(1, 'F22', 'Renderer translates all 2.34.0 & 2.30.0 New Conversation greetings/placeholders across all 15 languages and preserves editables', () => {
+  const langs = ['ko', 'ja', 'zh-CN', 'zh-TW', 'es', 'fr', 'de', 'ru', 'pt-BR', 'vi', 'it', 'id', 'tr', 'pl'];
   const textPrompts = [
     'Hey there, what should we build today?',
     'Welcome back. Where should we pick up?',
@@ -345,33 +351,44 @@ registerTest(1, 'F22', 'Renderer translates all 2.34.0 & 2.30.0 New Conversation
     assert.strictEqual(typedChild.textContent, 'Select a model in the model selector', `[${lang}] Typed child inside [contenteditable] must NOT be altered`);
   }
 
-  // Verify cycling ru -> en reverts both text nodes and input placeholder attributes cleanly
-  let ruNodes = [];
-  let ruInput;
-  const { window } = createRendererHarness('ru', (doc, patchEl) => {
+  // Verify cycling pl -> en reverts both text nodes and input placeholder attributes cleanly
+  let plNodes = [];
+  let plInput;
+  const { window } = createRendererHarness('pl', (doc, patchEl) => {
     const d = patchEl(new MockElement('div'));
     d.appendChild(new MockText('Hey Tora, what should we build today?'));
     doc.body.appendChild(d);
-    ruNodes.push(d);
-    ruInput = patchEl(new MockElement('input'));
-    ruInput.setAttribute('placeholder', 'Ask anything, @ to mention, / for actions');
-    doc.body.appendChild(ruInput);
+    plNodes.push(d);
+    plInput = patchEl(new MockElement('input'));
+    plInput.setAttribute('placeholder', 'Ask anything, @ to mention, / for actions');
+    doc.body.appendChild(plInput);
   });
-  assert.notStrictEqual(ruNodes[0].textContent, 'Hey Tora, what should we build today?');
-  assert.notStrictEqual(ruInput.getAttribute('placeholder'), 'Ask anything, @ to mention, / for actions');
-  window.dispatchEvent({ type: 'keydown', altKey: true, shiftKey: true, key: 'L', preventDefault: () => {} }); // ru -> en
-  assert.strictEqual(ruNodes[0].textContent, 'Hey Tora, what should we build today?', 'Switching to en must revert greeting');
-  assert.strictEqual(ruInput.getAttribute('placeholder'), 'Ask anything, @ to mention, / for actions', 'Switching to en must revert input placeholder');
+  assert.notStrictEqual(plNodes[0].textContent, 'Hey Tora, what should we build today?');
+  assert.notStrictEqual(plInput.getAttribute('placeholder'), 'Ask anything, @ to mention, / for actions');
+  window.dispatchEvent({ type: 'keydown', altKey: true, shiftKey: true, key: 'L', preventDefault: () => {} }); // pl -> en
+  assert.strictEqual(plNodes[0].textContent, 'Hey Tora, what should we build today?', 'Switching to en must revert greeting');
+  assert.strictEqual(plInput.getAttribute('placeholder'), 'Ask anything, @ to mention, / for actions', 'Switching to en must revert input placeholder');
 });
 
-registerTest(1, 'F22', 'dictionaries.json contains 2.34.0 strings across all 8 target languages', () => {
-  const dicts = JSON.parse(fs.readFileSync(path.join(ENHANCER_DIR, 'dictionaries.json'), 'utf8'));
-  const keys = ['Environments', 'Coordinators', 'New Coordinator', 'You said', 'Agent working', 'Ask /btw', 'Code Preview', 'Plan upgrade required'];
+registerTest(1, 'F22', 'dictionaries.json compact schema has 100% 15-language parity and stays under 3.71 MB', () => {
+  const rawBuf = fs.readFileSync(path.join(ENHANCER_DIR, 'dictionaries.json'));
+  assert.ok(rawBuf.length < 3.71 * 1024 * 1024, `Compact dictionaries.json (${rawBuf.length} bytes) must stay below v4.0.7 3.71 MB`);
+  const raw = JSON.parse(rawBuf.toString('utf8'));
+  const dicts = mainEnhancer.hydrateCompactDictionaries(raw);
+  const nonKoLangs = ['ja', 'zh-CN', 'zh-TW', 'es', 'fr', 'de', 'ru', 'pt-BR', 'vi', 'it', 'id', 'tr', 'pl'];
+  const keys = ['Environments', 'Coordinators', 'New Coordinator', 'You said', 'Agent working', 'Ask /btw', 'Code Preview', 'Plan upgrade required', 'Work in a New Worktree', 'Thinking effort', 'Skill Used'];
   for (const k of keys) {
     assert.ok(dicts.exactDict[k], `Missing Korean translation for ${k}`);
-    for (const lang of ['ja', 'zh-CN', 'zh-TW', 'es', 'fr', 'de', 'ru']) {
+    for (const lang of nonKoLangs) {
       assert.ok(dicts.translations[lang] && dicts.translations[lang][k], `Missing ${lang} translation for ${k}`);
     }
+  }
+  const keyCount = raw.keyTable.length;
+  for (const lang of nonKoLangs) {
+    assert.strictEqual(Object.keys(dicts.translations[lang]).length, keyCount, `Exact key parity mismatch for ${lang}`);
+    assert.strictEqual(dicts.multiLangDynamicRules[lang].length, dicts.dynamicRules.length, `Dynamic rule parity mismatch for ${lang}`);
+    assert.strictEqual(Object.keys(dicts.placeholdersByLang[lang]).length, Object.keys(dicts.placeholders).length, `Placeholder parity mismatch for ${lang}`);
+    assert.strictEqual(Object.keys(dicts.compositeTemplates[lang]).length, Object.keys(dicts.compositeTemplates.ko).length, `Composite template parity mismatch for ${lang}`);
   }
 });
 
@@ -752,6 +769,10 @@ registerTest(1, 'F25', 'build_exe_installer.ps1 uses safe build hygiene, #0B0B0E
   assert.ok(!fs.existsSync(path.join(INSTALLER_DIR, 'Launcher.cs')), 'Launcher.cs must be removed');
   assert.ok(!fs.existsSync(path.join(ROOT_DIR, 'AntigravityEnhancerLauncher.exe')), 'AntigravityEnhancerLauncher.exe must not be built');
   assert.ok(!ps1Src.includes('AntigravityEnhancerLauncher'), 'build_exe_installer.ps1 must not reference AntigravityEnhancerLauncher');
+  assert.ok(ps1Src.includes('UniformRadius = new CornerRadius(8)'), 'Installer must enforce unified 8px inner CornerRadius');
+  assert.ok(ps1Src.includes('clipHost.Clip = new RectangleGeometry'), 'Installer must mask interior to prevent caption button hover overflow');
+  assert.ok(ps1Src.includes('RunWindowEntrance') && ps1Src.includes('CloseWithAnimation'), 'Installer must include launch and exit animations');
+  assert.ok(ps1Src.includes('TransitionToStep2') && !ps1Src.includes('pnlCountdown'), 'Installer must use 2-step flow with immediate automatic restart');
 
   const mainSrc = fs.readFileSync(path.join(ENHANCER_DIR, 'main-enhancer.js'), 'utf8');
   assert.ok(!mainSrc.includes('AntigravityEnhancerLauncher'), 'main-enhancer.js must not reference AntigravityEnhancerLauncher');
@@ -874,7 +895,7 @@ registerTest(4, 'F24', 'Main updater rejects SHA-256 tampering cleanly, atomical
   }
 });
 
-registerTest(4, 'F25', 'Installer OS language auto-detection (9 languages + English fallback) and C# ASAR bootstrap idempotency', () => {
+registerTest(4, 'F25', 'Installer OS language auto-detection (15 languages + English fallback) and C# ASAR bootstrap idempotency', () => {
   const { execFileSync } = require('child_process');
   const csc = 'C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.50319\\csc.exe';
   const liveAsar = path.join(process.env.LOCALAPPDATA || '', 'Programs', 'Antigravity', 'resources', 'app.asar');
@@ -889,8 +910,8 @@ registerTest(4, 'F25', 'Installer OS language auto-detection (9 languages + Engl
     const installerCsPath = path.join(tmpDir, 'InstallerWPF.cs');
     // Rename App.Main out so test harness can define entry point cleanly
     const modifiedCs = match[1]
-      .replace(/__ASM_VERSION__/g, '4.0.5')
-      .replace(/__ENHANCER_VERSION__/g, '4.0.5')
+      .replace(/__ASM_VERSION__/g, '4.1.0')
+      .replace(/__ENHANCER_VERSION__/g, '4.1.0')
       .replace('public static void Main()', 'public static void MainWpfDisabled()');
     fs.writeFileSync(installerCsPath, '\uFEFF' + modifiedCs, 'utf8');
 
@@ -910,7 +931,9 @@ public static class ProbeMain
                 "zh-CN:zh-CN", "zh-SG:zh-CN", "zh-Hans:zh-CN",
                 "zh-TW:zh-TW", "zh-HK:zh-TW", "zh-Hant:zh-TW",
                 "es-ES:es", "es-419:es", "fr-FR:fr", "fr-CA:fr",
-                "de-DE:de", "ru-RU:ru", "pt-BR:en", "it-IT:en", "vi-VN:en", ":en"
+                "de-DE:de", "ru-RU:ru", "pt-BR:pt-BR", "pt-PT:pt-BR",
+                "vi-VN:vi", "it-IT:it", "id-ID:id", "in-ID:id",
+                "tr-TR:tr", "pl-PL:pl", "sv-SE:en", ":en"
             };
             foreach (string pair in cultures)
             {
@@ -967,12 +990,19 @@ public static class ProbeMain
     });
     assert.ok(out.includes('DETECTED:ja'), 'DetectLanguage must resolve ja-JP -> ja');
 
-    const fallbackOut = execFileSync(probeExe, ['--check-i18n'], {
+    const ptOut = execFileSync(probeExe, ['--check-i18n'], {
       env: { ...process.env, ANTIGRAVITY_ENHANCER_LANG: 'pt-BR' },
       encoding: 'utf8',
       timeout: 15000
     });
-    assert.ok(fallbackOut.includes('DETECTED:en'), 'DetectLanguage must fall back unsupported pt-BR -> en');
+    assert.ok(ptOut.includes('DETECTED:pt-BR'), 'DetectLanguage must resolve pt-BR -> pt-BR');
+
+    const fallbackOut = execFileSync(probeExe, ['--check-i18n'], {
+      env: { ...process.env, ANTIGRAVITY_ENHANCER_LANG: 'sv-SE' },
+      encoding: 'utf8',
+      timeout: 15000
+    });
+    assert.ok(fallbackOut.includes('DETECTED:en'), 'DetectLanguage must fall back unsupported sv-SE -> en');
 
     if (fs.existsSync(liveAsar)) {
       const workAsar = path.join(tmpDir, 'app.asar');
@@ -1290,7 +1320,7 @@ registerTest(2, 'F26', 'main-enhancer ensureAutoRepatchWrappers generates zero-f
   }
 });
 
-registerTest(2, 'F28', 'formatShortcutFromEvent handles ev.code fallback & Control Center localizes all 9 languages', () => {
+registerTest(2, 'F28', 'formatShortcutFromEvent handles ev.code fallback & Control Center localizes all 15 languages', () => {
   const env = createRendererHarness('ja');
   const hooks = env.window.__agEnhancerTestHooks;
   assert.ok(hooks, '__agEnhancerTestHooks should be exposed');
@@ -1302,7 +1332,7 @@ registerTest(2, 'F28', 'formatShortcutFromEvent handles ev.code fallback & Contr
     hooks.matchesShortcut({ altKey: true, shiftKey: true, ctrlKey: false, metaKey: false, key: 'L' }, 'Alt+Shift+L'),
     true
   );
-  for (const lang of ['en', 'ko', 'ja', 'zh-CN', 'zh-TW', 'es', 'fr', 'de', 'ru']) {
+  for (const lang of ['en', 'ko', 'ja', 'zh-CN', 'zh-TW', 'es', 'fr', 'de', 'ru', 'pt-BR', 'vi', 'it', 'id', 'tr', 'pl']) {
     const s = hooks.getControlCenterStrings(lang);
     assert.ok(s && s.tabs && s.tabs.general && s.tabs.shortcuts, `Control Center strings missing for ${lang}`);
   }
@@ -1423,7 +1453,7 @@ registerTest(2, 'F26', 'isUntranslatableNoise filters Korean/shortcuts/timers/pa
   assert.strictEqual(translatedMenu[3].label, '프로젝트 삭제');
 
   // Verify dynamicRules integrity & nested capture translation
-  const dicts = JSON.parse(fs.readFileSync(path.join(ENHANCER_DIR, 'dictionaries.json'), 'utf8'));
+  const dicts = mainEnh.hydrateCompactDictionaries(JSON.parse(fs.readFileSync(path.join(ENHANCER_DIR, 'dictionaries.json'), 'utf8')));
   for (const r of dicts.dynamicRules) {
     assert.strictEqual(typeof r.source, 'string');
     assert.strictEqual(typeof r.rep, 'string');
@@ -1444,4 +1474,74 @@ registerTest(2, 'F26', 'isUntranslatableNoise filters Korean/shortcuts/timers/pa
   assert.strictEqual(legalP.textContent, '법적인 이유로 콘텐츠 변경을 요청하려면 법적 도움말 페이지를 방문하세요.');
   assert.strictEqual(hooks.isUntranslatableNoise('Atlassian Teamwork Graph CLI'), true);
   assert.strictEqual(hooks.isUntranslatableNoise('Kling AI'), true);
+  assert.strictEqual(dicts.exactDict['Work in a New Worktree'], '새 워크트리에서 작업');
+  assert.strictEqual(dicts.exactDict['Thinking effort'], '추론 강도');
+  assert.strictEqual(dicts.exactDict['Open in Antigravity IDE'], 'Antigravity IDE에서 열기');
+  assert.strictEqual(dicts.exactDict['Skill Used'], '사용된 스킬');
+  assert.strictEqual(dicts.exactDict['Connect to WSL'], 'WSL에 연결');
+});
+
+registerTest(2, 'F26', 'Translation Engine 3.0 translates inline composite DOM templates across languages and reverts preserving exact child element identity', () => {
+  for (const lang of ['ko', 'ja', 'tr', 'pt-BR', 'vi', 'pl']) {
+    let legalP = null;
+    let legalA = null;
+    const { window } = createRendererHarness(lang, (document, patchEl) => {
+      legalP = patchEl(document.createElement('p'));
+      legalP.appendChild(new MockText('Visit '));
+      legalA = patchEl(document.createElement('a'));
+      legalA.setAttribute('href', 'https://support.google.com/legal');
+      legalA.appendChild(new MockText('Legal Help'));
+      legalP.appendChild(legalA);
+      legalP.appendChild(new MockText(' to ask for content changes for legal reasons.'));
+      document.body.appendChild(legalP);
+    });
+    assert.notStrictEqual(legalP.textContent, 'Visit Legal Help to ask for content changes for legal reasons.', `[${lang}] Composite sentence must translate`);
+    assert.ok(!legalP.textContent.includes('to ask for content changes'), `[${lang}] Composite sentence must not leave untranslated English tail: ${legalP.textContent}`);
+    assert.ok(legalP.childNodes.includes(legalA), `[${lang}] Original <a> element must remain in parent childNodes (React-safe)`);
+    if (lang === 'pl') {
+      window.dispatchEvent({ type: 'keydown', altKey: true, shiftKey: true, key: 'L', preventDefault: () => {} }); // pl -> en
+      assert.strictEqual(legalP.textContent, 'Visit Legal Help to ask for content changes for legal reasons.', 'Switching back to en must restore original composite sentence');
+      assert.ok(legalP.childNodes.includes(legalA), 'Original <a> element identity must be preserved after revert to en');
+    }
+  }
+});
+
+registerTest(2, 'F25', 'Cross-platform CLI installer (installer/install.mjs) installs, reports status, and restores cleanly on mock app.asar', () => {
+  const { execFileSync } = require('child_process');
+  const liveAsar = path.join(process.env.LOCALAPPDATA || '', 'Programs', 'Antigravity', 'resources', 'app.asar');
+  if (!fs.existsSync(liveAsar)) return;
+
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'agy-cli-inst-'));
+  try {
+    const mockAppDir = path.join(tmpDir, 'app');
+    const mockResDir = path.join(mockAppDir, 'resources');
+    const mockUserData = path.join(tmpDir, 'userdata');
+    fs.mkdirSync(mockResDir, { recursive: true });
+    fs.mkdirSync(mockUserData, { recursive: true });
+    const mockAsar = path.join(mockResDir, 'app.asar');
+    fs.copyFileSync(liveAsar, mockAsar);
+    if (asarPatcher.inspectAsarStatus(mockAsar).bootstrapped || asarPatcher.inspectAsarStatus(mockAsar).hasLegacy) {
+      asarPatcher.unpatchAsar(mockAsar);
+    }
+    const origSha = crypto.createHash('sha256').update(fs.readFileSync(mockAsar)).digest('hex');
+
+    const cliScript = path.join(INSTALLER_DIR, 'install.mjs');
+    const baseArgs = [cliScript, '--app-dir', mockAppDir, '--user-data', mockUserData, '--no-kill', '--no-relaunch', '--skip-codesign', '--json'];
+
+    const instOut = JSON.parse(execFileSync(process.execPath, [...baseArgs, '--install'], { encoding: 'utf8', timeout: 30000 }));
+    assert.strictEqual(instOut.ok, true, 'CLI --install must succeed');
+    assert.strictEqual(asarPatcher.inspectAsarStatus(mockAsar).bootstrapped, true, 'CLI --install must bootstrap mock app.asar');
+    assert.ok(fs.existsSync(path.join(mockUserData, 'enhancer', 'dictionaries.json')), 'CLI --install must copy dictionaries.json');
+
+    const statOut = JSON.parse(execFileSync(process.execPath, [...baseArgs, '--status'], { encoding: 'utf8', timeout: 15000 }));
+    assert.strictEqual(statOut.bootstrapped, true, 'CLI --status must report bootstrapped: true');
+
+    const restOut = JSON.parse(execFileSync(process.execPath, [...baseArgs, '--restore'], { encoding: 'utf8', timeout: 30000 }));
+    assert.strictEqual(restOut.ok, true, 'CLI --restore must succeed');
+    assert.strictEqual(asarPatcher.inspectAsarStatus(mockAsar).bootstrapped, false, 'CLI --restore must unpatch mock app.asar');
+    const restoredSha = crypto.createHash('sha256').update(fs.readFileSync(mockAsar)).digest('hex');
+    assert.strictEqual(restoredSha, origSha, 'CLI --restore must restore byte-identical app.asar');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
 });

@@ -7,7 +7,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
-const VERSION = '4.0.7';
+const VERSION = '4.1.0';
 const REPO = 'x2tora/antigravity-enhancer';
 const enhancerDir = path.join(__dirname, 'enhancer');
 
@@ -54,7 +54,14 @@ function parseReleaseNotesI18n(mdPath) {
     'Español': 'es',
     'Français': 'fr',
     'Deutsch': 'de',
-    'Русский': 'ru'
+    'Русский': 'ru',
+    'Português (Brasil)': 'pt-BR',
+    'Português': 'pt-BR',
+    'Tiếng Việt': 'vi',
+    'Italiano': 'it',
+    'Bahasa Indonesia': 'id',
+    'Türkçe': 'tr',
+    'Polski': 'pl'
   };
   const out = {};
   if (!fs.existsSync(mdPath)) return out;

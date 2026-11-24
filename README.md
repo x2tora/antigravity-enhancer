@@ -1,41 +1,45 @@
 # Antigravity Enhancer
 
-Multi-language UI localization and model quota viewer for **Antigravity**.
+15-language UI localization, model quota viewer, and cross-platform patch suite for **Antigravity**.
 
-**English** · [한국어](docs/README.ko.md) · [日本語](docs/README.ja.md) · [简体中文](docs/README.zh-CN.md) · [繁體中文](docs/README.zh-TW.md) · [Español](docs/README.es.md) · [Français](docs/README.fr.md) · [Deutsch](docs/README.de.md) · [Русский](docs/README.ru.md)
+**English** · [한국어](docs/README.ko.md) · [日本語](docs/README.ja.md) · [简体中文](docs/README.zh-CN.md) · [繁體中文](docs/README.zh-TW.md) · [Español](docs/README.es.md) · [Français](docs/README.fr.md) · [Deutsch](docs/README.de.md) · [Русский](docs/README.ru.md) · [Português (BR)](docs/README.pt-BR.md) · [Tiếng Việt](docs/README.vi.md) · [Italiano](docs/README.it.md) · [Bahasa Indonesia](docs/README.id.md) · [Türkçe](docs/README.tr.md) · [Polski](docs/README.pl.md)
 
-[![Download Latest (v3.5.4)](https://img.shields.io/badge/Download_Latest-v3.5.4_(Windows_x64)-A0A3F6?style=for-the-badge&logo=windows&logoColor=0B0B0E)](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-Setup.exe)
-[![All Releases](https://img.shields.io/badge/Releases-v3.5.4-0B0B0E?style=for-the-badge&labelColor=0B0B0E&color=CAD3F5)](https://github.com/x2tora/antigravity-enhancer/releases/latest)
+[![Download Latest (v4.1.0)](https://img.shields.io/badge/Download_Latest-v4.1.0_(Windows_x64)-A0A3F6?style=for-the-badge&logo=windows&logoColor=0B0B0E)](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-Setup.exe)
+[![All Releases](https://img.shields.io/badge/Releases-v4.1.0-0B0B0E?style=for-the-badge&labelColor=0B0B0E&color=CAD3F5)](https://github.com/x2tora/antigravity-enhancer/releases/latest)
 
-Direct files: [`Antigravity-Enhancer-Setup.exe`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-Setup.exe) · [`Antigravity-Enhancer-v3.5.4-Win.zip`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-v3.5.4-Win.zip) · [`SHA256SUMS.txt`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/SHA256SUMS.txt)
+Direct files: [`Antigravity-Enhancer-Setup.exe`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-Setup.exe) · [`Antigravity-Enhancer-v4.1.0-Win.zip`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-v4.1.0-Win.zip) · [`Antigravity-Enhancer-v4.1.0-Unix.tar.gz`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-v4.1.0-Unix.tar.gz) · [`SHA256SUMS.txt`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/SHA256SUMS.txt)
 
 ---
 
 ## Features
 
-- **9-Language UI Localization**
-  Supports English (`en`), 한국어 (`ko`), 日本語 (`ja`), 简体中文 (`zh-CN`), 繁體中文 (`zh-TW`), Español (`es`), Français (`fr`), Deutsch (`de`), and Русский (`ru`) with OS language auto-detection on first launch and zero-restart switching via the top bar, Settings, or `Alt + Shift + L`.
-- **Native Menu Integration & Update Pill**
-  Displays `AntigravityEnhanced` in the title menu bar, integrates `Patch Version`, `Check Patch Updates`, and `Restore Original` into the native `Antigravity` dropdown menu, and checks for patch updates every 10 minutes with a native-style `Update Available` pill.
-- **Model Quota Display**
-  - **Top-right widget**: displays 5-hour and weekly quotas across all model groups; click to open the full breakdown popover with reset countdowns.
-  - **Composer inline badge**: displays the remaining quota next to the active model selector; hover to inspect detailed 5-hour and weekly quotas for that model group only without colliding with model selection clicks.
-- **Update-Safe Architecture**
-  Loads patch modules from `%APPDATA%\Antigravity\enhancer` through a minimal ASAR bootstrapper (`asar-patcher.js`), verifies in-app updates against `manifest.json` SHA-256 digests, and detects the Windows OS UI language in the GUI installer.
+- **15-Language UI & Context Menu Localization**
+  Supports English (`en`), 한국어 (`ko`), 日本語 (`ja`), 简体中文 (`zh-CN`), 繁體中文 (`zh-TW`), Español (`es`), Français (`fr`), Deutsch (`de`), Русский (`ru`), Português (Brasil) (`pt-BR`), Tiếng Việt (`vi`), Italiano (`it`), Bahasa Indonesia (`id`), Türkçe (`tr`), and Polski (`pl`) with OS language auto-detection, zero-restart switching, natural inline-link sentence translation, and native right-click context menu localization.
+- **Unified Patch Settings & Custom Glossary**
+  Manage language, in-app updates, localized changelogs, custom glossary overrides (with 1-click pre-fill from collected untranslated strings, inline editing, and JSON import/export), quota alerts, and custom keyboard shortcuts in one modal.
+- **Model Quota Display & 72h History**
+  Displays 5-hour and weekly quotas for `Gemini` and `Other` in the top bar and composer badge, with a detailed breakdown popover, 72-hour usage sparklines, and optional low-quota / reset desktop notifications.
+- **Update-Safe & Cross-Platform**
+  Preserves byte-identical original files with one-click restore, verifies in-app updates with SHA-256 digests and automatic restart, and supports Windows (2-step GUI installer) plus macOS & Linux (zero-dependency CLI installer).
 
 ---
 
 ## Installation
 
-### Installer (`Antigravity-Enhancer-Setup.exe`)
+### Windows (`Antigravity-Enhancer-Setup.exe`)
 
 1. Download [`Antigravity-Enhancer-Setup.exe`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-Setup.exe).
-2. Run the installer and click **Install / Update** (or **Restore Original** to revert to unmodified files).
+2. Run the 2-step installer, confirm the auto-detected path, and click **Install Patch** (or **Restore Original**). Antigravity restarts automatically when finished.
 
-### Portable Archive (`.zip`)
+### macOS & Linux (`install.sh`)
 
-1. Download [`Antigravity-Enhancer-v3.2.0-Win.zip`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-v3.2.0-Win.zip) from [Releases](https://github.com/x2tora/antigravity-enhancer/releases/latest).
-2. Extract the archive and run `Antigravity-Enhancer-Setup.exe`.
+```bash
+tar -xzf Antigravity-Enhancer-v4.1.0-Unix.tar.gz
+cd Antigravity-Enhancer-v4.1.0-Unix 2>/dev/null || true
+sh ./install.sh --install
+# To restore original files:
+sh ./install.sh --restore
+```
 
 ---
 
@@ -45,10 +49,10 @@ Direct files: [`Antigravity-Enhancer-Setup.exe`](https://github.com/x2tora/antig
 # Regenerate enhancer/manifest.json SHA-256 digests
 node .\generate_enhancer_manifest.js
 
-# Build Antigravity-Enhancer-Setup.exe, ZIP archive, and SHA256SUMS.txt
-powershell -NoProfile -ExecutionPolicy Bypass -File .\build_exe_installer.ps1 -Version "3.2.0"
+# Build Windows installer, ZIP archive, and SHA256SUMS.txt
+powershell -NoProfile -ExecutionPolicy Bypass -File .\build_exe_installer.ps1 -Version "4.1.0"
 
-# Run E2E tests
+# Run full E2E test suite
 node .\tests\e2e\runner.js --summary -NoKill
 ```
 

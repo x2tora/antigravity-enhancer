@@ -29,26 +29,31 @@ jobs:
         run: |
           node .\generate_enhancer_manifest.js
 
-      - name: Build Windows installer and checksums
+      - name: Build Windows & Unix packages and checksums
         shell: pwsh
         run: |
+          $pkgVer = (Get-Content .\package.json -Raw -Encoding UTF8 | ConvertFrom-Json).version
           $tag = "${{ github.ref_name }}"
-          $ver = if ($tag -match '^v(\d+\.\d+\.\d+(?:\.\d+)?)$') { $Matches[1] } else { "4.0.5" }
+          $ver = if ($tag -match '^v(\d+\.\d+\.\d+(?:\.\d+)?)$') { $Matches[1] } else { $pkgVer }
           powershell -NoProfile -ExecutionPolicy Bypass -File .\build_exe_installer.ps1 -Version $ver
+          tar -czf "Antigravity-Enhancer-v$ver-Unix.tar.gz" install.sh installer/install.mjs enhancer README.md CHANGELOG.md
+          $unixHash = (Get-FileHash -Path "Antigravity-Enhancer-v$ver-Unix.tar.gz" -Algorithm SHA256).Hash.ToLowerInvariant()
+          Add-Content -Path .\SHA256SUMS.txt -Value "$unixHash  Antigravity-Enhancer-v$ver-Unix.tar.gz" -Encoding UTF8
 
-      - name: Run v3 architecture E2E suite
+      - name: Run full E2E verification suite
         shell: pwsh
         run: |
-          node .\tests\e2e\runner.js --feature=F22,F23,F24,F25 --summary -NoKill
+          node .\tests\e2e\runner.js --summary -NoKill
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: antigravity-enhancer-win
+          name: antigravity-enhancer-packages
           path: |
             Antigravity-Enhancer-Setup.exe
             Antigravity-Enhancer-v*-Setup.exe
             Antigravity-Enhancer-v*-Win.zip
+            Antigravity-Enhancer-v*-Unix.tar.gz
             SHA256SUMS.txt
 
       - name: Publish GitHub Release on version tag
@@ -61,6 +66,7 @@ jobs:
             Antigravity-Enhancer-Setup.exe
             Antigravity-Enhancer-v*-Setup.exe
             Antigravity-Enhancer-v*-Win.zip
+            Antigravity-Enhancer-v*-Unix.tar.gz
             SHA256SUMS.txt
 
       - name: Notify Discord on version release

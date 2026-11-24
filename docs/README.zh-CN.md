@@ -1,57 +1,41 @@
 # Antigravity Enhancer
 
-适用于 **Antigravity** 的多语言界面本地化与模型配额显示补丁。
+面向 **Antigravity** 的 15 语言界面本地化、模型配额监控与跨平台补丁套件。
 
-[English](../README.md) · [한국어](README.ko.md) · [日本語](README.ja.md) · **简体中文** · [繁體中文](README.zh-TW.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Русский](README.ru.md)
+[English](../README.md) · [한국어](README.ko.md) · [日本語](README.ja.md) · **简体中文** · [繁體中文](README.zh-TW.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Русский](README.ru.md) · [Português (BR)](README.pt-BR.md) · [Tiếng Việt](README.vi.md) · [Italiano](README.it.md) · [Bahasa Indonesia](README.id.md) · [Türkçe](README.tr.md) · [Polski](README.pl.md)
 
-[![Download Latest (v3.5.4)](https://img.shields.io/badge/下载最新版本-v3.5.4_(Windows_x64)-A0A3F6?style=for-the-badge&logo=windows&logoColor=0B0B0E)](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-Setup.exe)
-[![All Releases](https://img.shields.io/badge/Releases-v3.5.4-0B0B0E?style=for-the-badge&labelColor=0B0B0E&color=CAD3F5)](https://github.com/x2tora/antigravity-enhancer/releases/latest)
+[![下载最新版 (v4.1.0)](https://img.shields.io/badge/%E4%B8%8B%E8%BD%BD%E6%9C%80%E6%96%B0%E7%89%88-v4.1.0_(Windows_x64)-A0A3F6?style=for-the-badge&logo=windows&logoColor=0B0B0E)](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-Setup.exe)
+[![所有版本](https://img.shields.io/badge/%E6%89%80%E6%9C%89%E7%89%88%E6%9C%AC-v4.1.0-0B0B0E?style=for-the-badge&labelColor=0B0B0E&color=CAD3F5)](https://github.com/x2tora/antigravity-enhancer/releases/latest)
 
-直接下载: [`Antigravity-Enhancer-Setup.exe`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-Setup.exe) · [`Antigravity-Enhancer-v3.5.4-Win.zip`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-v3.5.4-Win.zip) · [`SHA256SUMS.txt`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/SHA256SUMS.txt)
+直接下载: [`Antigravity-Enhancer-Setup.exe`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-Setup.exe) · [`Antigravity-Enhancer-v4.1.0-Win.zip`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-v4.1.0-Win.zip) · [`Antigravity-Enhancer-v4.1.0-Unix.tar.gz`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-v4.1.0-Unix.tar.gz) · [`SHA256SUMS.txt`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/SHA256SUMS.txt)
 
 ---
 
-## 功能特性
+## 核心功能
 
-- **9 种语言实时切换**
-  支持 English (`en`)、한국어 (`ko`)、日本語 (`ja`)、简体中文 (`zh-CN`)、繁體中文 (`zh-TW`)、Español (`es`)、Français (`fr`)、Deutsch (`de`)、Русский (`ru`)，可通过顶栏、设置或 `Alt + Shift + L` 免重启切换。
-- **原生菜单集成**
-  标题栏显示 `AntigravityEnhanced`，并在原生 `Antigravity` 下拉菜单中集成 `补丁版本`、`检查补丁更新` 与 `恢复原版`。
-- **模型配额显示**
-  - **右上角组件**：显示所有模型组的 5 小时及每周配额，点击可查看完整分组详情与重置倒计时。
-  - **输入框内联徽章**：在当前模型选择器旁显示剩余配额，悬停仅显示当前所选模型组的详细信息，点击仅触发模型选择。
-- **可更新架构**
-  通过精简 ASAR 引导器（`asar-patcher.js`）从 `%APPDATA%\Antigravity\enhancer` 加载补丁模块，支持基于 `manifest.json` SHA-256 校验的应用内更新，安装器自动识别 Windows 系统语言。
+- **15 种语言界面与右键菜单本地化**：自动检测系统语言、免重启实时切换，并支持包含链接的自然语序翻译。
+- **统一补丁设置与自定义术语表**：集中管理应用内更新、多语言更新日志、自定义术语表（点击未翻译文本自动填充与 JSON 导入导出）与快捷键。
+- **模型配额显示与 72 小时历史**：在顶部栏显示 `Gemini` 与 `Other` 的 5 小时/每周配额、72 小时趋势图与重置倒计时。
+- **无损还原与跨平台支持**：无损保留原始文件并支持一键还原，提供 Windows 两步图形安装器与 macOS/Linux CLI 脚本。
 
 ---
 
 ## 安装方式
 
-### 安装程序 (`Antigravity-Enhancer-Setup.exe`)
+### Windows (`Antigravity-Enhancer-Setup.exe`)
 
 1. 下载 [`Antigravity-Enhancer-Setup.exe`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-Setup.exe)。
-2. 运行并点击 **安装 / 更新**（随时可点击 **恢复原版** 还原）。
+2. 运行安装程序并点击 **安装补丁**（或 **恢复原版**），完成后将自动重启 Antigravity。
 
-### 便携压缩包 (`.zip`)
+### macOS 与 Linux (`install.sh`)
 
-1. 从 [Releases](https://github.com/x2tora/antigravity-enhancer/releases/latest) 下载 [`Antigravity-Enhancer-v3.5.4-Win.zip`](https://github.com/x2tora/antigravity-enhancer/releases/latest/download/Antigravity-Enhancer-v3.5.4-Win.zip)。
-2. 解压后运行 `Antigravity-Enhancer-Setup.exe`。
-
----
-
-## 从源码构建与测试
-
-```powershell
-# 重新生成 enhancer/manifest.json SHA-256 校验值
-node .\generate_enhancer_manifest.js
-
-# 构建 Antigravity-Enhancer-Setup.exe、ZIP 与 SHA256SUMS.txt
-powershell -NoProfile -ExecutionPolicy Bypass -File .\build_exe_installer.ps1 -Version "3.5.4"
-
-# 运行端到端测试
-node .\tests\e2e\runner.js --summary -NoKill
+```bash
+tar -xzf Antigravity-Enhancer-v4.1.0-Unix.tar.gz
+sh ./install.sh --install
+# Restore:
+sh ./install.sh --restore
 ```
 
 ---
 
-*非官方社区补丁，与 Antigravity 官方团队无关联。*
+*非官方社区补丁，与官方 Antigravity 团队无关。*

@@ -63,6 +63,29 @@ function getAppAsarPath() {
     const candidate = appRootDir.endsWith('.asar') ? appRootDir : path.dirname(appRootDir);
     if (candidate.endsWith('app.asar') && fs.existsSync(candidate)) return candidate;
   }
+  if (process.platform === 'darwin') {
+    const home = process.env.HOME || '';
+    const macCandidates = [
+      '/Applications/Antigravity.app/Contents/Resources/app.asar',
+      home ? path.join(home, 'Applications', 'Antigravity.app', 'Contents', 'Resources', 'app.asar') : ''
+    ].filter(Boolean);
+    for (const mc of macCandidates) {
+      if (fs.existsSync(mc)) return mc;
+    }
+    return macCandidates[0];
+  }
+  if (process.platform === 'linux') {
+    const linuxCandidates = [
+      '/opt/Antigravity/resources/app.asar',
+      '/opt/antigravity/resources/app.asar',
+      '/usr/lib/antigravity/resources/app.asar',
+      '/usr/share/antigravity/resources/app.asar'
+    ];
+    for (const lc of linuxCandidates) {
+      if (fs.existsSync(lc)) return lc;
+    }
+    return linuxCandidates[0];
+  }
   const localDefault = path.join(process.env.LOCALAPPDATA || '', 'Programs', 'Antigravity', 'resources', 'app.asar');
   return localDefault;
 }
@@ -114,8 +137,40 @@ function getUserDataPath(filename) {
   return path.join(enhancerDir, 'user-data', filename);
 }
 
+function hydrateCompactDictionaries(raw) {
+  if (!raw || typeof raw !== 'object') return {};
+  if (raw.__hydrated || (raw.exactDict && Object.keys(raw.exactDict).length > 0 && raw.translations && !raw.keyTable)) {
+    return raw;
+  }
+  const out = { ...raw, __hydrated: true };
+  if (Array.isArray(raw.keyTable) && Array.isArray(raw.keyToConcept) && raw.conceptPools && typeof raw.conceptPools === 'object') {
+    const keys = raw.keyTable;
+    const k2c = raw.keyToConcept;
+    const pools = raw.conceptPools;
+    const koPool = Array.isArray(pools.ko) ? pools.ko : [];
+    const exactDict = { ...(raw.koOnlyExact || {}) };
+    for (let i = 0; i < keys.length; i++) {
+      const val = koPool[k2c[i]];
+      if (typeof val === 'string') exactDict[keys[i]] = val;
+    }
+    const translations = { ...(raw.translations || {}) };
+    for (const [lang, pool] of Object.entries(pools)) {
+      if (lang === 'ko' || !Array.isArray(pool)) continue;
+      const map = { ...(translations[lang] || {}) };
+      for (let i = 0; i < keys.length; i++) {
+        const val = pool[k2c[i]];
+        if (typeof val === 'string') map[keys[i]] = val;
+      }
+      translations[lang] = map;
+    }
+    out.exactDict = exactDict;
+    out.translations = translations;
+  }
+  return out;
+}
+
 function buildLanguageSlice(fullDict, langId) {
-  const src = (fullDict && typeof fullDict === 'object') ? fullDict : {};
+  const src = hydrateCompactDictionaries((fullDict && typeof fullDict === 'object') ? fullDict : {});
   const base = {
     SUPPORTED_LANGUAGES: src.SUPPORTED_LANGUAGES,
     LANG_ORDER: src.LANG_ORDER
@@ -128,23 +183,30 @@ function buildLanguageSlice(fullDict, langId) {
       translations: {},
       fragmentRules: [],
       placeholders: {},
+      placeholdersByLang: {},
+      compositeTemplates: {},
       dynamicRules: [],
       multiLangFragments: {},
       multiLangDynamicRules: {}
     };
   }
+  const compForLang = (src.compositeTemplates && src.compositeTemplates[langId]) ? { [langId]: src.compositeTemplates[langId] } : {};
   if (langId === 'ko') {
     return {
       ...base,
       exactDict: src.exactDict || {},
       fragmentRules: src.fragmentRules || [],
       placeholders: src.placeholders || {},
+      compositeTemplates: compForLang,
       dynamicRules: src.dynamicRules || []
     };
   }
+  const phForLang = (src.placeholdersByLang && src.placeholdersByLang[langId]) ? { [langId]: src.placeholdersByLang[langId] } : {};
   return {
     ...base,
     translations: { [langId]: (src.translations && src.translations[langId]) ? src.translations[langId] : {} },
+    placeholdersByLang: phForLang,
+    compositeTemplates: compForLang,
     multiLangFragments: { [langId]: (src.multiLangFragments && src.multiLangFragments[langId]) ? src.multiLangFragments[langId] : [] },
     multiLangDynamicRules: { [langId]: (src.multiLangDynamicRules && src.multiLangDynamicRules[langId]) ? src.multiLangDynamicRules[langId] : [] }
   };
@@ -475,12 +537,12 @@ function loadBootstrapPayload(forceRefresh = false, langId = null) {
       const rendererCode = fs.readFileSync(rendererPath, 'utf8');
       const gsapCode = fs.existsSync(gsapPath) ? fs.readFileSync(gsapPath, 'utf8') : '';
       const dictRaw = fs.existsSync(dictPath) ? fs.readFileSync(dictPath, 'utf8') : '{}';
-      const dictionaries = JSON.parse(dictRaw);
+      const dictionaries = hydrateCompactDictionaries(JSON.parse(dictRaw));
       const manifest = getLocalManifest();
 
       cachedBootstrapPayload = {
         disabled: false,
-        version: manifest.version || '4.0.7',
+        version: manifest.version || '4.1.0',
         repo: ENHANCER_REPO,
         code: rendererCode,
         gsapCode,
@@ -585,7 +647,14 @@ function parseReleaseNotesMarkdown(md) {
     'Español': 'es',
     'Français': 'fr',
     'Deutsch': 'de',
-    'Русский': 'ru'
+    'Русский': 'ru',
+    'Português (Brasil)': 'pt-BR',
+    'Português': 'pt-BR',
+    'Tiếng Việt': 'vi',
+    'Italiano': 'it',
+    'Bahasa Indonesia': 'id',
+    'Türkçe': 'tr',
+    'Polski': 'pl'
   };
   const out = {};
   const enMatch = md.match(/##\s*Changes\s*\r?\n([\s\S]*?)(?:\r?\n---|\r?\n###|$)/i);
@@ -985,7 +1054,7 @@ function translateMenuLabel(label, langId) {
   if (!dicts || !dicts.exactDict) {
     try {
       const fallbackPath = path.join(__dirname, 'dictionaries.json');
-      if (fs.existsSync(fallbackPath)) dicts = JSON.parse(fs.readFileSync(fallbackPath, 'utf8'));
+      if (fs.existsSync(fallbackPath)) dicts = hydrateCompactDictionaries(JSON.parse(fs.readFileSync(fallbackPath, 'utf8')));
     } catch (_) {}
   }
   if (!dicts) return label;
@@ -1058,6 +1127,7 @@ module.exports = {
   getFullStatus,
   getChangelogContent,
   ensureAutoRepatchWrappers,
+  hydrateCompactDictionaries,
   buildLanguageSlice,
   DEFAULT_PREFERENCES,
   getPreferences,

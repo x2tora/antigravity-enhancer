@@ -2,6 +2,215 @@
 
 All notable changes to **Antigravity Enhancer** are documented in this file.
 
+## [4.1.0] - 2026-11-24
+
+### Added
+- **15 Languages Supported**: Added Brazilian Portuguese, Vietnamese, Italian, Indonesian, Turkish, and Polish with full translation parity across all languages.
+- **macOS & Linux CLI Installer**: Added a zero-dependency CLI installer for macOS and Linux.
+
+### Improved
+- **Smoother Mixed-Link Translations**: Sentences containing links or code now translate in natural word order across every supported language.
+- **Redesigned 2-Step Installer**: Streamlined the Windows installer with smooth animations and automatic restart.
+- **Custom Glossary Improvements**: Click any collected untranslated string to pre-fill your custom glossary, and click existing entries to edit them inline.
+
+<details>
+<summary>한국어</summary>
+
+### 추가됨
+- **15개 언어 전면 지원**: 브라질 포르투갈어, 베트남어, 이탈리아어, 인도네시아어, 튀르키예어, 폴란드어 6개 언어를 추가하고 전체 언어 번역 완성도를 맞췄습니다.
+- **macOS·Linux CLI 설치 스크립트**: macOS와 Linux 환경에서 바로 설치할 수 있는 CLI 인스톨러를 추가했습니다.
+
+### 개선됨
+- **자연스러운 혼합 문장 번역**: 링크나 코드가 포함된 문장도 모든 언어에서 자연스러운 어순으로 표시됩니다.
+- **2단계 인스톨러 전면 개편**: 부드러운 애니메이션과 자동 재시작을 지원하는 새 Windows 설치 화면을 적용했습니다.
+- **사용자 용어집 편의성 개선**: 수집된 미번역 항목을 클릭해 바로 용어집에 채워 넣고 기존 항목도 클릭해서 수정할 수 있습니다.
+
+</details>
+
+<details>
+<summary>日本語</summary>
+
+### 追加
+- **15言語に拡大対応**: ポルトガル語（ブラジル）、ベトナム語、イタリア語、インドネシア語、トルコ語、ポーランド語を追加し、全言語の翻訳を統一しました。
+- **macOS・Linux 向け CLI インストーラー**: macOS と Linux で利用できる CLI インストーラーを追加しました。
+
+### 改善
+- **自然なインライン文翻訳**: リンクやコードを含む文章も各言語の自然な語順で表示されます。
+- **2ステップインストーラーに刷新**: アニメーションと自動再起動を備えた新しい Windows インストーラーを導入しました。
+- **カスタム用語集の改善**: 未翻訳リストの項目をクリックしてそのまま用語集へ入力・編集できます。
+
+</details>
+
+<details>
+<summary>简体中文</summary>
+
+### 新增
+- **扩展至 15 种语言**：新增巴西葡萄牙语、越南语、意大利语、印度尼西亚语、土耳其语与波兰语，并补齐所有语言的翻译覆盖。
+- **macOS / Linux 命令行安装脚本**：新增适用于 macOS 与 Linux 的零依赖 CLI 安装程序。
+
+### 改进
+- **更自然的混合语句翻译**：包含链接或代码的句子现在在所有语言中都能按自然语序显示。
+- **全新两步安装程序**：重做 Windows 安装界面，支持流畅动画与自动重启。
+- **自定义术语表改进**：点击已收集的未翻译文本即可自动填入术语表并支持直接编辑。
+
+</details>
+
+<details>
+<summary>繁體中文</summary>
+
+### 新增
+- **擴充至 15 種語言**：新增巴西葡萄牙語、越南語、義大利語、印尼語、土耳其語與波蘭語，並補齊所有語言的翻譯覆蓋。
+- **macOS / Linux 命令列安裝腳本**：新增適用於 macOS 與 Linux 的零相依性 CLI 安裝程式。
+
+### 改進
+- **更自然的混合語句翻譯**：包含連結或程式碼的句子現在在所有語言中都能依自然語序顯示。
+- **全新兩步安裝程式**：重做 Windows 安裝介面，支援流暢動畫與自動重啟。
+- **自訂詞彙表改進**：點選已收集的未翻譯文字即可自動填入詞彙表並支援直接編輯。
+
+</details>
+
+<details>
+<summary>Español</summary>
+
+### Añadido
+- **Soporte para 15 idiomas**: Se añadieron portugués de Brasil, vietnamita, italiano, indonesio, turco y polaco con paridad completa.
+- **Instalador CLI para macOS y Linux**: Se añadió un instalador de línea de comandos para macOS y Linux.
+
+### Mejorado
+- **Frases con enlaces más naturales**: Las oraciones con enlaces o código ahora respetan el orden natural de cada idioma.
+- **Nuevo instalador en 2 pasos**: Instalador renovado para Windows con animaciones fluidas y reinicio automático.
+- **Mejoras del glosario**: Haz clic en cualquier texto recopilado para rellenar y editar tu glosario personalizado.
+
+</details>
+
+<details>
+<summary>Français</summary>
+
+### Ajouté
+- **15 langues prises en charge** : Ajout du portugais (Brésil), vietnamien, italien, indonésien, turc et polonais avec parité complète.
+- **Installateur CLI macOS / Linux** : Ajout d’un script d’installation en ligne de commande pour macOS et Linux.
+
+### Amélioré
+- **Phrases avec liens plus naturelles** : Les phrases contenant des liens ou du code suivent désormais l’ordre naturel de chaque langue.
+- **Nouvel installateur en 2 étapes** : Interface Windows repensée avec animations fluides et redémarrage automatique.
+- **Glossaire amélioré** : Cliquez sur une chaîne collectée pour pré-remplir et modifier votre glossaire en un clic.
+
+</details>
+
+<details>
+<summary>Deutsch</summary>
+
+### Hinzugefügt
+- **15 Sprachen unterstützt**: Brasilianisches Portugiesisch, Vietnamesisch, Italienisch, Indonesisch, Türkisch und Polnisch mit vollständiger Parität ergänzt.
+- **CLI-Installer für macOS & Linux**: Kommandozeilen-Installer ohne Zusatzabhängigkeiten für macOS und Linux hinzugefügt.
+
+### Verbessert
+- **Natürlichere Sätze mit Links**: Sätze mit Links oder Code erscheinen nun in jeder Sprache in natürlicher Wortstellung.
+- **Überarbeiteter 2-Schritte-Installer**: Neuer Windows-Installer mit flüssigen Animationen und automatischem Neustart.
+- **Verbessertes Glossar**: Gesammelte Texte lassen sich per Klick direkt ins eigene Glossar übernehmen und bearbeiten.
+
+</details>
+
+<details>
+<summary>Русский</summary>
+
+### Добавлено
+- **Поддержка 15 языков**: Добавлены португальский (Бразилия), вьетнамский, итальянский, индонезийский, турецкий и польский с полным покрытием.
+- **CLI-установщик для macOS и Linux**: Добавлен консольный установщик без внешних зависимостей для macOS и Linux.
+
+### Улучшено
+- **Естественный перевод фраз со ссылками**: Предложения со ссылками и кодом теперь отображаются в естественном порядке слов.
+- **Новый 2-шаговый установщик**: Обновлённый установщик Windows с плавными анимациями и автоперезапуском.
+- **Улучшения глоссария**: Клик по собранной строке сразу подставляет её в пользовательский глоссарий.
+
+</details>
+
+<details>
+<summary>Português (Brasil)</summary>
+
+### Adicionado
+- **Suporte a 15 idiomas**: Adicionados português do Brasil, vietnamita, italiano, indonésio, turco e polonês com tradução completa.
+- **Instalador CLI para macOS e Linux**: Adicionado instalador de linha de comando sem dependências para macOS e Linux.
+
+### Melhorado
+- **Frases com links mais naturais**: Textos com links ou código agora seguem a ordem natural de cada idioma.
+- **Instalador em 2 etapas**: Novo instalador Windows com animações suaves e reinício automático.
+- **Glossário aprimorado**: Clique em qualquer texto coletado para preencher e editar o glossário rapidamente.
+
+</details>
+
+<details>
+<summary>Tiếng Việt</summary>
+
+### Đã thêm
+- **Hỗ trợ 15 ngôn ngữ**: Bổ sung tiếng Bồ Đào Nha (Brazil), Việt, Ý, Indonesia, Thổ Nhĩ Kỳ và Ba Lan với độ phủ đầy đủ.
+- **Trình cài đặt CLI cho macOS & Linux**: Thêm trình cài đặt dòng lệnh không cần phụ thuộc cho macOS và Linux.
+
+### Đã cải thiện
+- **Dịch câu chứa liên kết tự nhiên hơn**: Các câu có liên kết hoặc mã nguồn giờ hiển thị đúng trật tự từ của từng ngôn ngữ.
+- **Trình cài đặt 2 bước mới**: Giao diện cài đặt Windows mới với hiệu ứng mượt mà và tự động khởi động lại.
+- **Cải tiến từ điển tùy chỉnh**: Nhấp vào chuỗi chưa dịch để tự động điền và chỉnh sửa nhanh.
+
+</details>
+
+<details>
+<summary>Italiano</summary>
+
+### Aggiunto
+- **Supporto per 15 lingue**: Aggiunti portoghese brasiliano, vietnamita, italiano, indonesiano, turco e polacco con copertura completa.
+- **Installer CLI per macOS e Linux**: Aggiunto un installer da riga di comando per macOS e Linux.
+
+### Migliorato
+- **Frasi con link più naturali**: Le frasi con collegamenti o codice seguono ora l’ordine naturale di ogni lingua.
+- **Nuovo installer in 2 passaggi**: Installer Windows rinnovato con animazioni fluide e riavvio automatico.
+- **Glossario migliorato**: Fai clic su qualsiasi stringa raccolta per compilare e modificare il glossario.
+
+</details>
+
+<details>
+<summary>Bahasa Indonesia</summary>
+
+### Ditambahkan
+- **Dukungan 15 Bahasa**: Menambahkan Portugis (Brasil), Vietnam, Italia, Indonesia, Turki, dan Polandia dengan kelengkapan penuh.
+- **Pemasang CLI macOS & Linux**: Menambahkan pemasang baris perintah tanpa dependensi untuk macOS dan Linux.
+
+### Ditingkatkan
+- **Terjemahan Tautan Lebih Alami**: Kalimat dengan tautan atau kode kini mengikuti urutan kata alami di setiap bahasa.
+- **Pemasang 2 Langkah Baru**: Pemasang Windows baru dengan animasi halus dan mulai ulang otomatis.
+- **Peningkatan Glosarium**: Klik teks yang terkumpul untuk langsung mengisi dan mengedit glosarium kustom.
+
+</details>
+
+<details>
+<summary>Türkçe</summary>
+
+### Eklendi
+- **15 Dil Desteği**: Brezilya Portekizcesi, Vietnamca, İtalyanca, Endonezce, Türkçe ve Lehçe tam kapsamla eklendi.
+- **macOS ve Linux CLI Kurucusu**: macOS ve Linux için bağımsız komut satırı kurucusu eklendi.
+
+### İyileştirildi
+- **Bağlantılı Cümlelerde Doğal Çeviri**: Bağlantı veya kod içeren cümleler artık her dilin doğal söz dizimine uygun görünür.
+- **2 Adımlı Yeni Kurulum**: Akıcı animasyonlu ve otomatik yeniden başlatmalı yeni Windows kurulum ekranı eklendi.
+- **Gelişmiş Özel Sözlük**: Toplanan çevrilmemiş metinlere tıklayarak sözlüğe tek tıkla ekleme ve düzenleme yapılabilir.
+
+</details>
+
+<details>
+<summary>Polski</summary>
+
+### Dodano
+- **Obsługa 15 języków**: Dodano portugalski (Brazylia), wietnamski, włoski, indonezyjski, turecki i polski z pełnym pokryciem.
+- **Instalator CLI dla macOS i Linux**: Dodano bezproblemowy instalator wiersza poleceń dla macOS i Linux.
+
+### Ulepszono
+- **Naturalniejsze zdania z linkami**: Zdania zawierające linki lub kod zachowują naturalny szyk wyrazów w każdym języku.
+- **Nowy 2-etapowy instalator**: Odświeżony instalator Windows z płynnymi animacjami i automatycznym restartem.
+- **Ulepszony własny słownik**: Kliknięcie zebranego tekstu od razu wypełnia formularz słownika z możliwością edycji.
+
+</details>
+
+---
+
 ## [4.0.7] - 2026-11-24
 
 ### Improved
