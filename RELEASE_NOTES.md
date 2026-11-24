@@ -1,9 +1,8 @@
-# Antigravity Enhancer v4.0.4.1
+# Antigravity Enhancer v4.0.5
 
 ## Changes
 
-- **Silent Auto-Repatch**: Removed `powershell.exe` from `auto-repatch.vbs` and switched to direct `Antigravity.exe` execution with `ELECTRON_RUN_AS_NODE=1`.
-- **Schedule Interval**: Changed the `AntigravityEnhancerAutoRepatch` task interval from 5 minutes to 1 hour.
+- **Removed Separate Argon Quota Group**: Consolidated quota display, popover cards, 72h history tracking, and alerts into `Gemini` and `Other`.
 
 ---
 
@@ -12,63 +11,55 @@
 <details>
 <summary>한국어</summary>
 
-- **자동 재패치 무창 실행**: `auto-repatch.vbs`에서 `powershell.exe` 실행을 제거하고 `ELECTRON_RUN_AS_NODE=1` 모드로 `Antigravity.exe`를 직접 실행하도록 변경했습니다.
-- **패치 점검 주기 변경**: `AntigravityEnhancerAutoRepatch` 예약 작업 실행 주기를 5분에서 1시간 간격으로 변경했습니다.
+- **개별 Argon 할당량 그룹 제거**: 상단 바 위젯, 할당량 팝오버, 72시간 기록 추적 및 알림에서 개별 `Argon` 그룹을 제거하고 `Gemini`와 `기타 모델` 2개 그룹으로 통합했습니다.
 
 </details>
 
 <details>
 <summary>日本語</summary>
 
-- **自動再パッチの完全非表示実行**: `auto-repatch.vbs` から `powershell.exe` の呼び出しを削除し、`ELECTRON_RUN_AS_NODE=1` で直接実行するよう変更しました。
-- **実行間隔の変更**: `AntigravityEnhancerAutoRepatch` タスクの実行間隔を5分から1時間に変更しました。
+- **個別の Argon クォータグループを削除**: トップバーウィジェット、ポップオーバー、72時間履歴および通知から `Argon` グループを削除し、`Gemini` と `その他` の2グループに統合しました。
 
 </details>
 
 <details>
 <summary>简体中文</summary>
 
-- **静默自动重打补丁**：移除 `auto-repatch.vbs` 中的 `powershell.exe` 调用，改为使用 `ELECTRON_RUN_AS_NODE=1` 直接执行。
-- **调整检查周期**：将 `AntigravityEnhancerAutoRepatch` 计划任务间隔从 5 分钟改为 1 小时。
+- **移除独立的 Argon 配额分组**：从顶部栏组件、配额弹窗、72小时历史和通知中移除 `Argon` 分组，统一归并为 `Gemini` 和 `其他模型`。
 
 </details>
 
 <details>
 <summary>繁體中文</summary>
 
-- **靜默自動重打修補**：移除 `auto-repatch.vbs` 中的 `powershell.exe` 呼叫，改為使用 `ELECTRON_RUN_AS_NODE=1` 直接執行。
-- **調整檢查週期**：將 `AntigravityEnhancerAutoRepatch` 排程工作間隔從 5 分鐘改為 1 小時。
+- **移除獨立的 Argon 配額分組**：從頂部列元件、配額彈窗、72小時紀錄與通知中移除 `Argon` 分組，整合為 `Gemini` 與 `其他模型`。
 
 </details>
 
 <details>
 <summary>Español</summary>
 
-- **Auto-reparcheo silencioso**: Se eliminó `powershell.exe` de `auto-repatch.vbs` para ejecutar directamente con `ELECTRON_RUN_AS_NODE=1`.
-- **Cambio de intervalo**: Se cambió la frecuencia de la tarea `AntigravityEnhancerAutoRepatch` de 5 minutos a 1 hora.
+- **Grupo de cuota Argon eliminado**: Se eliminó el grupo `Argon` del widget, popover, historial de 72 h y alertas, unificándose en `Gemini` y `Otros`.
 
 </details>
 
 <details>
 <summary>Français</summary>
 
-- **Auto-repatch silencieux** : Suppression de `powershell.exe` dans `auto-repatch.vbs` au profit d’une exécution directe avec `ELECTRON_RUN_AS_NODE=1`.
-- **Intervalle modifié** : Passage de l’intervalle de tâche `AntigravityEnhancerAutoRepatch` de 5 minutes à 1 heure.
+- **Suppression du groupe de quota Argon** : Suppression du groupe `Argon` du widget, du popover, de l’historique 72 h et des alertes, regroupés sous `Gemini` et `Autres`.
 
 </details>
 
 <details>
 <summary>Deutsch</summary>
 
-- **Lautloses Auto-Repatch**: `powershell.exe` aus `auto-repatch.vbs` entfernt und auf direkte Ausführung mit `ELECTRON_RUN_AS_NODE=1` umgestellt.
-- **Intervall geändert**: Ausführungsintervall von `AntigravityEnhancerAutoRepatch` von 5 Minuten auf 1 Stunde geändert.
+- **Separates Argon-Kontingent entfernt**: `Argon`-Gruppe aus Widget, Popover, 72h-Verlauf und Benachrichtigungen entfernt und auf `Gemini` und `Andere` konsolidiert.
 
 </details>
 
 <details>
 <summary>Русский</summary>
 
-- **Тихий авто-перепатч**: Вызов `powershell.exe` удалён из `auto-repatch.vbs` и заменён прямым запуском с `ELECTRON_RUN_AS_NODE=1`.
-- **Изменение интервала**: Интервал задачи `AntigravityEnhancerAutoRepatch` изменён с 5 минут на 1 час.
+- **Удалена отдельная группа квот Argon**: Группа `Argon` убрана из виджета, поповера, 72-часовой истории и уведомлений; отображаются группы `Gemini` и `Другие`.
 
 </details>

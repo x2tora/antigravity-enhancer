@@ -1,5 +1,5 @@
 /**
- * Antigravity Enhancer v4.0.4.1 - Modular Renderer Enhancer Engine
+ * Antigravity Enhancer v4.0.5 - Modular Renderer Enhancer Engine
  * Features: 9-Language Zero-Restart i18n, Translation Engine 2.0 (Slice + Glossary),
  *           Quota Intelligence (Sparklines, Burn-Rate ETA & Alerts),
  *           Enhancer Control Center & Custom Shortcuts (x2tora/antigravity-enhancer)
@@ -11,7 +11,7 @@
   const ipc = electron_1 ? electron_1.ipcRenderer : null;
   const payload = (typeof __ENHANCER_PAYLOAD__ !== 'undefined' && __ENHANCER_PAYLOAD__) ? __ENHANCER_PAYLOAD__ : {};
   const ENHANCER_REPO = payload.repo || 'x2tora/antigravity-enhancer';
-  const ENHANCER_CURRENT_VERSION = payload.version || '4.0.4.1';
+  const ENHANCER_CURRENT_VERSION = payload.version || '4.0.5';
 
   const DEFAULT_PREFS = {
     shortcutCycleLang: 'Alt+Shift+L',
@@ -1098,7 +1098,7 @@
     const cooldownMs = 30 * 60 * 1000;
     const threshold = Number(userPreferences.quotaLowThreshold) || 20;
 
-    for (const key of ['argon', 'gemini', 'other']) {
+    for (const key of ['gemini', 'other']) {
       const g = snapshot[key];
       if (!g) continue;
       const vals = [g.h5, g.weekly].filter(v => typeof v === 'number');
@@ -2616,14 +2616,13 @@
       const MIN_FETCH_INTERVAL_MS = 10000;
       let debounceTimer = null;
       let countdownTimer = null;
-      let currentActiveGroup = 'argon';
+      let currentActiveGroup = 'gemini';
       let lastObservedModelName = '';
 
       function resolveModelGroup(rawName) {
         if (!rawName) return null;
         const lower = rawName.toLowerCase();
-        if (lower.includes('argon')) return 'argon';
-        if (lower.includes('hydrogen') || lower.includes('gemini') || lower.includes('flash')) {
+        if (lower.includes('argon') || lower.includes('neon') || lower.includes('hydrogen') || lower.includes('gemini') || lower.includes('flash')) {
           return 'gemini';
         }
         if (lower.includes('claude') || lower.includes('sonnet') || lower.includes('opus') || lower.includes('gpt') || lower.includes('haiku')) {
@@ -2761,8 +2760,7 @@
       function parseGroups(quotaResponse) {
         const qs = getQuotaStrings();
         const groups = quotaResponse?.groups || [];
-        const argon = { id: 'argon', label: 'Argon', color: '#A0A3F6', h5: null, weekly: null, h5TargetTs: null, weeklyTargetTs: null, models: ['Gemini 4 Argon'] };
-        const gemini = { id: 'gemini', label: 'Gemini', color: '#CAD3F5', h5: null, weekly: null, h5TargetTs: null, weeklyTargetTs: null, models: ['Gemini 4 Hydrogen', 'Gemini Flash', 'Gemini 3.1 Flash Image'] };
+        const gemini = { id: 'gemini', label: 'Gemini', color: '#A0A3F6', h5: null, weekly: null, h5TargetTs: null, weeklyTargetTs: null, models: ['Gemini 4', 'Gemini Flash', 'Gemini 3.1 Flash Image'] };
         const other = { id: 'other', label: qs.otherLabel || 'Other', color: '#8A93B2', h5: null, weekly: null, h5TargetTs: null, weeklyTargetTs: null, models: ['Claude Opus', 'Claude Sonnet', 'GPT-OSS'] };
 
         for (const g of groups) {
@@ -2772,8 +2770,9 @@
           const extractedModels = (modelsMatch && modelsMatch[1]) ? modelsMatch[1].split(',').map(s => s.trim()).filter(Boolean) : null;
 
           let target = other;
-          if (name.includes('argon') || (g.buckets || []).some(b => (b.bucketId || '').toLowerCase().includes('argon'))) target = argon;
-          else if (name.includes('gemini') || name.includes('hydrogen')) target = gemini;
+          if (name.includes('gemini') || name.includes('hydrogen') || name.includes('neon') || name.includes('argon') || (g.buckets || []).some(b => (b.bucketId || '').toLowerCase().includes('argon'))) {
+            target = gemini;
+          }
           if (extractedModels && extractedModels.length > 0) target.models = extractedModels;
 
           for (const b of (g.buckets || [])) {
@@ -2789,7 +2788,7 @@
             }
           }
         }
-        return { argon, gemini, other };
+        return { gemini, other };
       }
 
       function findTargetContainer() {
@@ -2932,7 +2931,7 @@
         const rows = renderBucketHtml(qs.h5Full, grp.h5, grp.h5TargetTs, qs) + renderBucketHtml(qs.weeklyFull, grp.weekly, grp.weeklyTargetTs, qs);
         const modelsTxt = (grp.models || []).join(', ');
 
-        card.innerHTML = `<header style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding-bottom:8px;border-bottom:1px solid rgba(202,211,245,0.08);"><div style="display:inline-flex;align-items:center;gap:6px;flex-shrink:0;white-space:nowrap;"><strong style="font-weight:600;font-size:13px;white-space:nowrap;color:${isLow ? '#E56B6F' : (grp.id === 'argon' ? '#A0A3F6' : '#CAD3F5')};">${grp.label}</strong>${(grp.id === currentActiveGroup || grp.id === groupKey) ? `<em style="font-style:normal;font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;white-space:nowrap;flex-shrink:0;line-height:1.2;background:rgba(160,163,246,0.14);color:#A0A3F6;border:1px solid rgba(160,163,246,0.32);">${qs.activeTag}</em>` : ''}</div><span style="font-size:11px;color:#818BA8;flex:1;min-width:0;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${modelsTxt}</span></header><section>${rows || '<p style="margin:8px 0 0;font-size:11px;color:#818BA8;">--</p>'}</section>`;
+        card.innerHTML = `<header style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding-bottom:8px;border-bottom:1px solid rgba(202,211,245,0.08);"><div style="display:inline-flex;align-items:center;gap:6px;flex-shrink:0;white-space:nowrap;"><strong style="font-weight:600;font-size:13px;white-space:nowrap;color:${isLow ? '#E56B6F' : (grp.id === 'gemini' ? '#A0A3F6' : '#CAD3F5')};">${grp.label}</strong>${(grp.id === currentActiveGroup || grp.id === groupKey) ? `<em style="font-style:normal;font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;white-space:nowrap;flex-shrink:0;line-height:1.2;background:rgba(160,163,246,0.14);color:#A0A3F6;border:1px solid rgba(160,163,246,0.32);">${qs.activeTag}</em>` : ''}</div><span style="font-size:11px;color:#818BA8;flex:1;min-width:0;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${modelsTxt}</span></header><section>${rows || '<p style="margin:8px 0 0;font-size:11px;color:#818BA8;">--</p>'}</section>`;
 
         (document.body || document.documentElement).appendChild(card);
         startCountdownTicker();
@@ -2946,7 +2945,7 @@
         if (existing) { closeQuotaPopover(existing); return; }
         hideComposerQuotaHoverCard(true);
         const qs = getQuotaStrings();
-        const groupsList = [parsed.argon, parsed.gemini, parsed.other];
+        const groupsList = [parsed.gemini, parsed.other];
         const pop = document.createElement('div');
         pop.id = 'antigravity-quota-popover';
         pop.className = 'agy-quota-popover agy-overlay border rounded-xl no-focus-ring flex flex-col shadow-lg notranslate';
@@ -3023,7 +3022,7 @@
       });
 
       function renderWidget(container, parsed, isMenuBar = false) {
-        const { argon, gemini, other } = parsed;
+        const { gemini, other } = parsed;
         const qs = getQuotaStrings();
         const isMac = navigator.platform && navigator.platform.toUpperCase().indexOf('MAC') >= 0;
         const rightMargin = isMenuBar ? (isMac ? '20px' : '140px') : '8px';
@@ -3048,7 +3047,7 @@
         };
 
         const dividerHtml = '<span aria-hidden="true" style="width:1px;height:12px;background:rgba(202,211,245,0.1);display:inline-block;flex-shrink:0;"></span>';
-        container.innerHTML = `${renderBadge('antigravity-badge-argon', 'Argon', '#A0A3F6', argon, 'argon')}${dividerHtml}${renderBadge('antigravity-badge-gemini', 'Gemini', '#CAD3F5', gemini, 'gemini')}${dividerHtml}${renderBadge('antigravity-badge-other', qs.otherLabel || 'Other', '#9DA7C7', other, 'other')}<button id="antigravity-quota-refresh-btn" title="${qs.refresh}" style="background:none;border:none;color:#9DA7C7;cursor:pointer;padding:0;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg></button>`;
+        container.innerHTML = `${renderBadge('antigravity-badge-gemini', 'Gemini', '#A0A3F6', gemini, 'gemini')}${dividerHtml}${renderBadge('antigravity-badge-other', qs.otherLabel || 'Other', '#9DA7C7', other, 'other')}<button id="antigravity-quota-refresh-btn" title="${qs.refresh}" style="background:none;border:none;color:#9DA7C7;cursor:pointer;padding:0;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg></button>`;
         container.onclick = (e) => { e.stopPropagation(); toggleQuotaPopover(container, parsed); };
         const refBtn = container.querySelector('#antigravity-quota-refresh-btn');
         if (refBtn) refBtn.onclick = (e) => { e.stopPropagation(); updateQuotaWidget(true); };
@@ -3153,7 +3152,7 @@
           const p = parseGroups(data);
           renderWidget(widget, p, target.isMenuBar);
           updateComposerModelQuota(p, currentActiveGroup);
-          try { window.dispatchEvent(new CustomEvent('antigravity-quota-snapshot', { detail: { ts: Date.now(), argon: p.argon, gemini: p.gemini, other: p.other } })); } catch (_) {}
+          try { window.dispatchEvent(new CustomEvent('antigravity-quota-snapshot', { detail: { ts: Date.now(), gemini: p.gemini, other: p.other } })); } catch (_) {}
         } else if (retryCount < MAX_RETRIES) {
           retryCount++;
           clearTimeout(retryTimer);

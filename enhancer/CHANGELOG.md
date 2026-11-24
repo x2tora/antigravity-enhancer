@@ -3,6 +3,13 @@
 All notable changes to **Antigravity Enhancer** are documented in this file.
 Older pre-v3 legacy patch logs have been consolidated into milestone summaries below.
 
+## [4.0.5] - 2026-11-24
+
+### Changed
+- **Quota Group Simplification**: Removed the separate `Argon` quota group from the top-bar widget, quota popover, 72h history tracking, and quota alerts; consolidated quota display into `Gemini` and `Other`.
+
+---
+
 ## [4.0.4.1] - 2026-11-24
 
 ### Changed
