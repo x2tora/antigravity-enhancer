@@ -1,5 +1,5 @@
 /**
- * Antigravity Enhancer v4.1.0 - Modular Renderer Enhancer Engine
+ * Antigravity Enhancer v4.1.1 - Modular Renderer Enhancer Engine
  * Features: 15-Language Zero-Restart i18n, Translation Engine 3.0 (Slice + Composite DOM + Glossary),
  *           Quota Intelligence (Sparklines, Burn-Rate ETA & Alerts),
  *           Enhancer Control Center & Custom Shortcuts (x2tora/antigravity-enhancer)
@@ -11,7 +11,7 @@
   const ipc = electron_1 ? electron_1.ipcRenderer : null;
   const payload = (typeof __ENHANCER_PAYLOAD__ !== 'undefined' && __ENHANCER_PAYLOAD__) ? __ENHANCER_PAYLOAD__ : {};
   const ENHANCER_REPO = payload.repo || 'x2tora/antigravity-enhancer';
-  const ENHANCER_CURRENT_VERSION = payload.version || '4.1.0';
+  const ENHANCER_CURRENT_VERSION = payload.version || '4.1.1';
 
   const DEFAULT_PREFS = {
     shortcutCycleLang: 'Alt+Shift+L',
@@ -831,62 +831,101 @@
         :root {
           --editor-font-family: D2Coding, JetBrains Mono, Consolas, monospace !important;
           --monaco-monospace-font: D2Coding, JetBrains Mono, Consolas, monospace !important;
+          --agy-bg: var(--background, #0B0B0E);
+          --agy-surface: var(--card, var(--popover, #111217));
+          --agy-surface-2: var(--secondary, #181A22);
+          --agy-fg: var(--foreground, #CAD3F5);
+          --agy-fg-secondary: var(--secondary-foreground, #9DA7C7);
+          --agy-fg-muted: var(--muted-foreground, #818BA8);
+          --agy-accent: var(--primary, #A0A3F6);
+          --agy-accent-fg: var(--primary-foreground, #0B0B0E);
+          --agy-accent-soft: color-mix(in srgb, var(--agy-accent) 14%, transparent);
+          --agy-accent-border: color-mix(in srgb, var(--agy-accent) 34%, transparent);
+          --agy-border: var(--border, color-mix(in srgb, var(--agy-fg) 10%, transparent));
+          --agy-border-strong: color-mix(in srgb, var(--agy-fg) 20%, transparent);
+          --agy-hover: color-mix(in srgb, var(--agy-fg) 8%, transparent);
+          --agy-danger: var(--error, var(--destructive, #E56B6F));
+          --agy-danger-soft: color-mix(in srgb, var(--agy-danger) 12%, transparent);
+          --agy-danger-border: color-mix(in srgb, var(--agy-danger) 34%, transparent);
+          --agy-success: var(--success, #4CC38A);
+          --agy-backdrop: rgba(11, 11, 14, 0.72);
+          --agy-shadow: 0 12px 32px rgba(0, 0, 0, 0.48);
+          --agy-shadow-sm: 0 8px 24px rgba(0, 0, 0, 0.42);
+          --agy-switch-thumb: #FFFFFF;
+        }
+        :root[data-agy-theme="light"] {
+          --agy-bg: var(--background, #FFFFFF);
+          --agy-surface: var(--card, var(--popover, #F8F9FC));
+          --agy-surface-2: var(--secondary, #EEF0F5);
+          --agy-fg: var(--foreground, #0A0A0C);
+          --agy-fg-secondary: var(--secondary-foreground, #3F3F46);
+          --agy-fg-muted: var(--muted-foreground, #71717A);
+          --agy-accent: var(--primary, #2F75C3);
+          --agy-accent-fg: var(--primary-foreground, #FFFFFF);
+          --agy-danger: var(--error, var(--destructive, #CB3D3D));
+          --agy-success: var(--success, #16A34A);
+          --agy-backdrop: rgba(15, 23, 42, 0.36);
+          --agy-shadow: 0 12px 32px rgba(15, 23, 42, 0.14);
+          --agy-shadow-sm: 0 8px 24px rgba(15, 23, 42, 0.12);
+          --agy-switch-thumb: #FFFFFF;
         }
         code, pre, .code-block, .code-block *, .code-line, .line-content, .monaco-editor, .monaco-editor * {
           font-family: D2Coding, JetBrains Mono, Consolas, monospace !important;
         }
         @keyframes antigravity-copy-pulse {
-          0% { color: #4CC38A; }
-          100% { color: #4CC38A; }
+          0% { color: var(--agy-success, #4CC38A); }
+          100% { color: var(--agy-success, #4CC38A); }
         }
         .antigravity-copy-success, .antigravity-copy-pulse {
           animation: antigravity-copy-pulse 0.5s cubic-bezier(0.22, 1, 0.36, 1) !important;
-          color: #4CC38A !important;
+          color: var(--agy-success, #4CC38A) !important;
         }
         .antigravity-copy-success svg, .antigravity-copy-pulse svg {
-          stroke: #4CC38A !important;
+          stroke: var(--agy-success, #4CC38A) !important;
         }
         #antigravity-quick-lang-menu::-webkit-scrollbar,
         #antigravity-lang-dropdown-menu::-webkit-scrollbar,
-        #ag-cc-lang-menu::-webkit-scrollbar {
+        #ag-cc-lang-menu::-webkit-scrollbar,
+        #ag-cc-body::-webkit-scrollbar {
           width: 5px;
         }
         #antigravity-quick-lang-menu::-webkit-scrollbar-thumb,
         #antigravity-lang-dropdown-menu::-webkit-scrollbar-thumb,
-        #ag-cc-lang-menu::-webkit-scrollbar-thumb {
-          background: rgba(202, 211, 245, 0.2);
+        #ag-cc-lang-menu::-webkit-scrollbar-thumb,
+        #ag-cc-body::-webkit-scrollbar-thumb {
+          background: var(--agy-border-strong, rgba(202, 211, 245, 0.2));
           border-radius: 9999px;
         }
         #antigravity-quick-lang-menu .agy-overlay-item:hover,
         #antigravity-lang-dropdown-menu .agy-overlay-item:hover {
-          background: rgba(202, 211, 245, 0.08) !important;
+          background: var(--agy-hover, rgba(202, 211, 245, 0.08)) !important;
         }
         #antigravity-quick-lang-btn:hover,
         #antigravity-quota-widget:hover {
-          border-color: rgba(160, 163, 246, 0.4) !important;
+          border-color: var(--agy-accent-border, rgba(160, 163, 246, 0.4)) !important;
         }
         #antigravity-quick-lang-btn:focus-visible,
         #antigravity-quota-widget:focus-visible,
         #antigravity-enhancer-update-btn:focus-visible,
         #antigravity-enhancer-modal button:focus-visible,
         #ag-enhancer-control-center button:focus-visible {
-          outline: 1.5px solid #A0A3F6 !important;
+          outline: 1.5px solid var(--agy-accent, #A0A3F6) !important;
           outline-offset: 1px;
         }
         #antigravity-enhancer-modal .agy-enh-btn:hover:not(:disabled),
         #ag-enhancer-control-center .agy-enh-btn:hover:not(:disabled) {
-          background: rgba(202, 211, 245, 0.12) !important;
+          background: var(--agy-hover, rgba(202, 211, 245, 0.12)) !important;
         }
         #antigravity-enhancer-modal .agy-enh-primary:hover:not(:disabled),
         #ag-enhancer-control-center .agy-enh-primary:hover:not(:disabled) {
           opacity: 0.92 !important;
         }
         #ag-enhancer-control-center .ag-cc-tab:hover {
-          color: #CAD3F5 !important;
+          color: var(--agy-fg, #CAD3F5) !important;
         }
         #ag-enhancer-control-center .agy-overlay-item:hover {
-          background: rgba(202, 211, 245, 0.08) !important;
-          color: #CAD3F5 !important;
+          background: var(--agy-hover, rgba(202, 211, 245, 0.08)) !important;
+          color: var(--agy-fg, #CAD3F5) !important;
         }
         #ag-enhancer-control-center .ag-cc-range {
           -webkit-appearance: none;
@@ -902,9 +941,9 @@
           width: 14px;
           height: 14px;
           border-radius: 9999px;
-          background: #CAD3F5;
-          border: 2px solid #A0A3F6;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+          background: var(--agy-switch-thumb, #FFFFFF);
+          border: 2px solid var(--agy-accent, #A0A3F6);
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
           cursor: pointer;
           transition: transform 120ms cubic-bezier(0.22, 1, 0.36, 1);
         }
@@ -912,7 +951,7 @@
           transform: scale(1.12);
         }
         #antigravity-popover-refresh:hover {
-          color: #CAD3F5 !important;
+          color: var(--agy-fg, #CAD3F5) !important;
         }
         #antigravity-open-models-settings:hover {
           text-decoration: underline !important;
@@ -928,6 +967,208 @@
       i18nStyle.disabled = (activeLanguage === 'en');
       root.appendChild(i18nStyle);
     }
+    syncEnhancerTheme();
+  }
+
+  // ---------------------------------------------------------------------------
+  // 2.5. Live Host Theme Sync (Light / Dark + Custom BG / FG / Accent)
+  // ---------------------------------------------------------------------------
+  let lastThemeSignature = '';
+  let themeObserverAttached = false;
+
+  function normalizeCssColorValue(val) {
+    if (!val || typeof val !== 'string') return '';
+    const trimmed = val.trim();
+    if (!trimmed || trimmed === 'transparent' || trimmed === 'none' || trimmed === 'initial' || trimmed === 'inherit') return '';
+    if (/^rgba?\(\s*0\s*[,\s]\s*0\s*[,\s]\s*0\s*(?:,|\/)\s*0(?:\.0+)?\s*\)$/i.test(trimmed)) return '';
+    // Handle shadcn/Tailwind bare HSL triplets like "0 0% 100%" or "222.2 84% 4.9%"
+    if (/^\d+(?:\.\d+)?\s+\d+(?:\.\d+)?%\s+\d+(?:\.\d+)?%(?:\s*\/\s*[\d.%]+)?$/.test(trimmed)) {
+      return `hsl(${trimmed})`;
+    }
+    return trimmed;
+  }
+
+  function parseRgbComponents(colorStr) {
+    const s = normalizeCssColorValue(colorStr);
+    if (!s) return null;
+    const hexM = s.match(/^#([0-9a-f]{3,8})$/i);
+    if (hexM) {
+      const h = hexM[1];
+      if (h.length === 3 || h.length === 4) {
+        return [parseInt(h[0] + h[0], 16), parseInt(h[1] + h[1], 16), parseInt(h[2] + h[2], 16)];
+      }
+      if (h.length === 6 || h.length === 8) {
+        return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
+      }
+    }
+    const rgbM = s.match(/^rgba?\(\s*([\d.]+)\s*[,\s]\s*([\d.]+)\s*[,\s]\s*([\d.]+)/i);
+    if (rgbM) {
+      return [Number(rgbM[1]), Number(rgbM[2]), Number(rgbM[3])];
+    }
+    const hslM = s.match(/^hsla?\(\s*([\d.]+)(?:deg)?\s*[,\s]\s*([\d.]+)%\s*[,\s]\s*([\d.]+)%/i);
+    if (hslM) {
+      const h = ((Number(hslM[1]) % 360) + 360) % 360;
+      const sat = Number(hslM[2]) / 100;
+      const lit = Number(hslM[3]) / 100;
+      const c = (1 - Math.abs(2 * lit - 1)) * sat;
+      const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+      const m = lit - c / 2;
+      let r1 = 0, g1 = 0, b1 = 0;
+      if (h < 60) [r1, g1, b1] = [c, x, 0];
+      else if (h < 120) [r1, g1, b1] = [x, c, 0];
+      else if (h < 180) [r1, g1, b1] = [0, c, x];
+      else if (h < 240) [r1, g1, b1] = [0, x, c];
+      else if (h < 300) [r1, g1, b1] = [x, 0, c];
+      else [r1, g1, b1] = [c, 0, x];
+      return [Math.round((r1 + m) * 255), Math.round((g1 + m) * 255), Math.round((b1 + m) * 255)];
+    }
+    return null;
+  }
+
+  function getRelativeLuminance(rgb) {
+    if (!rgb) return null;
+    return (0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2]) / 255;
+  }
+
+  function syncEnhancerTheme() {
+    try {
+      if (typeof document === 'undefined' || !document.documentElement) return null;
+      const rootEl = document.documentElement;
+      const rootStyle = (typeof getComputedStyle === 'function') ? getComputedStyle(rootEl) : null;
+      const bodyStyle = (document.body && typeof getComputedStyle === 'function') ? getComputedStyle(document.body) : null;
+
+      const pickVar = (...names) => {
+        for (const n of names) {
+          const v1 = rootStyle && typeof rootStyle.getPropertyValue === 'function' ? normalizeCssColorValue(rootStyle.getPropertyValue(n)) : '';
+          if (v1) return v1;
+          const v2 = bodyStyle && typeof bodyStyle.getPropertyValue === 'function' ? normalizeCssColorValue(bodyStyle.getPropertyValue(n)) : '';
+          if (v2) return v2;
+        }
+        return '';
+      };
+
+      const hostBg = pickVar('--background', '--bg-primary', '--vscode-editor-background') ||
+        normalizeCssColorValue(bodyStyle && bodyStyle.backgroundColor) || '';
+      const hostFg = pickVar('--foreground', '--text-primary', '--vscode-foreground') ||
+        normalizeCssColorValue(bodyStyle && bodyStyle.color) || '';
+      const hostAccent = pickVar('--primary', '--accent', '--vscode-focusBorder', '--vscode-button-background') || '';
+      const hostAccentFg = pickVar('--primary-foreground', '--vscode-button-foreground') || '';
+      const hostSurface = pickVar('--card', '--popover', '--bg-secondary', '--vscode-editorWidget-background') || '';
+      const hostSurface2 = pickVar('--secondary', '--muted', '--bg-tertiary', '--vscode-input-background') || '';
+      const hostFgSecondary = pickVar('--secondary-foreground', '--text-secondary') || '';
+      const hostFgMuted = pickVar('--muted-foreground', '--text-muted', '--vscode-descriptionForeground') || '';
+      const hostBorder = pickVar('--border', '--vscode-widget-border') || '';
+      const hostDanger = pickVar('--error', '--destructive', '--vscode-errorForeground') || '';
+      const hostSuccess = pickVar('--success') || '';
+
+      const bgLum = getRelativeLuminance(parseRgbComponents(hostBg));
+      const rootCls = String(rootEl.className || '');
+      const bodyCls = String((document.body && document.body.className) || '');
+      const dataTheme = String(rootEl.getAttribute('data-theme') || (document.body && document.body.getAttribute('data-theme')) || '').toLowerCase();
+      let isLight = false;
+      if (bgLum !== null) {
+        isLight = bgLum > 0.5;
+      } else if (dataTheme === 'light' || /\blight\b/.test(rootCls) || /\blight\b/.test(bodyCls)) {
+        isLight = true;
+      } else if (dataTheme === 'dark' || /\bdark\b/.test(rootCls) || /\bdark\b/.test(bodyCls)) {
+        isLight = false;
+      } else if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
+        try { isLight = Boolean(window.matchMedia('(prefers-color-scheme: light)').matches); } catch (_) {}
+      }
+
+      const mode = isLight ? 'light' : 'dark';
+      const bg = hostBg || (isLight ? '#FFFFFF' : '#0B0B0E');
+      const fg = hostFg || (isLight ? '#0A0A0C' : '#CAD3F5');
+      const accent = hostAccent || (isLight ? '#2F75C3' : '#A0A3F6');
+      const accentLum = getRelativeLuminance(parseRgbComponents(accent));
+      const accentFg = hostAccentFg || ((accentLum !== null ? accentLum > 0.48 : !isLight) ? '#0B0B0E' : '#FFFFFF');
+      const surface = hostSurface || (isLight
+        ? `color-mix(in srgb, ${bg} 96%, ${fg} 4%)`
+        : `color-mix(in srgb, ${bg} 94%, ${fg} 6%)`);
+      const surface2 = hostSurface2 || (isLight
+        ? `color-mix(in srgb, ${bg} 91%, ${fg} 9%)`
+        : `color-mix(in srgb, ${bg} 88%, ${fg} 12%)`);
+      const fgSecondary = hostFgSecondary || `color-mix(in srgb, ${fg} 76%, ${bg})`;
+      const fgMuted = hostFgMuted || `color-mix(in srgb, ${fg} 56%, ${bg})`;
+      const border = hostBorder || `color-mix(in srgb, ${fg} ${isLight ? 12 : 10}%, transparent)`;
+      const borderStrong = `color-mix(in srgb, ${fg} ${isLight ? 22 : 20}%, transparent)`;
+      const hover = `color-mix(in srgb, ${fg} ${isLight ? 7 : 9}%, transparent)`;
+      const accentSoft = `color-mix(in srgb, ${accent} ${isLight ? 12 : 14}%, transparent)`;
+      const accentBorder = `color-mix(in srgb, ${accent} ${isLight ? 32 : 34}%, transparent)`;
+      const danger = hostDanger || (isLight ? '#CB3D3D' : '#E56B6F');
+      const dangerSoft = `color-mix(in srgb, ${danger} ${isLight ? 10 : 12}%, transparent)`;
+      const dangerBorder = `color-mix(in srgb, ${danger} ${isLight ? 30 : 34}%, transparent)`;
+      const success = hostSuccess || (isLight ? '#16A34A' : '#4CC38A');
+      const backdrop = isLight ? 'rgba(15, 23, 42, 0.36)' : 'rgba(11, 11, 14, 0.72)';
+      const shadow = isLight ? '0 12px 32px rgba(15, 23, 42, 0.14)' : '0 12px 32px rgba(0, 0, 0, 0.48)';
+      const shadowSm = isLight ? '0 8px 24px rgba(15, 23, 42, 0.12)' : '0 8px 24px rgba(0, 0, 0, 0.42)';
+
+      const sig = [mode, bg, fg, accent, accentFg, surface, surface2, fgSecondary, fgMuted, border, danger, success].join('|');
+      if (sig === lastThemeSignature) return { mode, bg, fg, accent, accentFg };
+      lastThemeSignature = sig;
+
+      if (rootEl.getAttribute('data-agy-theme') !== mode) {
+        rootEl.setAttribute('data-agy-theme', mode);
+      }
+      if (rootEl.style && typeof rootEl.style.setProperty === 'function') {
+        rootEl.style.setProperty('--agy-bg', bg);
+        rootEl.style.setProperty('--agy-surface', surface);
+        rootEl.style.setProperty('--agy-surface-2', surface2);
+        rootEl.style.setProperty('--agy-fg', fg);
+        rootEl.style.setProperty('--agy-fg-secondary', fgSecondary);
+        rootEl.style.setProperty('--agy-fg-muted', fgMuted);
+        rootEl.style.setProperty('--agy-accent', accent);
+        rootEl.style.setProperty('--agy-accent-fg', accentFg);
+        rootEl.style.setProperty('--agy-accent-soft', accentSoft);
+        rootEl.style.setProperty('--agy-accent-border', accentBorder);
+        rootEl.style.setProperty('--agy-border', border);
+        rootEl.style.setProperty('--agy-border-strong', borderStrong);
+        rootEl.style.setProperty('--agy-hover', hover);
+        rootEl.style.setProperty('--agy-danger', danger);
+        rootEl.style.setProperty('--agy-danger-soft', dangerSoft);
+        rootEl.style.setProperty('--agy-danger-border', dangerBorder);
+        rootEl.style.setProperty('--agy-success', success);
+        rootEl.style.setProperty('--agy-backdrop', backdrop);
+        rootEl.style.setProperty('--agy-shadow', shadow);
+        rootEl.style.setProperty('--agy-shadow-sm', shadowSm);
+        rootEl.style.setProperty('--agy-switch-thumb', '#FFFFFF');
+      }
+      return { mode, bg, fg, accent, accentFg };
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function initEnhancerThemeSync() {
+    syncEnhancerTheme();
+    if (themeObserverAttached || typeof document === 'undefined') return;
+    themeObserverAttached = true;
+    try {
+      if (typeof MutationObserver === 'function' && document.documentElement) {
+        let scheduled = false;
+        const onMut = () => {
+          if (scheduled) return;
+          scheduled = true;
+          (typeof requestAnimationFrame === 'function' ? requestAnimationFrame : setTimeout)(() => {
+            scheduled = false;
+            syncEnhancerTheme();
+          });
+        };
+        const obs = new MutationObserver(onMut);
+        obs.observe(document.documentElement, { attributes: true, attributeFilter: ['style', 'class', 'data-theme'] });
+        if (document.body) {
+          obs.observe(document.body, { attributes: true, attributeFilter: ['style', 'class', 'data-theme'] });
+        }
+      }
+      if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
+        const mq = window.matchMedia('(prefers-color-scheme: light)');
+        if (mq && typeof mq.addEventListener === 'function') {
+          mq.addEventListener('change', syncEnhancerTheme);
+        } else if (mq && typeof mq.addListener === 'function') {
+          mq.addListener(syncEnhancerTheme);
+        }
+      }
+    } catch (_) {}
   }
 
   // ---------------------------------------------------------------------------
@@ -962,8 +1203,8 @@
       if (!toast) {
         toast = document.createElement('div');
         toast.id = 'antigravity-copy-toast';
-        toast.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:99999;display:flex;align-items:center;gap:8px;padding:8px 12px;background:#111217;color:#CAD3F5;font-size:13px;font-weight:500;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;border-radius:8px;border:1px solid rgba(202,211,245,0.1);box-shadow:0 8px 24px rgba(0,0,0,0.4);pointer-events:none;opacity:0;';
-        toast.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4CC38A" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"></polyline></svg><span id="antigravity-copy-toast-text">${toastText}</span>`;
+        toast.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:99999;display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--agy-surface, #111217);color:var(--agy-fg, #CAD3F5);font-size:13px;font-weight:500;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;border-radius:8px;border:1px solid var(--agy-border, rgba(202,211,245,0.1));box-shadow:var(--agy-shadow-sm, 0 8px 24px rgba(0,0,0,0.4));pointer-events:none;opacity:0;';
+        toast.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--agy-success, #4CC38A)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"></polyline></svg><span id="antigravity-copy-toast-text">${toastText}</span>`;
         (document.body || document.documentElement).appendChild(toast);
       } else {
         const textSpan = toast.querySelector('#antigravity-copy-toast-text');
@@ -1483,7 +1724,7 @@
 
   function renderNativeSwitch(id, checked) {
     const on = Boolean(checked);
-    return `<button type="button" role="switch" id="${id}" aria-checked="${on}" style="position:relative;display:inline-flex;height:20px;width:36px;flex-shrink:0;cursor:pointer;border-radius:9999px;border:2px solid transparent;transition:background-color 150ms cubic-bezier(0.22, 1, 0.36, 1);outline:none;background-color:${on ? '#A0A3F6' : 'rgba(202,211,245,0.2)'};"><span class="ag-switch-thumb" style="pointer-events:none;display:inline-block;height:16px;width:16px;border-radius:9999px;background-color:#CAD3F5;box-shadow:0 1px 2px rgba(0,0,0,0.3);transition:transform 150ms cubic-bezier(0.22, 1, 0.36, 1);transform:translateX(${on ? '16px' : '0px'});"></span></button>`;
+    return `<button type="button" role="switch" id="${id}" aria-checked="${on}" style="position:relative;display:inline-flex;height:20px;width:36px;flex-shrink:0;cursor:pointer;border-radius:9999px;border:2px solid transparent;transition:background-color 150ms cubic-bezier(0.22, 1, 0.36, 1);outline:none;background-color:${on ? 'var(--agy-accent, #A0A3F6)' : 'var(--agy-border-strong, rgba(202,211,245,0.2))'};"><span class="ag-switch-thumb" style="pointer-events:none;display:inline-block;height:16px;width:16px;border-radius:9999px;background-color:var(--agy-switch-thumb, #FFFFFF);box-shadow:0 1px 2px rgba(0,0,0,0.3);transition:transform 150ms cubic-bezier(0.22, 1, 0.36, 1);transform:translateX(${on ? '16px' : '0px'});"></span></button>`;
   }
 
   function wireNativeSwitch(btn, onChange) {
@@ -1492,7 +1733,7 @@
       if (e) e.stopPropagation();
       const next = btn.getAttribute('aria-checked') !== 'true';
       btn.setAttribute('aria-checked', String(next));
-      btn.style.backgroundColor = next ? '#A0A3F6' : 'rgba(202,211,245,0.2)';
+      btn.style.backgroundColor = next ? 'var(--agy-accent, #A0A3F6)' : 'var(--agy-border-strong, rgba(202,211,245,0.2))';
       const thumb = btn.querySelector('.ag-switch-thumb');
       if (thumb) thumb.style.transform = next ? 'translateX(16px)' : 'translateX(0px)';
       if (typeof onChange === 'function') onChange(next);
@@ -1587,13 +1828,13 @@
     bd.id = 'ag-enhancer-control-center-backdrop';
     bd.className = 'notranslate';
     bd.setAttribute('translate', 'no');
-    bd.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;width:100vw;height:100vh;margin:0;box-sizing:border-box;z-index:100001;background:rgba(11,11,14,0.72);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;align-items:flex-start;justify-content:center;padding:calc((100vh - min(86vh, 680px)) / 2) 20px 20px;app-region:no-drag;-webkit-app-region:no-drag;';
+    bd.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;width:100vw;height:100vh;margin:0;box-sizing:border-box;z-index:100001;background:var(--agy-backdrop, rgba(11,11,14,0.72));backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;align-items:flex-start;justify-content:center;padding:calc((100vh - min(86vh, 680px)) / 2) 20px 20px;app-region:no-drag;-webkit-app-region:no-drag;';
 
     const modal = document.createElement('div');
     modal.id = 'ag-enhancer-control-center';
     modal.className = 'notranslate';
     modal.setAttribute('translate', 'no');
-    modal.style.cssText = `position:relative;left:auto;right:auto;top:auto;bottom:auto;margin:0;flex-shrink:0;width:660px;max-width:calc(100vw - 40px);max-height:min(86vh, 680px);box-sizing:border-box;display:flex;flex-direction:column;background:#0B0B0E;border:1px solid rgba(202,211,245,0.1);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,0.48);color:#CAD3F5;font-family:${getUiFontFamily(activeLanguage)};font-size:13px;overflow:hidden;app-region:no-drag;-webkit-app-region:no-drag;`;
+    modal.style.cssText = `position:relative;left:auto;right:auto;top:auto;bottom:auto;margin:0;flex-shrink:0;width:660px;max-width:calc(100vw - 40px);max-height:min(86vh, 680px);box-sizing:border-box;display:flex;flex-direction:column;background:var(--agy-bg, #0B0B0E);border:1px solid var(--agy-border, rgba(202,211,245,0.1));border-radius:12px;box-shadow:var(--agy-shadow, 0 12px 32px rgba(0,0,0,0.48));color:var(--agy-fg, #CAD3F5);font-family:${getUiFontFamily(activeLanguage)};font-size:13px;overflow:hidden;app-region:no-drag;-webkit-app-region:no-drag;`;
 
     const sInit = getControlCenterStrings(activeLanguage);
     const tabs = [
@@ -1605,18 +1846,18 @@
     let currentTab = tabs.some(t => t.id === initialTab) ? initialTab : 'general';
 
     modal.innerHTML = `
-      <header style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid rgba(202,211,245,0.08);background:#0B0B0E;">
+      <header style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--agy-border, rgba(202,211,245,0.08));background:var(--agy-bg, #0B0B0E);">
         <div style="display:flex;align-items:center;gap:8px;">
-          <span style="font-size:14px;font-weight:600;color:#CAD3F5;">Antigravity<span style="color:#A0A3F6;margin-left:0;">Enhanced</span></span>
-          <span id="ag-cc-modal-subtitle" style="font-size:11px;color:#818BA8;font-variant-numeric:tabular-nums;">${escapeHtml(sInit.modalTitle)} · v${ENHANCER_CURRENT_VERSION}</span>
+          <span style="font-size:14px;font-weight:600;color:var(--agy-fg, #CAD3F5);">Antigravity<span style="color:var(--agy-accent, #A0A3F6);margin-left:0;">Enhanced</span></span>
+          <span id="ag-cc-modal-subtitle" style="font-size:11px;color:var(--agy-fg-muted, #818BA8);font-variant-numeric:tabular-nums;">${escapeHtml(sInit.modalTitle)} · v${ENHANCER_CURRENT_VERSION}</span>
         </div>
-        <button id="ag-cc-close" type="button" class="agy-enh-btn" style="background:#181A22;border:1px solid rgba(202,211,245,0.1);color:#CAD3F5;border-radius:6px;width:24px;height:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;line-height:1;">×</button>
+        <button id="ag-cc-close" type="button" class="agy-enh-btn" style="background:var(--agy-surface-2, #181A22);border:1px solid var(--agy-border, rgba(202,211,245,0.1));color:var(--agy-fg, #CAD3F5);border-radius:6px;width:24px;height:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;line-height:1;">×</button>
       </header>
-      <div id="ag-cc-tabs" style="position:relative;display:flex;gap:4px;padding:8px 14px;border-bottom:1px solid rgba(202,211,245,0.08);background:#0B0B0E;">
-        <span id="ag-cc-tab-pill" style="display:block;position:absolute;top:8px;bottom:8px;left:14px;width:0;border-radius:6px;background:rgba(160,163,246,0.14);border:1px solid rgba(160,163,246,0.22);pointer-events:none;z-index:0;"></span>
+      <div id="ag-cc-tabs" style="position:relative;display:flex;gap:4px;padding:8px 14px;border-bottom:1px solid var(--agy-border, rgba(202,211,245,0.08));background:var(--agy-bg, #0B0B0E);">
+        <span id="ag-cc-tab-pill" style="display:block;position:absolute;top:8px;bottom:8px;left:14px;width:0;border-radius:6px;background:var(--agy-accent-soft, rgba(160,163,246,0.14));border:1px solid var(--agy-accent-border, rgba(160,163,246,0.22));pointer-events:none;z-index:0;"></span>
         ${tabs.map(t => `<button type="button" data-tab="${t.id}" class="ag-cc-tab" style="position:relative;z-index:1;padding:6px 12px;border-radius:6px;border:none;background:transparent;cursor:pointer;font-size:12px;font-weight:500;transition:color 140ms ease;">${t.label}</button>`).join('')}
       </div>
-      <div id="ag-cc-body" style="padding:14px 16px;height:auto;max-height:min(68vh, 560px);overflow-y:auto;overflow-x:hidden;scrollbar-gutter:stable;display:flex;flex-direction:column;gap:10px;background:#0B0B0E;"></div>
+      <div id="ag-cc-body" style="padding:14px 16px;height:auto;max-height:min(68vh, 560px);overflow-y:auto;overflow-x:hidden;scrollbar-gutter:stable;display:flex;flex-direction:column;gap:10px;background:var(--agy-bg, #0B0B0E);"></div>
     `;
 
     bd.appendChild(modal);
@@ -1636,6 +1877,7 @@
     };
 
     bd.onclick = (e) => { if (e.target === bd) { cleanupRecorder(); closeControlCenterModal(false); } };
+    modal.onclick = (e) => { if (e && e.stopPropagation) e.stopPropagation(); };
     const closeBtn = modal.querySelector('#ag-cc-close');
     if (closeBtn) closeBtn.onclick = () => { cleanupRecorder(); closeControlCenterModal(false); };
 
@@ -1651,20 +1893,20 @@
     const formatReleaseNotesHtml = (rawText) => {
       const lines = String(rawText || '').replace(/\r\n/g, '\n').split('\n');
       const formatInline = (text) => escapeHtml(text)
-        .replace(/\*\*([^*]+)\*\*/g, '<strong style="color:#CAD3F5;font-weight:600;">$1</strong>')
-        .replace(/`([^`]+)`/g, '<code style="background:rgba(160,163,246,0.14);color:#A0A3F6;padding:1px 4px;border-radius:4px;font-family:monospace;font-size:10.5px;">$1</code>');
+        .replace(/\*\*([^*]+)\*\*/g, '<strong style="color:var(--agy-fg, #CAD3F5);font-weight:600;">$1</strong>')
+        .replace(/`([^`]+)`/g, '<code style="background:var(--agy-accent-soft, rgba(160,163,246,0.14));color:var(--agy-accent, #A0A3F6);padding:1px 4px;border-radius:4px;font-family:monospace;font-size:10.5px;">$1</code>');
       const htmlParts = [];
       for (const rawLine of lines) {
         const line = rawLine.trim();
         if (!line || line === '---') continue;
         const hMatch = line.match(/^#{1,3}\s+(.+)$/);
         if (hMatch) {
-          htmlParts.push(`<p style="margin:6px 0 2px;font-size:11.5px;font-weight:600;color:#A0A3F6;">${formatInline(hMatch[1])}</p>`);
+          htmlParts.push(`<p style="margin:6px 0 2px;font-size:11.5px;font-weight:600;color:var(--agy-accent, #A0A3F6);">${formatInline(hMatch[1])}</p>`);
         } else if (/^[-*•]\s+/.test(line)) {
           const itemText = line.replace(/^[-*•]\s+/, '');
-          htmlParts.push(`<p style="margin:2px 0;padding-left:10px;position:relative;color:#CAD3F5;"><span style="position:absolute;left:0;color:#A0A3F6;">•</span>${formatInline(itemText)}</p>`);
+          htmlParts.push(`<p style="margin:2px 0;padding-left:10px;position:relative;color:var(--agy-fg, #CAD3F5);"><span style="position:absolute;left:0;color:var(--agy-accent, #A0A3F6);">•</span>${formatInline(itemText)}</p>`);
         } else {
-          htmlParts.push(`<p style="margin:2px 0;color:#CAD3F5;">${formatInline(line)}</p>`);
+          htmlParts.push(`<p style="margin:2px 0;color:var(--agy-fg, #CAD3F5);">${formatInline(line)}</p>`);
         }
       }
       return htmlParts.join('');
@@ -1753,7 +1995,7 @@
         if (s.tabs[tKey]) b.textContent = s.tabs[tKey];
         const active = tKey === currentTab;
         if (active) activeBtn = b;
-        b.style.color = active ? '#A0A3F6' : '#9DA7C7';
+        b.style.color = active ? 'var(--agy-accent, #A0A3F6)' : 'var(--agy-fg-secondary, #9DA7C7)';
       });
       moveTabPill(activeBtn, animateSlide);
       if (!bodyEl) return;
@@ -1769,20 +2011,20 @@
             if (!listEl) return;
             const sections = parseChangelogSections(mdText);
             if (sections.length === 0) {
-              listEl.innerHTML = `<p style="margin:12px 0;font-size:12px;color:#818BA8;text-align:center;">${escapeHtml(s.changelogEmpty)}</p>`;
+              listEl.innerHTML = `<p style="margin:12px 0;font-size:12px;color:var(--agy-fg-muted, #818BA8);text-align:center;">${escapeHtml(s.changelogEmpty)}</p>`;
               return;
             }
             listEl.innerHTML = sections.map((sec, idx) => {
               const isLatest = idx === 0;
-              const badgeHtml = isLatest ? `<span style="font-size:10px;font-weight:600;padding:1px 6px;border-radius:9999px;background:rgba(160,163,246,0.18);color:#A0A3F6;margin-left:6px;">LATEST</span>` : '';
-              const dateHtml = sec.date ? `<span style="font-size:11px;color:#818BA8;font-variant-numeric:tabular-nums;">${escapeHtml(sec.date)}</span>` : '';
+              const badgeHtml = isLatest ? `<span style="font-size:10px;font-weight:600;padding:1px 6px;border-radius:9999px;background:var(--agy-accent-soft, rgba(160,163,246,0.18));color:var(--agy-accent, #A0A3F6);margin-left:6px;">LATEST</span>` : '';
+              const dateHtml = sec.date ? `<span style="font-size:11px;color:var(--agy-fg-muted, #818BA8);font-variant-numeric:tabular-nums;">${escapeHtml(sec.date)}</span>` : '';
               return `
-                <article class="agy-changelog-card" style="flex-shrink:0;background:#0B0B0E;border:1px solid rgba(202,211,245,0.09);border-radius:8px;overflow:hidden;">
-                  <button type="button" class="agy-changelog-toggle" data-idx="${idx}" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:transparent;border:none;color:#CAD3F5;cursor:pointer;text-align:left;">
+                <article class="agy-changelog-card" style="flex-shrink:0;background:var(--agy-bg, #0B0B0E);border:1px solid var(--agy-border, rgba(202,211,245,0.09));border-radius:8px;overflow:hidden;">
+                  <button type="button" class="agy-changelog-toggle" data-idx="${idx}" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:transparent;border:none;color:var(--agy-fg, #CAD3F5);cursor:pointer;text-align:left;">
                     <span style="font-size:12.5px;font-weight:600;font-variant-numeric:tabular-nums;">v${escapeHtml(sec.version)}${badgeHtml}</span>
                     ${dateHtml}
                   </button>
-                  <div class="agy-changelog-body" style="display:${isLatest ? 'block' : 'none'};padding:6px 10px 8px;border-top:1px solid rgba(202,211,245,0.06);font-size:11.5px;line-height:1.52;">
+                  <div class="agy-changelog-body" style="display:${isLatest ? 'block' : 'none'};padding:6px 10px 8px;border-top:1px solid var(--agy-border, rgba(202,211,245,0.06));font-size:11.5px;line-height:1.52;">
                     ${formatReleaseNotesHtml(sec.body)}
                   </div>
                 </article>
@@ -1802,13 +2044,13 @@
           };
 
           bodyEl.innerHTML = `
-            <section id="agy-hub-changelog-view" style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;flex-shrink:0;">
-              <header style="display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:1px solid rgba(202,211,245,0.08);padding-bottom:8px;">
-                <strong style="font-size:13px;font-weight:600;color:#CAD3F5;">${escapeHtml(s.changelogTitle)}</strong>
-                <button type="button" id="agy-hub-changelog-back" class="agy-enh-btn" style="height:24px;padding:0 10px;border-radius:6px;background:#181A22;border:1px solid rgba(202,211,245,0.1);color:#CAD3F5;font-size:11px;cursor:pointer;">← ${escapeHtml(s.changelogBack)}</button>
+            <section id="agy-hub-changelog-view" style="background:var(--agy-surface, #111217);border:1px solid var(--agy-border, rgba(202,211,245,0.08));border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;flex-shrink:0;">
+              <header style="display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:1px solid var(--agy-border, rgba(202,211,245,0.08));padding-bottom:8px;">
+                <strong style="font-size:13px;font-weight:600;color:var(--agy-fg, #CAD3F5);">${escapeHtml(s.changelogTitle)}</strong>
+                <button type="button" id="agy-hub-changelog-back" class="agy-enh-btn" style="height:24px;padding:0 10px;border-radius:6px;background:var(--agy-surface-2, #181A22);border:1px solid var(--agy-border, rgba(202,211,245,0.1));color:var(--agy-fg, #CAD3F5);font-size:11px;cursor:pointer;">← ${escapeHtml(s.changelogBack)}</button>
               </header>
               <main id="agy-hub-changelog-list" style="display:flex;flex-direction:column;gap:8px;">
-                <p style="margin:12px 0;font-size:12px;color:#818BA8;text-align:center;">${escapeHtml(h.checking)}</p>
+                <p style="margin:12px 0;font-size:12px;color:var(--agy-fg-muted, #818BA8);text-align:center;">${escapeHtml(h.checking)}</p>
               </main>
             </section>
           `;
@@ -1837,12 +2079,12 @@
 
         if (restoreConfirmOpen) {
           bodyEl.innerHTML = `
-            <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:12px;">
-              <div style="font-size:13px;font-weight:600;color:#CAD3F5;">${escapeHtml(h.restoreConfirmTitle)}</div>
-              <p style="margin:0;font-size:12px;color:#9DA7C7;line-height:1.55;">${escapeHtml(h.restoreConfirmDesc)}</p>
-              <div style="display:flex;justify-content:flex-end;gap:8px;padding-top:8px;border-top:1px solid rgba(202,211,245,0.08);">
-                <button type="button" id="agy-hub-cancel-restore" class="agy-enh-btn" style="height:28px;padding:0 12px;border-radius:6px;background:#181A22;border:1px solid rgba(202,211,245,0.1);color:#CAD3F5;font-size:12px;font-weight:500;cursor:pointer;">${escapeHtml(h.cancelBtn)}</button>
-                <button type="button" id="agy-hub-confirm-restore" class="agy-enh-primary" style="height:28px;padding:0 12px;border-radius:6px;background:#A0A3F6;border:none;color:#0B0B0E;font-size:12px;font-weight:600;cursor:pointer;">${escapeHtml(h.restoreVanilla)}</button>
+            <div style="background:var(--agy-surface, #111217);border:1px solid var(--agy-border, rgba(202,211,245,0.08));border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:12px;">
+              <div style="font-size:13px;font-weight:600;color:var(--agy-fg, #CAD3F5);">${escapeHtml(h.restoreConfirmTitle)}</div>
+              <p style="margin:0;font-size:12px;color:var(--agy-fg-secondary, #9DA7C7);line-height:1.55;">${escapeHtml(h.restoreConfirmDesc)}</p>
+              <div style="display:flex;justify-content:flex-end;gap:8px;padding-top:8px;border-top:1px solid var(--agy-border, rgba(202,211,245,0.08));">
+                <button type="button" id="agy-hub-cancel-restore" class="agy-enh-btn" style="height:28px;padding:0 12px;border-radius:6px;background:var(--agy-surface-2, #181A22);border:1px solid var(--agy-border, rgba(202,211,245,0.1));color:var(--agy-fg, #CAD3F5);font-size:12px;font-weight:500;cursor:pointer;">${escapeHtml(h.cancelBtn)}</button>
+                <button type="button" id="agy-hub-confirm-restore" class="agy-enh-primary" style="height:28px;padding:0 12px;border-radius:6px;background:var(--agy-accent, #A0A3F6);border:none;color:var(--agy-accent-fg, #0B0B0E);font-size:12px;font-weight:600;cursor:pointer;">${escapeHtml(h.restoreVanilla)}</button>
               </div>
             </div>
           `;
@@ -1862,39 +2104,39 @@
           const info = LANG_DISPLAY_NAMES[l] || { native: l, en: l };
           const labelText = (l === 'en') ? 'English (English)' : `${info.native} (${info.en})`;
           const isSel = activeLanguage === l;
-          return `<div class="agy-overlay-item" data-cc-lang="${l}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px;border-radius:6px;font-size:12px;cursor:pointer;color:${isSel ? '#CAD3F5' : '#9DA7C7'};font-weight:${isSel ? '600' : '400'};"><span>${escapeHtml(labelText)}</span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#A0A3F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:${isSel ? 'block' : 'none'};"><polyline points="20 6 9 17 4 12"></polyline></svg></div>`;
+          return `<div class="agy-overlay-item" data-cc-lang="${l}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px;border-radius:6px;font-size:12px;cursor:pointer;color:${isSel ? 'var(--agy-fg, #CAD3F5)' : 'var(--agy-fg-secondary, #9DA7C7)'};font-weight:${isSel ? '600' : '400'};"><span>${escapeHtml(labelText)}</span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--agy-accent, #A0A3F6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:${isSel ? 'block' : 'none'};"><polyline points="20 6 9 17 4 12"></polyline></svg></div>`;
         }).join('');
         bodyEl.innerHTML = `
-          <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:12px;overflow:visible;">
+          <div style="background:var(--agy-surface, #111217);border:1px solid var(--agy-border, rgba(202,211,245,0.08));border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:12px;overflow:visible;">
             <div>
-              <div style="font-size:13px;font-weight:500;color:#CAD3F5;">${escapeHtml(s.ifaceLang)}</div>
-              <div style="font-size:11px;color:#818BA8;margin-top:2px;">${escapeHtml(s.ifaceDesc)}</div>
+              <div style="font-size:13px;font-weight:500;color:var(--agy-fg, #CAD3F5);">${escapeHtml(s.ifaceLang)}</div>
+              <div style="font-size:11px;color:var(--agy-fg-muted, #818BA8);margin-top:2px;">${escapeHtml(s.ifaceDesc)}</div>
             </div>
             <div style="position:relative;flex-shrink:0;">
-              <button type="button" id="ag-cc-lang-trigger" class="agy-enh-btn" style="background:#181A22;color:#CAD3F5;border:1px solid rgba(202,211,245,0.1);border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:8px;min-width:168px;justify-content:space-between;">
+              <button type="button" id="ag-cc-lang-trigger" class="agy-enh-btn" style="background:var(--agy-surface-2, #181A22);color:var(--agy-fg, #CAD3F5);border:1px solid var(--agy-border, rgba(202,211,245,0.1));border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:8px;min-width:168px;justify-content:space-between;">
                 <span id="ag-cc-lang-label" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(curLabel)}</span>
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.7;flex-shrink:0;"><polyline points="6 9 12 15 18 9"></polyline></svg>
               </button>
-              <div id="ag-cc-lang-menu" class="agy-overlay" style="display:none;position:absolute;right:0;top:calc(100% + 4px);z-index:100010;background:#111217;border:1px solid rgba(202,211,245,0.1);box-shadow:0 8px 24px rgba(0,0,0,0.48);border-radius:10px;padding:4px;min-width:190px;max-height:220px;overflow-y:auto;flex-direction:column;gap:2px;">${langMenuItems}</div>
+              <div id="ag-cc-lang-menu" class="agy-overlay" style="display:none;position:absolute;right:0;top:calc(100% + 4px);z-index:100010;background:var(--agy-surface, #111217);border:1px solid var(--agy-border, rgba(202,211,245,0.1));box-shadow:var(--agy-shadow-sm, 0 8px 24px rgba(0,0,0,0.48));border-radius:10px;padding:4px;min-width:190px;max-height:220px;overflow-y:auto;flex-direction:column;gap:2px;">${langMenuItems}</div>
             </div>
           </div>
-          <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;">
+          <div style="background:var(--agy-surface, #111217);border:1px solid var(--agy-border, rgba(202,211,245,0.08));border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-              <strong style="font-size:13px;font-weight:500;color:#CAD3F5;">${escapeHtml(h.updateSection)} <small style="font-size:11px;font-weight:400;color:#818BA8;font-variant-numeric:tabular-nums;">v${ENHANCER_CURRENT_VERSION}</small></strong>
-              <button id="agy-hub-check-btn" type="button" class="agy-enh-btn" style="height:24px;padding:0 10px;border-radius:6px;background:rgba(160,163,246,0.14);border:1px solid rgba(160,163,246,0.32);color:#A0A3F6;font-size:11px;font-weight:500;cursor:pointer;">${escapeHtml(h.checkBtn)}</button>
+              <strong style="font-size:13px;font-weight:500;color:var(--agy-fg, #CAD3F5);">${escapeHtml(h.updateSection)} <small style="font-size:11px;font-weight:400;color:var(--agy-fg-muted, #818BA8);font-variant-numeric:tabular-nums;">v${ENHANCER_CURRENT_VERSION}</small></strong>
+              <button id="agy-hub-check-btn" type="button" class="agy-enh-btn" style="height:24px;padding:0 10px;border-radius:6px;background:var(--agy-accent-soft, rgba(160,163,246,0.14));border:1px solid var(--agy-accent-border, rgba(160,163,246,0.32));color:var(--agy-accent, #A0A3F6);font-size:11px;font-weight:500;cursor:pointer;">${escapeHtml(h.checkBtn)}</button>
             </div>
-            <p id="agy-hub-update-status" style="margin:0;font-size:12px;color:#9DA7C7;line-height:1.45;"></p>
+            <p id="agy-hub-update-status" style="margin:0;font-size:12px;color:var(--agy-fg-secondary, #9DA7C7);line-height:1.45;"></p>
             <aside id="agy-hub-progress-wrap" style="display:none;">
-              <div style="height:4px;border-radius:9999px;background:rgba(202,211,245,0.1);overflow:hidden;">
-                <span id="agy-hub-progress-bar" style="display:block;width:0%;height:100%;background:#A0A3F6;border-radius:9999px;"></span>
+              <div style="height:4px;border-radius:9999px;background:var(--agy-border, rgba(202,211,245,0.1));overflow:hidden;">
+                <span id="agy-hub-progress-bar" style="display:block;width:0%;height:100%;background:var(--agy-accent, #A0A3F6);border-radius:9999px;"></span>
               </div>
-              <p id="agy-hub-progress-text" style="margin:4px 0 0;font-size:11px;color:#818BA8;font-variant-numeric:tabular-nums;"></p>
+              <p id="agy-hub-progress-text" style="margin:4px 0 0;font-size:11px;color:var(--agy-fg-muted, #818BA8);font-variant-numeric:tabular-nums;"></p>
             </aside>
             <div id="agy-hub-update-actions" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;">
               <span id="agy-hub-apply-slot" style="display:flex;gap:8px;"></span>
               <span style="display:flex;gap:6px;align-items:center;">
-                <button id="agy-hub-changelog-btn" type="button" class="agy-enh-btn" style="height:26px;padding:0 10px;border-radius:6px;background:#181A22;border:1px solid rgba(202,211,245,0.1);color:#CAD3F5;font-size:11px;font-weight:500;cursor:pointer;">${escapeHtml(s.changelogBtn)}</button>
-                <button id="agy-hub-vanilla-btn" type="button" class="agy-enh-btn" style="height:26px;padding:0 10px;border-radius:6px;background:#181A22;border:1px solid rgba(202,211,245,0.1);color:#CAD3F5;font-size:11px;font-weight:500;cursor:pointer;">${escapeHtml(h.restoreVanilla)}</button>
+                <button id="agy-hub-changelog-btn" type="button" class="agy-enh-btn" style="height:26px;padding:0 10px;border-radius:6px;background:var(--agy-surface-2, #181A22);border:1px solid var(--agy-border, rgba(202,211,245,0.1));color:var(--agy-fg, #CAD3F5);font-size:11px;font-weight:500;cursor:pointer;">${escapeHtml(s.changelogBtn)}</button>
+                <button id="agy-hub-vanilla-btn" type="button" class="agy-enh-btn" style="height:26px;padding:0 10px;border-radius:6px;background:var(--agy-surface-2, #181A22);border:1px solid var(--agy-border, rgba(202,211,245,0.1));color:var(--agy-fg, #CAD3F5);font-size:11px;font-weight:500;cursor:pointer;">${escapeHtml(h.restoreVanilla)}</button>
               </span>
             </div>
           </div>
@@ -1937,26 +2179,26 @@
             return;
           }
           if (!info.ok) {
-            updateStatusEl.innerHTML = `<span style="color:#E56B6F;">${escapeHtml(info.error || 'Error checking updates')}</span>`;
+            updateStatusEl.innerHTML = `<span style="color:var(--agy-danger, #E56B6F);">${escapeHtml(info.error || 'Error checking updates')}</span>`;
             return;
           }
           if (!info.hasUpdate) {
-            updateStatusEl.innerHTML = `<span style="color:#A0A3F6;font-variant-numeric:tabular-nums;">${escapeHtml(h.upToDate)} (v${escapeHtml(info.currentVersion)})</span>`;
+            updateStatusEl.innerHTML = `<span style="color:var(--agy-accent, #A0A3F6);font-variant-numeric:tabular-nums;">${escapeHtml(h.upToDate)} (v${escapeHtml(info.currentVersion)})</span>`;
             return;
           }
           const i18nMap = (info && info.releaseNotesI18n && typeof info.releaseNotesI18n === 'object') ? info.releaseNotesI18n : null;
           const localizedNotes = (i18nMap && (i18nMap[activeLanguage] || i18nMap.en)) || info.releaseNotes || '';
           const notesHtml = localizedNotes
-            ? `<div id="agy-hub-release-notes" style="margin-top:6px;padding:8px 10px;border-radius:8px;background:#0B0B0E;border:1px solid rgba(202,211,245,0.1);font-size:11px;color:#CAD3F5;max-height:110px;overflow-y:auto;line-height:1.48;">${formatReleaseNotesHtml(localizedNotes)}</div>`
+            ? `<div id="agy-hub-release-notes" style="margin-top:6px;padding:8px 10px;border-radius:8px;background:var(--agy-bg, #0B0B0E);border:1px solid var(--agy-border, rgba(202,211,245,0.1));font-size:11px;color:var(--agy-fg, #CAD3F5);max-height:110px;overflow-y:auto;line-height:1.48;">${formatReleaseNotesHtml(localizedNotes)}</div>`
             : '';
-          updateStatusEl.innerHTML = `<span style="color:#A0A3F6;font-weight:600;font-variant-numeric:tabular-nums;">${escapeHtml(h.availPrefix)}v${escapeHtml(info.currentVersion)} → v${escapeHtml(info.remoteVersion)}</span>${notesHtml}`;
+          updateStatusEl.innerHTML = `<span style="color:var(--agy-accent, #A0A3F6);font-weight:600;font-variant-numeric:tabular-nums;">${escapeHtml(h.availPrefix)}v${escapeHtml(info.currentVersion)} → v${escapeHtml(info.remoteVersion)}</span>${notesHtml}`;
 
           if (info.canApplyInApp) {
             const applyBtn = document.createElement('button');
             applyBtn.type = 'button';
             applyBtn.className = 'agy-enh-primary';
             applyBtn.textContent = h.updateNow;
-            applyBtn.style.cssText = 'height:26px;padding:0 12px;border-radius:6px;background:#A0A3F6;border:none;color:#0B0B0E;font-size:11px;font-weight:600;cursor:pointer;';
+            applyBtn.style.cssText = 'height:26px;padding:0 12px;border-radius:6px;background:var(--agy-accent, #A0A3F6);border:none;color:var(--agy-accent-fg, #0B0B0E);font-size:11px;font-weight:600;cursor:pointer;';
             applyBtn.onclick = async () => {
               applyBtn.disabled = true;
               applyBtn.textContent = h.updating;
@@ -1967,7 +2209,7 @@
                 injectEnhancerUpdatePill();
                 scheduleInjectTitleMenuIntegration();
                 if (progBar) progBar.style.width = '100%';
-                updateStatusEl.innerHTML = `<span style="color:#A0A3F6;font-weight:600;font-variant-numeric:tabular-nums;">v${escapeHtml(res.newVersion)}${escapeHtml(h.updateDoneSuffix)}</span>`;
+                updateStatusEl.innerHTML = `<span style="color:var(--agy-accent, #A0A3F6);font-weight:600;font-variant-numeric:tabular-nums;">v${escapeHtml(res.newVersion)}${escapeHtml(h.updateDoneSuffix)}</span>`;
                 applySlotEl.innerHTML = '';
                 const relaunchRes = ipc && ipc.invoke ? await ipc.invoke('enhancer:relaunch') : null;
                 if (!(relaunchRes && relaunchRes.ok)) {
@@ -1975,14 +2217,14 @@
                   relaunchBtn.type = 'button';
                   relaunchBtn.className = 'agy-enh-primary';
                   relaunchBtn.textContent = h.relaunchNow;
-                  relaunchBtn.style.cssText = 'height:26px;padding:0 12px;border-radius:6px;background:#A0A3F6;border:none;color:#0B0B0E;font-size:11px;font-weight:600;cursor:pointer;';
+                  relaunchBtn.style.cssText = 'height:26px;padding:0 12px;border-radius:6px;background:var(--agy-accent, #A0A3F6);border:none;color:var(--agy-accent-fg, #0B0B0E);font-size:11px;font-weight:600;cursor:pointer;';
                   relaunchBtn.onclick = () => ipc && ipc.invoke && ipc.invoke('enhancer:relaunch');
                   applySlotEl.appendChild(relaunchBtn);
                 }
               } else {
                 applyBtn.disabled = false;
                 applyBtn.textContent = h.retryBtn;
-                updateStatusEl.innerHTML = `<span style="color:#E56B6F;">${escapeHtml((res && res.error) || 'Update failed')}</span>`;
+                updateStatusEl.innerHTML = `<span style="color:var(--agy-danger, #E56B6F);">${escapeHtml((res && res.error) || 'Update failed')}</span>`;
               }
             };
             applySlotEl.appendChild(applyBtn);
@@ -1991,7 +2233,7 @@
             releaseBtn.type = 'button';
             releaseBtn.className = 'agy-enh-primary';
             releaseBtn.textContent = `${h.updateNow} ↗`;
-            releaseBtn.style.cssText = 'height:26px;padding:0 12px;border-radius:6px;background:#A0A3F6;border:none;color:#0B0B0E;font-size:11px;font-weight:600;cursor:pointer;';
+            releaseBtn.style.cssText = 'height:26px;padding:0 12px;border-radius:6px;background:var(--agy-accent, #A0A3F6);border:none;color:var(--agy-accent-fg, #0B0B0E);font-size:11px;font-weight:600;cursor:pointer;';
             releaseBtn.onclick = () => {
               try { window.open(info.releasePageUrl, '_blank', 'noopener,noreferrer'); } catch { }
             };
@@ -2040,50 +2282,50 @@
             ? entries.filter(([src, dst]) => src.toLowerCase().includes(normF) || dst.toLowerCase().includes(normF))
             : entries;
           if (filtered.length === 0) {
-            return `<div style="font-size:12px;color:#818BA8;">${escapeHtml(s.noGlossary)}</div>`;
+            return `<div style="font-size:12px;color:var(--agy-fg-muted, #818BA8);">${escapeHtml(s.noGlossary)}</div>`;
           }
-          return filtered.map(([src, dst]) => `<div class="ag-cc-gl-row" data-gl-src="${escapeHtml(src)}" data-gl-dst="${escapeHtml(dst)}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px;background:#181A22;border:1px solid rgba(202,211,245,0.06);border-radius:6px;font-size:12px;cursor:pointer;" title="Click to edit"><span style="color:#9DA7C7;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(src)}</span><span style="color:#818BA8;">→</span><span style="color:#CAD3F5;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(dst)}</span><button type="button" data-del="${escapeHtml(src)}" class="ag-cc-del-glossary" style="background:none;border:none;color:#E56B6F;cursor:pointer;font-size:12px;">✕</button></div>`).join('');
+          return filtered.map(([src, dst]) => `<div class="ag-cc-gl-row" data-gl-src="${escapeHtml(src)}" data-gl-dst="${escapeHtml(dst)}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px;background:var(--agy-surface-2, #181A22);border:1px solid var(--agy-border, rgba(202,211,245,0.06));border-radius:6px;font-size:12px;cursor:pointer;" title="Click to edit"><span style="color:var(--agy-fg-secondary, #9DA7C7);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(src)}</span><span style="color:var(--agy-fg-muted, #818BA8);">→</span><span style="color:var(--agy-fg, #CAD3F5);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(dst)}</span><button type="button" data-del="${escapeHtml(src)}" class="ag-cc-del-glossary" style="background:none;border:none;color:var(--agy-danger, #E56B6F);cursor:pointer;font-size:12px;">✕</button></div>`).join('');
         };
         const filterInputHtml = entries.length > 6
-          ? `<input id="ag-cc-gl-filter" placeholder="Filter..." style="width:100%;background:#181A22;color:#CAD3F5;border:1px solid rgba(202,211,245,0.08);border-radius:6px;padding:4px 8px;font-size:11px;box-sizing:border-box;" />`
+          ? `<input id="ag-cc-gl-filter" placeholder="Filter..." style="width:100%;background:var(--agy-surface-2, #181A22);color:var(--agy-fg, #CAD3F5);border:1px solid var(--agy-border, rgba(202,211,245,0.08));border-radius:6px;padding:4px 8px;font-size:11px;box-sizing:border-box;" />`
           : '';
         bodyEl.innerHTML = `
-          <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;">
+          <div style="background:var(--agy-surface, #111217);border:1px solid var(--agy-border, rgba(202,211,245,0.08));border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;">
             <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-              <div style="font-size:13px;font-weight:500;color:#CAD3F5;">${escapeHtml(s.glossaryTitle)} (${activeLanguage.toUpperCase()})</div>
+              <div style="font-size:13px;font-weight:500;color:var(--agy-fg, #CAD3F5);">${escapeHtml(s.glossaryTitle)} (${activeLanguage.toUpperCase()})</div>
               <div style="display:flex;gap:6px;">
-                <button type="button" id="ag-cc-gl-export" class="agy-enh-btn" style="background:#181A22;color:#CAD3F5;border:1px solid rgba(202,211,245,0.1);border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;">${escapeHtml(s.exportJson)}</button>
-                <button type="button" id="ag-cc-gl-import" class="agy-enh-btn" style="background:#181A22;color:#CAD3F5;border:1px solid rgba(202,211,245,0.1);border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;">${escapeHtml(s.importJson)}</button>
+                <button type="button" id="ag-cc-gl-export" class="agy-enh-btn" style="background:var(--agy-surface-2, #181A22);color:var(--agy-fg, #CAD3F5);border:1px solid var(--agy-border, rgba(202,211,245,0.1));border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;">${escapeHtml(s.exportJson)}</button>
+                <button type="button" id="ag-cc-gl-import" class="agy-enh-btn" style="background:var(--agy-surface-2, #181A22);color:var(--agy-fg, #CAD3F5);border:1px solid var(--agy-border, rgba(202,211,245,0.1));border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;">${escapeHtml(s.importJson)}</button>
               </div>
             </div>
             <div id="ag-cc-gl-import-box" style="display:none;flex-direction:column;gap:6px;">
-              <textarea id="ag-cc-gl-import-txt" rows="2" placeholder='{"Settings":"설정"}' style="background:#181A22;color:#CAD3F5;border:1px solid rgba(202,211,245,0.1);border-radius:6px;padding:6px 8px;font-size:11px;font-family:monospace;"></textarea>
-              <button type="button" id="ag-cc-gl-import-apply" class="agy-enh-primary" style="align-self:flex-end;background:#A0A3F6;color:#0B0B0E;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;">${escapeHtml(s.apply)}</button>
+              <textarea id="ag-cc-gl-import-txt" rows="2" placeholder='{"Settings":"설정"}' style="background:var(--agy-surface-2, #181A22);color:var(--agy-fg, #CAD3F5);border:1px solid var(--agy-border, rgba(202,211,245,0.1));border-radius:6px;padding:6px 8px;font-size:11px;font-family:monospace;"></textarea>
+              <button type="button" id="ag-cc-gl-import-apply" class="agy-enh-primary" style="align-self:flex-end;background:var(--agy-accent, #A0A3F6);color:var(--agy-accent-fg, #0B0B0E);border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;">${escapeHtml(s.apply)}</button>
             </div>
             <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:6px;align-items:center;">
-              <input id="ag-cc-gl-src" placeholder="${escapeHtml(s.srcPh)}" style="width:100%;min-width:0;background:#181A22;color:#CAD3F5;border:1px solid rgba(202,211,245,0.1);border-radius:6px;padding:5px 8px;font-size:12px;box-sizing:border-box;transition:border-color 140ms ease;" />
-              <input id="ag-cc-gl-dst" placeholder="${escapeHtml(s.dstPh)}" style="width:100%;min-width:0;background:#181A22;color:#CAD3F5;border:1px solid rgba(202,211,245,0.1);border-radius:6px;padding:5px 8px;font-size:12px;box-sizing:border-box;transition:border-color 140ms ease;" />
-              <button type="button" id="ag-cc-gl-add" class="agy-enh-primary" style="flex-shrink:0;white-space:nowrap;background:#A0A3F6;color:#0B0B0E;border:none;border-radius:6px;padding:0 12px;height:28px;font-size:12px;font-weight:600;cursor:pointer;">${escapeHtml(s.add)}</button>
+              <input id="ag-cc-gl-src" placeholder="${escapeHtml(s.srcPh)}" style="width:100%;min-width:0;background:var(--agy-surface-2, #181A22);color:var(--agy-fg, #CAD3F5);border:1px solid var(--agy-border, rgba(202,211,245,0.1));border-radius:6px;padding:5px 8px;font-size:12px;box-sizing:border-box;transition:border-color 140ms ease;" />
+              <input id="ag-cc-gl-dst" placeholder="${escapeHtml(s.dstPh)}" style="width:100%;min-width:0;background:var(--agy-surface-2, #181A22);color:var(--agy-fg, #CAD3F5);border:1px solid var(--agy-border, rgba(202,211,245,0.1));border-radius:6px;padding:5px 8px;font-size:12px;box-sizing:border-box;transition:border-color 140ms ease;" />
+              <button type="button" id="ag-cc-gl-add" class="agy-enh-primary" style="flex-shrink:0;white-space:nowrap;background:var(--agy-accent, #A0A3F6);color:var(--agy-accent-fg, #0B0B0E);border:none;border-radius:6px;padding:0 12px;height:28px;font-size:12px;font-weight:600;cursor:pointer;">${escapeHtml(s.add)}</button>
             </div>
             ${filterInputHtml}
             <div id="ag-cc-gl-rows" style="display:flex;flex-direction:column;gap:4px;max-height:84px;overflow-y:auto;">${renderGlossaryRows('')}</div>
           </div>
-          <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;">
+          <div style="background:var(--agy-surface, #111217);border:1px solid var(--agy-border, rgba(202,211,245,0.08));border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;">
             <div style="display:flex;justify-content:space-between;align-items:center;">
               <div>
-                <div style="font-size:13px;font-weight:500;color:#CAD3F5;">${escapeHtml(s.collectUt)}</div>
-                <div style="font-size:11px;color:#818BA8;margin-top:2px;">${escapeHtml(s.collectUtDesc)}</div>
+                <div style="font-size:13px;font-weight:500;color:var(--agy-fg, #CAD3F5);">${escapeHtml(s.collectUt)}</div>
+                <div style="font-size:11px;color:var(--agy-fg-muted, #818BA8);margin-top:2px;">${escapeHtml(s.collectUtDesc)}</div>
               </div>
               ${renderNativeSwitch('ag-cc-ut-toggle', userPreferences.collectUntranslated)}
             </div>
-            <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(202,211,245,0.06);padding-top:8px;">
-              <span style="font-size:12px;color:#9DA7C7;">${escapeHtml(s.utList)} (<b id="ag-cc-ut-count" style="color:#CAD3F5;">0</b>)</span>
+            <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--agy-border, rgba(202,211,245,0.06));padding-top:8px;">
+              <span style="font-size:12px;color:var(--agy-fg-secondary, #9DA7C7);">${escapeHtml(s.utList)} (<b id="ag-cc-ut-count" style="color:var(--agy-fg, #CAD3F5);">0</b>)</span>
               <div style="display:flex;gap:6px;">
-                <button type="button" id="ag-cc-ut-copy" class="agy-enh-btn" style="background:#181A22;color:#CAD3F5;border:1px solid rgba(202,211,245,0.1);border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;">${escapeHtml(s.copy)}</button>
-                <button type="button" id="ag-cc-ut-clear" class="agy-enh-btn" style="background:#181A22;color:#E56B6F;border:1px solid rgba(229,107,111,0.28);border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;">${escapeHtml(s.clear)}</button>
+                <button type="button" id="ag-cc-ut-copy" class="agy-enh-btn" style="background:var(--agy-surface-2, #181A22);color:var(--agy-fg, #CAD3F5);border:1px solid var(--agy-border, rgba(202,211,245,0.1));border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;">${escapeHtml(s.copy)}</button>
+                <button type="button" id="ag-cc-ut-clear" class="agy-enh-btn" style="background:var(--agy-surface-2, #181A22);color:var(--agy-danger, #E56B6F);border:1px solid var(--agy-danger-border, rgba(229,107,111,0.28));border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;">${escapeHtml(s.clear)}</button>
               </div>
             </div>
-            <div id="ag-cc-ut-list" style="max-height:64px;overflow-y:auto;font-size:11px;color:#818BA8;">${escapeHtml(s.emptyUt)}</div>
+            <div id="ag-cc-ut-list" style="max-height:64px;overflow-y:auto;font-size:11px;color:var(--agy-fg-muted, #818BA8);">${escapeHtml(s.emptyUt)}</div>
           </div>
         `;
         const addBtn = bodyEl.querySelector('#ag-cc-gl-add');
@@ -2174,7 +2416,7 @@
               if (latestUtItems.length > 0) {
                 listEl.innerHTML = latestUtItems.slice(-25).reverse().map((x) => {
                   const rawTxt = typeof x === 'string' ? x : x.text;
-                  return `<div class="ag-cc-ut-item agy-overlay-item" data-ut-src="${escapeHtml(rawTxt)}" style="padding:3px 6px;border-radius:5px;color:#9DA7C7;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;">• ${escapeHtml(rawTxt)}</div>`;
+                  return `<div class="ag-cc-ut-item agy-overlay-item" data-ut-src="${escapeHtml(rawTxt)}" style="padding:3px 6px;border-radius:5px;color:var(--agy-fg-secondary, #9DA7C7);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;">• ${escapeHtml(rawTxt)}</div>`;
                 }).join('');
                 listEl.querySelectorAll('.ag-cc-ut-item').forEach((utEl) => {
                   utEl.onclick = () => {
@@ -2182,8 +2424,8 @@
                     const dstInp = bodyEl.querySelector('#ag-cc-gl-dst');
                     if (srcInp) {
                       srcInp.value = utEl.getAttribute('data-ut-src') || '';
-                      srcInp.style.borderColor = '#A0A3F6';
-                      setTimeout(() => { srcInp.style.borderColor = 'rgba(202,211,245,0.1)'; }, 450);
+                      srcInp.style.borderColor = 'var(--agy-accent, #A0A3F6)';
+                      setTimeout(() => { srcInp.style.borderColor = 'var(--agy-border, rgba(202,211,245,0.1))'; }, 450);
                     }
                     if (dstInp && dstInp.focus) dstInp.focus();
                   };
@@ -2217,47 +2459,47 @@
         const threshVal = userPreferences.quotaLowThreshold || 20;
         const pctFill = Math.round(((threshVal - 5) / 45) * 100);
         bodyEl.innerHTML = `
-          <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">
+          <div style="background:var(--agy-surface, #111217);border:1px solid var(--agy-border, rgba(202,211,245,0.08));border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">
             <div>
-              <div style="font-size:13px;font-weight:500;color:#CAD3F5;">${escapeHtml(s.sparklines)}</div>
-              <div style="font-size:11px;color:#818BA8;margin-top:2px;">${escapeHtml(s.sparkDesc)}</div>
+              <div style="font-size:13px;font-weight:500;color:var(--agy-fg, #CAD3F5);">${escapeHtml(s.sparklines)}</div>
+              <div style="font-size:11px;color:var(--agy-fg-muted, #818BA8);margin-top:2px;">${escapeHtml(s.sparkDesc)}</div>
             </div>
             ${renderNativeSwitch('ag-cc-spark-toggle', userPreferences.showSparklines !== false)}
           </div>
-          <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">
+          <div style="background:var(--agy-surface, #111217);border:1px solid var(--agy-border, rgba(202,211,245,0.08));border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">
             <div>
-              <div style="font-size:13px;font-weight:500;color:#CAD3F5;">${escapeHtml(s.compactCard)}</div>
-              <div style="font-size:11px;color:#818BA8;margin-top:2px;">${escapeHtml(s.compactDesc)}</div>
+              <div style="font-size:13px;font-weight:500;color:var(--agy-fg, #CAD3F5);">${escapeHtml(s.compactCard)}</div>
+              <div style="font-size:11px;color:var(--agy-fg-muted, #818BA8);margin-top:2px;">${escapeHtml(s.compactDesc)}</div>
             </div>
             ${renderNativeSwitch('ag-cc-compact-toggle', userPreferences.compactQuotaCard)}
           </div>
-          <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;">
+          <div style="background:var(--agy-surface, #111217);border:1px solid var(--agy-border, rgba(202,211,245,0.08));border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;">
             <div style="display:flex;justify-content:space-between;align-items:center;">
               <div>
-                <div style="font-size:13px;font-weight:500;color:#CAD3F5;">${escapeHtml(s.lowAlert)}</div>
-                <div style="font-size:11px;color:#818BA8;margin-top:2px;">${escapeHtml(s.lowDesc)}</div>
+                <div style="font-size:13px;font-weight:500;color:var(--agy-fg, #CAD3F5);">${escapeHtml(s.lowAlert)}</div>
+                <div style="font-size:11px;color:var(--agy-fg-muted, #818BA8);margin-top:2px;">${escapeHtml(s.lowDesc)}</div>
               </div>
               ${renderNativeSwitch('ag-cc-low-alert', userPreferences.quotaAlertsEnabled)}
             </div>
-            <div style="display:flex;align-items:center;gap:10px;font-size:12px;color:#9DA7C7;">
-              <span>${escapeHtml(s.threshold)}: <b id="ag-cc-thresh-val" style="color:#CAD3F5;font-variant-numeric:tabular-nums;">${threshVal}%</b></span>
-              <input type="range" id="ag-cc-thresh-range" class="ag-cc-range" min="5" max="50" step="5" value="${threshVal}" style="flex:1;background:linear-gradient(90deg, #A0A3F6 ${pctFill}%, rgba(202,211,245,0.14) ${pctFill}%);" />
+            <div style="display:flex;align-items:center;gap:10px;font-size:12px;color:var(--agy-fg-secondary, #9DA7C7);">
+              <span>${escapeHtml(s.threshold)}: <b id="ag-cc-thresh-val" style="color:var(--agy-fg, #CAD3F5);font-variant-numeric:tabular-nums;">${threshVal}%</b></span>
+              <input type="range" id="ag-cc-thresh-range" class="ag-cc-range" min="5" max="50" step="5" value="${threshVal}" style="flex:1;background:linear-gradient(90deg, var(--agy-accent, #A0A3F6) ${pctFill}%, var(--agy-border-strong, rgba(202,211,245,0.14)) ${pctFill}%);" />
             </div>
           </div>
-          <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">
+          <div style="background:var(--agy-surface, #111217);border:1px solid var(--agy-border, rgba(202,211,245,0.08));border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">
             <div>
-              <div style="font-size:13px;font-weight:500;color:#CAD3F5;">${escapeHtml(s.resetAlert)}</div>
-              <div style="font-size:11px;color:#818BA8;margin-top:2px;">${escapeHtml(s.resetDesc)}</div>
+              <div style="font-size:13px;font-weight:500;color:var(--agy-fg, #CAD3F5);">${escapeHtml(s.resetAlert)}</div>
+              <div style="font-size:11px;color:var(--agy-fg-muted, #818BA8);margin-top:2px;">${escapeHtml(s.resetDesc)}</div>
             </div>
             ${renderNativeSwitch('ag-cc-reset-alert', userPreferences.quotaResetAlertsEnabled)}
           </div>
           <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;flex-wrap:wrap;">
             ${clearHistConfirmOpen ? `
-              <span style="font-size:12px;color:#E56B6F;margin-right:auto;">${escapeHtml(s.clearHistConfirm)}</span>
-              <button type="button" id="ag-cc-cancel-clear-hist" class="agy-enh-btn" style="background:#181A22;color:#CAD3F5;border:1px solid rgba(202,211,245,0.1);border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;">${escapeHtml(s.cancel)}</button>
-              <button type="button" id="ag-cc-confirm-clear-hist" class="agy-enh-btn" style="background:#E56B6F;color:#0B0B0E;border:none;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;">${escapeHtml(s.confirmClear)}</button>
+              <span style="font-size:12px;color:var(--agy-danger, #E56B6F);margin-right:auto;">${escapeHtml(s.clearHistConfirm)}</span>
+              <button type="button" id="ag-cc-cancel-clear-hist" class="agy-enh-btn" style="background:var(--agy-surface-2, #181A22);color:var(--agy-fg, #CAD3F5);border:1px solid var(--agy-border, rgba(202,211,245,0.1));border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;">${escapeHtml(s.cancel)}</button>
+              <button type="button" id="ag-cc-confirm-clear-hist" class="agy-enh-btn" style="background:var(--agy-danger, #E56B6F);color:#FFFFFF;border:none;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;">${escapeHtml(s.confirmClear)}</button>
             ` : `
-              <button type="button" id="ag-cc-clear-hist" class="agy-enh-btn" style="background:#181A22;color:#E56B6F;border:1px solid rgba(229,107,111,0.28);border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;">${escapeHtml(s.clearHist)}</button>
+              <button type="button" id="ag-cc-clear-hist" class="agy-enh-btn" style="background:var(--agy-surface-2, #181A22);color:var(--agy-danger, #E56B6F);border:1px solid var(--agy-danger-border, rgba(229,107,111,0.28));border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;">${escapeHtml(s.clearHist)}</button>
             `}
           </div>
         `;
@@ -2271,7 +2513,7 @@
           rng.oninput = () => {
             const v = Number(rng.value) || 20;
             const fill = Math.round(((v - 5) / 45) * 100);
-            rng.style.background = `linear-gradient(90deg, #A0A3F6 ${fill}%, rgba(202,211,245,0.14) ${fill}%)`;
+            rng.style.background = `linear-gradient(90deg, var(--agy-accent, #A0A3F6) ${fill}%, var(--agy-border-strong, rgba(202,211,245,0.14)) ${fill}%)`;
             if (rngVal) rngVal.textContent = `${v}%`;
           };
           rng.onchange = () => persistPreferences({ quotaLowThreshold: Number(rng.value) || 20 });
@@ -2306,17 +2548,17 @@
         }
       } else if (currentTab === 'shortcuts') {
         bodyEl.innerHTML = `
-          <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">
-            <span style="font-size:13px;color:#CAD3F5;">${escapeHtml(s.cycleKey)}</span>
-            <button type="button" id="ag-cc-rec-lang" class="agy-enh-btn" style="background:#181A22;color:#A0A3F6;border:1px solid rgba(160,163,246,0.32);border-radius:6px;padding:5px 10px;font-size:12px;font-weight:500;cursor:pointer;font-variant-numeric:tabular-nums;">${escapeHtml(userPreferences.shortcutCycleLang)}</button>
+          <div style="background:var(--agy-surface, #111217);border:1px solid var(--agy-border, rgba(202,211,245,0.08));border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:13px;color:var(--agy-fg, #CAD3F5);">${escapeHtml(s.cycleKey)}</span>
+            <button type="button" id="ag-cc-rec-lang" class="agy-enh-btn" style="background:var(--agy-surface-2, #181A22);color:var(--agy-accent, #A0A3F6);border:1px solid var(--agy-accent-border, rgba(160,163,246,0.32));border-radius:6px;padding:5px 10px;font-size:12px;font-weight:500;cursor:pointer;font-variant-numeric:tabular-nums;">${escapeHtml(userPreferences.shortcutCycleLang)}</button>
           </div>
-          <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">
-            <span style="font-size:13px;color:#CAD3F5;">${escapeHtml(s.centerKey)}</span>
-            <button type="button" id="ag-cc-rec-center" class="agy-enh-btn" style="background:#181A22;color:#A0A3F6;border:1px solid rgba(160,163,246,0.32);border-radius:6px;padding:5px 10px;font-size:12px;font-weight:500;cursor:pointer;font-variant-numeric:tabular-nums;">${escapeHtml(userPreferences.shortcutOpenCenter)}</button>
+          <div style="background:var(--agy-surface, #111217);border:1px solid var(--agy-border, rgba(202,211,245,0.08));border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:13px;color:var(--agy-fg, #CAD3F5);">${escapeHtml(s.centerKey)}</span>
+            <button type="button" id="ag-cc-rec-center" class="agy-enh-btn" style="background:var(--agy-surface-2, #181A22);color:var(--agy-accent, #A0A3F6);border:1px solid var(--agy-accent-border, rgba(160,163,246,0.32));border-radius:6px;padding:5px 10px;font-size:12px;font-weight:500;cursor:pointer;font-variant-numeric:tabular-nums;">${escapeHtml(userPreferences.shortcutOpenCenter)}</button>
           </div>
-          <div style="background:#111217;border:1px solid rgba(202,211,245,0.08);border-radius:8px;padding:10px 12px;">
-            <div style="font-size:13px;font-weight:500;color:#CAD3F5;margin-bottom:4px;">${escapeHtml(s.diagnostics)}</div>
-            <div id="ag-cc-diag-box" style="font-size:11px;color:#818BA8;line-height:1.6;">Enhancer v${ENHANCER_CURRENT_VERSION}</div>
+          <div style="background:var(--agy-surface, #111217);border:1px solid var(--agy-border, rgba(202,211,245,0.08));border-radius:8px;padding:10px 12px;">
+            <div style="font-size:13px;font-weight:500;color:var(--agy-fg, #CAD3F5);margin-bottom:4px;">${escapeHtml(s.diagnostics)}</div>
+            <div id="ag-cc-diag-box" style="font-size:11px;color:var(--agy-fg-muted, #818BA8);line-height:1.6;">Enhancer v${ENHANCER_CURRENT_VERSION}</div>
           </div>
         `;
         const bindRecorder = (btnId, prefKey) => {
@@ -2354,7 +2596,7 @@
             if (st && box) {
               const ar = st.autoRepatchStatus;
               const arTxt = ar ? `${escapeHtml(ar.status || '')}${ar.ts ? ` (${new Date(ar.ts).toLocaleString()})` : ''}` : 'N/A';
-              box.innerHTML = `App: <b style="color:#CAD3F5;">${escapeHtml(st.appVersion || '')}</b> · ASAR Bootstrap: <b style="color:#4CC38A;">${st.asarBootstrapped ? 'Active' : 'Inactive'}</b><br/>${escapeHtml(s.autoRepatch)}: <b style="color:#CAD3F5;">${arTxt}</b><br/>Dir: ${escapeHtml(st.enhancerDir || '')}`;
+              box.innerHTML = `App: <b style="color:var(--agy-fg, #CAD3F5);">${escapeHtml(st.appVersion || '')}</b> · ASAR Bootstrap: <b style="color:var(--agy-success, #4CC38A);">${st.asarBootstrapped ? 'Active' : 'Inactive'}</b><br/>${escapeHtml(s.autoRepatch)}: <b style="color:var(--agy-fg, #CAD3F5);">${arTxt}</b><br/>Dir: ${escapeHtml(st.enhancerDir || '')}`;
             }
           }).catch(() => {});
         }
@@ -2599,7 +2841,7 @@
               <span class="truncate" id="antigravity-lang-current-label">${LANG_DISPLAY_NAMES[currentLang] ? `${LANG_DISPLAY_NAMES[currentLang].native} (${LANG_DISPLAY_NAMES[currentLang].en})` : currentLang}</span>
               <svg id="antigravity-lang-chevron" class="w-3.5 h-3.5 shrink-0 opacity-70 ml-auto pointer-events-none" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </button>
-            <div id="antigravity-lang-dropdown-menu" style="display:none;position:absolute;right:0;top:calc(100% + 4px);z-index:6000;background:#111217;border:1px solid rgba(202,211,245,0.1);box-shadow:0 8px 24px rgba(0,0,0,0.42);border-radius:10px;padding:4px;gap:2px;min-width:190px;max-height:280px;overflow-y:auto;" class="agy-overlay text-foreground no-focus-ring flex flex-col">${langItemsHtml}</div>
+            <div id="antigravity-lang-dropdown-menu" style="display:none;position:absolute;right:0;top:calc(100% + 4px);z-index:6000;background:var(--agy-surface, #111217);border:1px solid var(--agy-border, rgba(202,211,245,0.1));box-shadow:var(--agy-shadow-sm, 0 8px 24px rgba(0,0,0,0.42));border-radius:10px;padding:4px;gap:2px;min-width:190px;max-height:280px;overflow-y:auto;" class="agy-overlay text-foreground no-focus-ring flex flex-col">${langItemsHtml}</div>
           </div>
         </div>
         <div id="antigravity-quota-setting-row" class="py-2 px-3 w-full bg-transparent flex justify-between gap-4 items-center" style="display:flex;align-items:center;justify-content:space-between;gap:16px;">
@@ -2607,13 +2849,13 @@
             <span class="text-sm font-normal text-foreground" id="antigravity-quota-item-title">${getQuotaSettingStrings(currentLang).title}</span>
             <div class="text-xs text-secondary-foreground" id="antigravity-quota-item-desc" style="line-height:1.4;">${getQuotaSettingStrings(currentLang).desc}</div>
           </div>
-          <button type="button" role="switch" id="antigravity-quota-toggle" aria-checked="${isQuotaOn}" style="position:relative;display:inline-flex;height:20px;width:36px;flex-shrink:0;cursor:pointer;border-radius:9999px;border:2px solid transparent;transition:background-color 150ms cubic-bezier(0.22, 1, 0.36, 1);outline:none;background-color:${isQuotaOn ? '#A0A3F6' : 'rgba(202,211,245,0.2)'};">
-            <span id="antigravity-quota-toggle-thumb" style="pointer-events:none;display:inline-block;height:16px;width:16px;border-radius:9999px;background-color:#CAD3F5;box-shadow:0 1px 2px rgba(0,0,0,0.3);transition:transform 150ms cubic-bezier(0.22, 1, 0.36, 1);transform:translateX(${isQuotaOn ? '16px' : '0px'});"></span>
+          <button type="button" role="switch" id="antigravity-quota-toggle" aria-checked="${isQuotaOn}" style="position:relative;display:inline-flex;height:20px;width:36px;flex-shrink:0;cursor:pointer;border-radius:9999px;border:2px solid transparent;transition:background-color 150ms cubic-bezier(0.22, 1, 0.36, 1);outline:none;background-color:${isQuotaOn ? 'var(--agy-accent, #A0A3F6)' : 'var(--agy-border-strong, rgba(202,211,245,0.2))'};">
+            <span id="antigravity-quota-toggle-thumb" style="pointer-events:none;display:inline-block;height:16px;width:16px;border-radius:9999px;background-color:var(--agy-switch-thumb, #FFFFFF);box-shadow:0 1px 2px rgba(0,0,0,0.3);transition:transform 150ms cubic-bezier(0.22, 1, 0.36, 1);transform:translateX(${isQuotaOn ? '16px' : '0px'});"></span>
           </button>
         </div>
         <div class="py-2 px-3 w-full bg-transparent flex justify-between gap-4 items-center notranslate" translate="no" style="display:flex;align-items:center;justify-content:space-between;gap:16px;">
           <div class="flex-1 min-w-0 flex flex-col gap-0.5" style="flex:1 1 0%;min-width:180px;">
-            <span class="text-sm font-normal text-foreground">Antigravity<span style="color:#A0A3F6;font-weight:600;margin-left:0;">Enhanced</span></span>
+            <span class="text-sm font-normal text-foreground">Antigravity<span style="color:var(--agy-accent, #A0A3F6);font-weight:600;margin-left:0;">Enhanced</span></span>
             <div class="text-xs text-secondary-foreground" id="antigravity-settings-hub-subtitle" style="line-height:1.4;font-variant-numeric:tabular-nums;">${h.patchVersionPrefix} ${ENHANCER_CURRENT_VERSION}</div>
           </div>
           <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
@@ -2643,7 +2885,7 @@
       const toggleVis = () => {
         const isVisible = quotaToggle.getAttribute('aria-checked') !== 'true';
         quotaToggle.setAttribute('aria-checked', String(isVisible));
-        quotaToggle.style.backgroundColor = isVisible ? '#A0A3F6' : 'rgba(202,211,245,0.22)';
+        quotaToggle.style.backgroundColor = isVisible ? 'var(--agy-accent, #A0A3F6)' : 'var(--agy-border-strong, rgba(202,211,245,0.22))';
         if (quotaThumb) quotaThumb.style.transform = isVisible ? 'translateX(16px)' : 'translateX(0px)';
         try { localStorage.setItem('antigravity_show_quota_widget', String(isVisible)); } catch (_) {}
         const widget = document.getElementById('antigravity-quota-widget');
@@ -2689,13 +2931,13 @@
     menu.id = 'antigravity-quick-lang-menu';
     menu.className = 'agy-overlay border rounded-xl no-focus-ring flex flex-col shadow-lg min-w-[175px] p-1 gap-px notranslate';
     menu.setAttribute('translate', 'no');
-    menu.style.cssText = `position:fixed;top:${topPx}px;right:${rightPx}px;min-width:190px;max-height:280px;overflow-y:auto;padding:4px;gap:2px;display:flex;flex-direction:column;border-radius:10px;background:#111217;border:1px solid rgba(202,211,245,0.1);box-shadow:0 8px 24px rgba(0,0,0,0.42);color:#CAD3F5;font-family:${getUiFontFamily(activeLanguage)};z-index:99999;user-select:none;app-region:no-drag;-webkit-app-region:no-drag;`;
+    menu.style.cssText = `position:fixed;top:${topPx}px;right:${rightPx}px;min-width:190px;max-height:280px;overflow-y:auto;padding:4px;gap:2px;display:flex;flex-direction:column;border-radius:10px;background:var(--agy-surface, #111217);border:1px solid var(--agy-border, rgba(202,211,245,0.1));box-shadow:var(--agy-shadow-sm, 0 8px 24px rgba(0,0,0,0.42));color:var(--agy-fg, #CAD3F5);font-family:${getUiFontFamily(activeLanguage)};z-index:99999;user-select:none;app-region:no-drag;-webkit-app-region:no-drag;`;
 
     menu.innerHTML = LANG_ORDER.map(l => {
       const info = LANG_DISPLAY_NAMES[l] || { native: l, en: l };
       const isSelected = (activeLanguage === l);
       const labelText = (l === 'en') ? 'English (English)' : `${info.native} (${info.en})`;
-      return `<div id="antigravity-quick-opt-${l}" data-lang="${l}" class="agy-overlay-item w-full text-left whitespace-nowrap transition-colors duration-150 select-none rounded-md flex items-center justify-between gap-2 px-2 py-1 text-[13px] outline-none no-focus-ring cursor-pointer" style="color:${isSelected ? '#A0A3F6' : '#CAD3F5'};font-weight:${isSelected ? '600' : '400'};"><span class="truncate">${labelText}</span><svg id="antigravity-quick-lang-check-${l}" class="w-3.5 h-3.5 shrink-0 ml-auto pointer-events-none" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A0A3F6" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="display:${isSelected ? 'flex' : 'none'};flex-shrink:0;"><polyline points="20 6 9 17 4 12"></polyline></svg></div>`;
+      return `<div id="antigravity-quick-opt-${l}" data-lang="${l}" class="agy-overlay-item w-full text-left whitespace-nowrap transition-colors duration-150 select-none rounded-md flex items-center justify-between gap-2 px-2 py-1 text-[13px] outline-none no-focus-ring cursor-pointer" style="color:${isSelected ? 'var(--agy-accent, #A0A3F6)' : 'var(--agy-fg, #CAD3F5)'};font-weight:${isSelected ? '600' : '400'};"><span class="truncate">${labelText}</span><svg id="antigravity-quick-lang-check-${l}" class="w-3.5 h-3.5 shrink-0 ml-auto pointer-events-none" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--agy-accent, #A0A3F6)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="display:${isSelected ? 'flex' : 'none'};flex-shrink:0;"><polyline points="20 6 9 17 4 12"></polyline></svg></div>`;
     }).join('');
 
     for (const l of LANG_ORDER) {
@@ -2748,7 +2990,7 @@
     if (badgeText) {
       const badge = document.createElement('span');
       badge.className = 'antigravity-menu-badge';
-      badge.style.cssText = 'color:#A0A3F6;font-size:11px;font-weight:600;margin-left:8px;font-variant-numeric:tabular-nums;';
+      badge.style.cssText = 'color:var(--agy-accent, #A0A3F6);font-size:11px;font-weight:600;margin-left:8px;font-variant-numeric:tabular-nums;';
       badge.textContent = badgeText;
       btn.appendChild(badge);
     }
@@ -2777,7 +3019,7 @@
       pill.setAttribute('tabindex', '0');
       pill.setAttribute('translate', 'no');
       pill.className = 'flex items-center whitespace-nowrap cursor-pointer text-[11px] font-medium h-6 pl-2 pr-2 rounded-md select-none notranslate';
-      pill.style.cssText = 'display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 8px;border-radius:6px;background:#A0A3F6;color:#0B0B0E;font-size:11px;font-weight:600;line-height:1;white-space:nowrap;flex-shrink:0;cursor:pointer;app-region:no-drag;-webkit-app-region:no-drag;margin-right:4px;z-index:101;transition:opacity 150ms cubic-bezier(0.22, 1, 0.36, 1);';
+      pill.style.cssText = 'display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 8px;border-radius:6px;background:var(--agy-accent, #A0A3F6);color:var(--agy-accent-fg, #0B0B0E);font-size:11px;font-weight:600;line-height:1;white-space:nowrap;flex-shrink:0;cursor:pointer;app-region:no-drag;-webkit-app-region:no-drag;margin-right:4px;z-index:101;transition:opacity 150ms cubic-bezier(0.22, 1, 0.36, 1);';
       pill.innerHTML = `<span id="antigravity-enhancer-update-label">${h.updateAvailablePill}</span><span class="flex items-center" style="display:inline-flex;align-items:center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span>`;
       pill.onmouseenter = () => { pill.style.opacity = '0.9'; };
       pill.onmouseleave = () => { pill.style.opacity = '1'; };
@@ -2841,8 +3083,8 @@
       tag.id = 'antigravity-enhanced-tag';
       tag.className = 'notranslate';
       tag.setAttribute('translate', 'no');
-      tag.style.cssText = 'color:#A0A3F6;font-weight:600;margin-left:0;';
-      tag.style.color = '#A0A3F6';
+      tag.style.cssText = 'color:var(--agy-accent, #A0A3F6);font-weight:600;margin-left:0;';
+      tag.style.color = 'var(--agy-accent, #A0A3F6)';
       tag.textContent = 'Enhanced';
       agyMenuBtn.appendChild(tag);
     }
@@ -2885,7 +3127,7 @@
     section.setAttribute('translate', 'no');
 
     const sep = document.createElement('div');
-    sep.style.cssText = 'height:1px;background:rgba(202,211,245,0.08);margin:4px 0;';
+    sep.style.cssText = 'height:1px;background:var(--agy-border, rgba(202,211,245,0.08));margin:4px 0;';
     section.appendChild(sep);
 
     const verRow = createNativeMenuRow('antigravity-menu-patch-version', versionText, false, updateBadge);
@@ -2927,8 +3169,8 @@
       quickLangBtn.setAttribute('aria-label', 'Quick switch language');
       const langCode = (activeLanguage || 'ko').toUpperCase();
       quickLangBtn.title = `언어 선택 / Select Language (${langCode}) - Alt+Shift+L`;
-      quickLangBtn.style.cssText = `display:inline-flex;align-items:center;justify-content:center;gap:4px;height:24px;padding:0 8px;border-radius:6px;font-size:11px;font-weight:500;font-family:${getUiFontFamily(activeLanguage)};line-height:1;background:#0B0B0E;border:1px solid rgba(202,211,245,0.12);color:#CAD3F5;cursor:pointer;user-select:none;app-region:no-drag;-webkit-app-region:no-drag;outline:none;transition:background-color 150ms cubic-bezier(0.22, 1, 0.36, 1),border-color 150ms cubic-bezier(0.22, 1, 0.36, 1);margin-right:4px;white-space:nowrap;flex-shrink:0;z-index:101;`;
-      quickLangBtn.innerHTML = `<svg class="shrink-0 pointer-events-none" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="color:#9DA7C7;"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg><span id="antigravity-quick-lang-label" class="pointer-events-none" style="font-weight:600;font-size:11px;line-height:1;">${langCode}</span><svg class="shrink-0 pointer-events-none" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="color:#818BA8;"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+      quickLangBtn.style.cssText = `display:inline-flex;align-items:center;justify-content:center;gap:4px;height:24px;padding:0 8px;border-radius:6px;font-size:11px;font-weight:500;font-family:${getUiFontFamily(activeLanguage)};line-height:1;background:var(--agy-bg, #0B0B0E);border:1px solid var(--agy-border, rgba(202,211,245,0.12));color:var(--agy-fg, #CAD3F5);cursor:pointer;user-select:none;app-region:no-drag;-webkit-app-region:no-drag;outline:none;transition:background-color 150ms cubic-bezier(0.22, 1, 0.36, 1),border-color 150ms cubic-bezier(0.22, 1, 0.36, 1);margin-right:4px;white-space:nowrap;flex-shrink:0;z-index:101;`;
+      quickLangBtn.innerHTML = `<svg class="shrink-0 pointer-events-none" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="color:var(--agy-fg-secondary, #9DA7C7);"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg><span id="antigravity-quick-lang-label" class="pointer-events-none" style="font-weight:600;font-size:11px;line-height:1;">${langCode}</span><svg class="shrink-0 pointer-events-none" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="color:var(--agy-fg-muted, #818BA8);"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
       quickLangBtn.onclick = (e) => { e.stopPropagation(); e.preventDefault(); toggleQuickLangMenu(quickLangBtn); };
     } else {
       const lbl = quickLangBtn.querySelector('#antigravity-quick-lang-label');
@@ -3147,10 +3389,10 @@
       }
 
       function getStatusColor(f) {
-        if (f === undefined || f === null || isNaN(f)) return '#818BA8';
-        if (f >= 0.5) return '#CAD3F5';
-        if (f >= 0.2) return '#A0A3F6';
-        return '#E56B6F';
+        if (f === undefined || f === null || isNaN(f)) return 'var(--agy-fg-muted, #818BA8)';
+        if (f >= 0.5) return 'var(--agy-fg, #CAD3F5)';
+        if (f >= 0.2) return 'var(--agy-accent, #A0A3F6)';
+        return 'var(--agy-danger, #E56B6F)';
       }
 
       async function fetchQuotaData(force = false) {
@@ -3179,8 +3421,8 @@
       function parseGroups(quotaResponse) {
         const qs = getQuotaStrings();
         const groups = quotaResponse?.groups || [];
-        const gemini = { id: 'gemini', label: 'Gemini', color: '#A0A3F6', h5: null, weekly: null, h5TargetTs: null, weeklyTargetTs: null, models: ['Gemini 4', 'Gemini Flash', 'Gemini 3.1 Flash Image'] };
-        const other = { id: 'other', label: qs.otherLabel || 'Other', color: '#8A93B2', h5: null, weekly: null, h5TargetTs: null, weeklyTargetTs: null, models: ['Claude Opus', 'Claude Sonnet', 'GPT-OSS'] };
+        const gemini = { id: 'gemini', label: 'Gemini', color: 'var(--agy-accent, #A0A3F6)', h5: null, weekly: null, h5TargetTs: null, weeklyTargetTs: null, models: ['Gemini 4', 'Gemini Flash', 'Gemini 3.1 Flash Image'] };
+        const other = { id: 'other', label: qs.otherLabel || 'Other', color: 'var(--agy-fg-muted, #8A93B2)', h5: null, weekly: null, h5TargetTs: null, weeklyTargetTs: null, models: ['Claude Opus', 'Claude Sonnet', 'GPT-OSS'] };
 
         for (const g of groups) {
           const name = (g.displayName || '').toLowerCase();
@@ -3311,14 +3553,14 @@
         const h = 16;
         const step = w / Math.max(1, vals.length - 1);
         const pts = vals.map((v, idx) => `${(idx * step).toFixed(1)},${(h - 2 - (Math.max(0, Math.min(100, v)) / 100) * (h - 4)).toFixed(1)}`).join(' ');
-        const stroke = isLow ? '#E56B6F' : '#A0A3F6';
+        const stroke = isLow ? 'var(--agy-danger, #E56B6F)' : 'var(--agy-accent, #A0A3F6)';
         return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="display:block;flex-shrink:0;" aria-hidden="true"><polyline fill="none" stroke="${stroke}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" points="${pts}"/></svg>`;
       }
 
       function renderBucketHtml(title, pct, ts, qs) {
         if (pct === null || pct === undefined) return '';
-        const barColor = pct < 20 ? '#E56B6F' : '#A0A3F6';
-        return `<article class="bucket-row" style="margin-top:8px;"><p style="margin:0 0 4px;display:flex;justify-content:space-between;font-size:11px;"><span style="color:#9DA7C7;">${title}</span><small class="bucket-timer" ${ts ? `data-target-ts="${ts}"` : ''} style="color:#818BA8;font-size:11px;font-variant-numeric:tabular-nums;">${ts ? formatCountdown(ts) : qs.checking}</small></p><footer style="display:flex;align-items:center;gap:8px;"><div class="progress-bar-bg" style="flex:1;height:4px;border-radius:9999px;background:rgba(202,211,245,0.1);overflow:hidden;"><span class="progress-bar-fill" style="display:block;width:${Math.max(0, Math.min(100, pct))}%;height:100%;background:${barColor};border-radius:9999px;"></span></div><b style="font-size:11px;font-weight:600;font-variant-numeric:tabular-nums;color:${pct < 20 ? '#E56B6F' : '#CAD3F5'};min-width:32px;text-align:right;">${pct}%</b></footer></article>`;
+        const barColor = pct < 20 ? 'var(--agy-danger, #E56B6F)' : 'var(--agy-accent, #A0A3F6)';
+        return `<article class="bucket-row" style="margin-top:8px;"><p style="margin:0 0 4px;display:flex;justify-content:space-between;font-size:11px;"><span style="color:var(--agy-fg-secondary, #9DA7C7);">${title}</span><small class="bucket-timer" ${ts ? `data-target-ts="${ts}"` : ''} style="color:var(--agy-fg-muted, #818BA8);font-size:11px;font-variant-numeric:tabular-nums;">${ts ? formatCountdown(ts) : qs.checking}</small></p><footer style="display:flex;align-items:center;gap:8px;"><div class="progress-bar-bg" style="flex:1;height:4px;border-radius:9999px;background:var(--agy-border, rgba(202,211,245,0.1));overflow:hidden;"><span class="progress-bar-fill" style="display:block;width:${Math.max(0, Math.min(100, pct))}%;height:100%;background:${barColor};border-radius:9999px;"></span></div><b style="font-size:11px;font-weight:600;font-variant-numeric:tabular-nums;color:${pct < 20 ? 'var(--agy-danger, #E56B6F)' : 'var(--agy-fg, #CAD3F5)'};min-width:32px;text-align:right;">${pct}%</b></footer></article>`;
       }
 
       function showComposerQuotaHoverCard(anchorEl, groupKey, parsed) {
@@ -3343,14 +3585,14 @@
           ? `bottom:${Math.max(12, winH - rect.top + 8)}px;top:auto;`
           : `top:${Math.max(12, (rect.bottom || 32) + 8)}px;bottom:auto;`;
 
-        card.style.cssText = `position:fixed;${vertCss}left:${leftPx}px;width:280px;padding:12px;border-radius:12px;background:#111217;border:1px solid rgba(202,211,245,0.1);box-shadow:0 12px 28px rgba(0,0,0,0.45);color:#CAD3F5;font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable","Pretendard JP Variable","Noto Sans SC","Noto Sans TC","Noto Sans","Segoe UI",sans-serif;font-size:12px;z-index:99998;pointer-events:none;user-select:none;app-region:no-drag;-webkit-app-region:no-drag;`;
+        card.style.cssText = `position:fixed;${vertCss}left:${leftPx}px;width:280px;padding:12px;border-radius:12px;background:var(--agy-surface, #111217);border:1px solid var(--agy-border, rgba(202,211,245,0.1));box-shadow:var(--agy-shadow, 0 12px 28px rgba(0,0,0,0.45));color:var(--agy-fg, #CAD3F5);font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable","Pretendard JP Variable","Noto Sans SC","Noto Sans TC","Noto Sans","Segoe UI",sans-serif;font-size:12px;z-index:99998;pointer-events:none;user-select:none;app-region:no-drag;-webkit-app-region:no-drag;`;
 
         const vals = [grp.h5, grp.weekly].filter(v => typeof v === 'number');
         const isLow = vals.length > 0 && Math.min(...vals) < 20;
         const rows = renderBucketHtml(qs.h5Full, grp.h5, grp.h5TargetTs, qs) + renderBucketHtml(qs.weeklyFull, grp.weekly, grp.weeklyTargetTs, qs);
         const modelsTxt = (grp.models || []).join(', ');
 
-        card.innerHTML = `<header style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding-bottom:8px;border-bottom:1px solid rgba(202,211,245,0.08);"><div style="display:inline-flex;align-items:center;gap:6px;flex-shrink:0;white-space:nowrap;"><strong style="font-weight:600;font-size:13px;white-space:nowrap;color:${isLow ? '#E56B6F' : (grp.id === 'gemini' ? '#A0A3F6' : '#CAD3F5')};">${grp.label}</strong>${(grp.id === currentActiveGroup || grp.id === groupKey) ? `<em style="font-style:normal;font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;white-space:nowrap;flex-shrink:0;line-height:1.2;background:rgba(160,163,246,0.14);color:#A0A3F6;border:1px solid rgba(160,163,246,0.32);">${qs.activeTag}</em>` : ''}</div><span style="font-size:11px;color:#818BA8;flex:1;min-width:0;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${modelsTxt}</span></header><section>${rows || '<p style="margin:8px 0 0;font-size:11px;color:#818BA8;">--</p>'}</section>`;
+        card.innerHTML = `<header style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding-bottom:8px;border-bottom:1px solid var(--agy-border, rgba(202,211,245,0.08));"><div style="display:inline-flex;align-items:center;gap:6px;flex-shrink:0;white-space:nowrap;"><strong style="font-weight:600;font-size:13px;white-space:nowrap;color:${isLow ? 'var(--agy-danger, #E56B6F)' : (grp.id === 'gemini' ? 'var(--agy-accent, #A0A3F6)' : 'var(--agy-fg, #CAD3F5)')};">${grp.label}</strong>${(grp.id === currentActiveGroup || grp.id === groupKey) ? `<em style="font-style:normal;font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;white-space:nowrap;flex-shrink:0;line-height:1.2;background:var(--agy-accent-soft, rgba(160,163,246,0.14));color:var(--agy-accent, #A0A3F6);border:1px solid var(--agy-accent-border, rgba(160,163,246,0.32));">${qs.activeTag}</em>` : ''}</div><span style="font-size:11px;color:var(--agy-fg-muted, #818BA8);flex:1;min-width:0;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${modelsTxt}</span></header><section>${rows || '<p style="margin:8px 0 0;font-size:11px;color:var(--agy-fg-muted, #818BA8);">--</p>'}</section>`;
 
         (document.body || document.documentElement).appendChild(card);
         startCountdownTicker();
@@ -3378,7 +3620,7 @@
           ? `bottom:${Math.max(12, winH - rect.top + 8)}px;top:auto;left:${Math.max(12, Math.min(winW - 330, rect.left || 12))}px;right:auto;`
           : `top:${Math.max(32, (rect.bottom || 32) + 6)}px;bottom:auto;right:${Math.max(12, winW - (rect.right || 1180))}px;left:auto;`;
 
-        pop.style.cssText = `position:fixed;${posCss}width:320px;padding:12px;border-radius:12px;background:#111217;border:1px solid rgba(202,211,245,0.1);box-shadow:0 12px 32px rgba(0,0,0,0.48);color:#CAD3F5;font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable","Pretendard JP Variable","Noto Sans SC","Noto Sans TC","Noto Sans","Segoe UI",sans-serif;font-size:12px;z-index:99999;user-select:none;app-region:no-drag;-webkit-app-region:no-drag;`;
+        pop.style.cssText = `position:fixed;${posCss}width:320px;padding:12px;border-radius:12px;background:var(--agy-surface, #111217);border:1px solid var(--agy-border, rgba(202,211,245,0.1));box-shadow:var(--agy-shadow, 0 12px 32px rgba(0,0,0,0.48));color:var(--agy-fg, #CAD3F5);font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable","Pretendard JP Variable","Noto Sans SC","Noto Sans TC","Noto Sans","Segoe UI",sans-serif;font-size:12px;z-index:99999;user-select:none;app-region:no-drag;-webkit-app-region:no-drag;`;
 
         const cardsHtml = groupsList.map(g => {
           const rows = renderBucketHtml(qs.h5Full, g.h5, g.h5TargetTs, qs) + renderBucketHtml(qs.weeklyFull, g.weekly, g.weeklyTargetTs, qs);
@@ -3387,13 +3629,13 @@
           const hist = quotaHistoryCache[g.id] || [];
           const spark = renderSparklineSvg(hist, isLow);
           const etaTxt = calcBurnRateAndEta(hist, g.h5);
-          const borderStyle = isLow ? 'background:rgba(229,107,111,0.08);border:1px solid rgba(229,107,111,0.32);' : 'background:#161820;border:1px solid rgba(202,211,245,0.08);';
+          const borderStyle = isLow ? 'background:var(--agy-danger-soft, rgba(229,107,111,0.08));border:1px solid var(--agy-danger-border, rgba(229,107,111,0.32));' : 'background:var(--agy-surface-2, #161820);border:1px solid var(--agy-border, rgba(202,211,245,0.08));';
           const cardPad = quotaCompactCard ? 'padding:6px 10px;margin-bottom:6px;' : 'padding:8px 12px;margin-bottom:8px;';
           const rightMeta = etaTxt || (quotaCompactCard ? '' : (g.models || []).join(', '));
-          return `<section class="group-card rounded-lg p-2 mb-2" style="${borderStyle}border-radius:8px;${cardPad}"><header style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><div style="display:inline-flex;align-items:center;gap:6px;flex-shrink:0;white-space:nowrap;"><strong style="font-weight:600;font-size:12px;white-space:nowrap;color:${isLow ? '#E56B6F' : g.color};">${g.label}</strong>${g.id === currentActiveGroup ? `<em style="font-style:normal;font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;white-space:nowrap;flex-shrink:0;line-height:1.2;background:rgba(160,163,246,0.14);color:#A0A3F6;border:1px solid rgba(160,163,246,0.32);">${qs.activeTag}</em>` : ''}</div>${spark}<span style="font-size:11px;color:#818BA8;flex:1;min-width:0;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${rightMeta}</span></header><main>${rows || '<p style="margin:4px 0 0;font-size:11px;color:#818BA8;">--</p>'}</main></section>`;
+          return `<section class="group-card rounded-lg p-2 mb-2" style="${borderStyle}border-radius:8px;${cardPad}"><header style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><div style="display:inline-flex;align-items:center;gap:6px;flex-shrink:0;white-space:nowrap;"><strong style="font-weight:600;font-size:12px;white-space:nowrap;color:${isLow ? 'var(--agy-danger, #E56B6F)' : g.color};">${g.label}</strong>${g.id === currentActiveGroup ? `<em style="font-style:normal;font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;white-space:nowrap;flex-shrink:0;line-height:1.2;background:var(--agy-accent-soft, rgba(160,163,246,0.14));color:var(--agy-accent, #A0A3F6);border:1px solid var(--agy-accent-border, rgba(160,163,246,0.32));">${qs.activeTag}</em>` : ''}</div>${spark}<span style="font-size:11px;color:var(--agy-fg-muted, #818BA8);flex:1;min-width:0;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${rightMeta}</span></header><main>${rows || '<p style="margin:4px 0 0;font-size:11px;color:var(--agy-fg-muted, #818BA8);">--</p>'}</main></section>`;
         }).join('');
 
-        pop.innerHTML = `<header style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid rgba(202,211,245,0.08);"><span style="font-weight:600;font-size:13px;color:#CAD3F5;">${qs.title}</span><button id="antigravity-popover-refresh" title="${qs.refresh}" style="background:none;border:none;color:#9DA7C7;cursor:pointer;padding:0;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg></button></header><main>${cardsHtml}</main><footer style="margin-top:4px;padding-top:8px;text-align:right;border-top:1px solid rgba(202,211,245,0.08);"><button id="antigravity-open-models-settings" style="background:none;border:none;color:#A0A3F6;font-size:12px;font-weight:500;cursor:pointer;">${qs.openSettings}</button></footer>`;
+        pop.innerHTML = `<header style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--agy-border, rgba(202,211,245,0.08));"><span style="font-weight:600;font-size:13px;color:var(--agy-fg, #CAD3F5);">${qs.title}</span><button id="antigravity-popover-refresh" title="${qs.refresh}" style="background:none;border:none;color:var(--agy-fg-secondary, #9DA7C7);cursor:pointer;padding:0;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg></button></header><main>${cardsHtml}</main><footer style="margin-top:4px;padding-top:8px;text-align:right;border-top:1px solid var(--agy-border, rgba(202,211,245,0.08));"><button id="antigravity-open-models-settings" style="background:none;border:none;color:var(--agy-accent, #A0A3F6);font-size:12px;font-weight:500;cursor:pointer;">${qs.openSettings}</button></footer>`;
         (document.body || document.documentElement).appendChild(pop);
         startCountdownTicker();
 
@@ -3446,27 +3688,27 @@
         const isMac = navigator.platform && navigator.platform.toUpperCase().indexOf('MAC') >= 0;
         const rightMargin = isMenuBar ? (isMac ? '20px' : '140px') : '8px';
         container.className = 'agy-quota-capsule';
-        container.style.cssText = `display:${isQuotaWidgetVisible() ? 'inline-flex' : 'none'};align-items:center;gap:4px;padding:0 8px;height:24px;margin-left:${isMenuBar ? 'auto' : '0'};margin-right:${rightMargin};background:#0B0B0E;border:1px solid rgba(202,211,245,0.12);border-radius:6px;color:#CAD3F5;app-region:no-drag;-webkit-app-region:no-drag;user-select:none;font-size:11px;font-weight:500;font-variant-numeric:tabular-nums;line-height:1;cursor:pointer;z-index:100;transition:border-color 150ms cubic-bezier(0.22, 1, 0.36, 1);`;
+        container.style.cssText = `display:${isQuotaWidgetVisible() ? 'inline-flex' : 'none'};align-items:center;gap:4px;padding:0 8px;height:24px;margin-left:${isMenuBar ? 'auto' : '0'};margin-right:${rightMargin};background:var(--agy-bg, #0B0B0E);border:1px solid var(--agy-border, rgba(202,211,245,0.12));border-radius:6px;color:var(--agy-fg, #CAD3F5);app-region:no-drag;-webkit-app-region:no-drag;user-select:none;font-size:11px;font-weight:500;font-variant-numeric:tabular-nums;line-height:1;cursor:pointer;z-index:100;transition:border-color 150ms cubic-bezier(0.22, 1, 0.36, 1);`;
 
         const renderDual = (g) => {
           const hasH5 = (g.h5 !== null && g.h5 !== undefined);
           const hasWk = (g.weekly !== null && g.weekly !== undefined);
-          if (hasH5 && hasWk) return `<b style="font-weight:600;color:${g.h5 < 20 ? '#E56B6F' : getStatusColor(g.h5 / 100)};">${g.h5}%</b><span style="color:#818BA8;font-size:10px;">/</span><b style="font-weight:600;color:${g.weekly < 20 ? '#E56B6F' : getStatusColor(g.weekly / 100)};">${qs.weekly}${g.weekly}%</b>`;
-          if (hasH5) return `<b style="font-weight:600;color:${g.h5 < 20 ? '#E56B6F' : getStatusColor(g.h5 / 100)};">${g.h5}%</b>`;
-          if (hasWk) return `<b style="font-weight:600;color:${g.weekly < 20 ? '#E56B6F' : getStatusColor(g.weekly / 100)};">${qs.weekly}${g.weekly}%</b>`;
-          return `<b style="font-weight:500;color:#818BA8;">--</b>`;
+          if (hasH5 && hasWk) return `<b style="font-weight:600;color:${g.h5 < 20 ? 'var(--agy-danger, #E56B6F)' : getStatusColor(g.h5 / 100)};">${g.h5}%</b><span style="color:var(--agy-fg-muted, #818BA8);font-size:10px;">/</span><b style="font-weight:600;color:${g.weekly < 20 ? 'var(--agy-danger, #E56B6F)' : getStatusColor(g.weekly / 100)};">${qs.weekly}${g.weekly}%</b>`;
+          if (hasH5) return `<b style="font-weight:600;color:${g.h5 < 20 ? 'var(--agy-danger, #E56B6F)' : getStatusColor(g.h5 / 100)};">${g.h5}%</b>`;
+          if (hasWk) return `<b style="font-weight:600;color:${g.weekly < 20 ? 'var(--agy-danger, #E56B6F)' : getStatusColor(g.weekly / 100)};">${qs.weekly}${g.weekly}%</b>`;
+          return `<b style="font-weight:500;color:var(--agy-fg-muted, #818BA8);">--</b>`;
         };
         const renderBadge = (id, label, color, g, gid) => {
           const active = (gid === currentActiveGroup);
           const vals = [g.h5, g.weekly].filter(v => typeof v === 'number');
           const isLow = vals.length > 0 && Math.min(...vals) < 20;
-          const borderCss = active ? 'border:1px solid rgba(160,163,246,0.38);background:rgba(160,163,246,0.12);' : (isLow ? 'background:rgba(229,107,111,0.12);border:1px solid rgba(229,107,111,0.32);' : 'border:1px solid transparent;');
-          const dot = active ? '<span style="width:4px;height:4px;border-radius:50%;background:#A0A3F6;display:inline-block;"></span>' : '';
-          return `<div id="${id}" style="display:inline-flex;align-items:center;gap:4px;padding:2px 6px;border-radius:4px;${borderCss}">${dot}<span style="color:${isLow ? '#E56B6F' : (active ? '#A0A3F6' : color)};font-weight:${active ? '600' : '500'};">${label}</span>${renderDual(g)}</div>`;
+          const borderCss = active ? 'border:1px solid var(--agy-accent-border, rgba(160,163,246,0.38));background:var(--agy-accent-soft, rgba(160,163,246,0.12));' : (isLow ? 'background:var(--agy-danger-soft, rgba(229,107,111,0.12));border:1px solid var(--agy-danger-border, rgba(229,107,111,0.32));' : 'border:1px solid transparent;');
+          const dot = active ? '<span style="width:4px;height:4px;border-radius:50%;background:var(--agy-accent, #A0A3F6);display:inline-block;"></span>' : '';
+          return `<div id="${id}" style="display:inline-flex;align-items:center;gap:4px;padding:2px 6px;border-radius:4px;${borderCss}">${dot}<span style="color:${isLow ? 'var(--agy-danger, #E56B6F)' : (active ? 'var(--agy-accent, #A0A3F6)' : color)};font-weight:${active ? '600' : '500'};">${label}</span>${renderDual(g)}</div>`;
         };
 
-        const dividerHtml = '<span aria-hidden="true" style="width:1px;height:12px;background:rgba(202,211,245,0.1);display:inline-block;flex-shrink:0;"></span>';
-        container.innerHTML = `${renderBadge('antigravity-badge-gemini', 'Gemini', '#A0A3F6', gemini, 'gemini')}${dividerHtml}${renderBadge('antigravity-badge-other', qs.otherLabel || 'Other', '#9DA7C7', other, 'other')}<button id="antigravity-quota-refresh-btn" title="${qs.refresh}" style="background:none;border:none;color:#9DA7C7;cursor:pointer;padding:0;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg></button>`;
+        const dividerHtml = '<span aria-hidden="true" style="width:1px;height:12px;background:var(--agy-border, rgba(202,211,245,0.1));display:inline-block;flex-shrink:0;"></span>';
+        container.innerHTML = `${renderBadge('antigravity-badge-gemini', 'Gemini', 'var(--agy-accent, #A0A3F6)', gemini, 'gemini')}${dividerHtml}${renderBadge('antigravity-badge-other', qs.otherLabel || 'Other', 'var(--agy-fg-secondary, #9DA7C7)', other, 'other')}<button id="antigravity-quota-refresh-btn" title="${qs.refresh}" style="background:none;border:none;color:var(--agy-fg-secondary, #9DA7C7);cursor:pointer;padding:0;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg></button>`;
         container.onclick = (e) => { e.stopPropagation(); toggleQuotaPopover(container, parsed); };
         const refBtn = container.querySelector('#antigravity-quota-refresh-btn');
         if (refBtn) refBtn.onclick = (e) => { e.stopPropagation(); updateQuotaWidget(true); };
@@ -3503,7 +3745,7 @@
               inlineBadge = document.createElement('span');
               inlineBadge.className = 'antigravity-inline-model-quota notranslate';
               inlineBadge.setAttribute('translate', 'no');
-              inlineBadge.style.cssText = 'display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 8px;margin-left:4px;margin-right:0;border-radius:6px;border:1px solid rgba(202,211,245,0.12);font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable","Pretendard JP Variable","Noto Sans SC","Noto Sans TC","Noto Sans","Segoe UI",sans-serif;font-size:11px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1;cursor:pointer;user-select:none;white-space:nowrap;flex-shrink:0;vertical-align:middle;transition:border-color 150ms cubic-bezier(0.22, 1, 0.36, 1);';
+              inlineBadge.style.cssText = 'display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 8px;margin-left:4px;margin-right:0;border-radius:6px;border:1px solid var(--agy-border, rgba(202,211,245,0.12));font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable","Pretendard JP Variable","Noto Sans SC","Noto Sans TC","Noto Sans","Segoe UI",sans-serif;font-size:11px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1;cursor:pointer;user-select:none;white-space:nowrap;flex-shrink:0;vertical-align:middle;transition:border-color 150ms cubic-bezier(0.22, 1, 0.36, 1);';
               if (trigger.lastChild) trigger.insertBefore(inlineBadge, trigger.lastChild);
               else trigger.appendChild(inlineBadge);
             }
@@ -3520,25 +3762,25 @@
               hideComposerQuotaHoverCard(false);
             };
 
-            const brandColor = grp?.color || '#A0A3F6';
+            const brandColor = grp?.color || 'var(--agy-accent, #A0A3F6)';
             const hasH5 = (grp && grp.h5 !== null && grp.h5 !== undefined);
             const hasWk = (grp && grp.weekly !== null && grp.weekly !== undefined);
-            let valHtml = '<span style="color:#818BA8;font-size:10px;">--</span>';
+            let valHtml = '<span style="color:var(--agy-fg-muted, #818BA8);font-size:10px;">--</span>';
             let isLow = false;
             if (hasH5 && hasWk) {
-              valHtml = `<span style="color:${grp.h5 < 20 ? '#E56B6F' : getStatusColor(grp.h5 / 100)};">${grp.h5}%</span><span style="color:#818BA8;margin:0 2px;">/</span><span style="color:${grp.weekly < 20 ? '#E56B6F' : getStatusColor(grp.weekly / 100)};">${qs.weekly}${grp.weekly}%</span>`;
+              valHtml = `<span style="color:${grp.h5 < 20 ? 'var(--agy-danger, #E56B6F)' : getStatusColor(grp.h5 / 100)};">${grp.h5}%</span><span style="color:var(--agy-fg-muted, #818BA8);margin:0 2px;">/</span><span style="color:${grp.weekly < 20 ? 'var(--agy-danger, #E56B6F)' : getStatusColor(grp.weekly / 100)};">${qs.weekly}${grp.weekly}%</span>`;
               isLow = grp.h5 < 20 || grp.weekly < 20;
             } else if (hasH5) {
-              valHtml = `<span style="color:${grp.h5 < 20 ? '#E56B6F' : getStatusColor(grp.h5 / 100)};">${grp.h5}%</span>`;
+              valHtml = `<span style="color:${grp.h5 < 20 ? 'var(--agy-danger, #E56B6F)' : getStatusColor(grp.h5 / 100)};">${grp.h5}%</span>`;
               isLow = grp.h5 < 20;
             } else if (hasWk) {
-              valHtml = `<span style="color:${grp.weekly < 20 ? '#E56B6F' : getStatusColor(grp.weekly / 100)};">${qs.weekly}${grp.weekly}%</span>`;
+              valHtml = `<span style="color:${grp.weekly < 20 ? 'var(--agy-danger, #E56B6F)' : getStatusColor(grp.weekly / 100)};">${qs.weekly}${grp.weekly}%</span>`;
               isLow = grp.weekly < 20;
             }
-            inlineBadge.style.borderColor = isLow ? 'rgba(229,107,111,0.38)' : 'rgba(160,163,246,0.28)';
-            inlineBadge.style.background = isLow ? 'rgba(229,107,111,0.12)' : '#0B0B0E';
-            inlineBadge.style.color = '#CAD3F5';
-            inlineBadge.innerHTML = `<span style="width:4px;height:4px;border-radius:50%;background:${isLow ? '#E56B6F' : brandColor};display:inline-block;"></span>${valHtml}`;
+            inlineBadge.style.borderColor = isLow ? 'var(--agy-danger-border, rgba(229,107,111,0.38))' : 'var(--agy-accent-border, rgba(160,163,246,0.28))';
+            inlineBadge.style.background = isLow ? 'var(--agy-danger-soft, rgba(229,107,111,0.12))' : 'var(--agy-bg, #0B0B0E)';
+            inlineBadge.style.color = 'var(--agy-fg, #CAD3F5)';
+            inlineBadge.innerHTML = `<span style="width:4px;height:4px;border-radius:50%;background:${isLow ? 'var(--agy-danger, #E56B6F)' : brandColor};display:inline-block;"></span>${valHtml}`;
           }
         } catch (_) {}
       }
@@ -3670,6 +3912,7 @@
     if (activeLanguage && userPreferences.language !== activeLanguage) {
       persistPreferences({ language: activeLanguage });
     }
+    initEnhancerThemeSync();
     runTranslation();
     setupGsapGlobalInteractions();
     injectMainWorldQuotaWidget();
@@ -3743,7 +3986,8 @@
       formatShortcutFromEvent,
       matchesShortcut,
       getControlCenterStrings,
-      isUntranslatableNoise
+      isUntranslatableNoise,
+      syncEnhancerTheme
     };
   }
 

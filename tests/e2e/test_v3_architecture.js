@@ -219,11 +219,11 @@ function createRendererHarness(initialLang = 'ko', seedDomFn = null, payloadOver
 // ============================================================================
 // F22: Modular Enhancer & Manifest Integrity
 // ============================================================================
-registerTest(1, 'F22', 'manifest.json v4.1.0 points to x2tora/antigravity-enhancer & matches SHA-256 digests', () => {
+registerTest(1, 'F22', 'manifest.json v4.1.1 points to x2tora/antigravity-enhancer & matches SHA-256 digests', () => {
   const manifestPath = path.join(ENHANCER_DIR, 'manifest.json');
   assert.ok(fs.existsSync(manifestPath), 'enhancer/manifest.json missing');
   const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-  assert.strictEqual(manifest.version, '4.1.0');
+  assert.strictEqual(manifest.version, '4.1.1');
   assert.strictEqual(manifest.repo, 'x2tora/antigravity-enhancer');
   assert.strictEqual(manifest.testedAppVersion, '2.34.0');
   assert.ok(manifest.releaseNotesI18n && typeof manifest.releaseNotesI18n === 'object', 'manifest.json must include releaseNotesI18n');
@@ -1544,4 +1544,59 @@ registerTest(2, 'F25', 'Cross-platform CLI installer (installer/install.mjs) ins
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
+});
+
+registerTest(2, 'F28', 'Enhancer UI adapts dynamically to Light, Dark, custom BG/FG/Accent, and HSL triplet host themes', () => {
+  const env = createRendererHarness('ko');
+  const root = env.document.documentElement;
+  const hooks = env.window.__agEnhancerTestHooks;
+  assert.ok(hooks && typeof hooks.syncEnhancerTheme === 'function', 'syncEnhancerTheme hook must be exposed');
+
+  // 1. Default dark fallback
+  assert.strictEqual(root.getAttribute('data-agy-theme'), 'dark');
+  assert.strictEqual(root.style.getPropertyValue('--agy-bg'), '#0B0B0E');
+  assert.strictEqual(root.style.getPropertyValue('--agy-fg'), '#CAD3F5');
+  assert.strictEqual(root.style.getPropertyValue('--agy-accent'), '#A0A3F6');
+
+  // 2. Host Light theme tokens
+  root.style.setProperty('--background', '#FFFFFF');
+  root.style.setProperty('--foreground', '#0A0A0C');
+  root.style.setProperty('--primary', '#2F75C3');
+  root.style.setProperty('--primary-foreground', '#FFFFFF');
+  const lightRes = hooks.syncEnhancerTheme();
+  assert.strictEqual(lightRes.mode, 'light');
+  assert.strictEqual(root.getAttribute('data-agy-theme'), 'light');
+  assert.strictEqual(root.style.getPropertyValue('--agy-bg'), '#FFFFFF');
+  assert.strictEqual(root.style.getPropertyValue('--agy-fg'), '#0A0A0C');
+  assert.strictEqual(root.style.getPropertyValue('--agy-accent'), '#2F75C3');
+  assert.strictEqual(root.style.getPropertyValue('--agy-accent-fg'), '#FFFFFF');
+
+  // 3. Custom Light theme with bright accent & no --primary-foreground (auto-contrast dark text)
+  root.style.setProperty('--background', '#FAF7F0');
+  root.style.setProperty('--foreground', '#2A2118');
+  root.style.setProperty('--primary', '#7CF0BD');
+  root.style.removeProperty('--primary-foreground');
+  const customRes = hooks.syncEnhancerTheme();
+  assert.strictEqual(customRes.mode, 'light');
+  assert.strictEqual(root.style.getPropertyValue('--agy-bg'), '#FAF7F0');
+  assert.strictEqual(root.style.getPropertyValue('--agy-fg'), '#2A2118');
+  assert.strictEqual(root.style.getPropertyValue('--agy-accent'), '#7CF0BD');
+  assert.strictEqual(root.style.getPropertyValue('--agy-accent-fg'), '#0B0B0E');
+
+  // 4. Bare HSL triplet Dark theme (shadcn-style)
+  root.style.setProperty('--background', '222 47% 11%');
+  root.style.setProperty('--foreground', '210 40% 98%');
+  root.style.setProperty('--primary', '217 91% 60%');
+  const hslRes = hooks.syncEnhancerTheme();
+  assert.strictEqual(hslRes.mode, 'dark');
+  assert.strictEqual(root.getAttribute('data-agy-theme'), 'dark');
+  assert.strictEqual(root.style.getPropertyValue('--agy-bg'), 'hsl(222 47% 11%)');
+  assert.strictEqual(root.style.getPropertyValue('--agy-fg'), 'hsl(210 40% 98%)');
+  assert.strictEqual(root.style.getPropertyValue('--agy-accent'), 'hsl(217 91% 60%)');
+
+  // 5. Ensure renderer-enhancer UI section has zero bare hardcoded hex outside var(--agy-*)
+  const src = fs.readFileSync(path.join(ENHANCER_DIR, 'renderer-enhancer.js'), 'utf8');
+  const uiBody = src.slice(src.indexOf('// 3. Copy Toast Notification'));
+  const stripped = uiBody.replace(/var\(--agy-[a-z0-9-]+,\s*[^)]+\)/g, '').replace(/color:#FFFFFF/g, '');
+  assert.strictEqual(/#[0-9a-fA-F]{3,8}\b/.test(stripped), false, 'All Enhancer UI colors must use var(--agy-*) theme tokens');
 });

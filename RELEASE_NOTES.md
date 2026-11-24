@@ -1,147 +1,117 @@
-# Antigravity Enhancer v4.1.0
+# Antigravity Enhancer v4.1.1
 
 ## Changes
-- **15 Languages Supported**: Added Brazilian Portuguese, Vietnamese, Italian, Indonesian, Turkish, and Polish with full translation parity across all languages.
-- **Smoother Mixed-Link Translations**: Sentences containing links or code now translate in natural word order across every supported language.
-- **Redesigned 2-Step Installer & macOS/Linux Support**: Streamlined the Windows installer with smooth animations and automatic restart, and added a CLI installer for macOS and Linux.
-- **Custom Glossary Improvements**: Click any collected untranslated string to pre-fill your custom glossary, and click existing entries to edit them inline.
+- **Adaptive Light/Dark & Custom Theme UI**: Every Enhancer panel, menu, quota widget, and toast now automatically matches your light/dark theme’s background, text, and accent colors in real time.
+- **Settings Modal Stability**: Fixed an issue where clicking inside the Patch Settings modal could occasionally dismiss the window.
 
 <details>
 <summary>한국어</summary>
 
-- **15개 언어 전면 지원**: 브라질 포르투갈어, 베트남어, 이탈리아어, 인도네시아어, 튀르키예어, 폴란드어 6개 언어를 추가하고 전체 언어 번역 완성도를 맞췄습니다.
-- **자연스러운 혼합 문장 번역**: 링크나 코드가 포함된 문장도 모든 언어에서 자연스러운 어순으로 표시됩니다.
-- **단계별 인스톨러 개편 및 macOS/Linux 지원**: Windows 2단계 설치 화면과 자동 재시작을 적용하고, macOS·Linux용 CLI 설치 스크립트를 추가했습니다.
-- **사용자 용어집 편의성 개선**: 수집된 미번역 항목을 클릭해 바로 용어집에 채워 넣고 기존 항목도 클릭해서 수정할 수 있습니다.
+- **라이트/다크 및 사용자 테마 자동 대응**: 제어 센터, 메뉴, 사용량 위젯, 알림 등 모든 Enhancer UI가 사용자 테마의 배경색·텍스트색·강조색에 맞춰 실시간으로 변경됩니다.
+- **설정 창 안정성 개선**: 패치 설정 창 내부를 클릭할 때 창이 간헐적으로 닫히던 문제를 수정했습니다.
 
 </details>
 
 <details>
 <summary>日本語</summary>
 
-- **15言語に拡大対応**: ポルトガル語（ブラジル）、ベトナム語、イタリア語、インドネシア語、トルコ語、ポーランド語を追加し、全言語の翻訳を統一しました。
-- **自然なインライン文翻訳**: リンクやコードを含む文章も各言語の自然な語順で表示されます。
-- **2ステップインストーラーと macOS/Linux 対応**: アニメーション付きの新インストーラーと macOS・Linux 向け CLI インストーラーを追加しました。
-- **カスタム用語集の改善**: 未翻訳リストの項目をクリックしてそのまま用語集へ入力・編集できます。
+- **ライト／ダークおよびカスタムテーマ自動対応**: 設定モーダル、メニュー、クォータウィジェット、通知などすべての Enhancer UI がテーマの背景色・文字色・アクセント色にリアルタイムで追従します。
+- **設定モーダルの安定性向上**: パッチ設定ウィンドウ内のクリックでまれに閉じてしまう問題を修正しました。
 
 </details>
 
 <details>
 <summary>简体中文</summary>
 
-- **扩展至 15 种语言**：新增巴西葡萄牙语、越南语、意大利语、印度尼西亚语、土耳其语与波兰语，并补齐所有语言的翻译覆盖。
-- **更自然的混合语句翻译**：包含链接或代码的句子现在在所有语言中都能按自然语序显示。
-- **全新分步安装程序与 macOS/Linux 支持**：重做 Windows 两步安装界面并支持自动重启，新增 macOS 与 Linux 命令行安装脚本。
-- **自定义术语表改进**：点击已收集的未翻译文本即可自动填入术语表并支持直接编辑。
+- **自适应浅色/深色与自定义主题**：控制中心、菜单、配额组件和提示等所有 Enhancer 界面现在都会实时匹配您主题的背景色、文字色和强调色。
+- **设置窗口稳定性改进**：修复了点击补丁设置窗口内部时偶发关闭的问题。
 
 </details>
 
 <details>
 <summary>繁體中文</summary>
 
-- **擴充至 15 種語言**：新增巴西葡萄牙語、越南語、義大利語、印尼語、土耳其語與波蘭語，並補齊所有語言的翻譯覆蓋。
-- **更自然的混合語句翻譯**：包含連結或程式碼的句子現在在所有語言中都能依自然語序顯示。
-- **全新分步安裝程式與 macOS/Linux 支援**：重做 Windows 兩步安裝介面並支援自動重啟，新增 macOS 與 Linux 命令列安裝腳本。
-- **自訂詞彙表改進**：點選已收集的未翻譯文字即可自動填入詞彙表並支援直接編輯。
+- **自動適應淺色/深色與自訂主題**：控制中心、選單、配額元件與提示等所有 Enhancer 介面現在都會即時套用您主題的背景色、文字色與強調色。
+- **設定視窗穩定性改進**：修復了點擊修補設定視窗內部時偶發關閉的問題。
 
 </details>
 
 <details>
 <summary>Español</summary>
 
-- **Soporte para 15 idiomas**: Se añadieron portugués de Brasil, vietnamita, italiano, indonesio, turco y polaco con paridad completa.
-- **Frases con enlaces más naturales**: Las oraciones con enlaces o código ahora respetan el orden natural de cada idioma.
-- **Nuevo instalador en 2 pasos y soporte macOS/Linux**: Instalador renovado para Windows con reinicio automático e instalador CLI para macOS y Linux.
-- **Mejoras del glosario**: Haz clic en cualquier texto recopilado para rellenar y editar tu glosario personalizado.
+- **UI adaptable a temas claros/oscuros y personalizados**: Todos los paneles, menús, widgets de cuota y avisos de Enhancer ahora siguen en tiempo real los colores de fondo, texto y acento de tu tema.
+- **Mayor estabilidad del panel de ajustes**: Se corrigió un problema que podía cerrar la ventana al hacer clic dentro de Ajustes del parche.
 
 </details>
 
 <details>
 <summary>Français</summary>
 
-- **15 langues prises en charge** : Ajout du portugais (Brésil), vietnamien, italien, indonésien, turc et polonais avec parité complète.
-- **Phrases avec liens plus naturelles** : Les phrases contenant des liens ou du code suivent désormais l’ordre naturel de chaque langue.
-- **Nouvel installateur en 2 étapes et support macOS/Linux** : Interface Windows repensée avec redémarrage automatique et script CLI pour macOS et Linux.
-- **Glossaire amélioré** : Cliquez sur une chaîne collectée pour pré-remplir et modifier votre glossaire en un clic.
+- **Interface adaptée aux thèmes clair/sombre et personnalisés** : Tous les panneaux, menus, widgets de quota et notifications suivent désormais en temps réel les couleurs de fond, de texte et d’accentuation de votre thème.
+- **Stabilité de la fenêtre des paramètres** : Correction d’un problème pouvant fermer la fenêtre lors d’un clic dans les paramètres du patch.
 
 </details>
 
 <details>
 <summary>Deutsch</summary>
 
-- **15 Sprachen unterstützt**: Brasilianisches Portugiesisch, Vietnamesisch, Italienisch, Indonesisch, Türkisch und Polnisch mit vollständiger Parität ergänzt.
-- **Natürlichere Sätze mit Links**: Sätze mit Links oder Code erscheinen nun in jeder Sprache in natürlicher Wortstellung.
-- **2-Schritte-Installer & macOS/Linux-Support**: Überarbeiteter Windows-Installer mit automatischem Neustart sowie CLI-Installer für macOS und Linux.
-- **Verbessertes Glossar**: Gesammelte Texte lassen sich per Klick direkt ins eigene Glossar übernehmen und bearbeiten.
+- **Dynamische Hell-/Dunkel- & Theme-Anpassung**: Alle Enhancer-Oberflächen, Menüs, Kontingent-Widgets und Hinweise passen sich nun in Echtzeit an Hintergrund-, Text- und Akzentfarbe deines Themes an.
+- **Stabileres Einstellungsfenster**: Ein Problem wurde behoben, bei dem Klicks im Patch-Einstellungsfenster dieses gelegentlich schlossen.
 
 </details>
 
 <details>
 <summary>Русский</summary>
 
-- **Поддержка 15 языков**: Добавлены португальский (Бразилия), вьетнамский, итальянский, индонезийский, турецкий и польский с полным покрытием.
-- **Естественный перевод фраз со ссылками**: Предложения со ссылками и кодом теперь отображаются в естественном порядке слов.
-- **Новый 2-шаговый установщик и macOS/Linux**: Обновлённый установщик Windows с автоперезапуском и CLI-установщик для macOS и Linux.
-- **Улучшения глоссария**: Клик по собранной строке сразу подставляет её в пользовательский глоссарий.
+- **Адаптация к светлой, тёмной и пользовательским темам**: Все панели, меню, виджеты квоты и уведомления Enhancer теперь в реальном времени подстраиваются под цвета фона, текста и акцента вашей темы.
+- **Стабильность окна настроек**: Исправлена проблема, из-за которой клик внутри окна настроек патча мог случайно закрыть его.
 
 </details>
 
 <details>
 <summary>Português (Brasil)</summary>
 
-- **Suporte a 15 idiomas**: Adicionados português do Brasil, vietnamita, italiano, indonésio, turco e polonês com tradução completa.
-- **Frases com links mais naturais**: Textos com links ou código agora seguem a ordem natural de cada idioma.
-- **Instalador em 2 etapas e suporte a macOS/Linux**: Novo instalador Windows com reinício automático e instalador CLI para macOS e Linux.
-- **Glossário aprimorado**: Clique em qualquer texto coletado para preencher e editar o glossário rapidamente.
+- **UI adaptável a temas claro/escuro e personalizados**: Todos os painéis, menus, widgets de cota e avisos do Enhancer agora acompanham em tempo real as cores de fundo, texto e destaque do seu tema.
+- **Estabilidade da janela de configurações**: Corrigido um problema em que cliques dentro das Configurações do Patch podiam fechar a janela.
 
 </details>
 
 <details>
 <summary>Tiếng Việt</summary>
 
-- **Hỗ trợ 15 ngôn ngữ**: Bổ sung tiếng Bồ Đào Nha (Brazil), Việt, Ý, Indonesia, Thổ Nhĩ Kỳ và Ba Lan với độ phủ đầy đủ.
-- **Dịch câu chứa liên kết tự nhiên hơn**: Các câu có liên kết hoặc mã nguồn giờ hiển thị đúng trật tự từ của từng ngôn ngữ.
-- **Trình cài đặt 2 bước mới & hỗ trợ macOS/Linux**: Giao diện cài đặt Windows mới tự khởi động lại và thêm trình cài đặt CLI cho macOS/Linux.
-- **Cải tiến từ điển tùy chỉnh**: Nhấp vào chuỗi chưa dịch để tự động điền và chỉnh sửa nhanh.
+- **Tự động thích ứng giao diện Sáng/Tối & chủ đề tùy chỉnh**: Mọi bảng điều khiển, menu, tiện ích hạn mức và thông báo của Enhancer giờ tự động đồng bộ màu nền, màu chữ và màu nhấn theo chủ đề của bạn theo thời gian thực.
+- **Ổn định cửa sổ cài đặt**: Khắc phục lỗi nhấp bên trong cửa sổ Cài đặt bản vá đôi khi làm đóng cửa sổ.
 
 </details>
 
 <details>
 <summary>Italiano</summary>
 
-- **Supporto per 15 lingue**: Aggiunti portoghese brasiliano, vietnamita, italiano, indonesiano, turco e polacco con copertura completa.
-- **Frasi con link più naturali**: Le frasi con collegamenti o codice seguono ora l’ordine naturale di ogni lingua.
-- **Nuovo installer in 2 passaggi e supporto macOS/Linux**: Installer Windows rinnovato con riavvio automatico e installer CLI per macOS e Linux.
-- **Glossario migliorato**: Fai clic su qualsiasi stringa raccolta per compilare e modificare il glossario.
+- **UI adattiva a temi chiari/scuri e personalizzati**: Tutti i pannelli, menu, widget quota e notifiche di Enhancer ora si adattano in tempo reale ai colori di sfondo, testo e accento del tuo tema.
+- **Stabilità della finestra impostazioni**: Risolto un problema per cui un clic interno alle Impostazioni Patch poteva chiudere la finestra.
 
 </details>
 
 <details>
 <summary>Bahasa Indonesia</summary>
 
-- **Dukungan 15 Bahasa**: Menambahkan Portugis (Brasil), Vietnam, Italia, Indonesia, Turki, dan Polandia dengan kelengkapan penuh.
-- **Terjemahan Tautan Lebih Alami**: Kalimat dengan tautan atau kode kini mengikuti urutan kata alami di setiap bahasa.
-- **Pemasang 2 Langkah & Dukungan macOS/Linux**: Pemasang Windows baru dengan mulai ulang otomatis serta skrip CLI untuk macOS dan Linux.
-- **Peningkatan Glosarium**: Klik teks yang terkumpul untuk langsung mengisi dan mengedit glosarium kustom.
+- **UI Adaptif Tema Terang/Gelap & Kustom**: Semua panel, menu, widget kuota, dan notifikasi Enhancer kini otomatis mengikuti warna latar, teks, dan aksen tema Anda secara real-time.
+- **Stabilitas Jendela Pengaturan**: Memperbaiki masalah ketika klik di dalam jendela Pengaturan Patch terkadang menutup jendela.
 
 </details>
 
 <details>
 <summary>Türkçe</summary>
 
-- **15 Dil Desteği**: Brezilya Portekizcesi, Vietnamca, İtalyanca, Endonezce, Türkçe ve Lehçe tam kapsamla eklendi.
-- **Bağlantılı Cümlelerde Doğal Çeviri**: Bağlantı veya kod içeren cümleler artık her dilin doğal söz dizimine uygun görünür.
-- **2 Adımlı Kurulum ve macOS/Linux Desteği**: Otomatik yeniden başlatmalı yeni Windows kurulum ekranı ve macOS/Linux CLI kurucusu eklendi.
-- **Gelişmiş Özel Sözlük**: Toplanan çevrilmemiş metinlere tıklayarak sözlüğe tek tıkla ekleme ve düzenleme yapılabilir.
+- **Açık/Koyu ve Özel Temalara Tam Uyum**: Tüm Enhancer panelleri, menüleri, kota araçları ve bildirimleri artık temanızın arka plan, metin ve vurgu renklerine anlık olarak uyum sağlar.
+- **Ayarlar Penceresi Kararlılığı**: Yama Ayarları penceresinin içine tıklandığında pencerenin nadiren kapanmasına yol açan sorun giderildi.
 
 </details>
 
 <details>
 <summary>Polski</summary>
 
-- **Obsługa 15 języków**: Dodano portugalski (Brazylia), wietnamski, włoski, indonezyjski, turecki i polski z pełnym pokryciem.
-- **Naturalniejsze zdania z linkami**: Zdania zawierające linki lub kod zachowują naturalny szyk wyrazów w każdym języku.
-- **Nowy 2-etapowy instalator i wsparcie macOS/Linux**: Odświeżony instalator Windows z automatycznym restartem oraz instalator CLI dla macOS i Linux.
-- **Ulepszony własny słownik**: Kliknięcie zebranego tekstu od razu wypełnia formularz słownika z możliwością edycji.
+- **Dopasowanie do motywów jasnych, ciemnych i własnych**: Wszystkie panele, menu, widżety limitów i powiadomienia Enhancer automatycznie dostosowują tło, tekst i kolor akcentu do Twojego motywu w czasie rzeczywistym.
+- **Stabilność okna ustawień**: Naprawiono problem, przez który kliknięcie wewnątrz okna Ustawień łatki mogło je zamknąć.
 
 </details>

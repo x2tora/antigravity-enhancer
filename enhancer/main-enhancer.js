@@ -542,7 +542,7 @@ function loadBootstrapPayload(forceRefresh = false, langId = null) {
 
       cachedBootstrapPayload = {
         disabled: false,
-        version: manifest.version || '4.1.0',
+        version: manifest.version || '4.1.1',
         repo: ENHANCER_REPO,
         code: rendererCode,
         gsapCode,
