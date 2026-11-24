@@ -1,5 +1,5 @@
 /**
- * Antigravity Enhancer v4.0.5 - Modular Renderer Enhancer Engine
+ * Antigravity Enhancer v4.0.6 - Modular Renderer Enhancer Engine
  * Features: 9-Language Zero-Restart i18n, Translation Engine 2.0 (Slice + Glossary),
  *           Quota Intelligence (Sparklines, Burn-Rate ETA & Alerts),
  *           Enhancer Control Center & Custom Shortcuts (x2tora/antigravity-enhancer)
@@ -11,7 +11,7 @@
   const ipc = electron_1 ? electron_1.ipcRenderer : null;
   const payload = (typeof __ENHANCER_PAYLOAD__ !== 'undefined' && __ENHANCER_PAYLOAD__) ? __ENHANCER_PAYLOAD__ : {};
   const ENHANCER_REPO = payload.repo || 'x2tora/antigravity-enhancer';
-  const ENHANCER_CURRENT_VERSION = payload.version || '4.0.5';
+  const ENHANCER_CURRENT_VERSION = payload.version || '4.0.6';
 
   const DEFAULT_PREFS = {
     shortcutCycleLang: 'Alt+Shift+L',
@@ -262,6 +262,7 @@
     if (/^[^\s]*[\\/][^\s]+\.[A-Za-z0-9]{1,8}$/.test(trimmed)) return true;
     if (/^[A-Za-z0-9_.\-]+\.(?:js|ts|tsx|jsx|mjs|cjs|json|md|ps1|vbs|exe|zip|txt|css|scss|html|yml|yaml|asar|png|jpg|jpeg|svg|ico|log|lock|py|go|rs|java|cpp|c|h|sh|bat|cmd)$/i.test(trimmed)) return true;
     if (trimmed.includes('](') || /^(?:Project:|Close\s+\S+\.\w+$)/i.test(trimmed)) return true;
+    if (/^(?:Close\s+)?(?:localhost|\d{1,3}(?:\.\d{1,3}){3})(?::\d+)?(?:\/\S*)?$/i.test(trimmed)) return true;
     // Project/branch/code identifiers (snake_case, kebab-case, camelCase, PascalCase, semver, git sha)
     if (/^[A-Za-z0-9]+(?:[_-][A-Za-z0-9]+)+$/.test(trimmed)) return true;
     if (/^(?:[a-z]+[A-Z][A-Za-z0-9]*|[A-Z][a-z]+[A-Z][A-Za-z0-9]*)$/.test(trimmed)) return true;
@@ -387,7 +388,19 @@
     const dynRules = (lang === 'ko') ? dynamicRules : (multiLangDynamicRules[lang] || []);
     for (const rule of dynRules) {
       if (rule.reg.test(trimmed)) {
-        return raw.replace(trimmed, trimmed.replace(rule.reg, rule.rep));
+        const replaced = trimmed.replace(rule.reg, (...args) => {
+          return rule.rep.replace(/\$(\d+)/g, (_, idxStr) => {
+            const cap = args[parseInt(idxStr, 10)];
+            if (typeof cap !== 'string') return '';
+            const capTrim = cap.trim();
+            if (!capTrim || /^\d+(?:\.\d+)?$/.test(capTrim)) return cap;
+            const sub = safeDictGet(activeDict, capTrim)
+              || safeDictGet(activeDict, capTrim.toLowerCase())
+              || (lowercaseDictByLang[lang] ? lowercaseDictByLang[lang].get(capTrim.toLowerCase()) : undefined);
+            return typeof sub === 'string' ? sub : cap;
+          });
+        });
+        return raw.replace(trimmed, () => replaced);
       }
     }
 
@@ -1379,7 +1392,29 @@
         }
       }
       if (current) sections.push(current);
-      return sections.map(sec => ({ ...sec, body: sec.lines.join('\n').trim() }));
+      const summaryToLang = {
+        '한국어': 'ko',
+        '日本語': 'ja',
+        '简体中文': 'zh-CN',
+        '繁體中文': 'zh-TW',
+        'Español': 'es',
+        'Français': 'fr',
+        'Deutsch': 'de',
+        'Русский': 'ru'
+      };
+      return sections.map((sec) => {
+        const rawBody = sec.lines.join('\n').trim();
+        const i18n = {};
+        const detailsRe = /<details>\s*<summary>([^<]+)<\/summary>([\s\S]*?)<\/details>/gi;
+        let dm;
+        while ((dm = detailsRe.exec(rawBody)) !== null) {
+          const lang = summaryToLang[dm[1].trim()];
+          if (lang && dm[2] && dm[2].trim()) i18n[lang] = dm[2].trim();
+        }
+        const enBody = rawBody.replace(/<details>[\s\S]*?<\/details>/gi, '').replace(/\n{3,}/g, '\n\n').trim();
+        const localized = (activeLanguage && activeLanguage !== 'en' && i18n[activeLanguage]) ? i18n[activeLanguage] : enBody;
+        return { ...sec, body: localized, enBody, i18n };
+      });
     };
 
     const animateBodyHeight = (prevHeight) => {
@@ -1626,7 +1661,7 @@
               applyBtn.disabled = true;
               applyBtn.textContent = h.updating;
               if (progWrap) progWrap.style.display = 'block';
-              const res = ipc && ipc.invoke ? await ipc.invoke('enhancer:apply-update') : null;
+              const res = ipc && ipc.invoke ? await ipc.invoke('enhancer:apply-update', info.updateRef || 'main') : null;
               if (res && res.ok) {
                 enhancerUpdateInfo = { ...(enhancerUpdateInfo || {}), hasUpdate: false, currentVersion: res.newVersion || ENHANCER_CURRENT_VERSION };
                 injectEnhancerUpdatePill();
@@ -1634,13 +1669,16 @@
                 if (progBar) progBar.style.width = '100%';
                 updateStatusEl.innerHTML = `<span style="color:#A0A3F6;font-weight:600;font-variant-numeric:tabular-nums;">v${escapeHtml(res.newVersion)}${escapeHtml(h.updateDoneSuffix)}</span>`;
                 applySlotEl.innerHTML = '';
-                const relaunchBtn = document.createElement('button');
-                relaunchBtn.type = 'button';
-                relaunchBtn.className = 'agy-enh-primary';
-                relaunchBtn.textContent = h.relaunchNow;
-                relaunchBtn.style.cssText = 'height:26px;padding:0 12px;border-radius:6px;background:#A0A3F6;border:none;color:#0B0B0E;font-size:11px;font-weight:600;cursor:pointer;';
-                relaunchBtn.onclick = () => ipc && ipc.invoke && ipc.invoke('enhancer:relaunch');
-                applySlotEl.appendChild(relaunchBtn);
+                const relaunchRes = ipc && ipc.invoke ? await ipc.invoke('enhancer:relaunch') : null;
+                if (!(relaunchRes && relaunchRes.ok)) {
+                  const relaunchBtn = document.createElement('button');
+                  relaunchBtn.type = 'button';
+                  relaunchBtn.className = 'agy-enh-primary';
+                  relaunchBtn.textContent = h.relaunchNow;
+                  relaunchBtn.style.cssText = 'height:26px;padding:0 12px;border-radius:6px;background:#A0A3F6;border:none;color:#0B0B0E;font-size:11px;font-weight:600;cursor:pointer;';
+                  relaunchBtn.onclick = () => ipc && ipc.invoke && ipc.invoke('enhancer:relaunch');
+                  applySlotEl.appendChild(relaunchBtn);
+                }
               } else {
                 applyBtn.disabled = false;
                 applyBtn.textContent = h.retryBtn;
@@ -1648,6 +1686,16 @@
               }
             };
             applySlotEl.appendChild(applyBtn);
+          } else if (info.releasePageUrl) {
+            const releaseBtn = document.createElement('button');
+            releaseBtn.type = 'button';
+            releaseBtn.className = 'agy-enh-primary';
+            releaseBtn.textContent = `${h.updateNow} ↗`;
+            releaseBtn.style.cssText = 'height:26px;padding:0 12px;border-radius:6px;background:#A0A3F6;border:none;color:#0B0B0E;font-size:11px;font-weight:600;cursor:pointer;';
+            releaseBtn.onclick = () => {
+              try { window.open(info.releasePageUrl, '_blank', 'noopener,noreferrer'); } catch { }
+            };
+            applySlotEl.appendChild(releaseBtn);
           }
         };
 

@@ -1,5 +1,5 @@
 /**
- * Antigravity Enhancer v4.0.5 - Main Process Bridge, Persistence & Secure In-App Updater
+ * Antigravity Enhancer v4.0.6 - Main Process Bridge, Persistence & Secure In-App Updater
  * Source Repo: https://github.com/x2tora/antigravity-enhancer
  */
 'use strict';
@@ -480,7 +480,7 @@ function loadBootstrapPayload(forceRefresh = false, langId = null) {
 
       cachedBootstrapPayload = {
         disabled: false,
-        version: manifest.version || '4.0.5',
+        version: manifest.version || '4.0.6',
         repo: ENHANCER_REPO,
         code: rendererCode,
         gsapCode,
@@ -526,7 +526,7 @@ function getFullStatus() {
   } catch (_) {}
 
   return {
-    enhancerVersion: manifest.version || '4.0.5',
+    enhancerVersion: manifest.version || '4.0.6',
     appVersion: (el && el.app && el.app.getVersion) ? el.app.getVersion() : 'unknown',
     repo: ENHANCER_REPO,
     enhancerDir,
@@ -635,8 +635,24 @@ async function checkRemoteUpdate() {
     throw new Error(`Unable to fetch update metadata from ${ENHANCER_REPO}`);
   }
 
-  const manifestVer = remoteManifest ? remoteManifest.version : null;
+  let manifestVer = remoteManifest ? remoteManifest.version : null;
   const releaseVer = (releaseData && releaseData.tag_name) ? String(releaseData.tag_name).replace(/^v/i, '') : null;
+  let updateRef = 'main';
+
+  if (releaseData && releaseData.tag_name && releaseVer && (!manifestVer || compareSemver(releaseVer, manifestVer) > 0)) {
+    try {
+      const tagUrl = `https://raw.githubusercontent.com/${ENHANCER_REPO}/${encodeURIComponent(releaseData.tag_name)}/enhancer/manifest.json?t=${Date.now()}`;
+      const tagResp = await fetchTextUrl(tagUrl, 8000);
+      if (tagResp.status === 200) {
+        const tagParsed = JSON.parse(tagResp.body);
+        if (tagParsed && tagParsed.version) {
+          remoteManifest = tagParsed;
+          manifestVer = tagParsed.version;
+          updateRef = String(releaseData.tag_name);
+        }
+      }
+    } catch { }
+  }
 
   let latestVer = localVer;
   let updateSource = 'none';
@@ -673,6 +689,7 @@ async function checkRemoteUpdate() {
     hasUpdate,
     canApplyInApp: Boolean(remoteManifest && (!hasUpdate || (manifestVer && compareSemver(manifestVer, localVer) > 0))),
     updateSource,
+    updateRef,
     currentVersion: localVer,
     remoteVersion: latestVer,
     releaseNotes: (releaseNotesI18n && releaseNotesI18n.en) || (remoteManifest && remoteManifest.releaseNotes) || (releaseData && releaseData.body) || '',
@@ -689,7 +706,7 @@ async function checkRemoteUpdate() {
 
 async function applyInAppUpdate(refBranch = 'main') {
   const local = getLocalManifest();
-  const prevVersion = local.version || '4.0.5';
+  const prevVersion = local.version || '4.0.6';
 
   broadcastEvent('enhancer:update-progress', { phase: 'manifest', percent: 8, message: 'Fetching signed manifest...' });
   const manifestUrl = `https://raw.githubusercontent.com/${ENHANCER_REPO}/${encodeURIComponent(refBranch)}/enhancer/manifest.json?t=${Date.now()}`;
@@ -882,9 +899,10 @@ function registerIpcHandlers() {
     }
   });
 
-  ipcMain.handle('enhancer:apply-update', async () => {
+  ipcMain.handle('enhancer:apply-update', async (_event, refBranch) => {
     try {
-      return await applyInAppUpdate('main');
+      const safeRef = (typeof refBranch === 'string' && /^[A-Za-z0-9._-]+$/.test(refBranch)) ? refBranch : 'main';
+      return await applyInAppUpdate(safeRef);
     } catch (err) {
       return { ok: false, error: err.message || String(err) };
     }

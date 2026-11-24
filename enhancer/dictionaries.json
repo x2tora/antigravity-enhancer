@@ -2970,7 +2970,7 @@
     "Select All": "모두 선택",
     "Select All Occurrences": "모든 항목 선택",
     "Select an option": "옵션을 선택하세요",
-    "Select an option...": "option... 선택",
+    "Select an option...": "옵션 선택...",
     "Select another model": "다른 모델 선택",
     "Select entire line": "전체 줄 선택",
     "Select Environment": "환경 선택",
@@ -3628,7 +3628,16 @@
     "Read, write, and format spreadsheets.": "스프레드시트를 읽고, 쓰고, 서식을 지정합니다.",
     "Read, edit, and export presentations.": "프레젠테이션을 읽고, 편집하고, 내보냅니다.",
     "Search, upload, download, and share files.": "파일을 검색, 업로드, 다운로드 및 공유합니다.",
-    "Check availability, schedule events, and RSVP.": "일정을 확인하고, 이벤트를 예약하며, 참석 여부를 회신합니다."
+    "Check availability, schedule events, and RSVP.": "일정을 확인하고, 이벤트를 예약하며, 참석 여부를 회신합니다.",
+    "Scroll turns up": "대화 턴 위로 스크롤",
+    "Scroll turns down": "대화 턴 아래로 스크롤",
+    "Open Diff": "Diff 열기",
+    "Edit Conversation Title": "대화 제목 편집",
+    "Inspect element to comment": "댓글을 달 요소 검사",
+    "Set up": "설정",
+    "Your This Computer setting": "현재 이 컴퓨터 설정",
+    "This Conversation": "이 대화",
+    "Only this conversation uses this preset.": "이 대화에서만 이 프리셋을 사용합니다."
   },
   "translations": {
     "ja": {
@@ -27476,11 +27485,13 @@
     },
     {
       "source": "^You have used some of your weekly limit, it will fully refresh in (.+)\\.$",
-      "flags": ""
+      "flags": "",
+      "rep": "주간 한도의 일부를 사용했으며, $1 후에 완전히 초기화됩니다."
     },
     {
       "source": "^You have used some of your 5-hour limit, it will fully refresh in (.+)\\.$",
-      "flags": ""
+      "flags": "",
+      "rep": "5시간 한도의 일부를 사용했으며, $1 후에 완전히 초기화됩니다."
     },
     {
       "source": "^Go Back\\s*(.*)$",

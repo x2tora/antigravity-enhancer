@@ -219,11 +219,11 @@ function createRendererHarness(initialLang = 'ko', seedDomFn = null, payloadOver
 // ============================================================================
 // F22: Modular Enhancer & Manifest Integrity
 // ============================================================================
-registerTest(1, 'F22', 'manifest.json v4.0.5 points to x2tora/antigravity-enhancer & matches SHA-256 digests', () => {
+registerTest(1, 'F22', 'manifest.json v4.0.6 points to x2tora/antigravity-enhancer & matches SHA-256 digests', () => {
   const manifestPath = path.join(ENHANCER_DIR, 'manifest.json');
   assert.ok(fs.existsSync(manifestPath), 'enhancer/manifest.json missing');
   const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-  assert.strictEqual(manifest.version, '4.0.5');
+  assert.strictEqual(manifest.version, '4.0.6');
   assert.strictEqual(manifest.repo, 'x2tora/antigravity-enhancer');
   assert.strictEqual(manifest.testedAppVersion, '2.34.0');
   assert.ok(manifest.releaseNotesI18n && typeof manifest.releaseNotesI18n === 'object', 'manifest.json must include releaseNotesI18n');
@@ -595,20 +595,47 @@ registerTest(3, 'F24', 'Native Antigravity Enhanced title menu integrates Patch 
   const vanillaBtn = modal.querySelector('#agy-hub-vanilla-btn');
   assert.ok(vanillaBtn, 'Restore Original button must exist inside General tab');
 
-  // Applying in-app update must immediately hide the top-bar Update Available pill
+  // Applying in-app update must immediately hide the top-bar Update Available pill and auto-relaunch
   const applySlot = modal.querySelector('#agy-hub-apply-slot');
   const applyBtn = applySlot && applySlot.querySelector('.agy-enh-primary');
   assert.ok(applyBtn, 'Apply update button must exist when update is available');
   await applyBtn.onclick();
   await new Promise(r => setTimeout(r, 30));
   assert.strictEqual(document.getElementById('antigravity-enhancer-update-btn'), null, 'Update pill must hide immediately after in-app update succeeds');
+  assert.ok(invoked.some(i => i.channel === 'enhancer:apply-update'), 'Applying update must invoke enhancer:apply-update');
+  assert.ok(invoked.some(i => i.channel === 'enhancer:relaunch'), 'Applying update must automatically invoke enhancer:relaunch after success');
 
-  // Verify 10-minute (600000ms) polling interval in renderer-enhancer.js
+  // Verify 10-minute (600000ms) polling interval in renderer-enhancer.js and tag-ref fallback in main-enhancer.js
   const rendererSrc = fs.readFileSync(path.join(ENHANCER_DIR, 'renderer-enhancer.js'), 'utf8');
   assert.ok(rendererSrc.includes('600000'), 'Background update check interval must be 10 minutes (600000 ms)');
+  const mainSrc = fs.readFileSync(path.join(ENHANCER_DIR, 'main-enhancer.js'), 'utf8');
+  assert.ok(mainSrc.includes('updateRef') && mainSrc.includes('encodeURIComponent(releaseData.tag_name)'), 'checkRemoteUpdate must fall back to tag-ref manifest when main manifest is CDN-cached');
+
+  // Verify localized in-app Changelog viewer (English & Korean <details> extraction)
+  const changelogBtn = modal.querySelector('#agy-hub-changelog-btn');
+  assert.ok(changelogBtn, 'Changelog button must exist inside General tab');
+  changelogBtn.onclick();
+  await new Promise(r => setTimeout(r, 30));
+  const changelogList = modal.querySelector('#agy-hub-changelog-list');
+  assert.ok(changelogList && changelogList.innerHTML.includes('Localized In-App Changelog'), 'Changelog viewer must display English summary when activeLanguage is en');
+  assert.ok(!changelogList.innerHTML.includes('<summary>'), 'Changelog viewer must strip raw <details>/<summary> tags');
+  if (qBtn) {
+    if (qBtn.onclick) qBtn.onclick({ stopPropagation: () => {}, preventDefault: () => {} });
+    else qBtn.click();
+    const koOpt = document.getElementById('antigravity-quick-opt-ko');
+    if (koOpt) {
+      if (koOpt.onclick) koOpt.onclick({ stopPropagation: () => {} });
+      else koOpt.click();
+      const koChangelogList = modal.querySelector('#agy-hub-changelog-list');
+      assert.ok(koChangelogList && koChangelogList.innerHTML.includes('인앱 변경 기록 다국어 지원'), 'Changelog viewer must display Korean <details> block when switched to ko');
+    }
+  }
+  const backBtn = modal.querySelector('#agy-hub-changelog-back');
+  if (backBtn) backBtn.onclick();
 
   // Restore Original button switches General tab to inline confirmation and invokes IPC on confirm
-  vanillaBtn.onclick();
+  const vanillaBtnAfter = modal.querySelector('#agy-hub-vanilla-btn');
+  vanillaBtnAfter.onclick();
   const confirmBtn = modal.querySelector('#agy-hub-confirm-restore');
   assert.ok(confirmBtn, 'Restore Original button must open inline confirmation');
   await confirmBtn.onclick();
@@ -1286,6 +1313,9 @@ registerTest(2, 'F26', 'isUntranslatableNoise filters Korean/shortcuts/timers/pa
   let branchBtn = null;
   let presetBtn = null;
   let staticSpan = null;
+  let optSpan = null;
+  let shortcutBtn = null;
+  let limitSpan = null;
   const env = createRendererHarness('ko', (document, patchEl) => {
     projBtn = patchEl(document.createElement('button'));
     projBtn.setAttribute('aria-label', 'Select project, current: project_5');
@@ -1295,10 +1325,19 @@ registerTest(2, 'F26', 'isUntranslatableNoise filters Korean/shortcuts/timers/pa
     presetBtn.setAttribute('aria-label', 'Agent permissions preset selector, current: Turbo');
     staticSpan = patchEl(document.createElement('span'));
     staticSpan.appendChild(new MockText('Pinned Actions'));
+    optSpan = patchEl(document.createElement('span'));
+    optSpan.appendChild(new MockText('Select an option...'));
+    shortcutBtn = patchEl(document.createElement('button'));
+    shortcutBtn.setAttribute('aria-label', 'Shortcut Ctrl+K for Open Conversation Picker');
+    limitSpan = patchEl(document.createElement('span'));
+    limitSpan.appendChild(new MockText('You have used some of your 5-hour limit, it will fully refresh in 2h 30m.'));
     document.body.appendChild(projBtn);
     document.body.appendChild(branchBtn);
     document.body.appendChild(presetBtn);
     document.body.appendChild(staticSpan);
+    document.body.appendChild(optSpan);
+    document.body.appendChild(shortcutBtn);
+    document.body.appendChild(limitSpan);
   });
 
   const hooks = env.window.__agEnhancerTestHooks;
@@ -1344,12 +1383,14 @@ registerTest(2, 'F26', 'isUntranslatableNoise filters Korean/shortcuts/timers/pa
   assert.strictEqual(hooks.isUntranslatableNoise('3117 lines added, 19 lines removed'), true, 'Diff stats must be filtered from collector');
   assert.strictEqual(hooks.isUntranslatableNoise('12 excluded'), true, 'Excluded count must be filtered from collector');
   assert.strictEqual(hooks.isUntranslatableNoise('1 active conversation and 1 archived conversation'), true, 'Active+archived count must be filtered from collector');
+  assert.strictEqual(hooks.isUntranslatableNoise('127.0.0.1:4176/auth'), true, 'Localhost IP:port URL must be filtered');
+  assert.strictEqual(hooks.isUntranslatableNoise('Close 127.0.0.1:4176'), true, 'Close + IP:port tab label must be filtered');
   assert.strictEqual(hooks.isUntranslatableNoise('Pinned Actions'), false, 'Valid English UI string must pass');
 
   assert.strictEqual(staticSpan.textContent, '고정된 작업');
   assert.strictEqual(projBtn.getAttribute('aria-label'), '프로젝트 선택, 현재: project_5');
   assert.strictEqual(branchBtn.getAttribute('aria-label'), '브랜치, 현재: main');
-  assert.strictEqual(presetBtn.getAttribute('aria-label'), '에이전트 권한 프리셋 선택기, 현재: Turbo');
+  assert.strictEqual(presetBtn.getAttribute('aria-label'), '에이전트 권한 프리셋 선택기, 현재: 터보 (Turbo)');
 
   const mainEnh = require(path.join(ENHANCER_DIR, 'main-enhancer.js'));
   const translatedMenu = mainEnh.translateMenuTemplate([
@@ -1364,4 +1405,22 @@ registerTest(2, 'F26', 'isUntranslatableNoise filters Korean/shortcuts/timers/pa
   assert.strictEqual(translatedMenu[2].submenu[0].label, '새 그룹');
   assert.strictEqual(translatedMenu[2].submenu[1].label, '그룹에서 제거');
   assert.strictEqual(translatedMenu[3].label, '프로젝트 삭제');
+
+  // Verify dynamicRules integrity & nested capture translation
+  const dicts = JSON.parse(fs.readFileSync(path.join(ENHANCER_DIR, 'dictionaries.json'), 'utf8'));
+  for (const r of dicts.dynamicRules) {
+    assert.strictEqual(typeof r.source, 'string');
+    assert.strictEqual(typeof r.rep, 'string');
+    assert.ok(r.rep.length > 0, `dynamicRule rep must not be empty for ${r.source}`);
+  }
+  for (const [lang, rules] of Object.entries(dicts.multiLangDynamicRules || {})) {
+    for (const r of rules) {
+      assert.strictEqual(typeof r.source, 'string');
+      assert.strictEqual(typeof r.rep, 'string');
+      assert.ok(r.rep.length > 0, `multiLangDynamicRules[${lang}] rep must not be empty for ${r.source}`);
+    }
+  }
+  assert.strictEqual(optSpan.textContent, '옵션 선택...');
+  assert.strictEqual(shortcutBtn.getAttribute('aria-label'), '대화 선택기 열기 단축키: Ctrl+K');
+  assert.strictEqual(limitSpan.textContent, '5시간 한도의 일부를 사용했으며, 2h 30m 후에 완전히 초기화됩니다.');
 });
