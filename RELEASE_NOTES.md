@@ -1,117 +1,132 @@
-# Antigravity Enhancer v4.1.1
+# Antigravity Enhancer v4.1.2
 
 ## Changes
-- **Adaptive Light/Dark & Custom Theme UI**: Every Enhancer panel, menu, quota widget, and toast now automatically matches your light/dark theme’s background, text, and accent colors in real time.
-- **Settings Modal Stability**: Fixed an issue where clicking inside the Patch Settings modal could occasionally dismiss the window.
+- **Antigravity 2.35.1 Support**: Updated compatibility and verified full patch support for Antigravity 2.35.1.
+- **Expanded Review & Git Translations**: Added missing review panel, diff line, and commit/push translations across all 15 languages, and improved untranslated text filtering.
+- **Live Installer Changelog Sync**: The Windows installer now automatically displays the latest release changes directly from the changelog in your language.
 
 <details>
 <summary>한국어</summary>
 
-- **라이트/다크 및 사용자 테마 자동 대응**: 제어 센터, 메뉴, 사용량 위젯, 알림 등 모든 Enhancer UI가 사용자 테마의 배경색·텍스트색·강조색에 맞춰 실시간으로 변경됩니다.
-- **설정 창 안정성 개선**: 패치 설정 창 내부를 클릭할 때 창이 간헐적으로 닫히던 문제를 수정했습니다.
+- **Antigravity 2.35.1 호환성 업데이트**: 최신 Antigravity 2.35.1 버전에 맞춰 호환성과 패치 동작을 업데이트했습니다.
+- **검토 및 Git UI 번역 보완**: 검토 패널, Diff 줄 표시, 커밋·푸시 안내 문구 번역을 15개 언어에 추가하고 미번역 수집 필터를 다듬었습니다.
+- **인스톨러 변경 사항 자동 동기화**: Windows 인스톨러가 항상 최신 `CHANGELOG` 내용을 각 언어로 자동 표시하도록 수정했습니다.
 
 </details>
 
 <details>
 <summary>日本語</summary>
 
-- **ライト／ダークおよびカスタムテーマ自動対応**: 設定モーダル、メニュー、クォータウィジェット、通知などすべての Enhancer UI がテーマの背景色・文字色・アクセント色にリアルタイムで追従します。
-- **設定モーダルの安定性向上**: パッチ設定ウィンドウ内のクリックでまれに閉じてしまう問題を修正しました。
+- **Antigravity 2.35.1 対応**: 最新の Antigravity 2.35.1 向けに互換性を更新しました。
+- **レビュー・Git 関連の翻訳を拡充**: レビュー画面、差分行表示、コミット／プッシュ関連の翻訳を全15言語に追加し、未翻訳収集フィルターを改善しました。
+- **インストーラーの変更履歴を自動同期**: Windows インストーラーが常に最新の変更履歴を各言語で自動表示するようになりました。
 
 </details>
 
 <details>
 <summary>简体中文</summary>
 
-- **自适应浅色/深色与自定义主题**：控制中心、菜单、配额组件和提示等所有 Enhancer 界面现在都会实时匹配您主题的背景色、文字色和强调色。
-- **设置窗口稳定性改进**：修复了点击补丁设置窗口内部时偶发关闭的问题。
+- **支持 Antigravity 2.35.1**：已更新兼容性以完整支持最新 Antigravity 2.35.1 版本。
+- **补充审查与 Git 界面翻译**：为全部 15 种语言补齐审查面板、差异行号及提交/推送提示翻译，并优化未翻译收集过滤。
+- **安装程序更新日志自动同步**：Windows 安装程序现已自动按当前语言读取并显示最新更新日志。
 
 </details>
 
 <details>
 <summary>繁體中文</summary>
 
-- **自動適應淺色/深色與自訂主題**：控制中心、選單、配額元件與提示等所有 Enhancer 介面現在都會即時套用您主題的背景色、文字色與強調色。
-- **設定視窗穩定性改進**：修復了點擊修補設定視窗內部時偶發關閉的問題。
+- **支援 Antigravity 2.35.1**：已更新相容性以完整支援最新 Antigravity 2.35.1 版本。
+- **補充審查與 Git 介面翻譯**：為全部 15 種語言補齊審查面板、差異行號與提交/推送提示翻譯，並最佳化未翻譯收集過濾。
+- **安裝程式更新日誌自動同步**：Windows 安裝程式現會自動依語言顯示最新更新日誌內容。
 
 </details>
 
 <details>
 <summary>Español</summary>
 
-- **UI adaptable a temas claros/oscuros y personalizados**: Todos los paneles, menús, widgets de cuota y avisos de Enhancer ahora siguen en tiempo real los colores de fondo, texto y acento de tu tema.
-- **Mayor estabilidad del panel de ajustes**: Se corrigió un problema que podía cerrar la ventana al hacer clic dentro de Ajustes del parche.
+- **Compatibilidad con Antigravity 2.35.1**: Se actualizó la compatibilidad para la versión más reciente de Antigravity 2.35.1.
+- **Más traducciones de revisión y Git**: Se añadieron traducciones de paneles de revisión, líneas de diff y confirmaciones en los 15 idiomas.
+- **Sincronización automática de novedades en el instalador**: El instalador de Windows ahora muestra automáticamente los últimos cambios en tu idioma.
 
 </details>
 
 <details>
 <summary>Français</summary>
 
-- **Interface adaptée aux thèmes clair/sombre et personnalisés** : Tous les panneaux, menus, widgets de quota et notifications suivent désormais en temps réel les couleurs de fond, de texte et d’accentuation de votre thème.
-- **Stabilité de la fenêtre des paramètres** : Correction d’un problème pouvant fermer la fenêtre lors d’un clic dans les paramètres du patch.
+- **Compatibilité Antigravity 2.35.1** : Mise à jour de la compatibilité pour la dernière version Antigravity 2.35.1.
+- **Traductions Révision et Git complétées** : Ajout des chaînes de révision, lignes de diff et commits dans les 15 langues.
+- **Synchronisation automatique du journal dans l’installateur** : L’installateur Windows affiche désormais automatiquement les dernières nouveautés dans votre langue.
 
 </details>
 
 <details>
 <summary>Deutsch</summary>
 
-- **Dynamische Hell-/Dunkel- & Theme-Anpassung**: Alle Enhancer-Oberflächen, Menüs, Kontingent-Widgets und Hinweise passen sich nun in Echtzeit an Hintergrund-, Text- und Akzentfarbe deines Themes an.
-- **Stabileres Einstellungsfenster**: Ein Problem wurde behoben, bei dem Klicks im Patch-Einstellungsfenster dieses gelegentlich schlossen.
+- **Antigravity 2.35.1-Unterstützung**: Kompatibilität für das neueste Antigravity 2.35.1 aktualisiert.
+- **Erweiterte Review- & Git-Übersetzungen**: Fehlende Übersetzungen für Review-Ansicht, Diff-Zeilen und Commits in allen 15 Sprachen ergänzt.
+- **Automatischer Installer-Changelog**: Der Windows-Installer zeigt nun automatisch die neuesten Änderungen in deiner Sprache an.
 
 </details>
 
 <details>
 <summary>Русский</summary>
 
-- **Адаптация к светлой, тёмной и пользовательским темам**: Все панели, меню, виджеты квоты и уведомления Enhancer теперь в реальном времени подстраиваются под цвета фона, текста и акцента вашей темы.
-- **Стабильность окна настроек**: Исправлена проблема, из-за которой клик внутри окна настроек патча мог случайно закрыть его.
+- **Поддержка Antigravity 2.35.1**: Обновлена совместимость с новой версией Antigravity 2.35.1.
+- **Дополнены переводы проверки и Git**: Добавлены переводы панели проверки, строк diff и коммитов для всех 15 языков.
+- **Автосинхронизация списка изменений в установщике**: Установщик Windows теперь автоматически показывает актуальные изменения на вашем языке.
 
 </details>
 
 <details>
 <summary>Português (Brasil)</summary>
 
-- **UI adaptável a temas claro/escuro e personalizados**: Todos os painéis, menus, widgets de cota e avisos do Enhancer agora acompanham em tempo real as cores de fundo, texto e destaque do seu tema.
-- **Estabilidade da janela de configurações**: Corrigido um problema em que cliques dentro das Configurações do Patch podiam fechar a janela.
+- **Suporte ao Antigravity 2.35.1**: Compatibilidade atualizada para a versão mais recente do Antigravity 2.35.1.
+- **Traduções de Revisão e Git ampliadas**: Adicionadas traduções para revisão, linhas de diff e commits nos 15 idiomas.
+- **Novidades sincronizadas no instalador**: O instalador do Windows agora exibe automaticamente as alterações mais recentes no seu idioma.
 
 </details>
 
 <details>
 <summary>Tiếng Việt</summary>
 
-- **Tự động thích ứng giao diện Sáng/Tối & chủ đề tùy chỉnh**: Mọi bảng điều khiển, menu, tiện ích hạn mức và thông báo của Enhancer giờ tự động đồng bộ màu nền, màu chữ và màu nhấn theo chủ đề của bạn theo thời gian thực.
-- **Ổn định cửa sổ cài đặt**: Khắc phục lỗi nhấp bên trong cửa sổ Cài đặt bản vá đôi khi làm đóng cửa sổ.
+- **Hỗ trợ Antigravity 2.35.1**: Cập nhật tương thích đầy đủ cho phiên bản Antigravity 2.35.1 mới nhất.
+- **Bổ sung bản dịch Đánh giá & Git**: Thêm bản dịch cho bảng đánh giá, dòng diff và commit/push trên cả 15 ngôn ngữ.
+- **Tự động đồng bộ nhật ký thay đổi trên trình cài đặt**: Trình cài đặt Windows giờ tự động hiển thị thay đổi mới nhất theo ngôn ngữ của bạn.
 
 </details>
 
 <details>
 <summary>Italiano</summary>
 
-- **UI adattiva a temi chiari/scuri e personalizzati**: Tutti i pannelli, menu, widget quota e notifiche di Enhancer ora si adattano in tempo reale ai colori di sfondo, testo e accento del tuo tema.
-- **Stabilità della finestra impostazioni**: Risolto un problema per cui un clic interno alle Impostazioni Patch poteva chiudere la finestra.
+- **Supporto per Antigravity 2.35.1**: Compatibilità aggiornata per l’ultima versione Antigravity 2.35.1.
+- **Traduzioni Revisione e Git ampliate**: Aggiunte traduzioni per pannello revisione, righe diff e commit in tutte le 15 lingue.
+- **Sincronizzazione automatica novità nell’installer**: L’installer Windows ora mostra automaticamente le ultime modifiche nella tua lingua.
 
 </details>
 
 <details>
 <summary>Bahasa Indonesia</summary>
 
-- **UI Adaptif Tema Terang/Gelap & Kustom**: Semua panel, menu, widget kuota, dan notifikasi Enhancer kini otomatis mengikuti warna latar, teks, dan aksen tema Anda secara real-time.
-- **Stabilitas Jendela Pengaturan**: Memperbaiki masalah ketika klik di dalam jendela Pengaturan Patch terkadang menutup jendela.
+- **Dukungan Antigravity 2.35.1**: Kompatibilitas diperbarui untuk versi terbaru Antigravity 2.35.1.
+- **Terjemahan Tinjauan & Git Diperluas**: Menambahkan terjemahan panel tinjauan, baris diff, dan commit di seluruh 15 bahasa.
+- **Sinkronisasi Otomatis Perubahan di Pemasang**: Pemasang Windows kini otomatis menampilkan daftar perubahan terbaru sesuai bahasa Anda.
 
 </details>
 
 <details>
 <summary>Türkçe</summary>
 
-- **Açık/Koyu ve Özel Temalara Tam Uyum**: Tüm Enhancer panelleri, menüleri, kota araçları ve bildirimleri artık temanızın arka plan, metin ve vurgu renklerine anlık olarak uyum sağlar.
-- **Ayarlar Penceresi Kararlılığı**: Yama Ayarları penceresinin içine tıklandığında pencerenin nadiren kapanmasına yol açan sorun giderildi.
+- **Antigravity 2.35.1 Desteği**: En yeni Antigravity 2.35.1 sürümü için uyumluluk güncellendi.
+- **İnceleme ve Git Çevirileri Genişletildi**: 15 dilin tamamına inceleme paneli, fark satırları ve commit/push çevirileri eklendi.
+- **Kurucuda Otomatik Değişiklik Günlüğü**: Windows kurucusu artık en son değişiklikleri kendi dilinizde otomatik olarak gösterir.
 
 </details>
 
 <details>
 <summary>Polski</summary>
 
-- **Dopasowanie do motywów jasnych, ciemnych i własnych**: Wszystkie panele, menu, widżety limitów i powiadomienia Enhancer automatycznie dostosowują tło, tekst i kolor akcentu do Twojego motywu w czasie rzeczywistym.
-- **Stabilność okna ustawień**: Naprawiono problem, przez który kliknięcie wewnątrz okna Ustawień łatki mogło je zamknąć.
+- **Wsparcie dla Antigravity 2.35.1**: Zaktualizowano zgodność z najnowszą wersją Antigravity 2.35.1.
+- **Uzupełnione tłumaczenia Przeglądu i Git**: Dodano tłumaczenia panelu przeglądu, linii diff oraz commitów we wszystkich 15 językach.
+- **Automatyczna lista zmian w instalatorze**: Instalator Windows automatycznie wyświetla teraz najnowsze zmiany w Twoim języku.
 
 </details>

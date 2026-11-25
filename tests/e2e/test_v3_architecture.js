@@ -219,13 +219,13 @@ function createRendererHarness(initialLang = 'ko', seedDomFn = null, payloadOver
 // ============================================================================
 // F22: Modular Enhancer & Manifest Integrity
 // ============================================================================
-registerTest(1, 'F22', 'manifest.json v4.1.1 points to x2tora/antigravity-enhancer & matches SHA-256 digests', () => {
+registerTest(1, 'F22', 'manifest.json v4.1.2 points to x2tora/antigravity-enhancer & matches SHA-256 digests', () => {
   const manifestPath = path.join(ENHANCER_DIR, 'manifest.json');
   assert.ok(fs.existsSync(manifestPath), 'enhancer/manifest.json missing');
   const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-  assert.strictEqual(manifest.version, '4.1.1');
+  assert.strictEqual(manifest.version, '4.1.2');
   assert.strictEqual(manifest.repo, 'x2tora/antigravity-enhancer');
-  assert.strictEqual(manifest.testedAppVersion, '2.34.0');
+  assert.strictEqual(manifest.testedAppVersion, '2.35.1');
   assert.ok(manifest.releaseNotesI18n && typeof manifest.releaseNotesI18n === 'object', 'manifest.json must include releaseNotesI18n');
   for (const l of ['en', 'ko', 'ja', 'zh-CN', 'zh-TW', 'es', 'fr', 'de', 'ru', 'pt-BR', 'vi', 'it', 'id', 'tr', 'pl']) {
     assert.ok(typeof manifest.releaseNotesI18n[l] === 'string' && manifest.releaseNotesI18n[l].length > 10, `Missing manifest releaseNotesI18n for ${l}`);
@@ -959,6 +959,21 @@ public static class ProbeMain
             }
             return 0;
         }
+        if (args.Length >= 2 && args[0] == "--check-changelog")
+        {
+            string md = System.IO.File.ReadAllText(args[1], System.Text.Encoding.UTF8);
+            var parsed = MainWindow.ParseLatestChangelogMarkdown(md);
+            foreach (string lang in InstallerI18n.SupportedLanguages)
+            {
+                if (!parsed.ContainsKey(lang) || parsed[lang].Count == 0)
+                {
+                    Console.Error.WriteLine("Missing parsed changelog bullets for " + lang);
+                    return 5;
+                }
+            }
+            Console.WriteLine("CHANGELOG_OK:" + parsed.Count + ":" + parsed["en"][0]);
+            return 0;
+        }
         if (args.Length >= 2 && args[0] == "--asar-check")
         {
             AsarMicroPatcher.EnsureBootstrapped(args[1], false);
@@ -1003,6 +1018,12 @@ public static class ProbeMain
       timeout: 15000
     });
     assert.ok(fallbackOut.includes('DETECTED:en'), 'DetectLanguage must fall back unsupported sv-SE -> en');
+
+    const changelogOut = execFileSync(probeExe, ['--check-changelog', path.join(ENHANCER_DIR, 'CHANGELOG.md')], {
+      encoding: 'utf8',
+      timeout: 15000
+    });
+    assert.ok(changelogOut.includes('CHANGELOG_OK:15:'), `Installer must parse latest CHANGELOG.md for all 15 languages, got: ${changelogOut}`);
 
     if (fs.existsSync(liveAsar)) {
       const workAsar = path.join(tmpDir, 'app.asar');
@@ -1479,6 +1500,11 @@ registerTest(2, 'F26', 'isUntranslatableNoise filters Korean/shortcuts/timers/pa
   assert.strictEqual(dicts.exactDict['Open in Antigravity IDE'], 'Antigravity IDE에서 열기');
   assert.strictEqual(dicts.exactDict['Skill Used'], '사용된 스킬');
   assert.strictEqual(dicts.exactDict['Connect to WSL'], 'WSL에 연결');
+  assert.strictEqual(dicts.exactDict['Stage and commit all changes'], '모든 변경 사항 스테이징 및 커밋');
+  assert.strictEqual(dicts.exactDict['No commits to push'], '푸시할 커밋 없음');
+  assert.strictEqual(hooks.isUntranslatableNoise('Catppuccin'), true);
+  assert.strictEqual(hooks.isUntranslatableNoise('F1F2FD'), true);
+  assert.strictEqual(hooks.isUntranslatableNoise('polyline|path'), true);
 });
 
 registerTest(2, 'F26', 'Translation Engine 3.0 translates inline composite DOM templates across languages and reverts preserving exact child element identity', () => {

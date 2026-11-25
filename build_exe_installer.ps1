@@ -1,5 +1,5 @@
 ﻿param(
-    [string]$Version = "4.1.1",
+    [string]$Version = "4.1.2",
     [string]$OutputExe = "",
     [string]$SignCertThumbprint = ""
 )
@@ -575,59 +575,68 @@ namespace AntigravityEnhancer
 
         private Dictionary<string, List<string>> LoadEmbeddedLatestChangelog()
         {
-            var result = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
             try
             {
                 using (Stream res = Assembly.GetExecutingAssembly().GetManifestResourceStream("enhancer_CHANGELOG.md.gz"))
                 {
-                    if (res == null) return result;
+                    if (res == null) return new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
                     using (GZipStream gz = new GZipStream(res, CompressionMode.Decompress))
                     using (StreamReader sr = new StreamReader(gz, Encoding.UTF8))
                     {
-                        string md = sr.ReadToEnd().Replace("\r\n", "\n");
-                        Match secMatch = Regex.Match(md, @"^##\s+\[[^\]]+\][^\n]*\n([\s\S]*?)(?:\n---\n|\n##\s+\[|$)", RegexOptions.Multiline);
-                        if (!secMatch.Success) return result;
-                        string rawSec = secMatch.Groups[1].Value;
-
-                        var map = new Dictionary<string, string>();
-                        map["한국어"] = "ko";
-                        map["日本語"] = "ja";
-                        map["简体中文"] = "zh-CN";
-                        map["繁體中文"] = "zh-TW";
-                        map["Español"] = "es";
-                        map["Français"] = "fr";
-                        map["Deutsch"] = "de";
-                        map["Русский"] = "ru";
-                        map["Português (Brasil)"] = "pt-BR";
-                        map["Português"] = "pt-BR";
-                        map["Tiếng Việt"] = "vi";
-                        map["Italiano"] = "it";
-                        map["Bahasa Indonesia"] = "id";
-                        map["Türkçe"] = "tr";
-                        map["Polski"] = "pl";
-
-                        foreach (Match dm in Regex.Matches(rawSec, @"<details>\s*<summary>([^<]+)</summary>([\s\S]*?)</details>", RegexOptions.IgnoreCase))
-                        {
-                            string label = dm.Groups[1].Value.Trim();
-                            string langCode;
-                            if (map.TryGetValue(label, out langCode))
-                            {
-                                List<string> items = ExtractBulletLines(dm.Groups[2].Value);
-                                if (items.Count > 0) result[langCode] = items;
-                            }
-                        }
-
-                        string enRaw = Regex.Replace(rawSec, @"<details>[\s\S]*?</details>", "", RegexOptions.IgnoreCase);
-                        List<string> enItems = ExtractBulletLines(enRaw);
-                        if (enItems.Count > 0) result["en"] = enItems;
+                        return ParseLatestChangelogMarkdown(sr.ReadToEnd());
                     }
                 }
             }
-            catch { }
+            catch
+            {
+                return new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+            }
+        }
+
+        public static Dictionary<string, List<string>> ParseLatestChangelogMarkdown(string rawMd)
+        {
+            var result = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+            if (string.IsNullOrEmpty(rawMd)) return result;
+            string md = rawMd.Replace("\r\n", "\n");
+            Match secMatch = Regex.Match(md, @"^##\s+\[[^\]]+\][^\n]*\n([\s\S]*?)(?:\n---\s*\n|\n##\s+\[|\z)", RegexOptions.Multiline);
+            if (!secMatch.Success) return result;
+            string rawSec = secMatch.Groups[1].Value;
+
+            var map = new Dictionary<string, string>();
+            map["한국어"] = "ko";
+            map["日本語"] = "ja";
+            map["简体中文"] = "zh-CN";
+            map["繁體中文"] = "zh-TW";
+            map["Español"] = "es";
+            map["Français"] = "fr";
+            map["Deutsch"] = "de";
+            map["Русский"] = "ru";
+            map["Português (Brasil)"] = "pt-BR";
+            map["Português"] = "pt-BR";
+            map["Tiếng Việt"] = "vi";
+            map["Italiano"] = "it";
+            map["Bahasa Indonesia"] = "id";
+            map["Türkçe"] = "tr";
+            map["Polski"] = "pl";
+
+            foreach (Match dm in Regex.Matches(rawSec, @"<details>\s*<summary>([^<]+)</summary>([\s\S]*?)</details>", RegexOptions.IgnoreCase))
+            {
+                string label = dm.Groups[1].Value.Trim();
+                string langCode;
+                if (map.TryGetValue(label, out langCode))
+                {
+                    List<string> items = ExtractBulletLines(dm.Groups[2].Value);
+                    if (items.Count > 0) result[langCode] = items;
+                }
+            }
+
+            string enRaw = Regex.Replace(rawSec, @"<details>[\s\S]*?</details>", "", RegexOptions.IgnoreCase);
+            List<string> enItems = ExtractBulletLines(enRaw);
+            if (enItems.Count > 0) result["en"] = enItems;
             return result;
         }
 
-        private List<string> ExtractBulletLines(string block)
+        private static List<string> ExtractBulletLines(string block)
         {
             var list = new List<string>();
             if (string.IsNullOrEmpty(block)) return list;
@@ -641,7 +650,7 @@ namespace AntigravityEnhancer
                     cleaned = Regex.Replace(cleaned, @"`([^`]+)`", "$1");
                     if (cleaned.EndsWith(".")) cleaned = cleaned.Substring(0, cleaned.Length - 1);
                     if (!string.IsNullOrEmpty(cleaned)) list.Add(cleaned);
-                    if (list.Count >= 3) break;
+                    if (list.Count >= 5) break;
                 }
             }
             return list;

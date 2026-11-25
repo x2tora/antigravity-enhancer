@@ -1,5 +1,5 @@
 /**
- * Antigravity Enhancer v4.1.1 - Modular Renderer Enhancer Engine
+ * Antigravity Enhancer v4.1.2 - Modular Renderer Enhancer Engine
  * Features: 15-Language Zero-Restart i18n, Translation Engine 3.0 (Slice + Composite DOM + Glossary),
  *           Quota Intelligence (Sparklines, Burn-Rate ETA & Alerts),
  *           Enhancer Control Center & Custom Shortcuts (x2tora/antigravity-enhancer)
@@ -11,7 +11,7 @@
   const ipc = electron_1 ? electron_1.ipcRenderer : null;
   const payload = (typeof __ENHANCER_PAYLOAD__ !== 'undefined' && __ENHANCER_PAYLOAD__) ? __ENHANCER_PAYLOAD__ : {};
   const ENHANCER_REPO = payload.repo || 'x2tora/antigravity-enhancer';
-  const ENHANCER_CURRENT_VERSION = payload.version || '4.1.1';
+  const ENHANCER_CURRENT_VERSION = payload.version || '4.1.2';
 
   const DEFAULT_PREFS = {
     shortcutCycleLang: 'Alt+Shift+L',
@@ -287,6 +287,8 @@
     // Brand / model / codename standalone labels & dynamic multi-word Close <Title>
     if (/(.)\1{5,}/.test(trimmed)) return true;
     if (/^(?:Antigravity|Antigravity Enhancer|Argon|Gemini|Migratify|Gero|Supabase|Gmail|Inter|Google Sans|Object|Users|Desktop|e2e|_ns)$/i.test(trimmed)) return true;
+    if (/^(?:Catppuccin|Dracula|Everforest|Gruvbox Material|Monokai|Nord|One Dark Pro|One Light|Tokyo Night|Solarized Dark|Solarized Light|Vesper)$/i.test(trimmed)) return true;
+    if (/^[0-9A-Fa-f]{6}$/.test(trimmed) || /^[A-Za-z_][A-Za-z0-9_]*\.[A-Za-z0-9_.]*$/.test(trimmed) || /^[a-z0-9_]+\|[a-z0-9_|]+$/i.test(trimmed)) return true;
     if (/^(?:Notion|Context7|Linear|Dynatrace|Stripe|Canva|Figma|Mobbin|Dropbox|Granola|Cloudflare|Netlify|Railway|Spacefast|Wix|Arize AX|Auth0|Base44|Better Stack|Browserbase|Clerk|Bigin|Intercom|Levels\.fyi|Semrush|Looker|n8n|Kling AI|Atlassian Teamwork Graph CLI|Google Workspace|Google Docs|Google Sheets|Google Slides|Google Calendar|Data Agent Kit|Robotics|Genomics|Chemistry|Descrybe Legal Engine|Midpage Legal Research|Science Overview|Structural Biology|Scientific Literature)$/i.test(trimmed)) return true;
     if (/^(?:Gemini\s+\d+|Google AI\b|Gemini API$|Claude\s+(?:Opus|Sonnet|Haiku)\s+[\d.]+$|(?:PowerShell|Node\.js|Python|Electron|Chrome)\s+[\d.]+$)/i.test(trimmed)) return true;
     if (/^(?:Ctrl|Alt|Shift|Meta|Cmd|Opt|Enter|Esc|Tab|Space|Backspace|Delete)$/i.test(trimmed)) return true;
