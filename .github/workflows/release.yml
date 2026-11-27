@@ -80,7 +80,7 @@ jobs:
           $manifest = Get-Content .\enhancer\manifest.json -Raw -Encoding UTF8 | ConvertFrom-Json
           $notes = if ($manifest.releaseNotesI18n -and $manifest.releaseNotesI18n.ko) { $manifest.releaseNotesI18n.ko } else { $manifest.releaseNotes }
           if ($notes.Length -gt 600) { $notes = $notes.Substring(0, 597) + "..." }
-          $releaseUrl = "https://github.com/x2tora/antigravity-enhancer/releases/tag/$($env:TAG_NAME)"
+          $downloadUrl = "https://github.com/x2tora/antigravity-enhancer/releases/download/$($env:TAG_NAME)/Antigravity-Enhancer-$($env:TAG_NAME)-Setup.exe"
           $siteUrl = "https://antigravity.xitora.cc"
           $avatarUrl = "https://raw.githubusercontent.com/x2tora/antigravity-enhancer/main/assets/icon.png"
           $payload = @{
@@ -102,7 +102,7 @@ jobs:
                     type = 2
                     style = 5
                     label = "릴리스 다운로드"
-                    url = $releaseUrl
+                    url = $downloadUrl
                   }
                 )
               }
