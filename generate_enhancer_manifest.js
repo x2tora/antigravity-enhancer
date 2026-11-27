@@ -7,7 +7,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
-const VERSION = '4.1.2';
+const VERSION = '4.1.3';
 const REPO = 'x2tora/antigravity-enhancer';
 const enhancerDir = path.join(__dirname, 'enhancer');
 
@@ -90,7 +90,7 @@ const manifest = {
   version: VERSION,
   channel: 'stable',
   minAppVersion: '2.30.0',
-  testedAppVersion: '2.35.1',
+  testedAppVersion: '2.35.2',
   repo: REPO,
   updatedAt: new Date().toISOString(),
   releaseNotes: releaseNotesI18n.en || 'v3.3.0: Flush AntigravityEnhanced title branding, 10-minute update polling with native-style Update Available top-bar pill, localized Other quota group & fixed ACTIVE badge wrapping, Hydrogen in Gemini model list (nonexistent Pro removed), OS language auto-detection on first launch, 9-language copy toast & quota setting labels, and dead rollback code cleanup.',

@@ -219,13 +219,13 @@ function createRendererHarness(initialLang = 'ko', seedDomFn = null, payloadOver
 // ============================================================================
 // F22: Modular Enhancer & Manifest Integrity
 // ============================================================================
-registerTest(1, 'F22', 'manifest.json v4.1.2 points to x2tora/antigravity-enhancer & matches SHA-256 digests', () => {
+registerTest(1, 'F22', 'manifest.json v4.1.3 points to x2tora/antigravity-enhancer & matches SHA-256 digests', () => {
   const manifestPath = path.join(ENHANCER_DIR, 'manifest.json');
   assert.ok(fs.existsSync(manifestPath), 'enhancer/manifest.json missing');
   const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-  assert.strictEqual(manifest.version, '4.1.2');
+  assert.strictEqual(manifest.version, '4.1.3');
   assert.strictEqual(manifest.repo, 'x2tora/antigravity-enhancer');
-  assert.strictEqual(manifest.testedAppVersion, '2.35.1');
+  assert.strictEqual(manifest.testedAppVersion, '2.35.2');
   assert.ok(manifest.releaseNotesI18n && typeof manifest.releaseNotesI18n === 'object', 'manifest.json must include releaseNotesI18n');
   for (const l of ['en', 'ko', 'ja', 'zh-CN', 'zh-TW', 'es', 'fr', 'de', 'ru', 'pt-BR', 'vi', 'it', 'id', 'tr', 'pl']) {
     assert.ok(typeof manifest.releaseNotesI18n[l] === 'string' && manifest.releaseNotesI18n[l].length > 10, `Missing manifest releaseNotesI18n for ${l}`);
