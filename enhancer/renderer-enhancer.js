@@ -1,5 +1,5 @@
 /**
- * Antigravity Enhancer v4.1.3 - Modular Renderer Enhancer Engine
+ * Antigravity Enhancer v4.1.4 - Modular Renderer Enhancer Engine
  * Features: 15-Language Zero-Restart i18n, Translation Engine 3.0 (Slice + Composite DOM + Glossary),
  *           Quota Intelligence (Sparklines, Burn-Rate ETA & Alerts),
  *           Enhancer Control Center & Custom Shortcuts (x2tora/antigravity-enhancer)
@@ -11,7 +11,7 @@
   const ipc = electron_1 ? electron_1.ipcRenderer : null;
   const payload = (typeof __ENHANCER_PAYLOAD__ !== 'undefined' && __ENHANCER_PAYLOAD__) ? __ENHANCER_PAYLOAD__ : {};
   const ENHANCER_REPO = payload.repo || 'x2tora/antigravity-enhancer';
-  const ENHANCER_CURRENT_VERSION = payload.version || '4.1.3';
+  const ENHANCER_CURRENT_VERSION = payload.version || '4.1.4';
 
   const DEFAULT_PREFS = {
     shortcutCycleLang: 'Alt+Shift+L',
